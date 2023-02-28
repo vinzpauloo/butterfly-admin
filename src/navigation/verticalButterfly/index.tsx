@@ -79,7 +79,7 @@ const navigation = (): VerticalNavItemsType => {
         children: [
           {
             title: 'Upload Content',
-            path: '/apps/user/list/'
+            path: '/studio/upload/'
           },
           {
             title: 'Content Approval',
