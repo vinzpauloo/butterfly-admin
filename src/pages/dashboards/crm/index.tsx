@@ -1,114 +1,77 @@
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
+import Box from '@mui/material/Box'
+import { useTheme } from '@mui/material/styles'
 
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
-// ** Type Import
-import { CardStatsCharacterProps } from 'src/@core/components/card-statistics/types'
-
-// ** Custom Components Imports
-import CardStatisticsCharacter from 'src/@core/components/card-statistics/card-stats-with-image'
-import CardStatisticsVerticalComponent from 'src/@core/components/card-statistics/card-stats-vertical'
 
 // ** Styled Component Import
 import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 // ** Demo Components Imports
-import CrmTotalSales from 'src/views/dashboards/crm/CrmTotalSales'
-import CrmWeeklySales from 'src/views/dashboards/crm/CrmWeeklySales'
-import CrmTotalGrowth from 'src/views/dashboards/crm/CrmTotalGrowth'
-import CrmUpgradePlan from 'src/views/dashboards/crm/CrmUpgradePlan'
-import CrmTransactions from 'src/views/dashboards/crm/CrmTransactions'
-import CrmRevenueReport from 'src/views/dashboards/crm/CrmRevenueReport'
-import CrmSalesOverview from 'src/views/dashboards/crm/CrmSalesOverview'
-import CrmMeetingSchedule from 'src/views/dashboards/crm/CrmMeetingSchedule'
-import CrmDeveloperMeetup from 'src/views/dashboards/crm/CrmDeveloperMeetup'
-import CrmActivityTimeline from 'src/views/dashboards/crm/CrmActivityTimeline'
+import AnalyticsBFlyCC from 'src/views/dashboards/analytics/AnalyticsBFlyCC'
+import AnalyticsBFlyActiveUsers from 'src/views/dashboards/analytics/AnalyticsBFlyActiveUsers'
+import AnalyticsBFlyTopDownloadedVideos from 'src/views/dashboards/analytics/AnalyticsBFlyTopDownloadedVideos'
+import AnalyticsBFlyTopMostFollowed from 'src/views/dashboards/analytics/AnalyticsBFlyTopMostFollowed'
+import AnalyticsBFlyTopShared from 'src/views/dashboards/analytics/AnalyticsBFlyTopShared'
+import AnalyticsBFlyTotalViewedContents from 'src/views/dashboards/analytics/AnalyticsBFlyTotalViewedContents'
 
-const data: CardStatsCharacterProps[] = [
-  {
-    stats: '13.7k',
-    title: 'Ratings',
-    trendNumber: '+38%',
-    chipColor: 'primary',
-    chipText: 'Year of 2022',
-    src: '/images/cards/pose_f9.png'
-  },
-  {
-    stats: '24.5k',
-    trend: 'negative',
-    title: 'Sessions',
-    trendNumber: '-22%',
-    chipText: 'Last Week',
-    chipColor: 'secondary',
-    src: '/images/cards/pose_m18.png'
-  }
-]
+// ** Demo Charts Imports
+import ChartjsBarChart from 'src/views/charts/chartjs/ChartjsBarChart'
+
+// ** Third Party Styles Import
+import 'chart.js/auto'
+
 
 const CRMDashboard = () => {
 
-  return <>Dashboard</>
+  // ** Hook
+  const theme = useTheme()
+
+  // Vars
+  const barChartYellow = '#ffcf5c'
+  const borderColor = theme.palette.divider
+  const labelColor = theme.palette.text.disabled
+
 
   return (
-    <ApexChartWrapper>
-      <Grid container spacing={6}>
-        <Grid item xs={12} sm={6} md={3} sx={{ pt: theme => `${theme.spacing(12.25)} !important` }}>
-          <CardStatisticsCharacter data={data[0]} />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3} sx={{ pt: theme => `${theme.spacing(12.25)} !important` }}>
-          <CardStatisticsCharacter data={data[1]} />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <CrmTransactions />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <CrmTotalSales />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <CrmRevenueReport />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <CrmSalesOverview />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <CrmActivityTimeline />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Grid container spacing={6}>
-            <Grid item xs={12} sm={8}>
-              <CrmWeeklySales />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Grid container spacing={6}>
-                <Grid item xs={6} sm={12}>
-                  <CrmTotalGrowth />
-                </Grid>
-                <Grid item xs={6} sm={12}>
-                  <CardStatisticsVerticalComponent
-                    stats='862'
-                    trend='negative'
-                    trendNumber='-18%'
-                    title='New Project'
-                    subtitle='Yearly Project'
-                    icon={<Icon icon='mdi:briefcase-variant-outline' />}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
+    <DatePickerWrapper>
+      <ApexChartWrapper>
+
+        <Grid container spacing={6}>
+
+          <Grid item xs={12} md={4}>
+
+            <Box display='grid' gridTemplateColumns="repeat(1, 1fr)" gap={6}> 
+
+            <AnalyticsBFlyCC />
+
+            <AnalyticsBFlyActiveUsers />
+
+            <AnalyticsBFlyTopDownloadedVideos />
+
+            <AnalyticsBFlyTopMostFollowed />
+
+            <AnalyticsBFlyTopShared />
+
+            </Box>
+
           </Grid>
+
+          <Grid item xs={12} md={8} spacing={6}>
+
+            <Box display='grid' gridTemplateColumns="repeat(1, 1fr)" gap={6}> 
+              <AnalyticsBFlyTotalViewedContents />
+
+              <ChartjsBarChart yellow={barChartYellow} labelColor={labelColor} borderColor={borderColor} />
+            </Box>
+
+          </Grid>
+
         </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <CrmUpgradePlan />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <CrmMeetingSchedule />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <CrmDeveloperMeetup />
-        </Grid>
-      </Grid>
-    </ApexChartWrapper>
+
+      </ApexChartWrapper>
+    </DatePickerWrapper>
   )
 }
 
