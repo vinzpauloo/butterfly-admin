@@ -4,8 +4,7 @@ import { ReactNode } from 'react'
 // ** MUI Imports
 import { Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import Typography from '@mui/material/Typography'
-import Link from '@mui/material/Link'
+import Box from '@mui/material/Box'
 
 // ** Layout Imports
 // !Do not remove this Layout import
@@ -67,7 +66,10 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
         navMenu: {
           branding: (props) => <AppBrand {...props} />,
           navItems: VerticalNavItems(),
-          // lockedIcon: <></>,
+          lockedIcon: 
+          <Box
+            sx={{ cursor:'pointer', ml: 6 , display: 'flex', color: theme => theme.palette.primary.main }}
+          ><Icon icon='mdi:menu' fontSize={20} /></Box>,
           // unlockedIcon: <></>,
           // { hidden, settings, children, scrollToTop, footerProps, contentHeightFixed, verticalLayoutProps }
           // content: () => <VerticalLayout hidden={hidden} settings={settings}  />
