@@ -1,6 +1,9 @@
+import React from 'react'
+
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
+import { useTheme } from '@mui/material/styles'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -17,6 +20,10 @@ import NotificationDropdown, {
   NotificationsType
 } from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import ShortcutsDropdown, { ShortcutsType } from 'src/@core/layouts/components/shared-components/ShortcutsDropdown'
+import { Grid, Typography } from '@mui/material'
+
+// ** Date
+import { toDate, format } from 'date-fns';
 
 interface Props {
   hidden: boolean
@@ -121,9 +128,17 @@ const shortcuts: ShortcutsType[] = [
   }
 ]
 
+
 const AppBarContent = (props: Props) => {
+
+  // ** Hook
+  const theme = useTheme()
+
   // ** Props
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
+
+  const currentDate = toDate(new Date())
+  const formattedDate = format(currentDate, 'MMMM d, yyyy');
 
   return (
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -136,10 +151,24 @@ const AppBarContent = (props: Props) => {
         <Autocomplete hidden={hidden} settings={settings} />
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
-        <LanguageDropdown settings={settings} saveSettings={saveSettings} />
-        <ModeToggler settings={settings} saveSettings={saveSettings} />
-        <NotificationDropdown settings={settings} notifications={notifications} />
-        <UserDropdown settings={settings} />
+          
+        <Box gap={3} className='' sx={{ display: 'flex', flexDirection:'column', alignItems: 'center',paddingBlock:'1rem' }}>
+
+          <Box sx={{display:'flex', alignItems:'center'}} gap={2}>
+            <NotificationDropdown settings={settings} notifications={notifications} />
+            <ModeToggler settings={settings} saveSettings={saveSettings} />
+            {/* <Box component='div' sx={{padding:'8px',display:'inline-flex'}}><Icon icon='mdi:message-outline' /></Box> */}
+            <Typography sx={{color : theme.palette.primary.main, fontWeight:700 }}>Admin</Typography>
+            <UserDropdown settings={settings} />
+          </Box>
+
+          <Grid sx={{display:'flex', justifyContent:'flex-end',alignItems:'center'}} container spacing={2}>
+            <LanguageDropdown settings={settings} saveSettings={saveSettings} />
+            <Box><Typography>{formattedDate.toString()}</Typography></Box>
+          </Grid>
+
+        </Box>
+
       </Box>
     </Box>
   )

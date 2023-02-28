@@ -130,7 +130,7 @@ const ChartjsBarChart = (props: BarProp) => {
   return (
     <Card>
       <CardHeader
-        title='Latest Statistics'
+        title='Active Users (VIP & Gold)'
         sx={{
           flexDirection: ['column', 'row'],
           alignItems: ['flex-start', 'center'],
