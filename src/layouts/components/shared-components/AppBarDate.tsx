@@ -48,7 +48,7 @@ const AppBarDate = () => {
 
     return (
         <>
-            <StyledDateBox><Typography color={theme => theme.palette.common.white}>{ time }</Typography></StyledDateBox>
+            <StyledDateBox><Typography variant='caption' color={theme => theme.palette.common.white}>{ time }</Typography></StyledDateBox>
         </>
     )
 }

@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 // ** MUI Components
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
+import Button, { ButtonProps } from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
@@ -14,7 +14,7 @@ import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import { styled, useTheme } from '@mui/material/styles'
+import { styled, useTheme, darken } from '@mui/material/styles'
 import MuiCard, { CardProps } from '@mui/material/Card'
 import InputAdornment from '@mui/material/InputAdornment'
 
@@ -45,7 +45,7 @@ const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
-  fontSize: '0.875rem',
+  fontSize: '0.75rem',
   textDecoration: 'none',
   color: theme.customBflyColors.grayInputText
 }))
@@ -57,10 +57,20 @@ const RightLogoImage = styled('img')(({ theme }) => ({
   [theme.breakpoints.up('xl')]: { width: '220px' },
 }))
 
+const LoginButton = styled(Button)<ButtonProps>(({theme}) => ({
+    display:'block', 
+    mb: 7, width:'100%', 
+    maxWidth:'170px', 
+    marginInline:'auto',
+    '&:hover' : {
+      backgroundColor: darken( theme.palette.primary.main, 0.5 )
+    }
+}))  
 
+// ** Yup Schema
 const schema = yup.object().shape({
     email: yup.string().email('Email must be a valid email.').required('Email is a required field.'),
-    password: yup.string().min(5).required('test')
+    password: yup.string().min(5).required('Password is required')
   })
 
   //remove default values if you want no initial values on render page
@@ -217,12 +227,12 @@ const LoginPage = () => {
                 <Box
                   sx={{ mt:2, mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
                 >
-                  <Typography color={theme.palette.error.main} variant='body2'>{errors.email && errors.email.message}</Typography>
+                  <Typography color={theme.palette.error.main} variant='caption'>{errors.email && errors.email.message}</Typography>
                   <LinkStyled href='/forgot-password'>Forgot Password?</LinkStyled>
                 </Box>
-                <Button color='primary' size='large' type='submit' variant='contained' sx={{ display:'block', mb: 7, width:'100%', maxWidth:'170px', marginInline:'auto' }}>
+                <LoginButton color='primary' size='large' type='submit' variant='contained'>
                   Login
-                </Button>
+                </LoginButton>
               </form>
             </Box>
           </Grid>
