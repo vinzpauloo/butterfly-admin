@@ -456,20 +456,20 @@ const UserList = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: 'auto', overflow: 'hidden' }}>
       <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'space-between'], mb: 5 }}>
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 5 }}>
-          <Box sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography>Operators</Typography>
-          </Box>
-          <Box sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Button onClick={() => alert(`TEST`)} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Typography>Operators</Typography>
+          </Button>
+          <Button sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Typography>Super Agent</Typography>
-          </Box>
-          <Box sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          </Button>
+          <Button sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Typography>Content Creators</Typography>
-          </Box>
+          </Button>
         </Box>
 
-        <Box sx={{ border: 1, height: '56px', minWidth: '224px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Button sx={{ border: 1, height: '56px', minWidth: '224px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Typography>Create Account</Typography>
-        </Box>
+        </Button>
       </Box>
       <Root sx={{ minHeight: 540 }}>
         <table aria-label="custom pagination table" style={{ overflowX: 'auto', maxWidth: '100%', marginBottom: '1rem', tableLayout: 'fixed' }}> {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
