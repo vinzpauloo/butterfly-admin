@@ -23,7 +23,7 @@ const ModeToggler = (props: Props) => {
 
   const handleModeToggle = () => {
     if (settings.mode === 'light') {
-      handleModeChange('dark' as Mode)
+      handleModeChange('semi-dark' as Mode)
     } else {
       handleModeChange('light' as Mode)
     }
