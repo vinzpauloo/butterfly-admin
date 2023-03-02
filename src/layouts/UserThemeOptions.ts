@@ -18,6 +18,12 @@ declare module '@mui/system' {
       grayInputBG?: React.CSSProperties['color'],
       grayInputText?: React.CSSProperties['color'],
       dateColorBG?: React.CSSProperties['color'],
+      borderBrown?: React.CSSProperties['color'],
+      menuBG? : React.CSSProperties['color'],
+      menuItemsBG? : React.CSSProperties['color']
+    };
+    customTypography : {
+      fontFamilyPoppins : string
     };
   }
   // allow configuration using `createTheme`
@@ -27,6 +33,12 @@ declare module '@mui/system' {
       grayInputBG?: React.CSSProperties['color'],
       grayInputText?: React.CSSProperties['color'],
       dateColorBG?: React.CSSProperties['color'],
+      borderBrown?: React.CSSProperties['color'],
+      menuBG? : React.CSSProperties['color'],
+      menuItemsBG? : React.CSSProperties['color']
+    };
+    customTypography : {
+      fontFamilyPoppins : string
     };
   }
 }
@@ -48,6 +60,9 @@ const UserThemeOptions = (): ThemeOptions => {
       grayInputBG: '#F1F1F1',
       grayInputText: '#757575',
       dateColorBG : '#3C4B64',
+      borderBrown : '#B59770',
+      menuBG : '#090909',
+      menuItemsBG : '#0e0e0e'
     },
     palette:{
       primary: {
@@ -154,6 +169,9 @@ const UserThemeOptions = (): ThemeOptions => {
     typography: {
       fontFamily:
         '"Rubik", sans-serif',
+    },
+    customTypography: {
+      fontFamilyPoppins: '"Poppins", sans-serif'
     },
     shadows: mode === 'light' ? [
       'none',
