@@ -217,14 +217,20 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
             name="notes"
           />
           <DialogActions>
-            <Box>
-              <Button onClick={onClose} color="primary">
-                Cancel
-              </Button>
-              <Button type="submit" color="primary">
-                Save
-              </Button>
-            </Box>
+            <Button onClick={onClose} sx={{ backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
+                backgroundColor: '#7899ac',
+              }, }}>
+              <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
+                  transition: 'transform 0.2s ease-in-out',
+                },}}>Cancel</Typography>
+            </Button>
+            <Button type="submit" sx={{ backgroundColor: '#9747FF', color: 'white', width: '200px', '&:hover': {
+                backgroundColor: '#9747FF',
+              }, }}>
+              <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
+                  transition: 'transform 0.2s ease-in-out',
+                },}}>Update</Typography>
+            </Button>
           </DialogActions>
         </form>
       </DialogContent>
@@ -302,7 +308,7 @@ const ToggleButton = () => {
   );
 }
 
-interface Column {
+interface OperatorColumn {
   id: 'UserProfile' | 'MobileNumber' | 'Email' | 'DateCreated' | 'LastLogin' | 'Action';
   label: any;
   minWidth?: number;
@@ -310,7 +316,7 @@ interface Column {
   format?: (data: {value: any}) => string | JSX.Element;
 }
 
-const columns: readonly Column[] = [
+const columns: readonly OperatorColumn[] = [
   { id: 'UserProfile',
     label: (
      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
@@ -360,6 +366,7 @@ interface Data {
   DateCreated: any;
   LastLogin: any;
   Action: JSX.Element
+  type: 'operator' | 'super-agent' | 'content-creator';
 }
 
 function createData(
@@ -382,7 +389,7 @@ function createData(
   return { UserProfile, MobileNumber: formattedMobileNumber, Email, DateCreated: formattedDateCreated, LastLogin: formattedLastLog, Action};
 }
 
-const rows = [
+const operatorRows = [
   createData('Mèng yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
   createData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
   createData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
@@ -399,6 +406,42 @@ const rows = [
   createData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
   createData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
 ];
+
+const superagentRows = [
+  createData('SA yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
+  createData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
+  createData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
+  createData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
+  createData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <ToggleButton/>),
+  createData('Lin Lee yao', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <ToggleButton/>),
+  createData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
+  createData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <ToggleButton/>),
+  createData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
+  createData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+];
+
+const contentcreatorRows = [
+  createData('CC yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
+  createData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
+  createData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
+  createData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
+  createData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <ToggleButton/>),
+  createData('Lin Lee yao', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <ToggleButton/>),
+  createData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
+  createData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <ToggleButton/>),
+  createData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
+  createData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+]
 
 const Root = styled('div')`
   table {
@@ -432,6 +475,7 @@ const Root = styled('div')`
 
 const UserList = () => {
 
+  const [dataType, setDataType] = useState('all');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -442,8 +486,31 @@ const UserList = () => {
     setPage(0);
   };
 
-  const [isMobile, setIsMobile] = useState(false);
+  const handleOperatorsClick = () => {
+    setDataType('operators');
+  }
 
+  const handleSuperAgentClick = () => {
+    setDataType('super-agent');
+  }
+
+  const handleContentCreatorsClick = () => {
+    setDataType('content-creators');
+  }
+
+  let filteredRows: any = [];
+
+  if (dataType === 'all') {
+    filteredRows = [...operatorRows, ...superagentRows, ...contentcreatorRows];
+  } else if (dataType === 'operators') {
+    filteredRows = operatorRows;
+  } else if (dataType === 'super-agent') {
+    filteredRows = superagentRows;
+  } else if (dataType === 'content-creators') {
+    filteredRows = contentcreatorRows;
+  }
+
+  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
@@ -456,18 +523,18 @@ const UserList = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: 'auto', overflow: 'hidden' }}>
       <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'space-between'], mb: 5 }}>
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 5 }}>
-          <Button onClick={() => alert(`TEST`)} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Button onClick={handleOperatorsClick} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: 'black'}}>
               <Typography>Operators</Typography>
           </Button>
-          <Button sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Button onClick={handleSuperAgentClick} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: 'black' }}>
             <Typography>Super Agent</Typography>
           </Button>
-          <Button sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Button onClick={handleContentCreatorsClick} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: 'black' }}>
             <Typography>Content Creators</Typography>
           </Button>
         </Box>
 
-        <Button sx={{ border: 1, height: '56px', minWidth: '224px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Button sx={{ border: 1, height: '56px', minWidth: '224px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black' }}>
           <Typography>Create Account</Typography>
         </Button>
       </Box>
@@ -489,7 +556,7 @@ const UserList = () => {
           </tr>
           </thead>
           <tbody>
-          {rows
+          {filteredRows
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((row) => {
               return (
@@ -515,7 +582,7 @@ const UserList = () => {
       <Box style={{ margin: '0 auto' }}>
         <TablePagination
           component="div"
-          count={rows.length}
+          count={filteredRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -559,7 +626,7 @@ const UserList = () => {
                 ))}
                 <IconButton
                   onClick={() => onPageChange(null, page + 1)}
-                  disabled={page >= Math.ceil(rows.length / rowsPerPage) - 1}
+                  disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}
                   aria-label="next page"
                   sx={{ fontSize: 12, color: 'black' }}
                 >
