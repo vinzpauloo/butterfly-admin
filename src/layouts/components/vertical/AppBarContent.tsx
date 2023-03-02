@@ -128,7 +128,6 @@ const shortcuts: ShortcutsType[] = [
   }
 ]
 
-
 const AppBarContent = (props: Props) => {
 
   // ** Hook
