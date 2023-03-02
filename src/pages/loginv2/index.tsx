@@ -45,7 +45,7 @@ const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
-  fontSize: '0.875rem',
+  fontSize: '0.75rem',
   textDecoration: 'none',
   color: theme.customBflyColors.grayInputText
 }))
@@ -227,7 +227,7 @@ const LoginPage = () => {
                 <Box
                   sx={{ mt:2, mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
                 >
-                  <Typography color={theme.palette.error.main} variant='body2'>{errors.email && errors.email.message}</Typography>
+                  <Typography color={theme.palette.error.main} variant='caption'>{errors.email && errors.email.message}</Typography>
                   <LinkStyled href='/forgot-password'>Forgot Password?</LinkStyled>
                 </Box>
                 <LoginButton color='primary' size='large' type='submit' variant='contained'>
