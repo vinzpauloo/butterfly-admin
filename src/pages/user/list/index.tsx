@@ -366,7 +366,6 @@ interface Data {
   DateCreated: any;
   LastLogin: any;
   Action: JSX.Element
-  type: 'operator' | 'super-agent' | 'content-creator';
 }
 
 function createData(
