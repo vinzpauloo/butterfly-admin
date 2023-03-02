@@ -1,3 +1,6 @@
+// ** React Imports
+import React from 'react'
+
 // ** MUI Imports
 import { ThemeOptions } from '@mui/system'
 
@@ -6,6 +9,28 @@ import { ThemeOptions } from '@mui/system'
 
 // ** To use mode (light/dark/semi-dark), skin(default/bordered), direction(ltr/rtl), etc. for conditional styles, uncomment below line
 import { useSettings } from 'src/@core/hooks/useSettings'
+
+
+declare module '@mui/system' {
+  interface Theme {
+    customBflyColors: {
+      darkBg: React.CSSProperties['color'],
+      grayInputBG?: React.CSSProperties['color'],
+      grayInputText?: React.CSSProperties['color'],
+      dateColorBG?: React.CSSProperties['color'],
+    };
+  }
+  // allow configuration using `createTheme`
+  interface ThemeOptions {
+    customBflyColors?: {
+      darkBg?: React.CSSProperties['color'],
+      grayInputBG?: React.CSSProperties['color'],
+      grayInputText?: React.CSSProperties['color'],
+      dateColorBG?: React.CSSProperties['color'],
+    };
+  }
+}
+
 
 const UserThemeOptions = (): ThemeOptions => {
   // ** To use mode (light/dark/semi-dark), skin(default/bordered), direction(ltr/rtl), etc. for conditional styles, uncomment below line
@@ -18,13 +43,24 @@ const UserThemeOptions = (): ThemeOptions => {
   // const palette = corePalette(mode, skin, themeColor)
 
   return {
-    
+    customBflyColors: {
+      darkBg: '#020308',
+      grayInputBG: '#F1F1F1',
+      grayInputText: '#757575',
+      dateColorBG : '#3C4B64',
+    },
     palette:{
       primary: {
         light: '#72D949',
-        main: '#3BC117',
+        main: '#9747FF',
         dark: '#25A510',
         contrastText: '#FFF'
+      },
+      secondary: {
+        main : '#EDEDED'
+      },
+      background: {
+        default: '#FFF'
       },
     },
     breakpoints: {
@@ -117,7 +153,7 @@ const UserThemeOptions = (): ThemeOptions => {
     },
     typography: {
       fontFamily:
-        '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+        '"Rubik", sans-serif',
     },
     shadows: mode === 'light' ? [
       'none',
