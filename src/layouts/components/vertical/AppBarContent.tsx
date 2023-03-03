@@ -157,7 +157,7 @@ const AppBarContent = (props: Props) => {
             <NotificationDropdown settings={settings} notifications={notifications} />
             <ModeToggler settings={settings} saveSettings={saveSettings} />
             {/* <Box component='div' sx={{padding:'8px',display:'inline-flex'}}><Icon icon='mdi:message-outline' /></Box> */}
-            <Typography sx={{color : theme.palette.primary.main, fontWeight:700 }}>Admin</Typography>
+            <Typography variant='body2'>Juan Pablo Dela Cruz</Typography>
             <UserDropdown settings={settings} />
           </Box>
 

@@ -20,7 +20,11 @@ declare module '@mui/system' {
       dateColorBG?: React.CSSProperties['color'],
       borderBrown?: React.CSSProperties['color'],
       menuBG? : React.CSSProperties['color'],
-      menuItemsBG? : React.CSSProperties['color']
+      menuItemsBG? : React.CSSProperties['color'],
+      sidebarHeaderBG? : React.CSSProperties['color'],
+      sidebarContentBG? : React.CSSProperties['color'],
+      sidebarLinkColor? : React.CSSProperties['color'],
+      green? : React.CSSProperties['color']
     };
     customTypography : {
       fontFamilyPoppins : string
@@ -31,11 +35,15 @@ declare module '@mui/system' {
     customBflyColors?: {
       darkBg?: React.CSSProperties['color'],
       grayInputBG?: React.CSSProperties['color'],
-      grayInputText?: React.CSSProperties['color'],
+      grayInputText?: React.CSSProperties['color'], 
       dateColorBG?: React.CSSProperties['color'],
       borderBrown?: React.CSSProperties['color'],
       menuBG? : React.CSSProperties['color'],
-      menuItemsBG? : React.CSSProperties['color']
+      menuItemsBG? : React.CSSProperties['color'],
+      sidebarHeaderBG? : React.CSSProperties['color'],
+      sidebarContentBG? : React.CSSProperties['color'],
+      sidebarLinkColor? : React.CSSProperties['color'],
+      green? : React.CSSProperties['color']
     };
     customTypography : {
       fontFamilyPoppins : string
@@ -62,7 +70,12 @@ const UserThemeOptions = (): ThemeOptions => {
       dateColorBG : '#3C4B64',
       borderBrown : '#B59770',
       menuBG : '#090909',
-      menuItemsBG : '#0e0e0e'
+      menuItemsBG : '#0e0e0e',
+      sidebarHeaderBG: '#1D1D1D',
+      sidebarContentBG : '#2A3446',
+      sidebarLinkColor : '#BFC6D0',
+      green : '#60FF00'
+
     },
     palette:{
       primary: {

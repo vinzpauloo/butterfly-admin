@@ -111,16 +111,15 @@ const LanguageFlagsDropdown = () => {
                 <Grid rowSpacing={1.5} columnSpacing={2.5} className='gridContainer' container>
                     {
                         languages.map( lang => 
-                            <>
-                                <MenuGrid xs={6} item>
-                                    <LangMenuItem key={lang.id} onClick={handleClose}>
+                                <MenuGrid key={lang.id} xs={6} item>
+                                    <LangMenuItem onClick={handleClose}>
                                         <LangItemFlag>
                                             <img src={`${flagPath}/${lang.flag}.png`} />
                                         </LangItemFlag>
                                         { lang.title }
                                     </LangMenuItem>
                                 </MenuGrid>
-                            </> )
+                                )
                     }
                     
                 </Grid>

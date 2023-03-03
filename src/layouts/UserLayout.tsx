@@ -28,6 +28,8 @@ import HorizontalAppBarContent from './components/horizontal/AppBarContent'
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
 import AppBrand from './components/AppBrand'
+import SidebarContent from './components/vertical/SidebarContent'
+import SidebarFooter from './components/vertical/SidebarFooter'
 
 interface Props {
   children: ReactNode
@@ -64,20 +66,56 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       contentHeightFixed={contentHeightFixed}
       verticalLayoutProps={{
         navMenu: {
+          componentProps: {
+            sx: {
+              '& .MuiPaper-root':{
+                backgroundColor: theme => theme.customBflyColors.sidebarContentBG,
+              },
+              '& .nav-header': {
+                backgroundColor: theme => theme.customBflyColors.sidebarHeaderBG,
+                borderBottom: '1px solid #FFFFFF'
+              },
+              '& .scrollbar-container .nav-link .active': {
+                backgroundColor: 'none',
+                backgroundImage: 'none',
+                boxShadow:'none',
+                borderRadius:0
+              },
+              '& .scrollbar-container  a': {
+                color: theme => theme.palette.common.white
+              }
+            }
+          },
           branding: (props) => <AppBrand {...props} />,
           navItems: VerticalNavItems(),
           lockedIcon: 
-          <Box
-            sx={{ cursor:'pointer', ml: 6 , display: 'flex', color: theme => theme.palette.primary.main }}
-          ><Icon icon='mdi:menu' fontSize={20} /></Box>,
+          <Box 
+                sx={{ 
+                  backgroundColor : '#fff', 
+                  cursor:'pointer', ml: 6 , 
+                  display: 'flex', 
+                  color: '#3C4B64',
+                  boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.5)', 
+                  borderRadius: .3,
+                  border: '1px solid #3C4B64'
+                  }}>
+                <Icon icon='mdi:menu' fontSize={20} />
+          </Box>,
           // unlockedIcon: <></>,
           // { hidden, settings, children, scrollToTop, footerProps, contentHeightFixed, verticalLayoutProps }
-          // content: () => <VerticalLayout hidden={hidden} settings={settings}  />
+          content: () => <SidebarContent />,
+          afterContent: () => <SidebarFooter />,
 
           // Uncomment the below line when using server-side menu in vertical layout and comment the above line
           // navItems: verticalMenuItems
         },
         appBar: {
+          componentProps: {
+            sx: { 
+              boxShadow: theme => theme.shadows[9],
+              backgroundColor: theme => theme.palette.common.white,
+            }
+          },
           content: props => (
             <VerticalAppBarContent
               hidden={hidden}

@@ -1,13 +1,28 @@
 // ** MUI Imports
-import { useTheme } from '@mui/material/styles'
+import { useTheme, styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
+
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+
+
+// ** Styled component for the image
+const Img = styled('img')({
+  width: 80,
+  height:'auto',
+  position: 'relative',
+  left:'11px'
+})
+const Butterfly = styled('img')({
+  width: 30,
+  height:'auto',
+  position: 'relative',
+  left:'20px'
+})
 
 const AppBrand = () => {
 
@@ -23,13 +38,10 @@ const AppBrand = () => {
           {
             navCollapsed 
             ? 
-              <Box 
-              onClick={() => saveSettings({ ...settings, navCollapsed: !navCollapsed })}
-                sx={{ cursor:'pointer', ml: 6 , display: 'flex', color: theme => theme.palette.primary.main }}>
-                <Icon icon='mdi:menu' fontSize={20} />
-              </Box>
+              <Butterfly src='/images/butterfly_icon.png' />
+              
             : 
-              <Typography variant='h6' sx={{ ml: 2 }}>MAIN ADMIN</Typography>
+            <Img src='/images/drawer-logo.png' />
           }
         
       </Box>
