@@ -16,10 +16,8 @@ import {
   DialogActions,
   TextField,
   Checkbox,
-  useMediaQuery
 } from '@mui/material';
 import UnfoldMoreTwoToneIcon from '@mui/icons-material/UnfoldMoreTwoTone';
-import { useTheme } from '@mui/material/styles';
 import ArrowBackIos from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { styled } from '@mui/system';
@@ -313,10 +311,22 @@ interface OperatorColumn {
   label: any;
   minWidth?: number;
   align?: 'right';
-  format?: (data: {value: any}) => string | JSX.Element;
+  format?: (data: number) => string | JSX.Element;
 }
 
-const columns: readonly OperatorColumn[] = [
+interface SuperAgentColumn {
+  id: 'SuperAgent' | 'SiteName' | 'MobileNumber' | 'Email' | 'DateCreated' | 'LastUpdate' | 'SecurityFunds' | 'Action';
+  label: any;
+  format?: (data: number) => string | JSX.Element;
+}
+
+interface ContentCreatorColumn {
+  id: 'Username' | 'MobileNumber' | 'Email' | 'DateCreated' | 'LastUpdate' | 'Action'
+  label: any;
+  format?: (data: number) => string | JSX.Element;
+}
+
+const operatorColumns: readonly OperatorColumn[] = [
   { id: 'UserProfile',
     label: (
      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
@@ -355,11 +365,108 @@ const columns: readonly OperatorColumn[] = [
   {
     id: 'Action',
     label: 'Action',
-    format: ({ value }: { value: any }) => <div>{value}</div>,
   },
 ];
 
-interface Data {
+const superAgentColumns: readonly SuperAgentColumn[] = [
+  { id: 'SuperAgent',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Super Agent</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'SiteName',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Site Name</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'MobileNumber',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Mobile Number</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'Email',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Email</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'DateCreated',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Date Created</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'LastUpdate',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Last Update</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'SecurityFunds',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Security Funds</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  {
+    id: 'Action',
+    label: 'Action',
+  },
+];
+
+const contentCreatorColumns: readonly ContentCreatorColumn[] = [
+  { id: 'Username',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Username</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'MobileNumber',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Mobile Number</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'Email',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Email Address</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'DateCreated',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Date Created</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  { id: 'LastUpdate',
+    label: (
+      <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexDirection: {xs: 'column',md: 'row'}}}>
+        <span>Last Update</span>
+        <UnfoldMoreTwoToneIcon/>
+      </Box>
+    )},
+  {
+    id: 'Action',
+    label: 'Action',
+  },
+];
+
+interface operatorData {
   UserProfile: string;
   MobileNumber: any;
   Email: string;
@@ -368,14 +475,14 @@ interface Data {
   Action: JSX.Element
 }
 
-function createData(
+function createOperatorData(
   UserProfile: string,
   MobileNumber: number,
   Email: string,
   DateCreated: number,
   LastLogin: number,
   Action: JSX.Element,
-): Data {
+): operatorData {
   const formattedMobileNumber = `+${MobileNumber.toString().substring(0, 2)} ${MobileNumber.toString().substring(2, 5)} ${MobileNumber.toString().substring(5, 8)} ${MobileNumber.toString().substring(8)}`
   const date = new Date(DateCreated);
   const lastLog = new Date(LastLogin);
@@ -388,58 +495,117 @@ function createData(
   return { UserProfile, MobileNumber: formattedMobileNumber, Email, DateCreated: formattedDateCreated, LastLogin: formattedLastLog, Action};
 }
 
+interface superAgentData {
+  SuperAgent: string;
+  SiteName: any;
+  MobileNumber: string;
+  Email: any;
+  DateCreated: any;
+  LastUpdate: any;
+  SecurityFunds: any;
+  Action: JSX.Element
+}
+
+function createSuperAgentRows(
+  SuperAgent: string,
+  SiteName: any,
+  MobileNumber: any,
+  Email: any,
+  DateCreated: any,
+  LastUpdate: any,
+  SecurityFunds: any,
+  Action: JSX.Element
+): superAgentData {
+  const formattedMobileNumber = `+${MobileNumber.toString().substring(0, 2)} ${MobileNumber.toString().substring(2, 5)} ${MobileNumber.toString().substring(5, 8)} ${MobileNumber.toString().substring(8)}`
+  const date = new Date(DateCreated);
+  const lastUp = new Date(LastUpdate);
+  const hours = date.getHours();
+  const formattedHours = (hours % 12 || 12).toString().padStart(2, '0');
+  const formattedDateCreated = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${formattedHours}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
+  const formattedLastUpdate = `${lastUp.getFullYear()}-${(lastUp.getMonth() + 1).toString().padStart(2, '0')}-${lastUp.getDate().toString().padStart(2, '0')} ${formattedHours}:${lastUp.getMinutes().toString().padStart(2, '0')}:${lastUp.getSeconds().toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
+
+
+  return { SuperAgent, SiteName, MobileNumber: formattedMobileNumber, Email, DateCreated: formattedDateCreated, LastUpdate: formattedLastUpdate, SecurityFunds, Action};
+}
+
+interface contentCreatorData {
+  Username: string;
+  MobileNumber: any;
+  Email: string;
+  DateCreated: any;
+  LastUpdate: any;
+  Action: JSX.Element
+}
+
+function createContentCreatorData(
+  Username: string,
+  MobileNumber: number,
+  Email: string,
+  DateCreated: number,
+  LastUpdate: number,
+  Action: JSX.Element,
+): contentCreatorData {
+  const formattedMobileNumber = `+${MobileNumber.toString().substring(0, 2)} ${MobileNumber.toString().substring(2, 5)} ${MobileNumber.toString().substring(5, 8)} ${MobileNumber.toString().substring(8)}`
+  const date = new Date(DateCreated);
+  const lastLog = new Date(LastUpdate);
+  const hours = date.getHours();
+  const formattedHours = (hours % 12 || 12).toString().padStart(2, '0');
+  const formattedDateCreated = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${formattedHours}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
+  const formattedLastLog = `${lastLog.getFullYear()}-${(lastLog.getMonth() + 1).toString().padStart(2, '0')}-${lastLog.getDate().toString().padStart(2, '0')} ${formattedHours}:${lastLog.getMinutes().toString().padStart(2, '0')}:${lastLog.getSeconds().toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
+
+
+  return { Username, MobileNumber: formattedMobileNumber, Email, DateCreated: formattedDateCreated, LastUpdate: formattedLastLog, Action};
+}
+
 const operatorRows = [
-  createData('Mèng yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
-  createData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
-  createData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
-  createData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
-  createData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <ToggleButton/>),
-  createData('Lin Lee yao', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <ToggleButton/>),
-  createData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <ToggleButton/>),
-  createData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Mèng yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
 ];
 
 const superagentRows = [
-  createData('SA yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
-  createData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
-  createData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
-  createData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
-  createData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <ToggleButton/>),
-  createData('Lin Lee yao', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <ToggleButton/>),
-  createData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <ToggleButton/>),
-  createData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
 ];
 
 const contentcreatorRows = [
-  createData('CC yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
-  createData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
-  createData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
-  createData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
-  createData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <ToggleButton/>),
-  createData('Lin Lee yao', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <ToggleButton/>),
-  createData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <ToggleButton/>),
-  createData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createContentCreatorData('Yuxuan Hu', +639173263512, `cc@account.com`, 1632620222000, 1643320222000, <ToggleButton/>),
+  createContentCreatorData('Wei Tao Bambang', +639276562210, `cc@account.com`, 1321812403000, 1323620222000, <ToggleButton/>),
+  createContentCreatorData('Shi Kai Ding Bang', +639476545510, `cc@account.com`, 1662240621000, 1644420222000, <ToggleButton/>),
+  createContentCreatorData('Fu Dong Da-Fu', +639276522210, `cc@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
+  createContentCreatorData('Aiguo Chen', +639066523310, `cc@account.com`, 1648314228000, 1643621122000, <ToggleButton/>),
+  createContentCreatorData('Syaoran Taio', +639276573810, `cc@account.com`, 1643229492000, 1643330222000, <ToggleButton/>),
+  createContentCreatorData('Ming Longwei', +639066523410, `cc@account.com`, 1692217173000, 1642220222000, <ToggleButton/>),
+  createContentCreatorData('Lee Jiao-Long', +639976599210, `cc@account.com`, 1643223292000, 1643632222000, <ToggleButton/>),
+  createContentCreatorData('Hua Mu Lan', +639176246210, `cc@account.com`, 1695227173000, 1643330222000, <ToggleButton/>),
+  createContentCreatorData('Zhe Huang Ti', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createContentCreatorData('Gong Xi', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createContentCreatorData('Fei Long', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
+  createContentCreatorData('Jackie Chan', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createContentCreatorData('Pai Long', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
 ]
 
 const Root = styled('div')`
@@ -474,7 +640,9 @@ const Root = styled('div')`
 
 const UserList = () => {
 
-  const [dataType, setDataType] = useState('all');
+  const [dataType, setDataType] = useState('operators');
+  const [columnType, setColumnType] = useState('operators');
+  const [activeBtn, setActiveBtn] = useState('')
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -487,21 +655,34 @@ const UserList = () => {
 
   const handleOperatorsClick = () => {
     setDataType('operators');
+    setColumnType('operators');
+    setActiveBtn('operators')
   }
 
   const handleSuperAgentClick = () => {
     setDataType('super-agent');
+    setColumnType('super-agent');
+    setActiveBtn('superagent')
   }
 
   const handleContentCreatorsClick = () => {
     setDataType('content-creators');
+    setColumnType('content-creators');
+    setActiveBtn('contentcreators')
+  }
+
+  let filteredColumns: any = [];
+  if (columnType === 'operators') {
+    filteredColumns = operatorColumns;
+  } else if (columnType === 'super-agent') {
+    filteredColumns = superAgentColumns;
+  } else if (columnType === 'content-creators') {
+    filteredColumns = contentCreatorColumns;
   }
 
   let filteredRows: any = [];
 
-  if (dataType === 'all') {
-    filteredRows = [...operatorRows, ...superagentRows, ...contentcreatorRows];
-  } else if (dataType === 'operators') {
+  if (dataType === 'operators') {
     filteredRows = operatorRows;
   } else if (dataType === 'super-agent') {
     filteredRows = superagentRows;
@@ -511,6 +692,7 @@ const UserList = () => {
 
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
+    setActiveBtn('operators')
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -522,32 +704,83 @@ const UserList = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: 'auto', overflow: 'hidden' }}>
       <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'space-between'], mb: 5 }}>
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 5 }}>
-          <Button onClick={handleOperatorsClick} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: 'black'}}>
-              <Typography>Operators</Typography>
+          <Button onClick={handleOperatorsClick} sx={{
+            border: 1,
+            height: '56px',
+            minWidth: '224px',
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderColor: 'black',
+            backgroundColor: activeBtn === 'operators' ? '#9747FF' : null,
+            color: activeBtn === 'operators' ? '#FFF' : 'black',
+            transition: 'background-color 0.1s',
+            '&:hover': {
+              backgroundColor: `#9747FF`,
+              color: 'white',
+            },
+            textTransform: 'uppercase',
+          }}>
+            Operators
           </Button>
-          <Button onClick={handleSuperAgentClick} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: 'black' }}>
-            <Typography>Super Agent</Typography>
+          <Button onClick={handleSuperAgentClick} sx={{
+            border: 1,
+            height: '56px',
+            minWidth: '224px',
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderColor: 'black',
+            backgroundColor: activeBtn === 'superagent' ? '#9747FF' : null,
+            color: activeBtn === 'superagent' ? '#FFF' : 'black',
+            transition: 'background-color 0.1s',
+            '&:hover': {
+              backgroundColor: `#9747FF`,
+              color: 'white',
+            },
+            textTransform: 'uppercase'
+          }}>
+            Super Agent
           </Button>
-          <Button onClick={handleContentCreatorsClick} sx={{ border: 1, height: '56px', minWidth: '224px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderColor: 'black' }}>
-            <Typography>Content Creators</Typography>
+          <Button onClick={handleContentCreatorsClick} sx={{
+            border: 1,
+            height: '56px',
+            minWidth: '224px',
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderColor: 'black',
+            backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : null,
+            color: activeBtn === 'contentcreators' ? '#FFF' : 'black',
+            transition: 'background-color 0.1s',
+            '&:hover': {
+              backgroundColor: `#9747FF`,
+              color: 'white',
+            },
+            textTransform: 'uppercase',
+          }}>
+            Content Creators
           </Button>
         </Box>
 
-        <Button sx={{ border: 1, height: '56px', minWidth: '224px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black' }}>
-          <Typography>Create Account</Typography>
+        <Button sx={{ border: 1, height: '56px', minWidth: '224px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black', textTransform: 'uppercase', color: 'black' }}>
+          Create Account
         </Button>
       </Box>
       <Root sx={{ minHeight: 540 }}>
         <table aria-label="custom pagination table" style={{ overflowX: 'auto', maxWidth: '100%', marginBottom: '1rem', tableLayout: 'fixed' }}> {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
           <colgroup>
-            {columns.map((column) => (
+            {filteredColumns.map((column: any) => (
               <col key={column.id} style={{ minWidth: column.minWidth }} />
               ))}
           </colgroup>
           <thead>
           <tr>
             <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}><Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/></th>
-            {columns.map((column) => (
+            {filteredColumns.map((column: any) => (
               <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
                 {column.label}
               </th>
@@ -557,11 +790,11 @@ const UserList = () => {
           <tbody>
           {filteredRows
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((row) => {
+            .map((row: any) => {
               return (
                 <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
                   <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
-                  {columns.map((column) => {
+                  {filteredColumns.map((column: any) => {
                     const value = row[column.id];
 
                     return (
@@ -586,7 +819,7 @@ const UserList = () => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          labelDisplayedRows={({ from, to, count }) => ""}
+          labelDisplayedRows={() => ""}
           labelRowsPerPage=""
           rowsPerPageOptions={[]}
           ActionsComponent={(props) => {
