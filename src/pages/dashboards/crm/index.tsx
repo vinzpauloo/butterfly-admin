@@ -58,7 +58,7 @@ const CRMDashboard = () => {
 
           </Grid>
 
-          <Grid item xs={12} md={8} spacing={6}>
+          <Grid item xs={12} md={8}>
 
             <Box display='grid' gridTemplateColumns="repeat(1, 1fr)" gap={6}> 
               <AnalyticsBFlyTotalViewedContents />

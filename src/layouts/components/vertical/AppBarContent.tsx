@@ -76,7 +76,7 @@ const AppBarContent = (props: Props) => {
           </IconButton>
         ) : null}
         <Typography
-          sx={{ color:'##111111', paddingLeft:'3rem'}}>HOME</Typography>
+          sx={{ display:['none', 'flex'], color:'##111111', paddingLeft:'3rem'}}>HOME</Typography>
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
           
@@ -87,8 +87,8 @@ const AppBarContent = (props: Props) => {
             <img width={28} src='/images/topbar/msg.png' />
             <CustomNotificationDropdown settings={settings} notifications={notifications} />
             <Box alignItems='flex-end' flexDirection='column' display='flex' justifyContent='flex-end'>
-              <Typography lineHeight={1} variant='body2'>Juan Pablo Dela Cruz</Typography>
-              <Typography variant='body2'>Administrator</Typography>
+              <Typography sx={{ display:['none','none',null] }} lineHeight={1} variant='body2'>Juan Pablo Dela Cruz</Typography>
+              <Typography sx={{ display:['none', 'flex'] }} variant='body2'>Administrator</Typography>
             </Box>
             
             <CustomUserDropdown settings={settings} />
