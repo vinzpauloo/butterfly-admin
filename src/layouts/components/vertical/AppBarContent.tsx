@@ -33,27 +33,6 @@ interface Props {
 
 const notifications: NotificationsType[] = [
   {
-    meta: 'Today',
-    avatarAlt: 'Flora',
-    title: 'Congratulation Flora! 🎉',
-    avatarImg: '/images/avatars/4.png',
-    subtitle: 'Won the monthly best seller badge'
-  },
-  {
-    meta: 'Yesterday',
-    avatarColor: 'primary',
-    subtitle: '5 hours ago',
-    avatarText: 'Robert Austin',
-    title: 'New user registered.'
-  },
-  {
-    meta: '11 Aug',
-    avatarAlt: 'message',
-    title: 'New message received 👋🏻',
-    avatarImg: '/images/avatars/5.png',
-    subtitle: 'You have 10 unread messages'
-  },
-  {
     meta: '25 May',
     title: 'Paypal',
     avatarAlt: 'paypal',
@@ -65,7 +44,7 @@ const notifications: NotificationsType[] = [
     avatarAlt: 'order',
     title: 'Received Order 📦',
     avatarImg: '/images/avatars/3.png',
-    subtitle: 'New order received from John'
+    subtitle: 'New VIP member'
   },
   {
     meta: '27 Dec',

@@ -89,7 +89,7 @@ const UserDropdown = (props: Props) => {
           onClick={handleDropdownOpen}
           sx={{ 
             width: 66, 
-            height: 40, 
+            height: 41, 
             borderRadius:0,
             '& > .MuiAvatar-img' : {
               objectFit:'contain',
@@ -111,9 +111,9 @@ const UserDropdown = (props: Props) => {
         <Box sx={{ pt: 2, pb: 3, px: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 600 }}>Pablo Dela Cruz</Typography>
+              <Typography sx={{ fontWeight: 400 }}>Pablo Dela Cruz</Typography>
               <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-                Admin
+                Administrator
               </Typography>
             </Box>
           </Box>
