@@ -27,13 +27,12 @@ const StyledDateBox = styled(Box)<BoxProps>(({ theme }) => ({
         border: '1px solid #FFFFFF',
         boxShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
         borderRadius: '5px',
-        paddingInline:'1rem'
+        paddingInline:'1rem',
+        minWidth:'164px',
+        minHeight:'26px'
     },
   
-
 }))
-
-
 
 const AppBarDate = () => {  
     const [time, setTime] = React.useState<string>('')
