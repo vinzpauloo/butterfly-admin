@@ -7,7 +7,6 @@ import { styled } from '@mui/material/styles'
 // ** Types
 import { BlankLayoutWithAppBarProps } from 'src/@core/layouts/types'
 import LanguageFlagsDropdown from './components/shared-components/LanguageFlagsDropdown';
-import { Settings } from 'src/@core/context/settingsContext'
 import AppBarDate from './components/shared-components/AppBarDate';
 
 // Styled component 

@@ -112,7 +112,9 @@ const LanguageFlagsDropdown = () => {
                     {
                         languages.map( lang => 
                                 <MenuGrid key={lang.id} xs={6} item>
-                                    <LangMenuItem onClick={handleClose}>
+                                    <LangMenuItem 
+                                        className='langMenuItem'
+                                        onClick={handleClose}>
                                         <LangItemFlag>
                                             <img src={`${flagPath}/${lang.flag}.png`} />
                                         </LangItemFlag>

@@ -70,6 +70,7 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
             sx: {
               '& .MuiPaper-root':{
                 backgroundColor: theme => theme.customBflyColors.sidebarContentBG,
+                boxShadow: '5px 2px 2px rgb(0 0 0 / 25%)'
               },
               '& .nav-header': {
                 backgroundColor: theme => theme.customBflyColors.sidebarHeaderBG,
@@ -114,6 +115,13 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
             sx: { 
               boxShadow: theme => theme.shadows[9],
               backgroundColor: theme => theme.palette.common.white,
+              '& .navbar-content-container': {
+                minHeight:'50px !important'
+              },
+              '& .css-auttry' : {
+                paddingBottom: 1.2,
+                gap:.5
+              }
             }
           },
           content: props => (
