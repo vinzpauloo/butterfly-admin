@@ -343,7 +343,7 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
                         </label>
                       </Box>
                       {formValue?.logo === null || undefined ? (
-                        <Typography>AWWW</Typography>
+                        <Typography sx={{color: 'red'}}>Please upload an image</Typography>
                       ):(
                         <Typography>{formValue?.logo.name}</Typography>
                       )}

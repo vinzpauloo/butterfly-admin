@@ -19,8 +19,9 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 import OperatorEditModal from "../components/OperatorEditModal";
 import SuperAgentEditModal from "../components/SuperAgentEditModal";
+import ContentCreatorEditModal from "../components/ContentCreatorEditModal";
 
-const ToggleButton = () => {
+const OperatorToggleBtn = () => {
   const [isOn, setIsOn] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -84,8 +85,147 @@ const ToggleButton = () => {
         <button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
           <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
         </button>
-        {/*<OperatorEditModal isOpen={isModalOpen} onClose={handleModalClose} />*/}
+        <OperatorEditModal isOpen={isModalOpen} onClose={handleModalClose} />
+      </Box>
+    </Box>
+  );
+}
+
+const SuperAgentToggle = () => {
+  const [isOn, setIsOn] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleClick = () => {
+    setIsOn(!isOn);
+  };
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: {xs: 'center', sm: 'unset'}, justifyContent: 'center', gap: 2}}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+        <button
+          style={{
+            display: 'inline-block',
+            position: 'relative',
+            width: '52px',
+            height: '20px',
+            border: '1px solid transparent',
+            borderRadius: '25px',
+            backgroundColor: isOn ? `#60FF00` : `#F03738`,
+            cursor: 'pointer'
+          }}
+          className={`toggle ${isOn ? 'on' : 'off'}`}
+          onClick={handleClick}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '0px',
+              left: isOn ? '32px' : '0px',
+              width: '18px',
+              height: '18px',
+              borderRadius: '50%',
+              backgroundColor: 'white',
+              color: 'black',
+              textAlign: 'center',
+              lineHeight: '21px',
+              fontSize: '12px',
+              transition: 'transform 0.2s ease',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            {isOn ? (
+              <Typography sx={{fontSize: 7}}>ON</Typography>
+            ): (
+              <Typography sx={{fontSize: 7}}>OFF</Typography>
+            )}
+          </div>
+        </button>
+      </Box>
+      <Box>
+        <button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
+          <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
+        </button>
         <SuperAgentEditModal isOpen={isModalOpen} onClose={handleModalClose} />
+      </Box>
+    </Box>
+  );
+}
+
+const ContentCreatorToggle = () => {
+  const [isOn, setIsOn] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleClick = () => {
+    setIsOn(!isOn);
+  };
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: {xs: 'center', sm: 'unset'}, justifyContent: 'center', gap: 2}}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+        <button
+          style={{
+            display: 'inline-block',
+            position: 'relative',
+            width: '52px',
+            height: '20px',
+            border: '1px solid transparent',
+            borderRadius: '25px',
+            backgroundColor: isOn ? `#60FF00` : `#F03738`,
+            cursor: 'pointer'
+          }}
+          className={`toggle ${isOn ? 'on' : 'off'}`}
+          onClick={handleClick}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '0px',
+              left: isOn ? '32px' : '0px',
+              width: '18px',
+              height: '18px',
+              borderRadius: '50%',
+              backgroundColor: 'white',
+              color: 'black',
+              textAlign: 'center',
+              lineHeight: '21px',
+              fontSize: '12px',
+              transition: 'transform 0.2s ease',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            {isOn ? (
+              <Typography sx={{fontSize: 7}}>ON</Typography>
+            ): (
+              <Typography sx={{fontSize: 7}}>OFF</Typography>
+            )}
+          </div>
+        </button>
+      </Box>
+      <Box>
+        <button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
+          <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
+        </button>
+        <ContentCreatorEditModal isOpen={isModalOpen} onClose={handleModalClose} />
       </Box>
     </Box>
   );
@@ -343,54 +483,54 @@ function createContentCreatorData(
 }
 
 const operatorRows = [
-  createOperatorData('Mèng yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createOperatorData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createOperatorData('Mèng yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <OperatorToggleBtn/>),
+  createOperatorData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <OperatorToggleBtn/>),
 ];
 
 const superagentRows = [
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <ToggleButton/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
 ];
 
 const contentcreatorRows = [
-  createContentCreatorData('Yuxuan Hu', +639173263512, `cc@account.com`, 1632620222000, 1643320222000, <ToggleButton/>),
-  createContentCreatorData('Wei Tao Bambang', +639276562210, `cc@account.com`, 1321812403000, 1323620222000, <ToggleButton/>),
-  createContentCreatorData('Shi Kai Ding Bang', +639476545510, `cc@account.com`, 1662240621000, 1644420222000, <ToggleButton/>),
-  createContentCreatorData('Fu Dong Da-Fu', +639276522210, `cc@account.com`, 1645137632000, 1643620222000, <ToggleButton/>),
-  createContentCreatorData('Aiguo Chen', +639066523310, `cc@account.com`, 1648314228000, 1643621122000, <ToggleButton/>),
-  createContentCreatorData('Syaoran Taio', +639276573810, `cc@account.com`, 1643229492000, 1643330222000, <ToggleButton/>),
-  createContentCreatorData('Ming Longwei', +639066523410, `cc@account.com`, 1692217173000, 1642220222000, <ToggleButton/>),
-  createContentCreatorData('Lee Jiao-Long', +639976599210, `cc@account.com`, 1643223292000, 1643632222000, <ToggleButton/>),
-  createContentCreatorData('Hua Mu Lan', +639176246210, `cc@account.com`, 1695227173000, 1643330222000, <ToggleButton/>),
-  createContentCreatorData('Zhe Huang Ti', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createContentCreatorData('Gong Xi', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createContentCreatorData('Fei Long', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ToggleButton/>),
-  createContentCreatorData('Jackie Chan', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
-  createContentCreatorData('Pai Long', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ToggleButton/>),
+  createContentCreatorData('Yuxuan Hu', +639173263512, `cc@account.com`, 1632620222000, 1643320222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Wei Tao Bambang', +639276562210, `cc@account.com`, 1321812403000, 1323620222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Shi Kai Ding Bang', +639476545510, `cc@account.com`, 1662240621000, 1644420222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Fu Dong Da-Fu', +639276522210, `cc@account.com`, 1645137632000, 1643620222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Aiguo Chen', +639066523310, `cc@account.com`, 1648314228000, 1643621122000, <ContentCreatorToggle/>),
+  createContentCreatorData('Syaoran Taio', +639276573810, `cc@account.com`, 1643229492000, 1643330222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Ming Longwei', +639066523410, `cc@account.com`, 1692217173000, 1642220222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Lee Jiao-Long', +639976599210, `cc@account.com`, 1643223292000, 1643632222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Hua Mu Lan', +639176246210, `cc@account.com`, 1695227173000, 1643330222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Zhe Huang Ti', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Gong Xi', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Fei Long', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Jackie Chan', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ContentCreatorToggle/>),
+  createContentCreatorData('Pai Long', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ContentCreatorToggle/>),
 ]
 
 const Root = styled('div')`
