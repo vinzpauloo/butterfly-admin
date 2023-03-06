@@ -3,31 +3,45 @@ import { useState, ReactNode, MouseEvent } from 'react'
 
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
-import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import { styled, useTheme } from '@mui/material/styles'
+import Box, {BoxProps} from '@mui/material/Box'
 import MuiCard, { CardProps } from '@mui/material/Card'
-import Link from '@mui/material/Link'
+import { styled } from '@mui/material/styles'
+
+const bgPath = '/images/studio/uploadBG.jpg'
+
+// ** Layout Imports
+import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
+import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
+import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
+
+// ** Styled Components
+const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
+    backgroundImage: `url("${bgPath}")`,
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '100% 75%',
+    backgroundColor: '#d3d6df',
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'column',
+
+    [theme.breakpoints.up('sm')]: {
+        paddingTop: '5rem',
+    }
+}))
 
 // ** Styled Components
 const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
-    [theme.breakpoints.up('sm')]: { width: '28rem' }
+    [theme.breakpoints.up('sm')]: { width: '40rem' }
 }))
 
 const UploadContent = () => {
 
-  // ** Hook
-  const theme = useTheme()
-
-  // Vars
-  const barChartYellow = '#ffcf5c'
-  const borderColor = theme.palette.divider
-  const labelColor = theme.palette.text.disabled
-
   return (
-    <Box className='content-center' maxWidth={500} sx={{marginInline:'auto'}}>
-
+    <BoxBG>
+        
         <Typography
             variant='h6'
             sx={{
@@ -39,40 +53,44 @@ const UploadContent = () => {
                 fontSize: '1.5rem !important',
                 textAlign:'center'
             }}
+            color={ theme => theme.customBflyColors.primary }
             >
             THE STUDIO PAGE - UPLOAD
         </Typography>
 
-        <Card sx={{ mt:15,zIndex: 1, marginInline:'auto' }}>
-            <CardContent>
-            <Box sx={{ mb: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',flexDirection:'column' }}>
+        <BasicCard>
+            <Grid maxWidth={700} container rowGap={5}>
+                <Grid xs={12}>
+                <Typography color={theme => theme.palette.common.white} variant='subtitle2' 
+                    sx={{ 
+                        mb: 2,
+                        textAlign:'center',
+                        fontWeight: 400
+                    }}>
+                    Please Select content to upload
+                </Typography>
+                </Grid>
+                <Grid xs={12} item>
+                    <CustomButton>Upload Video</CustomButton>
+                </Grid>
+                <Grid xs={12} item>
+                    <CustomButton>Upload NEWSFEEDS</CustomButton>
+                </Grid>
+                <Grid xs={12}>
+                    <Typography sx={{fontWeight : 'normal'}} color={ theme => theme.palette.common.white }>
+                    Your videos or photos will be private until you publish them.
 
-                    <Typography mb={5}>Please select content to upload</Typography>
-                    <Grid display='flex' justifyContent='center' alignItems='center' container spacing={3}>
-                        <Grid item xs={12} textAlign='center'>
-                            <Link href="/studio/upload/newsfeeds">Upload WORKS</Link>
-                        </Grid>
-                        <Grid item xs={12} textAlign='center'>
-                            <Link href="/studio/upload/works">Upload NEWSFEEDS</Link>
-                        </Grid>
-                    </Grid>
-            </Box>
-            </CardContent>
-          </Card>
-
-            <Box sx={{mt:25, textAlign:'center'}}>
-                <Typography variant='body2'>Your videos and photos will be private until you published them.</Typography>
-                <Box sx={{mt:10}}>
-                    <Typography variant='body2'>By submitting your videos to Butterfly Project, you acknowledge that you agree to Butterfly's 
-                        <Link> Terms of Service</Link> and <Link>Community Guidelines.</Link> <br />
-                        Please be sure not to violate others' copyright or privacy rights. <Link>Learn more</Link>
+By submitting your videos to Butterfly Project, you acknowledge that you agree to Butterfly’s Terms of Service and Community Guidelines.
+Please be sure not to violate others' copyright or privacy rights. Learn more.
                     </Typography>
-                </Box>
-            </Box>
-                
-
-    </Box>
+                    
+                </Grid>
+            </Grid>
+        </BasicCard>
+    </BoxBG>
   )
 }
 
+UploadContent.contentHeightFixed = true
+UploadContent.getLayout = (page: ReactNode) => <UserLayoutNoPadding contentHeightFixed={UploadContent.contentHeightFixed}>{page}</UserLayoutNoPadding>
 export default UploadContent

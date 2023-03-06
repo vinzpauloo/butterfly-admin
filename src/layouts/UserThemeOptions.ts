@@ -22,7 +22,8 @@ declare module '@mui/system' {
       menuBG? : React.CSSProperties['color'],
       menuItemsBG? : React.CSSProperties['color'],
       sidebarHeaderBG? : React.CSSProperties['color'],
-      sidebarContentBG? : React.CSSProperties['color'],
+      primary? : React.CSSProperties['color'],
+      bodyText? : React.CSSProperties['color'],
       sidebarLinkColor? : React.CSSProperties['color'],
       green? : React.CSSProperties['color']
     };
@@ -41,7 +42,8 @@ declare module '@mui/system' {
       menuBG? : React.CSSProperties['color'],
       menuItemsBG? : React.CSSProperties['color'],
       sidebarHeaderBG? : React.CSSProperties['color'],
-      sidebarContentBG? : React.CSSProperties['color'],
+      primary? : React.CSSProperties['color'],
+      bodyText? : React.CSSProperties['color'],
       sidebarLinkColor? : React.CSSProperties['color'],
       green? : React.CSSProperties['color']
     };
@@ -72,7 +74,8 @@ const UserThemeOptions = (): ThemeOptions => {
       menuBG : '#090909',
       menuItemsBG : '#0e0e0e',
       sidebarHeaderBG: '#1D1D1D',
-      sidebarContentBG : '#2A3446',
+      primary : '#2A3446',
+      bodyText : '#D3D7DC',
       sidebarLinkColor : '#BFC6D0',
       green : '#60FF00'
 

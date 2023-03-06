@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import AvatarGroup from '@mui/material/AvatarGroup'
 
-const CardUser = () => {
+const BasicCard = () => {
   return (
     <Card sx={{ position: 'relative' }}>
       <CardMedia sx={{ height: '12.625rem' }} image='/images/cards/background-user.png' />
@@ -60,4 +60,4 @@ const CardUser = () => {
   )
 }
 
-export default CardUser
+export default BasicCard

@@ -69,7 +69,7 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
           componentProps: {
             sx: {
               '& .MuiPaper-root':{
-                backgroundColor: theme => theme.customBflyColors.sidebarContentBG,
+                backgroundColor: theme => theme.customBflyColors.primary,
                 boxShadow: '5px 2px 2px rgb(0 0 0 / 25%)'
               },
               '& .nav-header': {
