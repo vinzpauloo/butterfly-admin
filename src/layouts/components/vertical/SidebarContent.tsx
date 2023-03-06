@@ -39,13 +39,13 @@ const SidebarContent = () => {
             >
             <List>
                 {[
-                    {id : 1, title : 'Dashboard', icon : 'dashboard.svg'}, 
-                    {id : 2, title : 'Users', icon : 'users.svg'}, 
-                    {id : 3, title : 'Transaction', icon : 'transactions.svg'}, 
-                    {id : 4, title : 'Reports', icon : 'reports.svg'},
-                    {id : 5, title : 'Studio', icon : 'studio.svg'},
-                    {id : 6, title : 'Bundles', icon : 'bundles.svg'},
-                    {id : 7, title : 'Settings', icon : 'settings.svg'}
+                    {id : 1, title : 'Dashboard', icon : 'dashboard'}, 
+                    {id : 2, title : 'Users', icon : 'users'}, 
+                    {id : 3, title : 'Transaction', icon : 'transactions'}, 
+                    {id : 4, title : 'Reports', icon : 'reports'},
+                    {id : 5, title : 'Studio', icon : 'studio'},
+                    {id : 6, title : 'Bundles', icon : 'bundles'},
+                    {id : 7, title : 'Settings', icon : 'settings'}
                 
                 ].map((item) => (
                 <ListItem 
@@ -60,6 +60,9 @@ const SidebarContent = () => {
                             justifyContent:'flex-start',
                             marginBottom : '.5rem'
                         },
+                        '& .MuiTypography-root':{
+                            transition: 'color 0.5s'
+                        },
                         '&:hover .MuiTypography-root' : {
                             color : theme => theme.customBflyColors.green
                         }
@@ -73,17 +76,35 @@ const SidebarContent = () => {
                     }
                 }
                 >
-                    <ListItemButton>
-                    <ListItemIcon>
-                        <Img src={`/images/sidebar/icons/${item.icon}`} />
-                    </ListItemIcon>
-                    <ListItemText sx={{
-                        '& .MuiTypography-root': {
-                            color : '#BFC6D0', 
-                            fontSize: '0.875rem'
-                        } 
-                    }} 
-                    primary={item.title} />
+                    <ListItemButton 
+                        sx={{
+                            '& .iconContainer': {
+                                position:'relative',
+                                width:'30px',
+                                height: '30px',
+                            },
+                            '& .iconContainer > img' : {
+                                position:'absolute',
+                                transition: 'opacity 0.5s'
+                            },
+                            '& .iconContainer > img:last-child': {
+                                opacity:0
+                            },
+                            '&:hover .iconContainer > img:last-child': {
+                                opacity:1
+                            }
+                        }}>
+                        <ListItemIcon className='iconContainer'>
+                            <Img src={`/images/sidebar/icons/${item.icon}.svg`} />
+                            <Img src={`/images/sidebar/icons/${item.icon}-hover.svg`} />
+                        </ListItemIcon>
+                        <ListItemText sx={{
+                            '& .MuiTypography-root': {
+                                color : '#BFC6D0', 
+                                fontSize: '0.875rem'
+                            } 
+                        }} 
+                        primary={item.title} />
                     </ListItemButton>
                 </ListItem>
                 ))}

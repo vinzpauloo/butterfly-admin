@@ -92,6 +92,9 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
           lockedIcon: 
           <Box 
                 sx={{ 
+                  '&:hover': {
+                    backgroundColor: theme => theme.customBflyColors.green
+                  },
                   backgroundColor : '#fff', 
                   cursor:'pointer', ml: 6 , 
                   display: 'flex', 

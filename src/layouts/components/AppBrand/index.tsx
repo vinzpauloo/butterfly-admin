@@ -2,13 +2,8 @@
 import { useTheme, styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 
-
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
-
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
 
 // ** Styled component for the image
 const Img = styled('img')({
@@ -27,10 +22,9 @@ const Butterfly = styled('img')({
 const AppBrand = () => {
 
     // ** Hook
-    const { settings, saveSettings } = useSettings()
+    const { settings } = useSettings()
     const { navCollapsed } = settings
-    const theme = useTheme()
-
+    
     return (
       <Box
         sx={{ display: 'flex', alignItems: 'center' }}>
