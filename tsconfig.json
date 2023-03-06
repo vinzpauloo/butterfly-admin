@@ -27,11 +27,15 @@
       "apexcharts/*": [
         "./node_modules/apexcharts-clevision/*"
       ],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
     "src",
-    "declaration.d.ts"
+    "declaration.d.ts",
+    "next-env.d.ts", 
+    "**/*.ts", 
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules"
