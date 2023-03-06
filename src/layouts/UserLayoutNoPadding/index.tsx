@@ -6,13 +6,11 @@ import { Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Box from '@mui/material/Box'
 
-// ** Layout Imports
-// !Do not remove this Layout import
-import Layout from 'src/@core/layouts/Layout'
+// ** Custom Layout Imports
+import Layout from '@/layouts/UserLayoutNoPadding/Layout'
 
 // ** Navigation Imports
 import VerticalNavItems from 'src/navigation/verticalButterfly'
-import HorizontalNavItems from 'src/navigation/horizontal'
 
 // ** Icon
 import Icon from 'src/@core/components/icon'
@@ -22,21 +20,20 @@ import Icon from 'src/@core/components/icon'
 // import ServerSideVerticalNavItems from './components/vertical/ServerSideNavItems'
 // import ServerSideHorizontalNavItems from './components/horizontal/ServerSideNavItems'
 
-import VerticalAppBarContent from './components/vertical/AppBarContent'
-import HorizontalAppBarContent from './components/horizontal/AppBarContent'
+import VerticalAppBarContent from '../components/vertical/AppBarContent'
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
-import AppBrand from './components/AppBrand'
-import SidebarContent from './components/vertical/SidebarContent'
-import SidebarFooter from './components/vertical/SidebarFooter'
+import AppBrand from '../components/AppBrand'
+import SidebarContent from '../components/vertical/SidebarContent'
+import SidebarFooter from '../components/vertical/SidebarFooter'
 
 interface Props {
   children: ReactNode
   contentHeightFixed: boolean
 }
 
-const UserLayout = ({ children, contentHeightFixed }: Props) => {
+const UserLayoutNoPadding = ({ children, contentHeightFixed }: Props) => {
   // ** Hooks
   const { settings, saveSettings } = useSettings()
 
@@ -137,21 +134,9 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
           )
         }
       }}
-      {...(settings.layout === 'horizontal' && {
-        horizontalLayoutProps: {
-          navMenu: {
-            navItems: HorizontalNavItems()
-
-            // Uncomment the below line when using server-side menu in horizontal layout and comment the above line
-            // navItems: horizontalMenuItems
-          },
-          appBar: {
-            content: () => <HorizontalAppBarContent hidden={hidden} settings={settings} saveSettings={saveSettings} />
-          }
-        }
-      })}
       footerProps={{
-        content: () => <></> // no footer!
+        content: () => <></>,
+        sx:{ display:'none' }
       }}
     >
       {children}
@@ -160,4 +145,4 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
   )
 }
 
-export default UserLayout
+export default UserLayoutNoPadding
