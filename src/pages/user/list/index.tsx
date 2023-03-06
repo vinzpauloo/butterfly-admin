@@ -1,7 +1,9 @@
 // ** React Imports
 import React, {useState, ChangeEvent, useEffect} from 'react'
 
-import Image from 'next/image'
+// ** Next Imports
+import Image from 'next/image';
+import Link from 'next/link'
 
 // ** MUI Imports
 import {
@@ -533,6 +535,11 @@ const contentcreatorRows = [
   createContentCreatorData('Pai Long', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ContentCreatorToggle/>),
 ]
 
+const TableWrapper = styled('div')`
+  overflow-x: auto;
+  margin-bottom: 1rem;
+`;
+
 const Root = styled('div')`
   table {
     font-family: arial, sans-serif;
@@ -691,50 +698,58 @@ const UserList = () => {
           </Button>
         </Box>
 
-        <Button sx={{ border: 1, height: '56px', minWidth: '224px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black', textTransform: 'uppercase', color: 'black' }}>
-          Create Account
-        </Button>
+        <Link
+          style={{textDecoration: 'none'}}
+          href={{
+          pathname: 'list/CreateAccount'
+        }}>
+          <Button sx={{ border: 1, height: '56px', minWidth: '224px', width: ['100%', '224px'], display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black', textTransform: 'uppercase', color: 'black' }}>
+            Create Account
+          </Button>
+        </Link>
       </Box>
       <Root sx={{ minHeight: 540 }}>
-        <table aria-label="custom pagination table" style={{ overflowX: 'auto', maxWidth: '100%', marginBottom: '1rem', tableLayout: 'fixed' }}> {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
-          <colgroup>
-            {filteredColumns.map((column: any) => (
-              <col key={column.id} style={{ minWidth: column.minWidth }} />
+        <TableWrapper>
+          <table aria-label="custom pagination table" style={{ overflowX: 'auto', maxWidth: '100%', marginBottom: '1rem', tableLayout: 'fixed' }}> {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
+            <colgroup>
+              {filteredColumns.map((column: any) => (
+                <col key={column.id} style={{ minWidth: column.minWidth }} />
               ))}
-          </colgroup>
-          <thead>
-          <tr>
-            <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}><Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/></th>
-            {filteredColumns.map((column: any) => (
-              <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
-                {column.label}
-              </th>
-            ))}
-          </tr>
-          </thead>
-          <tbody>
-          {filteredRows
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((row: any) => {
-              return (
-                <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
-                  <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
-                  {filteredColumns.map((column: any) => {
-                    const value = row[column.id];
+            </colgroup>
+            <thead>
+            <tr>
+              <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}><Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/></th>
+              {filteredColumns.map((column: any) => (
+                <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
+                  {column.label}
+                </th>
+              ))}
+            </tr>
+            </thead>
+            <tbody>
+            {filteredRows
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row: any) => {
+                return (
+                  <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
+                    <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
+                    {filteredColumns.map((column: any) => {
+                      const value = row[column.id];
 
-                    return (
-                      <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                      return (
+                        <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>
+                          {column.format && typeof value === 'number'
+                            ? column.format(value)
+                            : value}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </TableWrapper>
       </Root>
       <Box style={{ margin: '0 auto' }}>
         <TablePagination
