@@ -12,6 +12,7 @@ import {
   IconButton,
   Typography,
   Button,
+  Switch,
 } from '@mui/material';
 import UnfoldMoreTwoToneIcon from '@mui/icons-material/UnfoldMoreTwoTone';
 import ArrowBackIos from '@mui/icons-material/ArrowBackIos';
@@ -23,8 +24,82 @@ import OperatorEditModal from "../components/OperatorEditModal";
 import SuperAgentEditModal from "../components/SuperAgentEditModal";
 import ContentCreatorEditModal from "../components/ContentCreatorEditModal";
 
-const OperatorToggleBtn = () => {
-  const [isOn, setIsOn] = useState(false);
+interface OperatorToggleBtnProps {
+  onChange?: () => void;
+  width?: number;
+  height?: number;
+  padding?: number;
+}
+
+interface SuperAgentToggleProps {
+  onChange?: () => void;
+  width?: number;
+  height?: number;
+  padding?: number;
+}
+
+interface ContentCreatorToggleProps {
+  onChange?: () => void;
+  width?: number;
+  height?: number;
+  padding?: number;
+}
+
+const StyledSwitch = styled(Switch)(({ theme }) => ({
+  width: '72px',
+  height: '42px',
+  '& .MuiSwitch-switchBase': {
+    margin: theme.spacing(3.50),
+    padding: 0,
+    transform: 'translateX(-0.50px)',
+    '&.Mui-checked': {
+      color: '#fff',
+      transform: 'translateX(28px)',
+      '& .MuiSwitch-thumb:before': {
+        content: "'ON'",
+      },
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: '#60FF00'
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    backgroundColor: 'white',
+    width: 15,
+    height: 15,
+    '&:before': {
+      content: "'OFF'",
+      fontSize: 7,
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      left: 0,
+      top: 3,
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      color: 'black'
+    },
+  },
+  '& .MuiSwitch-track': {
+    opacity: 1,
+    backgroundColor: '#F03738',
+    borderRadius: 20 / 2,
+  },
+}));
+const OperatorToggleBtn = ({ onChange, ...otherProps }: OperatorToggleBtnProps) => {
+
+  return (
+    <StyledSwitch onChange={(event) => {
+      if (event.target.checked) {
+        console.log(`TEST FUNCTION`);
+      }
+      onChange?.();
+    }} {...otherProps} />
+  );
+};
+
+const OperatorEditBtn = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -35,66 +110,29 @@ const OperatorToggleBtn = () => {
     setIsModalOpen(false);
   };
 
-  const handleClick = () => {
-    setIsOn(!isOn);
-  };
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: {xs: 'center', sm: 'unset'}, justifyContent: 'center', gap: 2}}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-        <button
-          style={{
-            display: 'inline-block',
-            position: 'relative',
-            width: '52px',
-            height: '20px',
-            border: '1px solid transparent',
-            borderRadius: '25px',
-            backgroundColor: isOn ? `#60FF00` : `#F03738`,
-            cursor: 'pointer'
-          }}
-          className={`toggle ${isOn ? 'on' : 'off'}`}
-          onClick={handleClick}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: '0px',
-              left: isOn ? '32px' : '0px',
-              width: '18px',
-              height: '18px',
-              borderRadius: '50%',
-              backgroundColor: 'white',
-              color: 'black',
-              textAlign: 'center',
-              lineHeight: '21px',
-              fontSize: '12px',
-              transition: 'transform 0.2s ease',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            {isOn ? (
-              <Typography sx={{fontSize: 7}}>ON</Typography>
-            ): (
-              <Typography sx={{fontSize: 7}}>OFF</Typography>
-            )}
-          </div>
-        </button>
-      </Box>
-      <Box>
-        <button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
-          <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
-        </button>
-        <OperatorEditModal isOpen={isModalOpen} onClose={handleModalClose} />
-      </Box>
-    </Box>
+    <>
+      <Button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
+        <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
+      </Button>
+      <OperatorEditModal isOpen={isModalOpen} onClose={handleModalClose} />
+    </>
   );
 }
 
-const SuperAgentToggle = () => {
-  const [isOn, setIsOn] = useState(false);
+const SuperAgentToggle = ({ onChange, ...otherProps }: SuperAgentToggleProps) => {
+
+  return (
+    <StyledSwitch onChange={(event) => {
+      if (event.target.checked) {
+        console.log(`TEST FUNCTION`);
+      }
+      onChange?.();
+    }} {...otherProps} />
+  );
+};
+
+const SuperAgentEditBtn = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -105,66 +143,29 @@ const SuperAgentToggle = () => {
     setIsModalOpen(false);
   };
 
-  const handleClick = () => {
-    setIsOn(!isOn);
-  };
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: {xs: 'center', sm: 'unset'}, justifyContent: 'center', gap: 2}}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-        <button
-          style={{
-            display: 'inline-block',
-            position: 'relative',
-            width: '52px',
-            height: '20px',
-            border: '1px solid transparent',
-            borderRadius: '25px',
-            backgroundColor: isOn ? `#60FF00` : `#F03738`,
-            cursor: 'pointer'
-          }}
-          className={`toggle ${isOn ? 'on' : 'off'}`}
-          onClick={handleClick}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: '0px',
-              left: isOn ? '32px' : '0px',
-              width: '18px',
-              height: '18px',
-              borderRadius: '50%',
-              backgroundColor: 'white',
-              color: 'black',
-              textAlign: 'center',
-              lineHeight: '21px',
-              fontSize: '12px',
-              transition: 'transform 0.2s ease',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            {isOn ? (
-              <Typography sx={{fontSize: 7}}>ON</Typography>
-            ): (
-              <Typography sx={{fontSize: 7}}>OFF</Typography>
-            )}
-          </div>
-        </button>
-      </Box>
-      <Box>
-        <button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
-          <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
-        </button>
-        <SuperAgentEditModal isOpen={isModalOpen} onClose={handleModalClose} />
-      </Box>
-    </Box>
+    <>
+      <Button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
+        <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
+      </Button>
+      <SuperAgentEditModal isOpen={isModalOpen} onClose={handleModalClose} />
+    </>
   );
 }
 
-const ContentCreatorToggle = () => {
-  const [isOn, setIsOn] = useState(false);
+const ContentCreatorToggle = ({ onChange, ...otherProps }: ContentCreatorToggleProps) => {
+
+  return (
+    <StyledSwitch onChange={(event) => {
+      if (event.target.checked) {
+        console.log(`TEST FUNCTION`);
+      }
+      onChange?.();
+    }} {...otherProps} />
+  );
+};
+
+const ContentCreatorEditBtn = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -175,61 +176,13 @@ const ContentCreatorToggle = () => {
     setIsModalOpen(false);
   };
 
-  const handleClick = () => {
-    setIsOn(!isOn);
-  };
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: {xs: 'center', sm: 'unset'}, justifyContent: 'center', gap: 2}}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-        <button
-          style={{
-            display: 'inline-block',
-            position: 'relative',
-            width: '52px',
-            height: '20px',
-            border: '1px solid transparent',
-            borderRadius: '25px',
-            backgroundColor: isOn ? `#60FF00` : `#F03738`,
-            cursor: 'pointer'
-          }}
-          className={`toggle ${isOn ? 'on' : 'off'}`}
-          onClick={handleClick}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: '0px',
-              left: isOn ? '32px' : '0px',
-              width: '18px',
-              height: '18px',
-              borderRadius: '50%',
-              backgroundColor: 'white',
-              color: 'black',
-              textAlign: 'center',
-              lineHeight: '21px',
-              fontSize: '12px',
-              transition: 'transform 0.2s ease',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            {isOn ? (
-              <Typography sx={{fontSize: 7}}>ON</Typography>
-            ): (
-              <Typography sx={{fontSize: 7}}>OFF</Typography>
-            )}
-          </div>
-        </button>
-      </Box>
-      <Box>
-        <button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
-          <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
-        </button>
-        <ContentCreatorEditModal isOpen={isModalOpen} onClose={handleModalClose} />
-      </Box>
-    </Box>
+    <>
+      <Button style={{background: 'transparent', border: 'none'}} onClick={handleModalOpen}>
+        <EditOutlinedIcon sx={{color: '#98A9BC', fontSize: 30}}/>
+      </Button>
+      <ContentCreatorEditModal isOpen={isModalOpen} onClose={handleModalClose} />
+    </>
   );
 }
 
@@ -399,7 +352,7 @@ interface operatorData {
   Email: string;
   DateCreated: any;
   LastLogin: any;
-  Action: JSX.Element
+  Action: JSX.Element[]
 }
 
 function createOperatorData(
@@ -408,7 +361,7 @@ function createOperatorData(
   Email: string,
   DateCreated: number,
   LastLogin: number,
-  Action: JSX.Element,
+  Action: JSX.Element[],
 ): operatorData {
   const formattedMobileNumber = `+${MobileNumber.toString().substring(0, 2)} ${MobileNumber.toString().substring(2, 5)} ${MobileNumber.toString().substring(5, 8)} ${MobileNumber.toString().substring(8)}`
   const date = new Date(DateCreated);
@@ -430,7 +383,7 @@ interface superAgentData {
   DateCreated: any;
   LastUpdate: any;
   SecurityFunds: any;
-  Action: JSX.Element
+  Action: JSX.Element[]
 }
 
 function createSuperAgentRows(
@@ -441,7 +394,7 @@ function createSuperAgentRows(
   DateCreated: any,
   LastUpdate: any,
   SecurityFunds: any,
-  Action: JSX.Element
+  Action: JSX.Element[]
 ): superAgentData {
   const formattedMobileNumber = `+${MobileNumber.toString().substring(0, 2)} ${MobileNumber.toString().substring(2, 5)} ${MobileNumber.toString().substring(5, 8)} ${MobileNumber.toString().substring(8)}`
   const date = new Date(DateCreated);
@@ -461,7 +414,7 @@ interface contentCreatorData {
   Email: string;
   DateCreated: any;
   LastUpdate: any;
-  Action: JSX.Element
+  Action: JSX.Element[]
 }
 
 function createContentCreatorData(
@@ -470,7 +423,7 @@ function createContentCreatorData(
   Email: string,
   DateCreated: number,
   LastUpdate: number,
-  Action: JSX.Element,
+  Action: JSX.Element[],
 ): contentCreatorData {
   const formattedMobileNumber = `+${MobileNumber.toString().substring(0, 2)} ${MobileNumber.toString().substring(2, 5)} ${MobileNumber.toString().substring(5, 8)} ${MobileNumber.toString().substring(8)}`
   const date = new Date(DateCreated);
@@ -484,61 +437,77 @@ function createContentCreatorData(
   return { Username, MobileNumber: formattedMobileNumber, Email, DateCreated: formattedDateCreated, LastUpdate: formattedLastLog, Action};
 }
 
-const operatorRows = [
-  createOperatorData('Mèng yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <OperatorToggleBtn/>),
-  createOperatorData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, <OperatorToggleBtn/>),
-];
-
-const superagentRows = [
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', <SuperAgentToggle/>),
-];
-
-const contentcreatorRows = [
-  createContentCreatorData('Yuxuan Hu', +639173263512, `cc@account.com`, 1632620222000, 1643320222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Wei Tao Bambang', +639276562210, `cc@account.com`, 1321812403000, 1323620222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Shi Kai Ding Bang', +639476545510, `cc@account.com`, 1662240621000, 1644420222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Fu Dong Da-Fu', +639276522210, `cc@account.com`, 1645137632000, 1643620222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Aiguo Chen', +639066523310, `cc@account.com`, 1648314228000, 1643621122000, <ContentCreatorToggle/>),
-  createContentCreatorData('Syaoran Taio', +639276573810, `cc@account.com`, 1643229492000, 1643330222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Ming Longwei', +639066523410, `cc@account.com`, 1692217173000, 1642220222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Lee Jiao-Long', +639976599210, `cc@account.com`, 1643223292000, 1643632222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Hua Mu Lan', +639176246210, `cc@account.com`, 1695227173000, 1643330222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Zhe Huang Ti', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Gong Xi', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Fei Long', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Jackie Chan', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ContentCreatorToggle/>),
-  createContentCreatorData('Pai Long', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, <ContentCreatorToggle/>),
+const operatorAction = [
+  <Box key={`operatorAction`} sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: 'center', justifyContent: 'center', gap: 0}}>
+    <OperatorToggleBtn/>
+    <OperatorEditBtn/>
+  </Box>
 ]
 
-const TableWrapper = styled('div')`
-  overflow-x: auto;
-  margin-bottom: 1rem;
-`;
+const operatorRows = [
+  createOperatorData('Mèng yáo', +639176543210, `my@account.com`, 1643620222000, 1643620222000, operatorAction),
+  createOperatorData('Xiāng', +639176543210, `my@account.com`, 1641812403000, 1643620222000, operatorAction),
+  createOperatorData('Niang Meng', +639176543210, `my@account.com`, 1661640621000, 1643620222000, operatorAction),
+  createOperatorData('Yao Wun', +639176543210, `my@account.com`, 1645137632000, 1643620222000, operatorAction),
+  createOperatorData('Lee Tok Hee', +639176543210, `my@account.com`, 1648314258000, 1643620222000, operatorAction),
+  createOperatorData('Aoxiang Sy', +639176543210, `my@account.com`, 1643239492000, 1643620222000, operatorAction),
+  createOperatorData('Xiao Ma', +639176543210, `my@account.com`, 1695217173000, 1643620222000, operatorAction),
+  createOperatorData('Li Mei', +639176543210, `my@account.com`, 1643220692000, 1643620222000, operatorAction),
+  createOperatorData('Jun Tao', +639176543210, `my@account.com`, 1695217173000, 1643620222000, operatorAction),
+  createOperatorData('Wang Fei', +639176543210, `my@account.com`, 1641811602000, 1643620222000, operatorAction),
+  createOperatorData('Chun Lee', +639176543210, `my@account.com`, 1641811602000, 1643620222000, operatorAction),
+  createOperatorData('Fei Long', +639176543210, `my@account.com`, 1641811602000, 1643620222000, operatorAction),
+  createOperatorData('Jackie Chan', +639176543210, `my@account.com`, 1644326766000, 1643620222000, operatorAction),
+  createOperatorData('Pai Long', +639176543210, `my@account.com`, 1644326766000, 1643620222000, operatorAction),
+];
+
+const superagentAction = [
+  <Box key={`superagentAction`} sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: 'center', justifyContent: 'center', gap: 0}}>
+    <SuperAgentToggle/>
+    <SuperAgentEditBtn/>
+  </Box>
+]
+
+const superagentRows = [
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+  createSuperAgentRows('SA-01', 'sample.com', +639176543210, 'sa@account.com', 1644326766000, 1643620222000, '333,000 CN¥', superagentAction),
+];
+
+const contentcreatorAction = [
+  <Box key={`contentcreatorAction`} sx={{ display: 'flex', flexDirection: {xs: 'column', sm: 'row'}, alignItems: 'center', justifyContent: 'center', gap: 0}}>
+    <ContentCreatorToggle/>
+    <ContentCreatorEditBtn/>
+  </Box>
+]
+
+const contentcreatorRows = [
+  createContentCreatorData('Yuxuan Hu', +639173263512, `cc@account.com`, 1632620222000, 1643320222000, contentcreatorAction),
+  createContentCreatorData('Wei Tao Bambang', +639276562210, `cc@account.com`, 1321812403000, 1323620222000, contentcreatorAction),
+  createContentCreatorData('Shi Kai Ding Bang', +639476545510, `cc@account.com`, 1662240621000, 1644420222000, contentcreatorAction),
+  createContentCreatorData('Fu Dong Da-Fu', +639276522210, `cc@account.com`, 1645137632000, 1643620222000, contentcreatorAction),
+  createContentCreatorData('Aiguo Chen', +639066523310, `cc@account.com`, 1648314228000, 1643621122000, contentcreatorAction),
+  createContentCreatorData('Syaoran Taio', +639276573810, `cc@account.com`, 1643229492000, 1643330222000, contentcreatorAction),
+  createContentCreatorData('Ming Longwei', +639066523410, `cc@account.com`, 1692217173000, 1642220222000, contentcreatorAction),
+  createContentCreatorData('Lee Jiao-Long', +639976599210, `cc@account.com`, 1643223292000, 1643632222000, contentcreatorAction),
+  createContentCreatorData('Hua Mu Lan', +639176246210, `cc@account.com`, 1695227173000, 1643330222000, contentcreatorAction),
+  createContentCreatorData('Zhe Huang Ti', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, contentcreatorAction),
+  createContentCreatorData('Gong Xi', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, contentcreatorAction),
+  createContentCreatorData('Fei Long', +639176543210, `cc@account.com`, 1641811602000, 1643620222000, contentcreatorAction),
+  createContentCreatorData('Jackie Chan', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, contentcreatorAction),
+  createContentCreatorData('Pai Long', +639176543210, `cc@account.com`, 1644326766000, 1643620222000, contentcreatorAction),
+]
 
 const Root = styled('div')`
   table {
@@ -546,7 +515,7 @@ const Root = styled('div')`
     border-collapse: separate;
     width: 100%;
     border-spacing: 0 15px;
-    table-layout: fixed;
+    //table-layout: fixed;
   }
 
   td,
@@ -708,49 +677,56 @@ const UserList = () => {
           </Button>
         </Link>
       </Box>
-      <Root sx={{ minHeight: 540 }}>
-        <TableWrapper>
-          <table aria-label="custom pagination table" style={{ overflowX: 'auto', maxWidth: '100%', marginBottom: '1rem', tableLayout: 'fixed' }}> {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
-            <colgroup>
-              {filteredColumns.map((column: any) => (
-                <col key={column.id} style={{ minWidth: column.minWidth }} />
-              ))}
-            </colgroup>
-            <thead>
-            <tr>
-              <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}><Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/></th>
-              {filteredColumns.map((column: any) => (
-                <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
-                  {column.label}
-                </th>
-              ))}
-            </tr>
-            </thead>
-            <tbody>
-            {filteredRows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row: any) => {
-                return (
-                  <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
-                    <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
-                    {filteredColumns.map((column: any) => {
-                      const value = row[column.id];
+      <Root sx={{ minHeight: 540, overflowX: 'auto' }}>
+        <table aria-label="custom pagination table" > {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
+          <colgroup>
+            {filteredColumns.map((column: any) => (
+              <col key={column.id} style={{ minWidth: column.minWidth }} />
+            ))}
+          </colgroup>
+          <thead>
+          <tr>
+            <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}>
+              {activeBtn === 'operators' ? (
+                <Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/>
+              ): activeBtn === 'superagent' ? (
+                <Image src='/images/icons/project-icons/superagent-icon.png' alt="icon" width={50} height={50}/>
+              ): activeBtn === 'contentcreators' && (
+                <Image src='/images/icons/project-icons/creator-icon.png' alt="icon" width={50} height={50}/>
+                )}
+            </th>
+            {filteredColumns.map((column: any) => (
+              <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
+                {column.label}
+              </th>
+            ))}
+          </tr>
+          </thead>
+          <tbody>
+          {filteredRows
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((row: any) => {
+              return (
+                <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
+                  <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
+                  {filteredColumns.map((column: any) => {
+                    const value = row[column.id];
 
-                      return (
-                        <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </TableWrapper>
+                    return (
+                      <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>
+                        {column.format && typeof value === 'number'
+                          ? column.format(value)
+                          : value}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </Root>
+      {/*<UserTable/>*/}
       <Box style={{ margin: '0 auto' }}>
         <TablePagination
           component="div"
@@ -785,7 +761,7 @@ const UserList = () => {
                       width: 24,
                       height: 24,
                       borderRadius: 2,
-                      backgroundColor: page === pageNumber ? 'black' : 'white',
+                      backgroundColor: page === pageNumber ? '#9747FF' : 'white',
                       color: page === pageNumber ? 'white' : 'black',
                       marginLeft: 2,
                       marginRight: 2,
