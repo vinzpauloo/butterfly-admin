@@ -1,6 +1,12 @@
 // ** React Imports
 import React, { ReactNode } from 'react'
 
+// ** MUI Imports
+import Box, {BoxProps} from '@mui/material/Box'
+import { styled } from '@mui/material/styles'
+
+const bgPath = '/images/studio/uploadBG.jpg'
+
 // ** Layout Imports
 import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
 
@@ -9,6 +15,27 @@ import UploadMenu from './views/UploadMenu'
 import UploadVideoStep1 from './views/UploadVideoStep1'
 import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
 
+// ** Styled Components
+const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
+  backgroundImage: `url("${bgPath}")`,
+  backgroundSize: 'cover',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: '100% 75%',
+  backgroundColor: '#d3d6df',
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  flexDirection: 'column',
+
+  [theme.breakpoints.down('sm')]: {
+      padding:'1em 1em',
+  },
+  
+
+  [theme.breakpoints.up('sm')]: {
+      paddingTop: '5rem',
+  }
+}))
 
 export enum DisplayPage {
     MainPage,
@@ -35,7 +62,9 @@ const UploadContent = () => {
 
   return (
     <StudioContext.Provider value={{  displayPage, setDisplayPage }}>
+      <BoxBG>
         {PageDisplay()}
+      </BoxBG>
     </StudioContext.Provider>
   )
 }

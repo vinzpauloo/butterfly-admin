@@ -7,8 +7,6 @@ import Typography from '@mui/material/Typography'
 import Box, {BoxProps} from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
-const bgPath = '/images/studio/uploadBG.jpg'
-
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
@@ -19,27 +17,6 @@ import { StudioContext } from '..'
 import { DisplayPage } from '..'
 
 // ** Styled Components
-const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
-    backgroundImage: `url("${bgPath}")`,
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: '100% 75%',
-    backgroundColor: '#d3d6df',
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'column',
-
-    [theme.breakpoints.down('sm')]: {
-        padding:'1em 1em',
-    },
-    
-
-    [theme.breakpoints.up('sm')]: {
-        paddingTop: '5rem',
-    }
-}))
-
 const UploadBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
     [theme.breakpoints.up('sm')]: {
         maxWidth:'416px',
@@ -50,8 +27,6 @@ const UploadBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
 const TOSLink = styled(Link)(({ theme }) => ({
     color : theme.palette.common.white
 }))
-
-
 
 type Props = {}
 
@@ -68,7 +43,7 @@ const UploadMenu = (props: Props) => {
   }
 
   return (
-    <BoxBG>
+    <>
         <Typography
             variant='h6'
             sx={{
@@ -125,7 +100,7 @@ const UploadMenu = (props: Props) => {
                 </Grid>
             </Grid>
         </BasicCard>
-    </BoxBG>
+    </>
   )
 }
 
