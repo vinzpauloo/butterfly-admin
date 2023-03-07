@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 
 // ** MUI Imports
 import {
@@ -8,13 +8,36 @@ import {
   TextField,
   Typography
 } from "@mui/material";
+import { styled } from '@mui/system';
 
 // ** Next Imports
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import CreatedSuccessful from "./CreatedSuccessful";
+import UserLayoutNoPadding from "@/layouts/UserLayoutNoPadding";
+
+import {BoxProps} from "@mui/material/Box";
+
+const bgPath = '/images/pages/bitcoin-bg.png'
+const bgPathTwo = '/images/pages/operator-create-bg.png'
 
 const CreateAccount = () => {
+
+  // ** Styled Components
+  const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
+    backgroundImage: submitted || continueBtnTwo ? `url("${bgPath}")` : `url("${bgPathTwo}")`,
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '100% 75%',
+    backgroundColor: '#d3d6df',
+    padding: 10,
+    height: 'auto',
+
+    [theme.breakpoints.up('sm')]: {
+      padding: 80,
+      height: '100vh'
+    }
+  }))
 
   const [submitted, setSubmitted] = useState(false);
   const [continueBtn, setContinueBtn] = useState(false);
@@ -71,6 +94,7 @@ const CreateAccount = () => {
   }, []);
 
   return (
+    <BoxBG>
     <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'center'], gap: 10, }}>
       <Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -659,7 +683,11 @@ const CreateAccount = () => {
         </Box>
       )}
     </Box>
+    </BoxBG>
   )
 }
+
+CreateAccount.contentHeightFixed = false
+CreateAccount.getLayout = (page: ReactNode) => <UserLayoutNoPadding contentHeightFixed={CreateAccount.contentHeightFixed}>{page}</UserLayoutNoPadding>
 
 export default CreateAccount
