@@ -1,93 +1,71 @@
 // ** React Imports
-import { useState, ReactNode, MouseEvent } from 'react'
+import React, { ReactNode } from 'react'
 
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
 import Box, {BoxProps} from '@mui/material/Box'
-import MuiCard, { CardProps } from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
 
 const bgPath = '/images/studio/uploadBG.jpg'
 
 // ** Layout Imports
 import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
-import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
-import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
+
+//** Views Imports */
+import UploadMenu from './views/UploadMenu'
+import UploadVideoStep1 from './views/UploadVideoStep1'
+import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
 
 // ** Styled Components
 const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
-    backgroundImage: `url("${bgPath}")`,
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: '100% 75%',
-    backgroundColor: '#d3d6df',
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'column',
+  backgroundImage: `url("${bgPath}")`,
+  backgroundSize: 'cover',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: '100% 75%',
+  backgroundColor: '#d3d6df',
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  flexDirection: 'column',
 
-    [theme.breakpoints.up('sm')]: {
-        paddingTop: '5rem',
-    }
+  [theme.breakpoints.down('sm')]: {
+      padding:'1em 1em',
+  },
+  
+
+  [theme.breakpoints.up('sm')]: {
+      paddingTop: '5rem',
+  }
 }))
 
-// ** Styled Components
-const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
-    [theme.breakpoints.up('sm')]: { width: '40rem' }
-}))
+export enum DisplayPage {
+    MainPage,
+    UploadVideoStep1,
+    UploadNewsfeedsStep1,
+}
+
+type StudioContextType = {
+    displayPage : DisplayPage,
+    setDisplayPage : React.Dispatch<React.SetStateAction<DisplayPage>>
+}
+
+export const StudioContext = React.createContext<null | StudioContextType>(null)
 
 const UploadContent = () => {
+  
+  const [displayPage, setDisplayPage] = React.useState<DisplayPage>(DisplayPage.MainPage)
+
+  const PageDisplay = () => {
+    if (displayPage == DisplayPage.MainPage) return <UploadMenu />
+    if (displayPage == DisplayPage.UploadVideoStep1) return <UploadVideoStep1 />
+    if (displayPage == DisplayPage.UploadNewsfeedsStep1) return <UploadNewsfeedsStep1 />
+}
 
   return (
-    <BoxBG>
-        
-        <Typography
-            variant='h6'
-            sx={{
-                marginInline:'auto',
-                mb:7,
-                lineHeight: 1,
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                fontSize: '1.5rem !important',
-                textAlign:'center'
-            }}
-            color={ theme => theme.customBflyColors.primary }
-            >
-            THE STUDIO PAGE - UPLOAD
-        </Typography>
-
-        <BasicCard>
-            <Grid maxWidth={700} container rowGap={5}>
-                <Grid xs={12}>
-                <Typography color={theme => theme.palette.common.white} variant='subtitle2' 
-                    sx={{ 
-                        mb: 2,
-                        textAlign:'center',
-                        fontWeight: 400
-                    }}>
-                    Please Select content to upload
-                </Typography>
-                </Grid>
-                <Grid xs={12} item>
-                    <CustomButton>Upload Video</CustomButton>
-                </Grid>
-                <Grid xs={12} item>
-                    <CustomButton>Upload NEWSFEEDS</CustomButton>
-                </Grid>
-                <Grid xs={12}>
-                    <Typography sx={{fontWeight : 'normal'}} color={ theme => theme.palette.common.white }>
-                    Your videos or photos will be private until you publish them.
-
-By submitting your videos to Butterfly Project, you acknowledge that you agree to Butterfly’s Terms of Service and Community Guidelines.
-Please be sure not to violate others' copyright or privacy rights. Learn more.
-                    </Typography>
-                    
-                </Grid>
-            </Grid>
-        </BasicCard>
-    </BoxBG>
+    <StudioContext.Provider value={{  displayPage, setDisplayPage }}>
+      <BoxBG>
+        {PageDisplay()}
+      </BoxBG>
+    </StudioContext.Provider>
   )
 }
 
