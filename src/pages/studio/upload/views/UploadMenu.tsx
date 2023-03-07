@@ -28,6 +28,7 @@ const TOSLink = styled(Link)(({ theme }) => ({
     color : theme.palette.common.white
 }))
 
+// ** Types & Interfaces
 type Props = {}
 
 const UploadMenu = (props: Props) => {

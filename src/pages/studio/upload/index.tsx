@@ -14,6 +14,8 @@ import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
 import UploadMenu from './views/UploadMenu'
 import UploadVideoStep1 from './views/UploadVideoStep1'
 import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
+import LoadingScreen from './views/LoadingScreen'
+
 
 // ** Styled Components
 const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
@@ -41,7 +43,29 @@ export enum DisplayPage {
     MainPage,
     UploadVideoStep1,
     UploadNewsfeedsStep1,
+    LoadingScreen
 }
+
+export type RequestType = {
+  user_id : number,
+  title : string,
+  description : string,
+  orientation : 'landscape' | 'portrait',
+  tags : string[],
+  has_own_trial : boolean
+}
+export type ResponseType = {
+  user_id : number,
+  title : string,
+  description : string,
+  orientation : 'landscape' | 'portrait',
+  thumbnail_url : string,
+  tags : string[],
+  has_own_trial : boolean,
+  full_uid : string,
+  full_upload_url : string, 
+}
+
 
 type StudioContextType = {
     displayPage : DisplayPage,
@@ -58,6 +82,8 @@ const UploadContent = () => {
     if (displayPage == DisplayPage.MainPage) return <UploadMenu />
     if (displayPage == DisplayPage.UploadVideoStep1) return <UploadVideoStep1 />
     if (displayPage == DisplayPage.UploadNewsfeedsStep1) return <UploadNewsfeedsStep1 />
+    if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
+    LoadingScreen
 }
 
   return (
