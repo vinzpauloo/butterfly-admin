@@ -15,7 +15,7 @@ import { styled } from '@mui/system';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
-import CreatedSuccessful from "./CreatedSuccessful";
+import CreatedSuccessful from "../components/form/CreatedSuccessful";
 import UserLayoutNoPadding from "@/layouts/UserLayoutNoPadding";
 
 const bgPath = '/images/pages/bitcoin-bg.png'
