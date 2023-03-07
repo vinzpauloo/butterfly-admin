@@ -39,13 +39,13 @@ const SidebarContent = () => {
             >
             <List>
                 {[
-                    {id : 1, title : 'Dashboard', icon : 'dashboard'}, 
-                    {id : 2, title : 'Users', icon : 'users'}, 
-                    {id : 3, title : 'Transaction', icon : 'transactions'}, 
-                    {id : 4, title : 'Reports', icon : 'reports'},
-                    {id : 5, title : 'Studio', icon : 'studio'},
-                    {id : 6, title : 'Bundles', icon : 'bundles'},
-                    {id : 7, title : 'Settings', icon : 'settings'}
+                    {id : 1, title : 'Dashboard', icon : 'dashboard', link : ''}, 
+                    {id : 2, title : 'Users', icon : 'users', link : '/user/list'}, 
+                    {id : 3, title : 'Transaction', icon : 'transactions', link : ''}, 
+                    {id : 4, title : 'Reports', icon : 'reports', link : ''},
+                    {id : 5, title : 'Studio', icon : 'studio', link : '/studio/upload'},
+                    {id : 6, title : 'Bundles', icon : 'bundles', link : ''},
+                    {id : 7, title : 'Settings', icon : 'settings', link : ''}
                 
                 ].map((item) => (
                 <ListItem 
@@ -76,7 +76,8 @@ const SidebarContent = () => {
                     }
                 }
                 >
-                    <ListItemButton 
+                    <ListItemButton
+                        href={`${item.link}`} 
                         sx={{
                             '& .iconContainer': {
                                 position:'relative',
