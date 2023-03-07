@@ -1,5 +1,5 @@
 // ** React Imports
-import React, {useState, ChangeEvent, useEffect} from 'react'
+import React, {useState, ChangeEvent, useEffect, ReactNode} from 'react'
 
 // ** Next Imports
 import Image from 'next/image';
@@ -23,6 +23,24 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import OperatorEditModal from "../components/OperatorEditModal";
 import SuperAgentEditModal from "../components/SuperAgentEditModal";
 import ContentCreatorEditModal from "../components/ContentCreatorEditModal";
+import UserLayoutNoPadding from "@/layouts/UserLayoutNoPadding";
+import {BoxProps} from "@mui/material/Box";
+
+const bgPath = '/images/pages/user-bg.png'
+
+// ** Styled Components
+const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
+  backgroundImage: `url("${bgPath}")`,
+  backgroundSize: 'cover',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: '100% 75%',
+  backgroundColor: '#d3d6df',
+  padding: 10,
+
+  [theme.breakpoints.up('sm')]: {
+    padding: 50
+  }
+}))
 
 interface OperatorToggleBtnProps {
   onChange?: () => void;
@@ -602,192 +620,198 @@ const UserList = () => {
   }, []);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: 'auto', overflow: 'hidden' }}>
-      <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'space-between'], mb: 5 }}>
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 5 }}>
-          <Button onClick={handleOperatorsClick} sx={{
-            border: 1,
-            height: '56px',
-            minWidth: '224px',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderColor: 'black',
-            backgroundColor: activeBtn === 'operators' ? '#9747FF' : null,
-            color: activeBtn === 'operators' ? '#FFF' : 'black',
-            transition: 'background-color 0.1s',
-            '&:hover': {
-              backgroundColor: `#9747FF`,
-              color: 'white',
-            },
-            textTransform: 'uppercase',
-          }}>
-            Operators
-          </Button>
-          <Button onClick={handleSuperAgentClick} sx={{
-            border: 1,
-            height: '56px',
-            minWidth: '224px',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderColor: 'black',
-            backgroundColor: activeBtn === 'superagent' ? '#9747FF' : null,
-            color: activeBtn === 'superagent' ? '#FFF' : 'black',
-            transition: 'background-color 0.1s',
-            '&:hover': {
-              backgroundColor: `#9747FF`,
-              color: 'white',
-            },
-            textTransform: 'uppercase'
-          }}>
-            Super Agent
-          </Button>
-          <Button onClick={handleContentCreatorsClick} sx={{
-            border: 1,
-            height: '56px',
-            minWidth: '224px',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderColor: 'black',
-            backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : null,
-            color: activeBtn === 'contentcreators' ? '#FFF' : 'black',
-            transition: 'background-color 0.1s',
-            '&:hover': {
-              backgroundColor: `#9747FF`,
-              color: 'white',
-            },
-            textTransform: 'uppercase',
-          }}>
-            Content Creators
-          </Button>
+    <BoxBG>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: 'auto', overflow: 'hidden' }}>
+        <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'space-between'], mb: 5 }}>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 5 }}>
+            <Button onClick={handleOperatorsClick} sx={{
+              border: 1,
+              height: '56px',
+              minWidth: '224px',
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderColor: 'black',
+              backgroundColor: activeBtn === 'operators' ? '#9747FF' : null,
+              color: activeBtn === 'operators' ? '#FFF' : 'black',
+              transition: 'background-color 0.1s',
+              '&:hover': {
+                backgroundColor: `#9747FF`,
+                color: 'white',
+              },
+              textTransform: 'uppercase',
+            }}>
+              Operators
+            </Button>
+            <Button onClick={handleSuperAgentClick} sx={{
+              border: 1,
+              height: '56px',
+              minWidth: '224px',
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderColor: 'black',
+              backgroundColor: activeBtn === 'superagent' ? '#9747FF' : null,
+              color: activeBtn === 'superagent' ? '#FFF' : 'black',
+              transition: 'background-color 0.1s',
+              '&:hover': {
+                backgroundColor: `#9747FF`,
+                color: 'white',
+              },
+              textTransform: 'uppercase'
+            }}>
+              Super Agent
+            </Button>
+            <Button onClick={handleContentCreatorsClick} sx={{
+              border: 1,
+              height: '56px',
+              minWidth: '224px',
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderColor: 'black',
+              backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : null,
+              color: activeBtn === 'contentcreators' ? '#FFF' : 'black',
+              transition: 'background-color 0.1s',
+              '&:hover': {
+                backgroundColor: `#9747FF`,
+                color: 'white',
+              },
+              textTransform: 'uppercase',
+            }}>
+              Content Creators
+            </Button>
+          </Box>
+
+          <Link
+            style={{textDecoration: 'none'}}
+            href={{
+              pathname: activeBtn === 'operators' ? 'list/CreateAccount' : activeBtn === 'superagent' ? 'list/CreateAccount' : 'list/CreateAccount',
+              query: { activeBtn }
+            }}>
+            <Button sx={{ border: 1, height: '56px', minWidth: '224px', width: ['100%', '224px'], display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black', textTransform: 'uppercase', color: 'black' }}>
+              Create Account
+            </Button>
+          </Link>
         </Box>
-
-        <Link
-          style={{textDecoration: 'none'}}
-          href={{
-          pathname: 'list/CreateAccount'
-        }}>
-          <Button sx={{ border: 1, height: '56px', minWidth: '224px', width: ['100%', '224px'], display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black', textTransform: 'uppercase', color: 'black' }}>
-            Create Account
-          </Button>
-        </Link>
-      </Box>
-      <Root sx={{ minHeight: 540, overflowX: 'auto' }}>
-        <table aria-label="custom pagination table" > {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
-          <colgroup>
-            {filteredColumns.map((column: any) => (
-              <col key={column.id} style={{ minWidth: column.minWidth }} />
-            ))}
-          </colgroup>
-          <thead>
-          <tr>
-            <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}>
-              {activeBtn === 'operators' ? (
-                <Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/>
-              ): activeBtn === 'superagent' ? (
-                <Image src='/images/icons/project-icons/superagent-icon.png' alt="icon" width={50} height={50}/>
-              ): activeBtn === 'contentcreators' && (
-                <Image src='/images/icons/project-icons/creator-icon.png' alt="icon" width={50} height={50}/>
+        <Root sx={{ minHeight: 540, overflowX: 'auto' }}>
+          <table aria-label="custom pagination table" > {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
+            <colgroup>
+              {filteredColumns.map((column: any) => (
+                <col key={column.id} style={{ minWidth: column.minWidth }} />
+              ))}
+            </colgroup>
+            <thead>
+            <tr>
+              <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}>
+                {activeBtn === 'operators' ? (
+                  <Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/>
+                ): activeBtn === 'superagent' ? (
+                  <Image src='/images/icons/project-icons/superagent-icon.png' alt="icon" width={50} height={50}/>
+                ): activeBtn === 'contentcreators' && (
+                  <Image src='/images/icons/project-icons/creator-icon.png' alt="icon" width={50} height={50}/>
                 )}
-            </th>
-            {filteredColumns.map((column: any) => (
-              <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
-                {column.label}
               </th>
-            ))}
-          </tr>
-          </thead>
-          <tbody>
-          {filteredRows
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((row: any) => {
+              {filteredColumns.map((column: any) => (
+                <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
+                  {column.label}
+                </th>
+              ))}
+            </tr>
+            </thead>
+            <tbody>
+            {filteredRows
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row: any) => {
+                return (
+                  <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
+                    <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
+                    {filteredColumns.map((column: any) => {
+                      const value = row[column.id];
+
+                      return (
+                        <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>
+                          {column.format && typeof value === 'number'
+                            ? column.format(value)
+                            : value}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </Root>
+        {/*<UserTable/>*/}
+        <Box style={{ margin: '0 auto' }}>
+          <TablePagination
+            component="div"
+            count={filteredRows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelDisplayedRows={() => ""}
+            labelRowsPerPage=""
+            rowsPerPageOptions={[]}
+            ActionsComponent={(props) => {
+              const { onPageChange, page } = props;
+
               return (
-                <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
-                  <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
-                  {filteredColumns.map((column: any) => {
-                    const value = row[column.id];
-
-                    return (
-                      <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </Root>
-      {/*<UserTable/>*/}
-      <Box style={{ margin: '0 auto' }}>
-        <TablePagination
-          component="div"
-          count={filteredRows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelDisplayedRows={() => ""}
-          labelRowsPerPage=""
-          rowsPerPageOptions={[]}
-          ActionsComponent={(props) => {
-            const { onPageChange, page } = props;
-
-            return (
-              <Box style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                <IconButton
-                  onClick={() => onPageChange(null, page - 1)}
-                  disabled={page === 0}
-                  aria-label="previous page"
-                >
-                  <ArrowBackIos sx={{ fontSize: 12, color: 'black' }} />
-                  <Typography style={{color: 'black', fontSize: 12, paddingLeft: '4px'}}>Prev</Typography>
-                </IconButton>
-                {[0, 1].map((pageNumber) => (
-                  <Box
-                    key={pageNumber}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 24,
-                      height: 24,
-                      borderRadius: 2,
-                      backgroundColor: page === pageNumber ? '#9747FF' : 'white',
-                      color: page === pageNumber ? 'white' : 'black',
-                      marginLeft: 2,
-                      marginRight: 2,
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => onPageChange(null, pageNumber)}
+                <Box style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <IconButton
+                    onClick={() => onPageChange(null, page - 1)}
+                    disabled={page === 0}
+                    aria-label="previous page"
                   >
-                    {pageNumber + 1}
-                  </Box>
-                ))}
-                <IconButton
-                  onClick={() => onPageChange(null, page + 1)}
-                  disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}
-                  aria-label="next page"
-                  sx={{ fontSize: 12, color: 'black' }}
-                >
-                  <Typography sx={{color: 'black', fontSize: 12, paddingRight: '4px'}}>Next</Typography>
-                  <ArrowForwardIos sx={{ fontSize: 12, color: 'black' }} />
-                </IconButton>
-              </Box>
-            );
-          }}
-        />
+                    <ArrowBackIos sx={{ fontSize: 12, color: 'black' }} />
+                    <Typography style={{color: 'black', fontSize: 12, paddingLeft: '4px'}}>Prev</Typography>
+                  </IconButton>
+                  {[0, 1].map((pageNumber) => (
+                    <Box
+                      key={pageNumber}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 24,
+                        height: 24,
+                        borderRadius: 2,
+                        backgroundColor: page === pageNumber ? '#9747FF' : 'white',
+                        color: page === pageNumber ? 'white' : 'black',
+                        marginLeft: 2,
+                        marginRight: 2,
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => onPageChange(null, pageNumber)}
+                    >
+                      {pageNumber + 1}
+                    </Box>
+                  ))}
+                  <IconButton
+                    onClick={() => onPageChange(null, page + 1)}
+                    disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}
+                    aria-label="next page"
+                    sx={{ fontSize: 12, color: 'black' }}
+                  >
+                    <Typography sx={{color: 'black', fontSize: 12, paddingRight: '4px'}}>Next</Typography>
+                    <ArrowForwardIos sx={{ fontSize: 12, color: 'black' }} />
+                  </IconButton>
+                </Box>
+              );
+            }}
+          />
+        </Box>
       </Box>
-    </Box>
+    </BoxBG>
   );
 };
+
+UserList.contentHeightFixed = false
+UserList.getLayout = (page: ReactNode) => <UserLayoutNoPadding contentHeightFixed={UserList.contentHeightFixed}>{page}</UserLayoutNoPadding>
 
 export default UserList

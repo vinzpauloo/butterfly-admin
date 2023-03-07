@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 
 // ** MUI Imports
 import {
@@ -8,19 +8,45 @@ import {
   TextField,
   Typography
 } from "@mui/material";
+import { styled } from '@mui/system';
 
 // ** Next Imports
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import CreatedSuccessful from "./CreatedSuccessful";
+import UserLayoutNoPadding from "@/layouts/UserLayoutNoPadding";
+
+import {BoxProps} from "@mui/material/Box";
+
+const bgPath = '/images/pages/bitcoin-bg.png'
+const bgPathTwo = '/images/pages/operator-create-bg.png'
 
 const CreateAccount = () => {
+
+  // ** Styled Components
+  const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
+    backgroundImage: submitted || continueBtnTwo ? `url("${bgPathTwo}")` : `url("${bgPath}")`,
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '100% 75%',
+    backgroundColor: '#d3d6df',
+    padding: 10,
+    height: 'auto',
+
+    [theme.breakpoints.up('sm')]: {
+      padding: 80,
+      height: '100vh'
+    }
+  }))
 
   const [submitted, setSubmitted] = useState(false);
   const [continueBtn, setContinueBtn] = useState(false);
   const [continueBtnTwo, setContinueBtnTwo] = useState(false);
 
   const router = useRouter();
+  const param = router.query;
+
+  console.log(param.activeBtn)
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -47,7 +73,7 @@ const CreateAccount = () => {
   }
 
   const handleOperatorClick = () => {
-    setActiveBtn('operator')
+    setActiveBtn('operators')
   }
 
   const handleSuperAgentClick = () => {
@@ -55,13 +81,14 @@ const CreateAccount = () => {
   }
 
   const handleCreatorClick = () => {
-    setActiveBtn('contentcreator')
+    setActiveBtn('contentcreators')
   }
 
   const [isMobile, setIsMobile] = useState(false);
   const [activeBtn, setActiveBtn] = useState('')
   useEffect(() => {
-    setActiveBtn('operator')
+    setActiveBtn(`${param.activeBtn}`)
+    console.log('operator')
     setSubmitted(false)
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
@@ -71,6 +98,7 @@ const CreateAccount = () => {
   }, []);
 
   return (
+    <BoxBG>
     <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'center'], gap: 10, }}>
       <Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -85,8 +113,8 @@ const CreateAccount = () => {
             gap: 2,
             borderColor: 'black',
             transition: 'background-color 0.1s',
-            backgroundColor: activeBtn === 'operator' ? '#9747FF' : 'white',
-            color: activeBtn === 'operator' ? 'white' : 'black',
+            backgroundColor: activeBtn === 'operators' ? '#9747FF' : 'white',
+            color: activeBtn === 'operators' ? 'white' : 'black',
             '&:hover': {
               backgroundColor: `#9747FF`,
               color: 'white',
@@ -131,8 +159,8 @@ const CreateAccount = () => {
               gap: 2,
               borderColor: 'black',
               transition: 'background-color 0.1s',
-              backgroundColor: activeBtn === 'contentcreator' ? '#9747FF' : 'white',
-              color: activeBtn === 'contentcreator' ? 'white' : 'black',
+              backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : 'white',
+              color: activeBtn === 'contentcreators' ? 'white' : 'black',
               '&:hover': {
                 backgroundColor: `#9747FF`,
                 color: 'white',
@@ -146,7 +174,7 @@ const CreateAccount = () => {
         </Box>
       </Box>
 
-      {activeBtn === 'operator' ? (
+      {activeBtn === 'operators' ? (
         <Box>
           {!submitted ? (
             <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
@@ -551,7 +579,7 @@ const CreateAccount = () => {
               )
           }
         </Box>
-      ): activeBtn === 'contentcreator' && (
+      ): activeBtn === 'contentcreators' && (
         <Box>
           {!submitted ? (
             <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
@@ -659,7 +687,11 @@ const CreateAccount = () => {
         </Box>
       )}
     </Box>
+    </BoxBG>
   )
 }
+
+CreateAccount.contentHeightFixed = false
+CreateAccount.getLayout = (page: ReactNode) => <UserLayoutNoPadding contentHeightFixed={CreateAccount.contentHeightFixed}>{page}</UserLayoutNoPadding>
 
 export default CreateAccount
