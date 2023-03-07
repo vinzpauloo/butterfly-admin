@@ -42,7 +42,6 @@ const BoxBG = styled(Box)(({ theme }) => {
 
     [theme.breakpoints.up('sm')]: {
       padding: 80,
-      height: '100vh'
     }
   };
 });
