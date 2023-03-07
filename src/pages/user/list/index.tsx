@@ -13,18 +13,19 @@ import {
   Typography,
   Button,
   Switch,
+  BoxProps,
 } from '@mui/material';
 import UnfoldMoreTwoToneIcon from '@mui/icons-material/UnfoldMoreTwoTone';
 import ArrowBackIos from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { styled } from '@mui/system';
+import { createTheme } from '@mui/material/styles';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 import OperatorEditModal from "../components/OperatorEditModal";
 import SuperAgentEditModal from "../components/SuperAgentEditModal";
 import ContentCreatorEditModal from "../components/ContentCreatorEditModal";
 import UserLayoutNoPadding from "@/layouts/UserLayoutNoPadding";
-import {BoxProps} from "@mui/material/Box";
 
 const bgPath = '/images/pages/user-bg.png'
 
@@ -619,6 +620,30 @@ const UserList = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const [src, setSrc] = useState('/images/icons/project-icons/operator-icon.png');
+  const [agentSrc, setAgentSrc] = useState('/images/icons/project-icons/superagent-icon.png')
+  const [creatorSrc,setCreatorSrc] = useState('/images/icons/project-icons/creator-icon.png')
+
+  const handleMouseEnter = () => {
+    if (activeBtn === 'operators') {
+      setSrc('/images/icons/project-icons/operator-icon-hover.png');
+    } else if (activeBtn === 'superagent') {
+      setAgentSrc('/images/icons/project-icons/superagent-icon-hover.png');
+    } else if (activeBtn === 'contentcreators') {
+      setCreatorSrc('/images/icons/project-icons/creator-icon-hover.png');
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (activeBtn === 'operators') {
+      setSrc('/images/icons/project-icons/user-table-icon.png');
+    } else if (activeBtn === 'superagent') {
+      setAgentSrc('/images/icons/project-icons/superagent-icon.png');
+    } else if (activeBtn === 'contentcreators') {
+      setCreatorSrc('/images/icons/project-icons/creator-icon.png');
+    }
+  };
+
   return (
     <BoxBG>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: 'auto', overflow: 'hidden' }}>
@@ -633,7 +658,7 @@ const UserList = () => {
               alignItems: 'center',
               justifyContent: 'center',
               borderColor: 'black',
-              backgroundColor: activeBtn === 'operators' ? '#9747FF' : null,
+              backgroundColor: activeBtn === 'operators' ? '#9747FF' : '#FFF',
               color: activeBtn === 'operators' ? '#FFF' : 'black',
               transition: 'background-color 0.1s',
               '&:hover': {
@@ -653,7 +678,7 @@ const UserList = () => {
               alignItems: 'center',
               justifyContent: 'center',
               borderColor: 'black',
-              backgroundColor: activeBtn === 'superagent' ? '#9747FF' : null,
+              backgroundColor: activeBtn === 'superagent' ? '#9747FF' : '#FFF',
               color: activeBtn === 'superagent' ? '#FFF' : 'black',
               transition: 'background-color 0.1s',
               '&:hover': {
@@ -673,7 +698,7 @@ const UserList = () => {
               alignItems: 'center',
               justifyContent: 'center',
               borderColor: 'black',
-              backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : null,
+              backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : '#FFF',
               color: activeBtn === 'contentcreators' ? '#FFF' : 'black',
               transition: 'background-color 0.1s',
               '&:hover': {
@@ -692,13 +717,30 @@ const UserList = () => {
               pathname: activeBtn === 'operators' ? 'list/CreateAccount' : activeBtn === 'superagent' ? 'list/CreateAccount' : 'list/CreateAccount',
               query: { activeBtn }
             }}>
-            <Button sx={{ border: 1, height: '56px', minWidth: '224px', width: ['100%', '224px'], display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black', textTransform: 'uppercase', color: 'black' }}>
+            <Button sx={{
+              border: 1,
+              height: '56px',
+              minWidth: '224px',
+              width: ['100%', '224px'],
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              borderColor: 'black',
+              textTransform: 'uppercase',
+              color: 'black',
+              backgroundColor: '#FFF',
+              '&:hover': {
+                backgroundColor: `#9747FF`,
+                color: 'white',
+              },
+            }}>
               Create Account
             </Button>
           </Link>
         </Box>
         <Root sx={{ minHeight: 540, overflowX: 'auto' }}>
-          <table aria-label="custom pagination table" > {/* add tableLayout: 'fixed' style to enable setting a fixed width for each column */}
+          <table aria-label="custom pagination table" >
             <colgroup>
               {filteredColumns.map((column: any) => (
                 <col key={column.id} style={{ minWidth: column.minWidth }} />
@@ -708,11 +750,20 @@ const UserList = () => {
             <tr>
               <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}>
                 {activeBtn === 'operators' ? (
-                  <Image src='/images/icons/project-icons/user-table-icon.png' alt="icon" width={50} height={50}/>
+                  <Image src={src} alt="icon" width={50} height={50}
+                         onMouseEnter={handleMouseEnter}
+                         onMouseLeave={handleMouseLeave}
+                  />
                 ): activeBtn === 'superagent' ? (
-                  <Image src='/images/icons/project-icons/superagent-icon.png' alt="icon" width={50} height={50}/>
+                  <Image src={agentSrc} alt="icon" width={50} height={50}
+                         onMouseEnter={handleMouseEnter}
+                         onMouseLeave={handleMouseLeave}
+                  />
                 ): activeBtn === 'contentcreators' && (
-                  <Image src='/images/icons/project-icons/creator-icon.png' alt="icon" width={50} height={50}/>
+                  <Image src={creatorSrc} alt="icon" width={50} height={50}
+                         onMouseEnter={handleMouseEnter}
+                         onMouseLeave={handleMouseLeave}
+                  />
                 )}
               </th>
               {filteredColumns.map((column: any) => (

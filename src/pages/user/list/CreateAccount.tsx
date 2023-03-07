@@ -6,21 +6,20 @@ import {
   Button,
   Checkbox, InputAdornment, MenuItem,
   TextField,
-  Typography
+  Typography,
+  BoxProps
 } from "@mui/material";
 import { styled } from '@mui/system';
 
 // ** Next Imports
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+
 import CreatedSuccessful from "./CreatedSuccessful";
 import UserLayoutNoPadding from "@/layouts/UserLayoutNoPadding";
 
-import {BoxProps} from "@mui/material/Box";
-
 const bgPath = '/images/pages/bitcoin-bg.png'
 const bgPathTwo = '/images/pages/operator-create-bg.png'
-
 const CreateAccount = () => {
 
   // ** Styled Components
@@ -123,7 +122,7 @@ const CreateAccount = () => {
             onClick={handleOperatorClick}
           >
             <Image src='/images/icons/project-icons/operator-icon.png' width={40} height={40} alt='operator-icon'/>
-            <Typography sx={{ flexGrow: 1 }}>Operator</Typography>
+            <Typography sx={{ flexGrow: 1, color: activeBtn === 'operators' ? 'white' : 'black' }}>Operator</Typography>
           </Button>
           <Button
             sx={{
@@ -146,7 +145,7 @@ const CreateAccount = () => {
             onClick={handleSuperAgentClick}
           >
             <Image src='/images/icons/project-icons/superagent-icon.png' width={40} height={40} alt='operator-icon'/>
-            <Typography sx={{ flexGrow: 1 }}>Super Agent</Typography>
+            <Typography sx={{ flexGrow: 1, color: activeBtn === 'superagent' ? 'white' : 'black' }}>Super Agent</Typography>
           </Button>
           <Button
             sx={{
@@ -169,7 +168,7 @@ const CreateAccount = () => {
             onClick={handleCreatorClick}
           >
             <Image src='/images/icons/project-icons/creator-icon.png' width={40} height={40} alt='operator-icon'/>
-            <Typography sx={{ flexGrow: 1 }}>Content Creator</Typography>
+            <Typography sx={{ flexGrow: 1, color: activeBtn === 'contentcreators' ? 'white' : 'black' }}>Content Creator</Typography>
           </Button>
         </Box>
       </Box>
