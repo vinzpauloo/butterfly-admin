@@ -689,7 +689,8 @@ const UserList = () => {
           <Link
             style={{textDecoration: 'none'}}
             href={{
-              pathname: 'list/CreateAccount'
+              pathname: activeBtn === 'operators' ? 'list/CreateAccount' : activeBtn === 'superagent' ? 'list/CreateAccount' : 'list/CreateAccount',
+              query: { activeBtn }
             }}>
             <Button sx={{ border: 1, height: '56px', minWidth: '224px', width: ['100%', '224px'], display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderColor: 'black', textTransform: 'uppercase', color: 'black' }}>
               Create Account

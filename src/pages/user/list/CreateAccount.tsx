@@ -25,7 +25,7 @@ const CreateAccount = () => {
 
   // ** Styled Components
   const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
-    backgroundImage: submitted || continueBtnTwo ? `url("${bgPath}")` : `url("${bgPathTwo}")`,
+    backgroundImage: submitted || continueBtnTwo ? `url("${bgPathTwo}")` : `url("${bgPath}")`,
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: '100% 75%',
@@ -44,6 +44,9 @@ const CreateAccount = () => {
   const [continueBtnTwo, setContinueBtnTwo] = useState(false);
 
   const router = useRouter();
+  const param = router.query;
+
+  console.log(param.activeBtn)
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -70,7 +73,7 @@ const CreateAccount = () => {
   }
 
   const handleOperatorClick = () => {
-    setActiveBtn('operator')
+    setActiveBtn('operators')
   }
 
   const handleSuperAgentClick = () => {
@@ -78,13 +81,14 @@ const CreateAccount = () => {
   }
 
   const handleCreatorClick = () => {
-    setActiveBtn('contentcreator')
+    setActiveBtn('contentcreators')
   }
 
   const [isMobile, setIsMobile] = useState(false);
   const [activeBtn, setActiveBtn] = useState('')
   useEffect(() => {
-    setActiveBtn('operator')
+    setActiveBtn(`${param.activeBtn}`)
+    console.log('operator')
     setSubmitted(false)
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
@@ -109,8 +113,8 @@ const CreateAccount = () => {
             gap: 2,
             borderColor: 'black',
             transition: 'background-color 0.1s',
-            backgroundColor: activeBtn === 'operator' ? '#9747FF' : 'white',
-            color: activeBtn === 'operator' ? 'white' : 'black',
+            backgroundColor: activeBtn === 'operators' ? '#9747FF' : 'white',
+            color: activeBtn === 'operators' ? 'white' : 'black',
             '&:hover': {
               backgroundColor: `#9747FF`,
               color: 'white',
@@ -155,8 +159,8 @@ const CreateAccount = () => {
               gap: 2,
               borderColor: 'black',
               transition: 'background-color 0.1s',
-              backgroundColor: activeBtn === 'contentcreator' ? '#9747FF' : 'white',
-              color: activeBtn === 'contentcreator' ? 'white' : 'black',
+              backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : 'white',
+              color: activeBtn === 'contentcreators' ? 'white' : 'black',
               '&:hover': {
                 backgroundColor: `#9747FF`,
                 color: 'white',
@@ -170,7 +174,7 @@ const CreateAccount = () => {
         </Box>
       </Box>
 
-      {activeBtn === 'operator' ? (
+      {activeBtn === 'operators' ? (
         <Box>
           {!submitted ? (
             <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
@@ -575,7 +579,7 @@ const CreateAccount = () => {
               )
           }
         </Box>
-      ): activeBtn === 'contentcreator' && (
+      ): activeBtn === 'contentcreators' && (
         <Box>
           {!submitted ? (
             <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
