@@ -15,6 +15,9 @@ import CustomButton from '@/layouts/components/shared-components/CustomButton/Cu
 // ** Third Party Components
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
+import * as tus from "tus-js-client";
+import axios from 'axios'
+
 
 //* Context Import
 import { StudioContext } from '..'
@@ -52,58 +55,140 @@ interface State {
 }
 
 
+const URL = 'http://192.168.50.9/api/videos'
+const { CLOUD_ACCOUNT_IDENTIFIER, CLOUD_TOKEN } = process.env;
+
 const UploadVideoStep1 = (props: Props) => {
 
   const studioContext = React.useContext(StudioContext)
 
   // ** State
-  const [files, setFiles] = React.useState<File[]>([])
+  const [files, setFiles] = React.useState<File[] | null>([])
+  
 
   // ** Hooks
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     accept: {
-      'video/*': ['.mp4']
+      'video/*': ['.mp4','.avi']
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
     },
     onDropRejected: () => {
-      toast.error('You can only upload 1 file.', {
+      toast.error('You can only upload video files.', {
         duration: 2000
       })
     }
   })
 
-  const renderFilePreview = (file: FileProp) => {
-    if (file.type.startsWith('image')) {
-      return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file as any)} />
-    } else {
-      console.log('file',file)
-      return 'file preview'
-    }
-  }
-
-  const handleRemoveFile = (file: FileProp) => {
-    const uploadedFiles = files
-    const filtered = uploadedFiles.filter((i: FileProp) => i.name !== file.name)
-    setFiles([...filtered])
-  }
+  // const renderFilePreview = (file: FileProp) => {
+  //   if (file.type.startsWith('image')) {
+  //     return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file as any)} />
+  //   } else {
+  //     console.log('file',file)
+  //     return 'file preview'
+  //   }
+  // }
 
   const handleCancelButton = () => {
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
 
-  const handleUploadContinue = () => {
+  const testAPIFirstCall = () => {
+    
+    var data = JSON.stringify({
+      "user_id": 2,
+      "title": "sample title 70 try",
+      "description": "sample description 65 try",
+      "orientation": "landscape",
+      "tags": [
+        "tag1",
+        "tag1"
+      ],
+      "has_own_trial": false
+    });
+    
+    var config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url:  URL,
+      mode: 'no-cors',
+      headers: { 
+        'Accept': 'application/json', 
+        'Content-Type': 'application/json',
+      },
+      data : data
+    };
+    
+    axios(config)
+    .then(function (response) {
+
+      handleUploadContinue(response.data)
+
+      // TUS 
+
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    
+  }
+
+  const handleUploadContinue = (endpoint : any) => {
     //check required fields
 
+    console.log('endpoint', endpoint.data.full_upload_url)
+    
     // call videos api
+    if (!files) {
+      return;
+    }
+    
+    //mock data
 
+    var file = files[0]
+
+    console.log('file', file)
+
+    const upload = new tus.Upload(file, {
+      endpoint: `${endpoint.data.full_upload_url}`,
+      headers: {
+        "Authorization": `Bearer i4xoG0dtdOBVAAad59OaTOoO9d7KJRDCgmTZle1R`,
+        'Content-Type': 'application/json',
+      },
+      chunkSize: 150 * 1024 * 1024,
+      retryDelays: [0, 1000, 3000, 5000],
+      metadata: {
+        filename: file.name,
+        filetype: file.type,
+      },
+      onError: (error) => {
+        console.error('Failed because:', error);
+      },
+      onProgress: (bytesUploaded, bytesTotal) => {
+        const progress = Math.round((bytesUploaded / bytesTotal) * 100);
+        console.log('progress', progress)
+      },
+      onSuccess: () => {
+        console.log('Upload finished:', upload.url);
+      },
+    });
+
+     // Check if there are any previous uploads to continue.
+     upload.findPreviousUploads().then(function (previousUploads) {
+      // Found previous uploads so we select the first one. 
+      if (previousUploads.length) {
+          upload.resumeFromPreviousUpload(previousUploads[0])
+      }
+
+      // Start the upload
+      upload.start()
+    })
 
     //set page
     studioContext?.setDisplayPage(DisplayPage.LoadingScreen)
   }
-
 
   return (
     <>
@@ -171,7 +256,8 @@ const UploadVideoStep1 = (props: Props) => {
               <Box className='uploadBoxes'>
 
                 <Box className='uploadWorkVidBox'>
-                  
+
+
                   <div {...getRootProps({ className: 'dropzone' })}>
                     <input {...getInputProps()} />
                     <Box 
@@ -190,11 +276,19 @@ const UploadVideoStep1 = (props: Props) => {
                           padding:'3em'
                           }}>
                           <Img src='/images/studio/butterfly_file_upload.png'  />
-                          <CustomButton 
-                            sx={{ 
+                          {files?.length ? (
+                            <Typography textAlign='center'>1 file uploaded</Typography>
+                          ) : 
+                          (
+                            <CustomButton 
+                              sx={{ 
                               bgcolor : 'primary.main',
                               color : 'common.white'
                               }}>Upload Work Video</CustomButton>
+                          )
+                            
+                          }
+                          
                       </Box>
                     </Box>
                   </div>
@@ -224,7 +318,7 @@ const UploadVideoStep1 = (props: Props) => {
                   </Box>
                   <Box>
                     <CustomButton
-                      onClick={handleUploadContinue}
+                      onClick={testAPIFirstCall}
                       sx={{ 
                         bgcolor : 'primary.main',
                         color : 'common.white'
