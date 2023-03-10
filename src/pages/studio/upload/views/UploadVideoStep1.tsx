@@ -1,12 +1,17 @@
 // ** React imports
-import React,{ ChangeEvent, MouseEvent, useState, SyntheticEvent } from 'react'
+import React from 'react'
 
 // ** MUI Imports 
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import Box, {BoxProps} from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import InputLabel from '@mui/material/InputLabel'
+import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
+import Chip from '@mui/material/Chip'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
@@ -18,9 +23,7 @@ import { useDropzone } from 'react-dropzone'
 import * as tus from "tus-js-client";
 
 //* Context Import
-import { StudioContext } from '..'
-import { DisplayPage } from '..'
-
+import { StudioContext, DisplayPage, StudioContextType, GenericDataType } from '..'
 
 // Styled components
 const Img = styled('img')(({ theme }) => ({
@@ -38,11 +41,47 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
   }
 }))
 
+const CustomSelect = styled(Select)(({ theme }) => ({
+  backgroundColor : theme.palette.common.white,
+  borderRadius:'5px',
+  '& .MuiSelect-select': {
+    paddingBlock:'.5em'
+  }
+}))
+
+// ** Data
+export const ContentCreatorsDummy = [
+  {id : 1, name : 'Ola Hansen'},
+  {id : 2, name : 'Van Aja'},
+  {id : 3, name : 'April Tucker'}
+]
+
+export const TaggingsDummy = [
+  {id : 1, name : '#Tagging 1'},
+  {id : 2, name : '#Taggings 2'},
+  {id : 3, name : '#Taggings 3'},
+  {id : 4, name : '#Tagging 4'},
+  {id : 5, name : '#Taggings 5'},
+  {id : 6, name : '#Taggings 6'},
+  {id : 7, name : '#Tagging 7'},
+  {id : 8, name : '#Taggings 8'},
+  {id : 9, name : '#Taggings 9'}
+]
+
+export const GroupingsDummy = [
+  {id : 1, name : 'Groupings 1'},
+  {id : 2, name : 'Groupings 2'},
+  {id : 3, name : 'Groupings 3'},
+  {id : 4, name : 'Groupings 4'},
+  {id : 5, name : 'Groupings 5'},
+  {id : 6, name : 'Groupings 6'},
+]
+
 // ** Props and interfaces 
 type Props = {}
 
 // ** Constant variables
-const URL : string = 'https://9e5d-122-55-235-37.jp.ngrok.io/api/videos'
+const URL : string = 'https://db6e-122-55-235-37.jp.ngrok.io/api/videos'
 
 const UploadVideoStep1 = (props: Props) => {
 
@@ -52,6 +91,18 @@ const UploadVideoStep1 = (props: Props) => {
   const [files, setFiles] = React.useState<File[] | null>([])
   
   // ** Hooks
+  React.useEffect(() => {
+    console.log('studioContext', studioContext)
+
+    //load content creator from API
+    
+    //load taggings
+
+    //load groupings
+
+  }, [])
+
+
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     accept: {
@@ -66,8 +117,11 @@ const UploadVideoStep1 = (props: Props) => {
       })
     }
   })
+  
+  // ** Functions
 
   const handleCancelButton = () => {
+    //navigate back
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
 
@@ -99,20 +153,10 @@ const UploadVideoStep1 = (props: Props) => {
 
     var file = files[0]
 
-    console.log('file', file)
-
     const headerData = JSON.stringify({
-      "user_id": 2,
+      "username": 'superbawangers',
       "title": "Testing only sample title 50 try",
-      "description": "sample description 65 try",
-      "orientation": "landscape",
       "video_type" : "full",
-      "tags": [
-        "tag1",
-        "tag1"
-      ],
-      "has_own_trial": false,
-      "full_size_bytes": 2392580019,
     })
 
     const upload = new tus.Upload(file, {
@@ -157,6 +201,14 @@ const UploadVideoStep1 = (props: Props) => {
     studioContext?.setDisplayPage(DisplayPage.LoadingScreen)
   }
 
+  const handleTaggingsChange = (event : React.ChangeEvent) => { 
+    studioContext?.setTags(event.target.value as GenericDataType[])
+  }
+
+  const handleGroupingsChange = (event: React.ChangeEvent<{ value: unknown }>) => { 
+    studioContext?.setGroupings( (event.target as HTMLInputElement).value as number )
+  }
+
   return (
     <>
       <BasicCard
@@ -178,30 +230,112 @@ const UploadVideoStep1 = (props: Props) => {
 
           <Grid container spacing={10}>
             <Grid item sm={8}>
+
               <form onSubmit={e => e.preventDefault()}>
                 <Grid container spacing={5}>
                   <Grid item xs={12}>
-                    <CustomTextField 
-                      fullWidth 
-                      placeholder='Content Creator POC' />
+                    <FormControl 
+                      fullWidth>
+                      <CustomSelect
+                        displayEmpty 
+                        inputProps={{ 'aria-label': 'Without label' }}
+                        label='Select Content Creator'
+                        defaultValue='' 
+                        id='cc-select'
+                        labelId='cc-select-label'
+                        renderValue={ selected => {
+                          console.log('selected', selected)
+                          if ((selected as unknown as string[]).length === 0) {
+                            return 'Select Content Creator'
+                          }
+                          return 
+                        }}
+                      >
+                        <MenuItem disabled value=''>
+                          Select Content Creator
+                        </MenuItem>
+                        <MenuItem value={1}>Content Creator 1</MenuItem>
+                        <MenuItem value={2}>Content Creator 2</MenuItem>
+                      </CustomSelect>
+                  </FormControl>
                   </Grid>
                   <Grid item xs={12}>
                     <CustomTextField
                       fullWidth
-                      placeholder='Title POC'
+                      placeholder='Title'
                       type='text'
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <CustomTextField
+                        multiline 
+                        rows={3}
                         fullWidth
-                        placeholder='Description POC'
+                        placeholder='Description'
                         type='text'
-                        sx={{paddingBlock:'2em'}}
                       />
                   </Grid>
                   <Grid item xs={12}>
-                    
+                        
+                  <Grid container justifyContent="space-between" spacing={2}>
+                    <Grid item xs={6}>
+
+                    <FormControl fullWidth>
+                      <InputLabel id='multiple-taggings-label'>Select Taggings</InputLabel>
+                      <CustomSelect
+                        multiple
+                        label='Chip'
+                        value={studioContext?.tags}
+                        id='multiple-taggings'
+                        onChange={(event) => { handleTaggingsChange(event as React.ChangeEvent) }}
+                        labelId='multiple-taggings-label'
+                        renderValue={selected => (
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {(selected as unknown as string[]).map(value => (
+                              <Chip onDelete={()=>{console.log('delete')}} key={value} label={value} sx={{ m: 0.75 }} />
+                            ))}
+                          </Box>
+                        )}
+                      >
+                        {TaggingsDummy.map(tag => (
+                          <MenuItem key={tag.id} value={tag.name}>
+                            {tag.name}
+                          </MenuItem>
+                        ))}
+                      </CustomSelect>
+                    </FormControl>
+
+                    </Grid>
+                    <Grid item xs={6}>
+                      
+                      <FormControl fullWidth>
+                        <InputLabel id='multiple-taggings-label'>Select Groupings</InputLabel>
+                        <CustomSelect
+                          multiple
+                          label='Chip'
+                          value={studioContext?.groupings}
+                          id='multiple-taggings'
+                          onChange={(event) => { handleGroupingsChange(event as React.ChangeEvent) }}
+                          labelId='multiple-taggings-label'
+                          renderValue={selected => (
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                              {(selected as unknown as string[]).map(value => (
+                                <Chip key={value} label={value} sx={{ m: 0.75 }} />
+                              ))}
+                            </Box>
+                          )}
+                        >
+                          {GroupingsDummy.map(tag => (
+                            <MenuItem key={tag.id} value={tag.name}>
+                              {tag.name}
+                            </MenuItem>
+                          ))}
+                        </CustomSelect>
+                      </FormControl>
+
+                    </Grid>
+                  </Grid>
+
                   </Grid>
                   <Grid item xs={12}>
                     <Box
@@ -217,6 +351,7 @@ const UploadVideoStep1 = (props: Props) => {
                   </Grid>
                 </Grid>
               </form>
+              
             </Grid>
             <Grid item sm={4}>
             

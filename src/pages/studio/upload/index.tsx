@@ -5,7 +5,12 @@ import React, { ReactNode } from 'react'
 import Box, {BoxProps} from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
-const bgPath = '/images/studio/uploadBG.jpg'
+// ** Third Party Imports
+import * as yup from 'yup'
+import toast from 'react-hot-toast'
+import { useForm, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+
 
 // ** Layout Imports
 import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
@@ -15,6 +20,7 @@ import UploadMenu from './views/UploadMenu'
 import UploadVideoStep1 from './views/UploadVideoStep1'
 import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
 import LoadingScreen from './views/LoadingScreen'
+import StepperLinearWithValidation from '@/views/forms/form-wizard/StepperLinearWithValidation'
 
 
 // ** Styled Components
@@ -43,7 +49,8 @@ export enum DisplayPage {
     MainPage,
     UploadVideoStep1,
     UploadNewsfeedsStep1,
-    LoadingScreen
+    LoadingScreen,
+    FormWizardTest
 }
 
 export type RequestType = {
@@ -66,28 +73,59 @@ export type ResponseType = {
   full_upload_url : string, 
 }
 
-
-type StudioContextType = {
-    displayPage : DisplayPage,
-    setDisplayPage : React.Dispatch<React.SetStateAction<DisplayPage>>
+export type GenericDataType = {
+  id : number,
+  name : string
 }
+
+export type StudioFormDataType = {
+
+}
+
+export type StudioContextType = {
+    displayPage : DisplayPage,
+    setDisplayPage : React.Dispatch<React.SetStateAction<DisplayPage>>,
+    contentCreator : GenericDataType,
+    setContentCreator : React.Dispatch<React.SetStateAction<GenericDataType>>
+    tags : GenericDataType[],
+    setTags : React.Dispatch<React.SetStateAction<GenericDataType[]>>,
+    groupings : GenericDataType[],
+    setGroupings : React.Dispatch<React.SetStateAction<GenericDataType[]>>,
+}
+
+//** DATA */
 
 export const StudioContext = React.createContext<null | StudioContextType>(null)
 
+const bgPath = '/images/studio/uploadBG.jpg'
+
 const UploadContent = () => {
   
+  // ** States
   const [displayPage, setDisplayPage] = React.useState<DisplayPage>(DisplayPage.MainPage)
+  //** Form states */
+  const [tags, setTags] = React.useState<GenericDataType[]>([])
+  const [groupings, setGroupings] = React.useState<GenericDataType[]>([])
+  const [contentCreator, setContentCreator] = React.useState<GenericDataType>({} as GenericDataType)
 
   const PageDisplay = () => {
     if (displayPage == DisplayPage.MainPage) return <UploadMenu />
     if (displayPage == DisplayPage.UploadVideoStep1) return <UploadVideoStep1 />
     if (displayPage == DisplayPage.UploadNewsfeedsStep1) return <UploadNewsfeedsStep1 />
     if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
-    LoadingScreen
 }
 
   return (
-    <StudioContext.Provider value={{  displayPage, setDisplayPage }}>
+    <StudioContext.Provider value={{ 
+      displayPage, 
+      setDisplayPage,
+      contentCreator,
+      setContentCreator,
+      tags,
+      setTags,
+      groupings,
+      setGroupings
+      }}>
       <BoxBG>
         {PageDisplay()}
       </BoxBG>

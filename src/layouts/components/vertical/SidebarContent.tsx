@@ -80,7 +80,7 @@ const SidebarContent = () => {
                 >    
                     <Link 
                         href={`${item.link}`} 
-                        component={NextLink} >
+                        component={NextLink}>
                         <ListItemButton
                             sx={{
                                 '& .iconContainer': {
