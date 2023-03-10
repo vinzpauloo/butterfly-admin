@@ -4,6 +4,8 @@ import React from 'react'
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
+import NextLink from 'next/link'
+import Link from '@mui/material/Link';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -75,38 +77,41 @@ const SidebarContent = () => {
                         },
                     }
                 }
-                >
-                    <ListItemButton
+                >    
+                    <Link 
                         href={`${item.link}`} 
-                        sx={{
-                            '& .iconContainer': {
-                                position:'relative',
-                                width:'30px',
-                                height: '30px',
-                            },
-                            '& .iconContainer > img' : {
-                                position:'absolute',
-                                transition: 'opacity 0.5s'
-                            },
-                            '& .iconContainer > img:last-child': {
-                                opacity:0
-                            },
-                            '&:hover .iconContainer > img:last-child': {
-                                opacity:1
-                            }
-                        }}>
-                        <ListItemIcon className='iconContainer'>
-                            <Img src={`/images/sidebar/icons/${item.icon}.svg`} />
-                            <Img src={`/images/sidebar/icons/${item.icon}-hover.svg`} />
-                        </ListItemIcon>
-                        <ListItemText sx={{
-                            '& .MuiTypography-root': {
-                                color : '#BFC6D0', 
-                                fontSize: '0.875rem'
-                            } 
-                        }} 
-                        primary={item.title} />
-                    </ListItemButton>
+                        component={NextLink} >
+                        <ListItemButton
+                            sx={{
+                                '& .iconContainer': {
+                                    position:'relative',
+                                    width:'30px',
+                                    height: '30px',
+                                },
+                                '& .iconContainer > img' : {
+                                    position:'absolute',
+                                    transition: 'opacity 0.5s'
+                                },
+                                '& .iconContainer > img:last-child': {
+                                    opacity:0
+                                },
+                                '&:hover .iconContainer > img:last-child': {
+                                    opacity:1
+                                }
+                            }}>
+                            <ListItemIcon className='iconContainer'>
+                                <Img src={`/images/sidebar/icons/${item.icon}.svg`} />
+                                <Img src={`/images/sidebar/icons/${item.icon}-hover.svg`} />
+                            </ListItemIcon>
+                            <ListItemText sx={{
+                                '& .MuiTypography-root': {
+                                    color : '#BFC6D0', 
+                                    fontSize: '0.875rem'
+                                } 
+                            }} 
+                            primary={item.title} />
+                        </ListItemButton>
+                    </Link>
                 </ListItem>
                 ))}
 

@@ -16,8 +16,6 @@ import CustomButton from '@/layouts/components/shared-components/CustomButton/Cu
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
 import * as tus from "tus-js-client";
-import axios from 'axios'
-
 
 //* Context Import
 import { StudioContext } from '..'
@@ -43,20 +41,8 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 // ** Props and interfaces 
 type Props = {}
 
-
-interface FileProp {
-  name: string
-  type: string
-  size: number
-}
-interface State {
-  password: string
-  showPassword: boolean
-}
-
-
-const URL = 'http://192.168.50.9/api/videos'
-const { CLOUD_ACCOUNT_IDENTIFIER, CLOUD_TOKEN } = process.env;
+// ** Constant variables
+const URL : string = 'https://9e5d-122-55-235-37.jp.ngrok.io/api/videos'
 
 const UploadVideoStep1 = (props: Props) => {
 
@@ -65,7 +51,6 @@ const UploadVideoStep1 = (props: Props) => {
   // ** State
   const [files, setFiles] = React.useState<File[] | null>([])
   
-
   // ** Hooks
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
@@ -82,64 +67,29 @@ const UploadVideoStep1 = (props: Props) => {
     }
   })
 
-  // const renderFilePreview = (file: FileProp) => {
-  //   if (file.type.startsWith('image')) {
-  //     return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file as any)} />
-  //   } else {
-  //     console.log('file',file)
-  //     return 'file preview'
-  //   }
-  // }
-
   const handleCancelButton = () => {
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
 
-  const testAPIFirstCall = () => {
-    
-    var data = JSON.stringify({
-      "user_id": 2,
-      "title": "sample title 70 try",
-      "description": "sample description 65 try",
-      "orientation": "landscape",
-      "tags": [
-        "tag1",
-        "tag1"
-      ],
-      "has_own_trial": false
+  const askToResumeUpload = (previousUploads : tus.PreviousUpload[]) => {
+    if (previousUploads.length === 0) return null;
+  
+    var text = "You tried to upload this file previously at these times:\n\n";
+    previousUploads.forEach((previousUpload, index) => {
+      text += "[" + index + "] " + previousUpload.creationTime + "\n";
     });
-    
-    var config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url:  URL,
-      mode: 'no-cors',
-      headers: { 
-        'Accept': 'application/json', 
-        'Content-Type': 'application/json',
-      },
-      data : data
-    };
-    
-    axios(config)
-    .then(function (response) {
+    text += "\nResume to continue upload or press Cancel to start a new upload";
+  
+    var isConfirmed : boolean  = confirm(text);
 
-      handleUploadContinue(response.data)
-
-      // TUS 
-
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-    
+    if (isConfirmed){
+      return previousUploads[0];
+    } 
   }
 
-  const handleUploadContinue = (endpoint : any) => {
+  const handleUploadContinue = () => {
     //check required fields
 
-    console.log('endpoint', endpoint.data.full_upload_url)
-    
     // call videos api
     if (!files) {
       return;
@@ -151,14 +101,27 @@ const UploadVideoStep1 = (props: Props) => {
 
     console.log('file', file)
 
+    const headerData = JSON.stringify({
+      "user_id": 2,
+      "title": "Testing only sample title 50 try",
+      "description": "sample description 65 try",
+      "orientation": "landscape",
+      "video_type" : "full",
+      "tags": [
+        "tag1",
+        "tag1"
+      ],
+      "has_own_trial": false,
+      "full_size_bytes": 2392580019,
+    })
+
     const upload = new tus.Upload(file, {
-      endpoint: `${endpoint.data.full_upload_url}`,
-      headers: {
-        "Authorization": `Bearer i4xoG0dtdOBVAAad59OaTOoO9d7KJRDCgmTZle1R`,
-        'Content-Type': 'application/json',
-      },
-      chunkSize: 150 * 1024 * 1024,
+      endpoint: `${URL}`,
+      chunkSize: 5 * 1024 * 1024,
       retryDelays: [0, 1000, 3000, 5000],
+      headers : {
+        data : headerData
+      },
       metadata: {
         filename: file.name,
         filetype: file.type,
@@ -177,9 +140,13 @@ const UploadVideoStep1 = (props: Props) => {
 
      // Check if there are any previous uploads to continue.
      upload.findPreviousUploads().then(function (previousUploads) {
+
       // Found previous uploads so we select the first one. 
-      if (previousUploads.length) {
-          upload.resumeFromPreviousUpload(previousUploads[0])
+      var chosenUpload = askToResumeUpload(previousUploads);
+
+      // If an upload has been chosen to be resumed, instruct the upload object to do so.
+      if(chosenUpload) {
+            upload.resumeFromPreviousUpload(chosenUpload);
       }
 
       // Start the upload
@@ -257,7 +224,6 @@ const UploadVideoStep1 = (props: Props) => {
 
                 <Box className='uploadWorkVidBox'>
 
-
                   <div {...getRootProps({ className: 'dropzone' })}>
                     <input {...getInputProps()} />
                     <Box 
@@ -318,7 +284,7 @@ const UploadVideoStep1 = (props: Props) => {
                   </Box>
                   <Box>
                     <CustomButton
-                      onClick={testAPIFirstCall}
+                      onClick={handleUploadContinue}
                       sx={{ 
                         bgcolor : 'primary.main',
                         color : 'common.white'
