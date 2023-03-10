@@ -34,12 +34,12 @@ const StyledSwitch = styled(Switch)(({ theme }) => ({
     height: 15,
     '&:before': {
       content: "'OFF'",
-      fontSize: 7,
+      fontSize: 6,
       position: 'absolute',
       width: '100%',
       height: '100%',
-      left: 0,
-      top: 3,
+      left: 3,
+      top: -2,
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
       color: 'black'
