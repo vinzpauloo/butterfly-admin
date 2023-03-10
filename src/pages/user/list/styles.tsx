@@ -18,13 +18,19 @@ const styles = {
       md: 'flex-start',
       lg: 'space-between',
     },
-    mb: 5
+    mb: 0
   },
   usersButtons: {
     display: 'flex',
     gap: 2,
     flexWrap: 'wrap',
-    mb: 3,
+    mb: {
+      xs: 5,
+      sm: 5,
+      md: 5,
+      lg: 0,
+      xl: 0,
+    },
   },
   userButton: {
     border: 1,
