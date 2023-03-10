@@ -20,7 +20,7 @@ const TableHeader = (props: TableHeaderProps) => {
     <Box sx={{ p: 5, pb: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
       <Button
         sx={{ mr: 4, mb: 2 }}
-        color='secondary'
+        color='primary'
         variant='outlined'
         startIcon={<Icon icon='mdi:export-variant' fontSize={20} />}
       >

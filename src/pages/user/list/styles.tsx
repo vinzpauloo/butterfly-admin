@@ -9,6 +9,7 @@ const styles = {
     display: 'flex',
     flexDirection: {
       xs: 'column',
+      sm: 'column',
       md: 'column',
       lg: 'row',
     },
@@ -23,12 +24,17 @@ const styles = {
     display: 'flex',
     gap: 2,
     flexWrap: 'wrap',
-    mb: 5
+    mb: 3,
   },
   userButton: {
     border: 1,
     height: '56px',
-    minWidth: '224px',
+    minWidth: {
+      xs: '224px',
+      sm: 'auto',
+      md: 'auto',
+      lg: '224px',
+    },
     flex: 1,
     display: 'flex',
     alignItems: 'center',

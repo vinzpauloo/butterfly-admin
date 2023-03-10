@@ -25,17 +25,18 @@ import contentCreatorColumns from "@/pages/user/data/ContentCreatorColumn";
 import operatorRows from "@/pages/user/data/OperatorData";
 import superagentRows from "@/pages/user/data/SuperAgentData";
 import contentcreatorRows from "@/pages/user/data/ContentCreatorData";
-import styles from './styles'
+import styles from './styles';
+import UserTable from "@/pages/user/components/UserTable";
 
 // ** Custom Layout Style Components
 const BoxBG = styled(Box)(({ theme }) => {
   const bgPath = '/images/pages/user-bg.png';
 
   return {
-    backgroundImage: `url("${bgPath}")`,
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: '100% 75%',
+    // backgroundImage: `url("${bgPath}")`,
+    // backgroundSize: 'cover',
+    // backgroundRepeat: 'no-repeat',
+    // backgroundPosition: '100% 75%',
     backgroundColor: '#d3d6df',
     padding: 10,
     height: 'auto',
@@ -166,136 +167,140 @@ const UserList = () => {
     <BoxBG>
       <Box sx={styles.container}>
         <Box sx={styles.buttonContainer}>
-          <Box sx={styles.usersButtons}>
-            <Button onClick={handleOperatorsClick} sx={{...styles.userButton, backgroundColor: activeBtn === 'operators' ? '#9747FF' : '#FFF',
-              color: activeBtn === 'operators' ? '#FFF' : 'black'}}>
-              Operators
-            </Button>
-            <Button onClick={handleSuperAgentClick} sx={{...styles.userButton, backgroundColor: activeBtn === 'superagent' ? '#9747FF' : '#FFF',
-              color: activeBtn === 'superagent' ? '#FFF' : 'black'}}>
-              Super Agent
-            </Button>
-            <Button onClick={handleContentCreatorsClick} sx={{...styles.userButton, backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : '#FFF',
-              color: activeBtn === 'contentcreators' ? '#FFF' : 'black'}}>
-              Content Creators
-            </Button>
-          </Box>
+          {/*<Box sx={styles.usersButtons}>*/}
+          {/*  <Button onClick={handleOperatorsClick} sx={{...styles.userButton, backgroundColor: activeBtn === 'operators' ? '#9747FF' : '#FFF',*/}
+          {/*    color: activeBtn === 'operators' ? '#FFF' : 'black'}}>*/}
+          {/*    Operators*/}
+          {/*  </Button>*/}
+          {/*  <Button onClick={handleSuperAgentClick} sx={{...styles.userButton, backgroundColor: activeBtn === 'superagent' ? '#9747FF' : '#FFF',*/}
+          {/*    color: activeBtn === 'superagent' ? '#FFF' : 'black'}}>*/}
+          {/*    Super Agent*/}
+          {/*  </Button>*/}
+          {/*  <Button onClick={handleContentCreatorsClick} sx={{...styles.userButton, backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : '#FFF',*/}
+          {/*    color: activeBtn === 'contentcreators' ? '#FFF' : 'black'}}>*/}
+          {/*    Content Creators*/}
+          {/*  </Button>*/}
+          {/*</Box>*/}
 
-          <Link
-            style={styles.linkButton}
-            href={{
-              pathname: activeBtn === 'operators' ? 'list/CreateAccount' : activeBtn === 'superagent' ? 'list/CreateAccount' : 'list/CreateAccount',
-              query: { activeBtn }
-            }}>
-            <Button sx={styles.createAccount}>Create Account</Button>
-          </Link>
+          {/*<Link*/}
+          {/*  style={styles.linkButton}*/}
+          {/*  href={{*/}
+          {/*    pathname: activeBtn === 'operators' ? 'list/CreateAccount' : activeBtn === 'superagent' ? 'list/CreateAccount' : 'list/CreateAccount',*/}
+          {/*    query: { activeBtn }*/}
+          {/*  }}>*/}
+          {/*  <Button sx={styles.createAccount}>Create Account</Button>*/}
+          {/*</Link>*/}
+
         </Box>
-        <Root sx={styles.tableContainer}>
-          <table aria-label="custom pagination table" >
-            <colgroup>
-              {filteredColumns.map((column: any) => (
-                <col key={column.id} style={{ minWidth: column.minWidth }} />
-              ))}
-            </colgroup>
-            <thead>
-            <tr>
-              <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}>
-                {activeBtn === 'operators' ? (
-                  <Image src={src} alt="icon" width={50} height={50}
-                         onMouseEnter={handleMouseEnter}
-                         onMouseLeave={handleMouseLeave}
-                  />
-                ): activeBtn === 'superagent' ? (
-                  <Image src={agentSrc} alt="icon" width={50} height={50}
-                         onMouseEnter={handleMouseEnter}
-                         onMouseLeave={handleMouseLeave}
-                  />
-                ): activeBtn === 'contentcreators' && (
-                  <Image src={creatorSrc} alt="icon" width={50} height={50}
-                         onMouseEnter={handleMouseEnter}
-                         onMouseLeave={handleMouseLeave}
-                  />
-                )}
-              </th>
-              {filteredColumns.map((column: any) => (
-                <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>
-                  {column.label}
-                </th>
-              ))}
-            </tr>
-            </thead>
-            <tbody>
-            {filteredRows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row: any) => {
-                return (
-                  <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>
-                    <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>
-                    {filteredColumns.map((column: any) => {
-                      const value = row[column.id];
+        {/*<Root sx={styles.tableContainer}>*/}
+        {/*  <table aria-label="custom pagination table" >*/}
+        {/*    <colgroup>*/}
+        {/*      {filteredColumns.map((column: any) => (*/}
+        {/*        <col key={column.id} style={{ minWidth: column.minWidth }} />*/}
+        {/*      ))}*/}
+        {/*    </colgroup>*/}
+        {/*    <thead>*/}
+        {/*    <tr>*/}
+        {/*      <th style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}>*/}
+        {/*        {activeBtn === 'operators' ? (*/}
+        {/*          <Image src={src} alt="icon" width={50} height={50}*/}
+        {/*                 onMouseEnter={handleMouseEnter}*/}
+        {/*                 onMouseLeave={handleMouseLeave}*/}
+        {/*          />*/}
+        {/*        ): activeBtn === 'superagent' ? (*/}
+        {/*          <Image src={agentSrc} alt="icon" width={50} height={50}*/}
+        {/*                 onMouseEnter={handleMouseEnter}*/}
+        {/*                 onMouseLeave={handleMouseLeave}*/}
+        {/*          />*/}
+        {/*        ): activeBtn === 'contentcreators' && (*/}
+        {/*          <Image src={creatorSrc} alt="icon" width={50} height={50}*/}
+        {/*                 onMouseEnter={handleMouseEnter}*/}
+        {/*                 onMouseLeave={handleMouseLeave}*/}
+        {/*          />*/}
+        {/*        )}*/}
+        {/*      </th>*/}
+        {/*      {filteredColumns.map((column: any) => (*/}
+        {/*        <th key={column.id} style={{fontSize: isMobile? 12 : 17}}>*/}
+        {/*          {column.label}*/}
+        {/*        </th>*/}
+        {/*      ))}*/}
+        {/*    </tr>*/}
+        {/*    </thead>*/}
+        {/*    <tbody>*/}
+        {/*    {filteredRows*/}
+        {/*      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)*/}
+        {/*      .map((row: any) => {*/}
+        {/*        return (*/}
+        {/*          <tr role="checkbox" tabIndex={-1} key={row.UserProfile}>*/}
+        {/*            <td style={{display: isMobile ? 'none' : 'table-cell', width: '120px'}}></td>*/}
+        {/*            {filteredColumns.map((column: any) => {*/}
+        {/*              const value = row[column.id];*/}
 
-                      return (
-                        <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </Root>
-        <Box style={styles.paginationContainer}>
-          <TablePagination
-            component="div"
-            count={filteredRows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelDisplayedRows={() => ""}
-            labelRowsPerPage=""
-            rowsPerPageOptions={[]}
-            ActionsComponent={(props) => {
-              const { onPageChange, page } = props;
+        {/*              return (*/}
+        {/*                <td key={column.id} align={column.align} style={{fontSize: isMobile? 12 : 15}}>*/}
+        {/*                  {column.format && typeof value === 'number'*/}
+        {/*                    ? column.format(value)*/}
+        {/*                    : value}*/}
+        {/*                </td>*/}
+        {/*              );*/}
+        {/*            })}*/}
+        {/*          </tr>*/}
+        {/*        );*/}
+        {/*      })}*/}
+        {/*    </tbody>*/}
+        {/*  </table>*/}
+        {/*</Root>*/}
 
-              return (
-                <Box style={styles.paginationContent}>
-                  <IconButton
-                    onClick={() => onPageChange(null, page - 1)}
-                    disabled={page === 0}
-                    aria-label="previous page"
-                  >
-                    <ArrowBackIos sx={styles.icon} />
-                    <Typography style={{...styles.text,paddingLeft: '4px'}}>Prev</Typography>
-                  </IconButton>
-                  {[0, 1].map((pageNumber) => (
-                    <Box
-                      key={pageNumber}
-                      style={{...styles.pageNumber,backgroundColor: page === pageNumber ? '#9747FF' : 'white',
-                        color: page === pageNumber ? 'white' : 'black',}}
-                      onClick={() => onPageChange(null, pageNumber)}
-                    >
-                      {pageNumber + 1}
-                    </Box>
-                  ))}
-                  <IconButton
-                    onClick={() => onPageChange(null, page + 1)}
-                    disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}
-                    aria-label="next page"
-                    sx={styles.icon}
-                  >
-                    <Typography sx={{...styles.text,paddingRight: '4px'}}>Next</Typography>
-                    <ArrowForwardIos sx={styles.icon} />
-                  </IconButton>
-                </Box>
-              );
-            }}
-          />
-        </Box>
+        <UserTable/>
+
+        {/*<Box style={styles.paginationContainer}>*/}
+        {/*  <TablePagination*/}
+        {/*    component="div"*/}
+        {/*    count={filteredRows.length}*/}
+        {/*    rowsPerPage={rowsPerPage}*/}
+        {/*    page={page}*/}
+        {/*    onPageChange={handleChangePage}*/}
+        {/*    onRowsPerPageChange={handleChangeRowsPerPage}*/}
+        {/*    labelDisplayedRows={() => ""}*/}
+        {/*    labelRowsPerPage=""*/}
+        {/*    rowsPerPageOptions={[]}*/}
+        {/*    ActionsComponent={(props) => {*/}
+        {/*      const { onPageChange, page } = props;*/}
+
+        {/*      return (*/}
+        {/*        <Box style={styles.paginationContent}>*/}
+        {/*          <IconButton*/}
+        {/*            onClick={() => onPageChange(null, page - 1)}*/}
+        {/*            disabled={page === 0}*/}
+        {/*            aria-label="previous page"*/}
+        {/*          >*/}
+        {/*            <ArrowBackIos sx={styles.icon} />*/}
+        {/*            <Typography style={{...styles.text,paddingLeft: '4px'}}>Prev</Typography>*/}
+        {/*          </IconButton>*/}
+        {/*          {[0, 1].map((pageNumber) => (*/}
+        {/*            <Box*/}
+        {/*              key={pageNumber}*/}
+        {/*              style={{...styles.pageNumber,backgroundColor: page === pageNumber ? '#9747FF' : 'white',*/}
+        {/*                color: page === pageNumber ? 'white' : 'black',}}*/}
+        {/*              onClick={() => onPageChange(null, pageNumber)}*/}
+        {/*            >*/}
+        {/*              {pageNumber + 1}*/}
+        {/*            </Box>*/}
+        {/*          ))}*/}
+        {/*          <IconButton*/}
+        {/*            onClick={() => onPageChange(null, page + 1)}*/}
+        {/*            disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}*/}
+        {/*            aria-label="next page"*/}
+        {/*            sx={styles.icon}*/}
+        {/*          >*/}
+        {/*            <Typography sx={{...styles.text,paddingRight: '4px'}}>Next</Typography>*/}
+        {/*            <ArrowForwardIos sx={styles.icon} />*/}
+        {/*          </IconButton>*/}
+        {/*        </Box>*/}
+        {/*      );*/}
+        {/*    }}*/}
+        {/*  />*/}
+        {/*</Box>*/}
       </Box>
     </BoxBG>
   );
