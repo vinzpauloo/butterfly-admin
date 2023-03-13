@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box';
@@ -19,6 +19,25 @@ const Img = styled('img')({
     height:'auto',
 })
 
+const sideBarContent = [
+  {id : 1, title : 'Dashboard', icon : 'dashboard', link : ''},
+  {id : 2, title : 'Users', icon : 'users', link : '/user/list'},
+  {id : 3, title : 'Transaction', icon : 'transactions', link : ''},
+  {id : 4, title : 'Reports', icon : 'reports', link : ''},
+  {id : 5, title : 'Studio', icon : 'studio', link : '/studio/upload'},
+  {id : 6, title : 'Bundles', icon : 'bundles', link : ''},
+  {id : 7, title : 'Settings', icon : 'settings', link : ''}
+]
+
+const settingsSubMenu = [
+  {id : 1, title : 'Work Groupings', link : '/settings'},
+  {id : 2, title : 'Feed Features', link : '/user/list'},
+  {id: 3, title: 'Advertisements', link: ''},
+  {id: 4, title: 'Announcements', link: '/studio/upload'},
+  {id: 5, title: 'Privacy Policy', link: '/studio/upload'},
+  {id: 6, title: 'Terms and Services', link: 'user/list'}
+]
+
 const SidebarContent = () => {
 
   // ** Hook
@@ -29,6 +48,8 @@ const SidebarContent = () => {
     navCollapsed,
   } = settings
 
+  const [showSettingsSubMenu, setShowSettingsSubMenu] = useState(false);
+
     return (
         <Box
             className='drawerBox'
@@ -37,19 +58,10 @@ const SidebarContent = () => {
                 paddingTop: '1.5rem'
             }}
             >
-            <List>
-                {[
-                    {id : 1, title : 'Dashboard', icon : 'dashboard', link : ''}, 
-                    {id : 2, title : 'Users', icon : 'users', link : '/user/list'}, 
-                    {id : 3, title : 'Transaction', icon : 'transactions', link : ''}, 
-                    {id : 4, title : 'Reports', icon : 'reports', link : ''},
-                    {id : 5, title : 'Studio', icon : 'studio', link : '/studio/upload'},
-                    {id : 6, title : 'Bundles', icon : 'bundles', link : ''},
-                    {id : 7, title : 'Settings', icon : 'settings', link : ''}
-                
-                ].map((item) => (
-                <ListItem 
-                key={item.id} 
+            <List sx={{paddingBottom: 0, marginBottom: 0}}>
+                {sideBarContent.map((item) => (
+                <ListItem
+                key={item.id}
                 disablePadding
                 sx={
                     !navCollapsed ? {
@@ -77,7 +89,12 @@ const SidebarContent = () => {
                 }
                 >
                     <ListItemButton
-                        href={`${item.link}`} 
+                        href={`${item.link}`}
+                        onClick={() => {
+                          if (item.title === 'Settings') {
+                            setShowSettingsSubMenu(!showSettingsSubMenu);
+                          }
+                        }}
                         sx={{
                             '& .iconContainer': {
                                 position:'relative',
@@ -101,18 +118,63 @@ const SidebarContent = () => {
                         </ListItemIcon>
                         <ListItemText sx={{
                             '& .MuiTypography-root': {
-                                color : '#BFC6D0', 
+                                color : '#BFC6D0',
                                 fontSize: '0.875rem'
-                            } 
-                        }} 
+                            }
+                        }}
                         primary={item.title} />
                     </ListItemButton>
                 </ListItem>
                 ))}
-
             </List>
+
+          {showSettingsSubMenu && (
+            <List disablePadding>
+              {!navCollapsed ? settingsSubMenu.map((item) => (
+                <ListItem
+                  key={item.id}
+                  disablePadding
+                  sx={
+                    !navCollapsed ? {
+                      '& .MuiButtonBase-root': {
+                        gap: '1rem',
+                        display: 'flex',
+                        marginLeft: 25,
+                      },
+                      '& .MuiTypography-root':{
+                        transition: 'color 0.5s'
+                      },
+                      '&:hover .MuiTypography-root' : {
+                        color : theme => theme.customBflyColors.green
+                      }
+                    } : {
+                      '& .MuiButtonBase-root': {
+                        paddingInline : '1rem',
+                        display: 'flex',
+                        gap: 3,
+                        marginBottom : '.5rem'
+                      },
+                    }
+                  }
+                >
+                  <ListItemButton
+                    href={`${item.link}`}
+                    sx={{ margin: 0, padding: 0 }}
+                  >
+                    <ListItemText sx={{
+                      '& .MuiTypography-root': {
+                        color : '#BFC6D0',
+                        fontSize: '0.65rem',
+                      }
+                    }} primary={item.title} />
+                  </ListItemButton>
+                </ListItem>
+              )): null}
+            </List>
+          )}
+
             <Divider />
-            </Box>
+            </Box >
     )
 }
 
