@@ -22,6 +22,7 @@ import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
 import LoadingScreen from './views/LoadingScreen'
 import VideoVisibility from './views/VideoVisibility'
 import UploadVideoPublish from './views/UploadVideoPublish'
+import VideosListTable from './views/VideosList'
 
 
 // ** Styled Components
@@ -52,7 +53,8 @@ export enum DisplayPage {
     UploadNewsfeedsStep1,
     LoadingScreen,
     VideoVisibility,
-    UploadVideoPublish
+    UploadVideoPublish,
+    VideosList
 }
 
 export type RequestType = {
@@ -117,6 +119,8 @@ const UploadContent = () => {
     if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
     if (displayPage == DisplayPage.VideoVisibility) return <VideoVisibility />
     if (displayPage == DisplayPage.UploadVideoPublish) return <UploadVideoPublish />
+    if (displayPage == DisplayPage.VideosList) return <VideosListTable />
+    
 }
 
   return (

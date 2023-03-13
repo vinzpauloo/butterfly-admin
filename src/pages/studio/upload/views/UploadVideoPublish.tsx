@@ -91,7 +91,7 @@ const UploadVideoPublish = () => {
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
   const dummyNavigate = () => {
-    studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
+    studioContext?.setDisplayPage(DisplayPage.VideosList)
   }
 
   const dimOnTrue = (flag : boolean) => {
