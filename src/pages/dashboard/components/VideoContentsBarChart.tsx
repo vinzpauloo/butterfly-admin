@@ -1,14 +1,12 @@
+// ** React Imports
+import React, {useState, useEffect} from "react";
+
 // ** MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
+import { Card, CardHeader, CardContent, ToggleButtonGroup, ToggleButton } from '@mui/material'
 
 // ** Third Party Imports
 import { Bar } from 'react-chartjs-2'
 import { ChartData, ChartOptions } from 'chart.js'
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import ToggleButton from "@mui/material/ToggleButton";
-import React, {MouseEvent, useState, useEffect} from "react";
 
 interface VerticalBarProps {
   info: string
@@ -18,8 +16,7 @@ interface VerticalBarProps {
   legendColor: string
 }
 
-const ChartjsHorizontalBarChart = (props: VerticalBarProps) => {
-  // ** Props
+const VideoContentsBarChart = (props: VerticalBarProps) => {
   const { info, warning, labelColor, borderColor, legendColor } = props
 
   const [active, setActive] = useState<string>('daily')
@@ -35,24 +32,25 @@ const ChartjsHorizontalBarChart = (props: VerticalBarProps) => {
         label: 'Total Views',
         backgroundColor: warning,
         borderColor: 'transparent',
-        data: [710, 350, 580, 460],
+        data: [],
       },
     ],
   })
 
+  const newData: ChartData<'bar'> = {
+    labels: ['2020', '2021', '2022', '2023'],
+    datasets: [
+      {
+        maxBarThickness: 200,
+        label: 'Total Views',
+        backgroundColor: warning,
+        borderColor: 'transparent',
+        data: [],
+      },
+    ],
+  }
+
   useEffect(() => {
-    const newData: ChartData<'bar'> = {
-      labels: ['2020', '2021', '2022', '2023'],
-      datasets: [
-        {
-          maxBarThickness: 200,
-          label: 'Total Views',
-          backgroundColor: warning,
-          borderColor: 'transparent',
-          data: [],
-        },
-      ],
-    }
     switch (active) {
       case 'daily':
         newData.labels = ['Mon', 'Tue','Wed','Thur', 'Fri', 'Sat']
@@ -71,7 +69,7 @@ const ChartjsHorizontalBarChart = (props: VerticalBarProps) => {
         break
     }
     setData(newData)
-  }, [active, warning])
+  }, [active])
 
   const options: ChartOptions<'bar'> = {
     indexAxis: 'x',
@@ -127,7 +125,7 @@ const ChartjsHorizontalBarChart = (props: VerticalBarProps) => {
             exclusive
             value={active}
             onChange={handleActive}
-            sx={{display: 'flex', flexDirection: ['column', 'row'], marginLeft: 10}}
+            sx={styles.toggle}
           >
             <ToggleButton value='daily'>Daily</ToggleButton>
             <ToggleButton value='weekly'>Weekly</ToggleButton>
@@ -143,4 +141,17 @@ const ChartjsHorizontalBarChart = (props: VerticalBarProps) => {
   )
 }
 
-export default ChartjsHorizontalBarChart
+const styles = {
+  toggle: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      sm: 'row',
+      md: 'row',
+      lg: 'row'
+    },
+    marginLeft: 10
+  }
+}
+
+export default VideoContentsBarChart
