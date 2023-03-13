@@ -76,14 +76,6 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 500 },
-    elements: {
-      bar: {
-        borderRadius: {
-          topRight: 15,
-          bottomRight: 15,
-        },
-      },
-    },
     layout: {
       padding: { top: -4 },
     },

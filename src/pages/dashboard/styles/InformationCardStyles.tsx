@@ -17,7 +17,7 @@ const styles = {
     width: {
       xs: '100%',
       md: '100%',
-      lg: '25%'
+      lg: '50%'
     }
   },
   subHead: {
