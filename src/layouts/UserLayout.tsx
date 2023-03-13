@@ -68,7 +68,7 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
         navMenu: {
           componentProps: {
             sx: {
-              '& .MuiPaper-root':{
+              '& .MuiPaper-root': {
                 backgroundColor: theme => theme.customBflyColors.primary,
                 boxShadow: '5px 2px 2px rgb(0 0 0 / 25%)'
               },
@@ -79,51 +79,55 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
               '& .scrollbar-container .nav-link .active': {
                 backgroundColor: 'none',
                 backgroundImage: 'none',
-                boxShadow:'none',
-                borderRadius:0
+                boxShadow: 'none',
+                borderRadius: 0
               },
               '& .scrollbar-container  a': {
                 color: theme => theme.palette.common.white
-              },
+              }
             }
           },
-          branding: (props) => <AppBrand {...props} />,
+          branding: props => <AppBrand {...props} />,
           navItems: VerticalNavItems(),
-          lockedIcon: 
-          <Box 
-                sx={{ 
-                  '&:hover': {
-                    backgroundColor: theme => theme.customBflyColors.green
-                  },
-                  backgroundColor : '#fff', 
-                  cursor:'pointer', ml: 6 , 
-                  display: 'flex', 
-                  color: '#3C4B64',
-                  boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.5)', 
-                  borderRadius: .3,
-                  border: '1px solid #3C4B64'
-                  }}>
-                <Icon icon='mdi:menu' fontSize={20} />
-          </Box>,
+          lockedIcon: (
+            <Box
+              sx={{
+                '&:hover': {
+                  backgroundColor: theme => theme.customBflyColors.green
+                },
+                backgroundColor: '#fff',
+                cursor: 'pointer',
+                ml: 6,
+                display: 'flex',
+                color: '#3C4B64',
+                boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.5)',
+                borderRadius: 0.3,
+                border: '1px solid #3C4B64'
+              }}
+            >
+              <Icon icon='mdi:menu' fontSize={20} />
+            </Box>
+          ),
+
           // unlockedIcon: <></>,
           // { hidden, settings, children, scrollToTop, footerProps, contentHeightFixed, verticalLayoutProps }
           content: () => <SidebarContent />,
-          afterContent: () => <SidebarFooter />,
+          afterContent: () => <SidebarFooter />
 
           // Uncomment the below line when using server-side menu in vertical layout and comment the above line
           // navItems: verticalMenuItems
         },
         appBar: {
           componentProps: {
-            sx: { 
+            sx: {
               boxShadow: theme => theme.shadows[9],
               backgroundColor: theme => theme.palette.common.white,
               '& .navbar-content-container': {
-                minHeight:'50px !important'
+                minHeight: '50px !important'
               },
-              '& .css-auttry' : {
+              '& .css-auttry': {
                 paddingBottom: 1.2,
-                gap:.5
+                gap: 0.5
               }
             }
           },
@@ -155,7 +159,6 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       }}
     >
       {children}
-      
     </Layout>
   )
 }
