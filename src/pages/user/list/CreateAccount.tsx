@@ -1,3 +1,4 @@
+// ** React Imports
 import React, {ReactNode, useEffect, useState} from "react";
 
 // ** MUI Imports
@@ -7,7 +8,6 @@ import {
   Checkbox, InputAdornment, MenuItem,
   TextField,
   Typography,
-  BoxProps
 } from "@mui/material";
 import { styled } from '@mui/system';
 
@@ -15,28 +15,33 @@ import { styled } from '@mui/system';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+// ** Other Imports
 import CreatedSuccessful from "../components/form/CreatedSuccessful";
 import UserLayoutNoPadding from "@/layouts/UserLayoutNoPadding";
+import CreateForm from "@/pages/user/components/form/CreateForm";
+import styles from './StyleSheetCreateAccount';
 
-const bgPath = '/images/pages/bitcoin-bg.png'
-const bgPathTwo = '/images/pages/operator-create-bg.png'
 const CreateAccount = () => {
-
   // ** Styled Components
-  const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
-    backgroundImage: submitted || continueBtnTwo ? `url("${bgPathTwo}")` : `url("${bgPath}")`,
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: '100% 75%',
-    backgroundColor: '#d3d6df',
-    padding: 10,
-    height: 'auto',
+  const BoxBG = styled(Box)(({ theme }) => {
+    const bgPath = '/images/pages/bitcoin-bg.png'
+    const bgPathTwo = '/images/pages/operator-create-bg.png'
 
-    [theme.breakpoints.up('sm')]: {
-      padding: 80,
-      height: '100vh'
-    }
-  }))
+    return {
+      backgroundImage: submitted || continueBtnTwo ? `url("${bgPathTwo}")` : `url("${bgPath}")`,
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: '100% 75%',
+      backgroundColor: '#d3d6df',
+      padding: 10,
+      height: 'auto',
+
+      [theme.breakpoints.up('sm')]: {
+        padding: 80,
+        height: '100vh'
+      }
+    };
+  });
 
   const [submitted, setSubmitted] = useState(false);
   const [continueBtn, setContinueBtn] = useState(false);
@@ -44,8 +49,6 @@ const CreateAccount = () => {
 
   const router = useRouter();
   const param = router.query;
-
-  console.log(param.activeBtn)
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -98,77 +101,32 @@ const CreateAccount = () => {
 
   return (
     <BoxBG>
-    <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], justifyContent: ['flex-start', 'center'], gap: 10, }}>
+    <Box sx={styles.container}>
       <Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={styles.userButtons}>
           <Button
-            sx={{
-            border: 1,
-            height: '62px',
-            minWidth: '332px',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            borderColor: 'black',
-            transition: 'background-color 0.1s',
-            backgroundColor: activeBtn === 'operators' ? '#9747FF' : 'white',
-            color: activeBtn === 'operators' ? 'white' : 'black',
-            '&:hover': {
-              backgroundColor: `#9747FF`,
-              color: 'white',
-            },
-          }}
+            sx={{...styles.userButton, backgroundColor: activeBtn === 'operators' ? '#9747FF' : 'white',
+              color: activeBtn === 'operators' ? 'white' : 'black'}}
             onClick={handleOperatorClick}
           >
             <Image src='/images/icons/project-icons/operator-icon.png' width={40} height={40} alt='operator-icon'/>
-            <Typography sx={{ flexGrow: 1, color: activeBtn === 'operators' ? 'white' : 'black' }}>Operator</Typography>
+            <Typography sx={{ ...styles.text, color: activeBtn === 'operators' ? 'white' : 'black' }}>Operator</Typography>
           </Button>
           <Button
-            sx={{
-              border: 1,
-              height: '62px',
-              minWidth: '332px',
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              borderColor: 'black',
-              transition: 'background-color 0.1s',
-              backgroundColor: activeBtn === 'superagent' ? '#9747FF' : 'white',
-              color: activeBtn === 'superagent' ? 'white' : 'black',
-              '&:hover': {
-                backgroundColor: `#9747FF`,
-                color: 'white',
-              },
-          }}
+            sx={{...styles.userButton, backgroundColor: activeBtn === 'superagent' ? '#9747FF' : 'white',
+              color: activeBtn === 'superagent' ? 'white' : 'black'}}
             onClick={handleSuperAgentClick}
           >
             <Image src='/images/icons/project-icons/superagent-icon.png' width={40} height={40} alt='operator-icon'/>
-            <Typography sx={{ flexGrow: 1, color: activeBtn === 'superagent' ? 'white' : 'black' }}>Super Agent</Typography>
+            <Typography sx={{ ...styles.text, color: activeBtn === 'superagent' ? 'white' : 'black' }}>Super Agent</Typography>
           </Button>
           <Button
-            sx={{
-              border: 1,
-              height: '62px',
-              minWidth: '332px',
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              borderColor: 'black',
-              transition: 'background-color 0.1s',
-              backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : 'white',
-              color: activeBtn === 'contentcreators' ? 'white' : 'black',
-              '&:hover': {
-                backgroundColor: `#9747FF`,
-                color: 'white',
-              },
-            }}
+            sx={{...styles.userButton, backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : 'white',
+              color: activeBtn === 'contentcreators' ? 'white' : 'black'}}
             onClick={handleCreatorClick}
           >
             <Image src='/images/icons/project-icons/creator-icon.png' width={40} height={40} alt='operator-icon'/>
-            <Typography sx={{ flexGrow: 1, color: activeBtn === 'contentcreators' ? 'white' : 'black' }}>Content Creator</Typography>
+            <Typography sx={{ ...styles.text, color: activeBtn === 'contentcreators' ? 'white' : 'black' }}>Content Creator</Typography>
           </Button>
         </Box>
       </Box>
@@ -176,121 +134,28 @@ const CreateAccount = () => {
       {activeBtn === 'operators' ? (
         <Box>
           {!submitted ? (
-            <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
-              <Box sx={{display: 'flex', backgroundColor: '#A459D1', padding: 2}}>
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                  <Typography sx={{color: 'white'}}>Operator</Typography>
+            <Box sx={styles.formContainer}>
+              <Box sx={styles.operatorHeader}>
+                <Box sx={styles.header}>
+                  <Typography sx={styles.white}>Operator</Typography>
                   <Checkbox
                     name="operator"
                     inputProps={{ 'aria-label': 'primary checkbox' }}
-                    sx={{color: 'white'}}
+                    sx={styles.white}
                     color="default"
                   />
                 </Box>
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                  <Typography sx={{color: 'white'}}>Supervisor</Typography>
+                <Box sx={styles.header}>
+                  <Typography sx={styles.white}>Supervisor</Typography>
                   <Checkbox
                     name="supervisor"
                     inputProps={{ 'aria-label': 'primary checkbox' }}
-                    sx={{color: 'white'}}
+                    sx={styles.white}
                     color="default"
                   />
                 </Box>
               </Box>
-              <Box sx={{padding: 4, backgroundColor: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <form>
-                  <Box sx={{width: '100%'}}>
-                    <Typography>Username</Typography>
-                    <TextField
-                      label="Entire Desired Username"
-                      variant="outlined"
-                      fullWidth
-                      name="username"
-                    />
-                  </Box>
-                  <Box style={{display: 'flex', gap: 20, marginTop: 20, marginBottom: 20}}>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Password</Typography>
-                      <TextField
-                        label="Enter Password"
-                        variant="outlined"
-                        fullWidth
-                        type="password"
-                        name="password"
-                      />
-                    </Box>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Re-enter Password</Typography>
-                      <TextField
-                        label="Re-enter Password"
-                        variant="outlined"
-                        fullWidth
-                        type="password"
-                        name="confirmPassword"
-                      />
-                    </Box>
-                  </Box>
-                  <Box style={{display: 'flex', gap: 20, marginBottom: 20}}>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Mobile No.</Typography>
-                      <TextField
-                        label="Mobile No."
-                        variant="outlined"
-                        fullWidth
-                        name="mobileNo"
-                      />
-                    </Box>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Email Address</Typography>
-                      <TextField
-                        label="Email Address"
-                        variant="outlined"
-                        fullWidth
-                        name="emailAddress"
-                      />
-                    </Box>
-                  </Box>
-                  <Typography>Notes (Optional)</Typography>
-                  <TextField
-                    label="Notes"
-                    variant="outlined"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    name="notes"
-                  />
-                  <Box sx={{display: 'flex', flexDirection: ['column', 'row'] ,mt: 5, gap:3, justifyContent: 'space-between', alignItems: 'center'}}>
-                    <Box>
-                      <Button sx={{ backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
-                          backgroundColor: '#7899ac',
-                        }, }}>
-                        <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                            transition: 'transform 0.2s ease-in-out',
-                          },}}>Cancel</Typography>
-                      </Button>
-                    </Box>
-
-                    <Box>
-                      <Button
-                        type="submit"
-                        sx={{
-                          backgroundColor: '#9747FF',
-                          color: 'white',
-                          width: '200px',
-                          '&:hover': {
-                            backgroundColor: '#9747FF',
-                          },
-                        }}
-                        onClick={handleSubmit}
-                      >
-                        <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                            transition: 'transform 0.2s ease-in-out',
-                          },}}>Continue</Typography>
-                      </Button>
-                    </Box>
-                  </Box>
-                </form>
-              </Box>
+              <CreateForm onSubmit={handleSubmit}/>
             </Box>
           ):(
             <CreatedSuccessful/>
@@ -301,19 +166,19 @@ const CreateAccount = () => {
           {
             !continueBtn
               ? (
-                <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
-                  <Box sx={{display: 'flex', justifyContent: 'space-between',backgroundColor: '#A459D1', padding: 4}}>
-                    <Box sx={{display: 'flex', alignItems: 'center'}}>
-                      <Typography sx={{color: 'white'}}>Step 1</Typography>
+                <Box sx={styles.formContainer}>
+                  <Box sx={styles.headerContainer}>
+                    <Box sx={styles.header}>
+                      <Typography sx={styles.white}>Step 1</Typography>
                     </Box>
-                    <Box sx={{display: 'flex', alignItems: 'center'}}>
-                      <Typography sx={{color: 'white'}}>Create Super Agent</Typography>
+                    <Box sx={styles.header}>
+                      <Typography sx={styles.white}>Create Super Agent</Typography>
                     </Box>
                   </Box>
-                  <Box sx={{padding: 4, backgroundColor: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                  <Box sx={styles.innerFormContainer}>
                     <form>
-                      <Box style={{display: 'flex', gap: 20, marginTop: 20, marginBottom: 20}}>
-                        <Box sx={{width: '50%'}}>
+                      <Box style={styles.formMargin}>
+                        <Box sx={styles.halfWidth}>
                           <Typography>Company Name</Typography>
                           <TextField
                             label="Enter Company Name"
@@ -323,7 +188,7 @@ const CreateAccount = () => {
                             name="companyName"
                           />
                         </Box>
-                        <Box sx={{width: '50%'}}>
+                        <Box sx={styles.halfWidth}>
                           <Typography>Company Code</Typography>
                           <TextField
                             label="Enter Company Code"
@@ -334,7 +199,7 @@ const CreateAccount = () => {
                           />
                         </Box>
                       </Box>
-                      <Box sx={{width: '100%'}}>
+                      <Box sx={styles.fullWidth}>
                         <Typography>Username</Typography>
                         <TextField
                           label="Entire Desired Username"
@@ -343,8 +208,8 @@ const CreateAccount = () => {
                           name="username"
                         />
                       </Box>
-                      <Box style={{display: 'flex', gap: 20, marginTop: 20, marginBottom: 20}}>
-                        <Box sx={{width: '50%'}}>
+                      <Box style={styles.formMargin}>
+                        <Box sx={styles.halfWidth}>
                           <Typography>Password</Typography>
                           <TextField
                             label="Enter Password"
@@ -354,7 +219,7 @@ const CreateAccount = () => {
                             name="password"
                           />
                         </Box>
-                        <Box sx={{width: '50%'}}>
+                        <Box sx={styles.halfWidth}>
                           <Typography>Re-enter Password</Typography>
                           <TextField
                             label="Re-enter Password"
@@ -365,8 +230,8 @@ const CreateAccount = () => {
                           />
                         </Box>
                       </Box>
-                      <Box style={{display: 'flex', gap: 20, marginBottom: 20, marginTop: 20}}>
-                        <Box sx={{width: '50%'}}>
+                      <Box style={styles.formMargin}>
+                        <Box sx={styles.halfWidth}>
                           <Typography>Mobile No.</Typography>
                           <TextField
                             label="Mobile No."
@@ -375,7 +240,7 @@ const CreateAccount = () => {
                             name="mobileNo"
                           />
                         </Box>
-                        <Box sx={{width: '50%'}}>
+                        <Box sx={styles.halfWidth}>
                           <Typography>Email Address</Typography>
                           <TextField
                             label="Email Address"
@@ -394,33 +259,20 @@ const CreateAccount = () => {
                         rows={4}
                         name="notes"
                       />
-                      <Box sx={{display: 'flex', flexDirection: ['column', 'row'] ,mt: 5, gap:3, justifyContent: 'space-between', alignItems: 'center'}}>
+                      <Box sx={styles.bottomFormButtons}>
                         <Box>
-                          <Button sx={{ backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
-                              backgroundColor: '#7899ac',
-                            }, }}>
-                            <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                                transition: 'transform 0.2s ease-in-out',
-                              },}}>Cancel</Typography>
+                          <Button sx={styles.cancelButton}>
+                            <Typography sx={styles.buttonText}>Cancel</Typography>
                           </Button>
                         </Box>
 
                         <Box>
                           <Button
                             type="submit"
-                            sx={{
-                              backgroundColor: '#9747FF',
-                              color: 'white',
-                              width: '200px',
-                              '&:hover': {
-                                backgroundColor: '#9747FF',
-                              },
-                            }}
+                            sx={styles.continueButton}
                             onClick={superAgentContinueBtn}
                           >
-                            <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                                transition: 'transform 0.2s ease-in-out',
-                              },}}>Continue</Typography>
+                            <Typography sx={styles.buttonText}>Continue</Typography>
                           </Button>
                         </Box>
                       </Box>
@@ -429,19 +281,19 @@ const CreateAccount = () => {
                 </Box>
               )
               : !continueBtnTwo ? (
-                  <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
-                    <Box sx={{display: 'flex', justifyContent: 'space-between',backgroundColor: '#A459D1', padding: 4}}>
-                      <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <Typography sx={{color: 'white'}}>Step 2</Typography>
+                  <Box sx={styles.formContainer}>
+                    <Box sx={styles.headerContainer}>
+                      <Box sx={styles.header}>
+                        <Typography sx={styles.white}>Step 2</Typography>
                       </Box>
-                      <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <Typography sx={{color: 'white'}}>Create Site</Typography>
+                      <Box sx={styles.header}>
+                        <Typography sx={styles.white}>Create Site</Typography>
                       </Box>
                     </Box>
-                    <Box sx={{padding: 4, backgroundColor: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                    <Box sx={styles.innerFormContainer}>
                       <form>
-                        <Box style={{display: 'flex', gap: 20, marginTop: 20, marginBottom: 20}}>
-                          <Box sx={{width: '50%'}}>
+                        <Box style={styles.formMargin}>
+                          <Box sx={styles.halfWidth}>
                             <Typography>Name of Site</Typography>
                             <TextField
                               label="Please input site name"
@@ -451,7 +303,7 @@ const CreateAccount = () => {
                               name="confirmPassword"
                             />
                           </Box>
-                          <Box sx={{width: '50%'}}>
+                          <Box sx={styles.halfWidth}>
                             <Typography>Language</Typography>
                             <TextField
                               select
@@ -466,8 +318,8 @@ const CreateAccount = () => {
                             </TextField>
                           </Box>
                         </Box>
-                        <Box style={{display: 'flex', gap: 20, marginTop: 20, marginBottom: 20}}>
-                          <Box sx={{width: '50%'}}>
+                        <Box style={styles.formMargin}>
+                          <Box sx={styles.halfWidth}>
                             <Typography>Currency</Typography>
                             <TextField
                               select
@@ -481,7 +333,7 @@ const CreateAccount = () => {
                               <MenuItem value="gbp">GBP</MenuItem>
                             </TextField>
                           </Box>
-                          <Box sx={{width: '50%'}}>
+                          <Box sx={styles.halfWidth}>
                             <Typography>Access URL</Typography>
                             <TextField
                               label=""
@@ -492,8 +344,8 @@ const CreateAccount = () => {
                             />
                           </Box>
                         </Box>
-                        <Box style={{display: 'flex', gap: 20, marginBottom: 20, marginTop: 20}}>
-                          <Box sx={{width: '50%'}}>
+                        <Box style={styles.formMargin}>
+                          <Box sx={styles.halfWidth}>
                             <Typography>Add Security Funds</Typography>
                             <TextField
                               label="Amount"
@@ -502,13 +354,13 @@ const CreateAccount = () => {
                               name="mobileNo"
                             />
                           </Box>
-                          <Box sx={{width: '50%'}}>
+                          <Box sx={styles.halfWidth}>
                             <Typography>Logo</Typography>
                             <Box>
                               <input
                                 type="file"
                                 accept=".jpg, .jpeg, .png"
-                                style={{ display: 'none' }}
+                                style={styles.input}
                                 name="logo"
                                 id="logo"
                               />
@@ -518,9 +370,9 @@ const CreateAccount = () => {
                                   fullWidth
                                   InputProps={{
                                     endAdornment: (
-                                      <InputAdornment position="end" sx={{position: 'absolute', right: 5}}>
-                                        <Box sx={{backgroundColor: '#979797', padding: "8px 15px 8px 15px", borderRadius: '5px'}}>
-                                          <Typography sx={{color: '#FFF'}}>UPLOAD</Typography>
+                                      <InputAdornment position="end">
+                                        <Box sx={styles.upload}>
+                                          <Typography sx={styles.white}>UPLOAD</Typography>
                                         </Box>
                                       </InputAdornment>
                                     ),
@@ -539,33 +391,20 @@ const CreateAccount = () => {
                           rows={4}
                           name="notes"
                         />
-                        <Box sx={{display: 'flex', flexDirection: ['column', 'row'] ,mt: 5, gap:3, justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Box sx={styles.bottomFormButtons}>
                           <Box>
-                            <Button sx={{ backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
-                                backgroundColor: '#7899ac',
-                              }, }}>
-                              <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                                  transition: 'transform 0.2s ease-in-out',
-                                },}}>Cancel</Typography>
+                            <Button sx={styles.cancelButton}>
+                              <Typography sx={styles.buttonText}>Cancel</Typography>
                             </Button>
                           </Box>
 
                           <Box>
                             <Button
                               type="submit"
-                              sx={{
-                                backgroundColor: '#9747FF',
-                                color: 'white',
-                                width: '200px',
-                                '&:hover': {
-                                  backgroundColor: '#9747FF',
-                                },
-                              }}
+                              sx={styles.continueButton}
                               onClick={superAgentContinueBtnTwo}
                             >
-                              <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                                  transition: 'transform 0.2s ease-in-out',
-                                },}}>Continue</Typography>
+                              <Typography sx={styles.buttonText}>Continue</Typography>
                             </Button>
                           </Box>
                         </Box>
@@ -581,104 +420,11 @@ const CreateAccount = () => {
       ): activeBtn === 'contentcreators' && (
         <Box>
           {!submitted ? (
-            <Box sx={{border: '1px solid grey', borderRadius: '5px',}}>
-              <Box sx={{display: 'flex', backgroundColor: '#A459D1', padding: 4}}>
-                <Typography sx={{color: 'white'}}>Content Creator</Typography>
+            <Box sx={styles.formContainer}>
+              <Box sx={styles.creatorHeader}>
+                <Typography sx={styles.white}>Content Creator</Typography>
               </Box>
-              <Box sx={{padding: 4, backgroundColor: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <form>
-                  <Box sx={{width: '100%'}}>
-                    <Typography>Username</Typography>
-                    <TextField
-                      label="Entire Desired Username"
-                      variant="outlined"
-                      fullWidth
-                      name="username"
-                    />
-                  </Box>
-                  <Box style={{display: 'flex', gap: 20, marginTop: 20, marginBottom: 20}}>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Password</Typography>
-                      <TextField
-                        label="Enter Password"
-                        variant="outlined"
-                        fullWidth
-                        type="password"
-                        name="password"
-                      />
-                    </Box>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Re-enter Password</Typography>
-                      <TextField
-                        label="Re-enter Password"
-                        variant="outlined"
-                        fullWidth
-                        type="password"
-                        name="confirmPassword"
-                      />
-                    </Box>
-                  </Box>
-                  <Box style={{display: 'flex', gap: 20, marginBottom: 20}}>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Mobile No.</Typography>
-                      <TextField
-                        label="Mobile No."
-                        variant="outlined"
-                        fullWidth
-                        name="mobileNo"
-                      />
-                    </Box>
-                    <Box sx={{width: '50%'}}>
-                      <Typography>Email Address</Typography>
-                      <TextField
-                        label="Email Address"
-                        variant="outlined"
-                        fullWidth
-                        name="emailAddress"
-                      />
-                    </Box>
-                  </Box>
-                  <Typography>Notes (Optional)</Typography>
-                  <TextField
-                    label="Notes"
-                    variant="outlined"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    name="notes"
-                  />
-                  <Box sx={{display: 'flex', flexDirection: ['column', 'row'] ,mt: 5, gap:3, justifyContent: 'space-between', alignItems: 'center'}}>
-                    <Box>
-                      <Button sx={{ backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
-                          backgroundColor: '#7899ac',
-                        }, }}>
-                        <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                            transition: 'transform 0.2s ease-in-out',
-                          },}}>Cancel</Typography>
-                      </Button>
-                    </Box>
-
-                    <Box>
-                      <Button
-                        type="submit"
-                        sx={{
-                          backgroundColor: '#9747FF',
-                          color: 'white',
-                          width: '200px',
-                          '&:hover': {
-                            backgroundColor: '#9747FF',
-                          },
-                        }}
-                        onClick={handleSubmit}
-                      >
-                        <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
-                            transition: 'transform 0.2s ease-in-out',
-                          },}}>Continue</Typography>
-                      </Button>
-                    </Box>
-                  </Box>
-                </form>
-              </Box>
+              <CreateForm onSubmit={handleSubmit}/>
             </Box>
           ):(
             <CreatedSuccessful/>

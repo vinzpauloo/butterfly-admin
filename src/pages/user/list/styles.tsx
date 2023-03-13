@@ -5,30 +5,42 @@ const styles = {
     height: 'auto',
     overflow: 'hidden'
   },
-  buttonContainer : {
+  buttonContainer: {
     display: 'flex',
     flexDirection: {
       xs: 'column',
+      sm: 'column',
       md: 'column',
-      lg: 'row',
+      lg: 'row'
     },
     justifyContent: {
       xs: 'flex-start',
       md: 'flex-start',
-      lg: 'space-between',
+      lg: 'space-between'
     },
-    mb: 5
+    mb: 0
   },
   usersButtons: {
     display: 'flex',
     gap: 2,
     flexWrap: 'wrap',
-    mb: 5
+    mb: {
+      xs: 5,
+      sm: 5,
+      md: 5,
+      lg: 0,
+      xl: 0
+    }
   },
   userButton: {
     border: 1,
     height: '56px',
-    minWidth: '224px',
+    minWidth: {
+      xs: '224px',
+      sm: 'auto',
+      md: 'auto',
+      lg: '224px'
+    },
     flex: 1,
     display: 'flex',
     alignItems: 'center',
@@ -37,9 +49,9 @@ const styles = {
     transition: 'background-color 0.1s',
     '&:hover': {
       backgroundColor: `#9747FF`,
-      color: 'white',
+      color: 'white'
     },
-    textTransform: 'uppercase',
+    textTransform: 'uppercase'
   },
   linkButton: {
     textDecoration: 'none'
@@ -51,7 +63,7 @@ const styles = {
     width: {
       xs: '100%',
       md: '100%',
-      lg: '224px',
+      lg: '224px'
     },
     display: 'flex',
     alignItems: 'center',
@@ -63,8 +75,8 @@ const styles = {
     backgroundColor: '#FFF',
     '&:hover': {
       backgroundColor: `#9747FF`,
-      color: 'white',
-    },
+      color: 'white'
+    }
   },
   tableContainer: {
     minHeight: 540,
@@ -84,7 +96,7 @@ const styles = {
   },
   text: {
     color: 'black',
-    fontSize: 12,
+    fontSize: 12
   },
   pageNumber: {
     display: 'flex',
@@ -95,8 +107,32 @@ const styles = {
     borderRadius: 2,
     marginLeft: 2,
     marginRight: 2,
-    cursor: 'pointer',
+    cursor: 'pointer'
+  },
+  searchContainer: {
+    padding: 5,
+    borderTop: '1px solid black'
+  },
+  cardHeader: {
+    margin: 0,
+    padding: 0
+  },
+  searchInput: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      md: 'column',
+      lg: 'row'
+    },
+    padding: 0,
+    gap: 5
+  },
+  fullWidth: {
+    width: '100%'
+  },
+  dataGrid: {
+    padding: 5
   }
 }
 
-export default styles;
+export default styles
