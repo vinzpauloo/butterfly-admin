@@ -3,15 +3,33 @@ import React from 'react'
 
 // ** MUI Imports 
 import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
 import MenuItem from '@mui/material/MenuItem'
 import InputLabel from '@mui/material/InputLabel'
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
+import Switch from '@mui/material/Switch'
 import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack';
+
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
+
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
+import IconButton from '@mui/material/IconButton'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import InputAdornment from '@mui/material/InputAdornment'
+
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
@@ -49,46 +67,51 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   }
 }))
 
+const CustomStack = styled(Stack)(({ theme }) => ({
+  backgroundColor : theme.palette.common.white,
+  borderRadius:'5px',
+  padding:'1em',
+  marginTop: '1rem',
+  display:'flex',
+  flexWrap:'wrap',
+  flexDirection:'row',
+  justifyContent: 'flex-start',
+  gap:'.6rem'
+
+}))
+
+const ThumbnailBox = styled(Box)(({ theme }) => ({
+  backgroundColor : theme.palette.common.white,
+  justifyContent:'center',
+  borderRadius:'5px',
+  padding:'0',
+  marginBottom: 18,
+  maxWidth: '180px',
+  marginLeft:'auto',
+  height: '100%',
+  flexDirection: 'column',
+  display:'flex',
+  alignItems:'center',
+  gap:'1rem'
+}))
+
 // ** Data
-export const ContentCreatorsDummy = [
-  {id : 1, name : 'Ola Hansen'},
-  {id : 2, name : 'Van Aja'},
-  {id : 3, name : 'April Tucker'}
-]
-
-export const TaggingsDummy = [
-  {id : 1, name : '#Tagging 1'},
-  {id : 2, name : '#Taggings 2'},
-  {id : 3, name : '#Taggings 3'},
-  {id : 4, name : '#Tagging 4'},
-  {id : 5, name : '#Taggings 5'},
-  {id : 6, name : '#Taggings 6'},
-  {id : 7, name : '#Tagging 7'},
-  {id : 8, name : '#Taggings 8'},
-  {id : 9, name : '#Taggings 9'}
-]
-
-export const GroupingsDummy = [
-  {id : 1, name : 'Groupings 1'},
-  {id : 2, name : 'Groupings 2'},
-  {id : 3, name : 'Groupings 3'},
-  {id : 4, name : 'Groupings 4'},
-  {id : 5, name : 'Groupings 5'},
-  {id : 6, name : 'Groupings 6'},
-]
+import { ContentCreatorsDummy, TaggingsDummy, GroupingsDummy } from '@/data/uploadVideoData'
 
 // ** Props and interfaces 
 type Props = {}
 
 // ** Constant variables
-const URL : string = 'https://db6e-122-55-235-37.jp.ngrok.io/api/videos'
+const URL : string = `${process.env.NEXT_PUBLIC_BASE_URL}/videos/upload-url`
 
 const UploadVideoStep1 = (props: Props) => {
-
+  
   const studioContext = React.useContext(StudioContext)
 
   // ** State
   const [files, setFiles] = React.useState<File[] | null>([])
+  const [tags, setTags] =  React.useState<[] | null>([])
+  const [groupings, setGroupings] =  React.useState<[] | null>([])
   
   // ** Hooks
   React.useEffect(() => {
@@ -124,7 +147,6 @@ const UploadVideoStep1 = (props: Props) => {
     //navigate back
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
-
   const askToResumeUpload = (previousUploads : tus.PreviousUpload[]) => {
     if (previousUploads.length === 0) return null;
   
@@ -140,8 +162,8 @@ const UploadVideoStep1 = (props: Props) => {
       return previousUploads[0];
     } 
   }
-
   const handleUploadContinue = () => {
+    
     //check required fields
 
     // call videos api
@@ -200,13 +222,22 @@ const UploadVideoStep1 = (props: Props) => {
     //set page
     studioContext?.setDisplayPage(DisplayPage.LoadingScreen)
   }
-
-  const handleTaggingsChange = (event : React.ChangeEvent) => { 
-    studioContext?.setTags(event.target.value as GenericDataType[])
+  const handleTaggingsChange = (event : React.ChangeEvent, child : { props : { children : string, value : number } }) => { 
+    setTags( (event.target as HTMLInputElement).value as any )
   }
-
+  const handleTaggingsDelete = (tag : string) => {
+    let filteredTags = tags?.filter(e => e !== tag)
+    setTags(filteredTags as [])
+  }
   const handleGroupingsChange = (event: React.ChangeEvent<{ value: unknown }>) => { 
-    studioContext?.setGroupings( (event.target as HTMLInputElement).value as number )
+    setGroupings( (event.target as HTMLInputElement).value as any )
+  }
+  const handleGroupingsDelete = (group : string) => {
+    let filteredGroupings = groupings?.filter(e => e !== group)
+    setGroupings(filteredGroupings as [])
+  }
+  const dummyNavigate = () => {
+    studioContext?.setDisplayPage(DisplayPage.LoadingScreen)
   }
 
   return (
@@ -243,13 +274,6 @@ const UploadVideoStep1 = (props: Props) => {
                         defaultValue='' 
                         id='cc-select'
                         labelId='cc-select-label'
-                        renderValue={ selected => {
-                          console.log('selected', selected)
-                          if ((selected as unknown as string[]).length === 0) {
-                            return 'Select Content Creator'
-                          }
-                          return 
-                        }}
                       >
                         <MenuItem disabled value=''>
                           Select Content Creator
@@ -276,8 +300,23 @@ const UploadVideoStep1 = (props: Props) => {
                       />
                   </Grid>
                   <Grid item xs={12}>
+
+                  <Grid container justifyContent="space-between" spacing={4} sx={{marginBottom:5}}>
+                    <Grid justifySelf='flex-end' item xs={6}>
+                         <ThumbnailBox>
+                            <img width='48' src="/images/studio/thumbnail.png" />
+                            <Button size='small' variant='contained'>Upload</Button>
+                         </ThumbnailBox>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography maxWidth='23ch' color={theme => theme.palette.common.white}>
+                        THUMBNAIL <br />
+                        <Typography fontSize={13} color={theme => theme.palette.common.white}>Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and draws viewers attention.</Typography>  
+                      </Typography>
+                    </Grid>
+                  </Grid>
                         
-                  <Grid container justifyContent="space-between" spacing={2}>
+                  <Grid container justifyContent="space-between" spacing={4}>
                     <Grid item xs={6}>
 
                     <FormControl fullWidth>
@@ -285,17 +324,10 @@ const UploadVideoStep1 = (props: Props) => {
                       <CustomSelect
                         multiple
                         label='Chip'
-                        value={studioContext?.tags}
+                        value={tags}
                         id='multiple-taggings'
-                        onChange={(event) => { handleTaggingsChange(event as React.ChangeEvent) }}
+                        onChange={(event, child) => { handleTaggingsChange(event as React.ChangeEvent, child as any) }}
                         labelId='multiple-taggings-label'
-                        renderValue={selected => (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                            {(selected as unknown as string[]).map(value => (
-                              <Chip onDelete={()=>{console.log('delete')}} key={value} label={value} sx={{ m: 0.75 }} />
-                            ))}
-                          </Box>
-                        )}
                       >
                         {TaggingsDummy.map(tag => (
                           <MenuItem key={tag.id} value={tag.name}>
@@ -303,6 +335,17 @@ const UploadVideoStep1 = (props: Props) => {
                           </MenuItem>
                         ))}
                       </CustomSelect>
+                      
+                      {
+                        (tags?.length != 0) ? 
+                        <CustomStack>
+                          {
+                            tags && tags.map( tag => <Chip key={tag} label={tag} onDelete={ (e) => handleTaggingsDelete(tag)  } /> )
+                          }
+                        </CustomStack>
+                        : null
+                      }
+                      
                     </FormControl>
 
                     </Grid>
@@ -313,17 +356,10 @@ const UploadVideoStep1 = (props: Props) => {
                         <CustomSelect
                           multiple
                           label='Chip'
-                          value={studioContext?.groupings}
+                          value={groupings}
                           id='multiple-taggings'
-                          onChange={(event) => { handleGroupingsChange(event as React.ChangeEvent) }}
+                          onChange={(event) => { handleGroupingsChange(event as any) }}
                           labelId='multiple-taggings-label'
-                          renderValue={selected => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                              {(selected as unknown as string[]).map(value => (
-                                <Chip key={value} label={value} sx={{ m: 0.75 }} />
-                              ))}
-                            </Box>
-                          )}
                         >
                           {GroupingsDummy.map(tag => (
                             <MenuItem key={tag.id} value={tag.name}>
@@ -331,6 +367,16 @@ const UploadVideoStep1 = (props: Props) => {
                             </MenuItem>
                           ))}
                         </CustomSelect>
+
+                        {
+                        (groupings?.length != 0) ? 
+                        <CustomStack>
+                          {
+                            groupings && groupings.map( group => <Chip key={group} label={group} onDelete={ (e) => handleGroupingsDelete(group)  } /> )
+                          }
+                        </CustomStack>
+                        : null
+                      }
                       </FormControl>
 
                     </Grid>
@@ -396,8 +442,39 @@ const UploadVideoStep1 = (props: Props) => {
     
                 </Box>  
 
-                <Box className='uploadShortVidBox'>
-                  
+                <Box className='uploadShortVidBox' sx={{mt:10}}>
+                  <Card>
+                    <CardContent>
+                      <FormGroup sx={{ justifyContent:'space-between', alignItems:'center'}} row>
+                        <Typography fontSize={12}>Upload trial video is optional</Typography>
+                        <Switch color='error' defaultChecked />
+                      </FormGroup>
+                      <FormGroup sx={{rowGap:'1rem'}} row>
+                        <TextField fullWidth id='start' placeholder='Start' />
+                        
+                        <FormControl>
+                          <OutlinedInput
+                            placeholder='End'
+                            value={''}
+                            type='text'
+                            endAdornment={
+                              <InputAdornment position='end'>
+                                <Switch 
+                                  defaultChecked
+                                  onClick={() => {}}
+                                  color='primary'  />
+                              </InputAdornment>
+                            }
+                          />
+                        </FormControl>
+
+                      </FormGroup>
+                    </CardContent>
+                    <CardActions sx={{display:'flex', justifyContent:'center'}} className='card-action-dense'>
+                      
+                      <Button variant='contained'>Upload Trial Video</Button>
+                    </CardActions>
+                  </Card>
                 </Box>
 
               </Box>
@@ -419,7 +496,7 @@ const UploadVideoStep1 = (props: Props) => {
                   </Box>
                   <Box>
                     <CustomButton
-                      onClick={handleUploadContinue}
+                      onClick={dummyNavigate}
                       sx={{ 
                         bgcolor : 'primary.main',
                         color : 'common.white'
