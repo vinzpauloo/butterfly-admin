@@ -4,7 +4,7 @@ import React from 'react'
 // ** MUI Imports 
 import Grid from '@mui/material/Grid'
 import FormControl from '@mui/material/FormControl'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import MenuItem from '@mui/material/MenuItem'
@@ -17,16 +17,13 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack';
 
 import FormGroup from '@mui/material/FormGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
 
 import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
-import IconButton from '@mui/material/IconButton'
+
 import OutlinedInput from '@mui/material/OutlinedInput'
 import InputAdornment from '@mui/material/InputAdornment'
 
@@ -237,7 +234,7 @@ const UploadVideoStep1 = (props: Props) => {
     setGroupings(filteredGroupings as [])
   }
   const dummyNavigate = () => {
-    studioContext?.setDisplayPage(DisplayPage.LoadingScreen)
+    studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
   }
 
   return (
@@ -441,7 +438,8 @@ const UploadVideoStep1 = (props: Props) => {
                   </div>
     
                 </Box>  
-
+                
+                {files?.length ? (
                 <Box className='uploadShortVidBox' sx={{mt:10}}>
                   <Card>
                     <CardContent>
@@ -476,6 +474,8 @@ const UploadVideoStep1 = (props: Props) => {
                     </CardActions>
                   </Card>
                 </Box>
+                ) : null}
+
 
               </Box>
 

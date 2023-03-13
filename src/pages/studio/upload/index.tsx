@@ -20,7 +20,8 @@ import UploadMenu from './views/UploadMenu'
 import UploadVideoStep1 from './views/UploadVideoStep1'
 import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
 import LoadingScreen from './views/LoadingScreen'
-import StepperLinearWithValidation from '@/views/forms/form-wizard/StepperLinearWithValidation'
+import VideoVisibility from './views/VideoVisibility'
+import UploadVideoPublish from './views/UploadVideoPublish'
 
 
 // ** Styled Components
@@ -50,7 +51,8 @@ export enum DisplayPage {
     UploadVideoStep1,
     UploadNewsfeedsStep1,
     LoadingScreen,
-    FormWizardTest
+    VideoVisibility,
+    UploadVideoPublish
 }
 
 export type RequestType = {
@@ -113,6 +115,8 @@ const UploadContent = () => {
     if (displayPage == DisplayPage.UploadVideoStep1) return <UploadVideoStep1 />
     if (displayPage == DisplayPage.UploadNewsfeedsStep1) return <UploadNewsfeedsStep1 />
     if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
+    if (displayPage == DisplayPage.VideoVisibility) return <VideoVisibility />
+    if (displayPage == DisplayPage.UploadVideoPublish) return <UploadVideoPublish />
 }
 
   return (
