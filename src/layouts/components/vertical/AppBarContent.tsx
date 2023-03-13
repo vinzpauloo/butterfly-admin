@@ -13,16 +13,15 @@ import { Settings } from 'src/@core/context/settingsContext'
 
 // ** Components
 import CustomUserDropdown from 'src/layouts/components/shared-components/CustomUserDropdown'
-import LanguageFlagsDropdown from 'src/layouts/components/shared-components/LanguageFlagsDropdown';
-import AppBarDate from 'src/layouts/components/shared-components/AppBarDate';
+import LanguageFlagsDropdown from 'src/layouts/components/shared-components/LanguageFlagsDropdown'
+import AppBarDate from 'src/layouts/components/shared-components/AppBarDate'
 import CustomNotificationDropdown, {
   NotificationsType
 } from 'src/layouts/components/shared-components/CustomNotificationDropdown'
 import { Grid, Typography } from '@mui/material'
 
 // ** Date
-import { toDate, format } from 'date-fns';
-
+import { toDate, format } from 'date-fns'
 
 interface Props {
   hidden: boolean
@@ -55,9 +54,7 @@ const notifications: NotificationsType[] = [
   }
 ]
 
-
 const AppBarContent = (props: Props) => {
-
   // ** Hook
   const theme = useTheme()
 
@@ -65,7 +62,7 @@ const AppBarContent = (props: Props) => {
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
 
   const currentDate = toDate(new Date())
-  const formattedDate = format(currentDate, 'MMMM d, yyyy');
+  const formattedDate = format(currentDate, 'MMMM d, yyyy')
 
   return (
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -75,26 +72,30 @@ const AppBarContent = (props: Props) => {
             <Icon icon='mdi:menu' />
           </IconButton>
         ) : null}
-        <Typography
-          sx={{ display:['none', 'flex'], color:'##111111', paddingLeft:'3rem'}}>HOME</Typography>
+        <Typography sx={{ display: ['none', 'flex'], color: '##111111', paddingLeft: '3rem' }}>HOME</Typography>
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
-          
-        <Box gap={3} className='' sx={{ display: 'flex', flexDirection:'column', alignItems: 'center',paddingBlock:'1rem' }}>
-
-          <Box sx={{display:'flex', alignItems:'flex-start'}} gap={2}>
-
+        <Box
+          gap={3}
+          className=''
+          sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBlock: '1rem' }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'flex-start' }} gap={2}>
             <img width={28} src='/images/topbar/msg.png' />
             <CustomNotificationDropdown settings={settings} notifications={notifications} />
             <Box alignItems='flex-end' flexDirection='column' display='flex' justifyContent='flex-end'>
-              <Typography sx={{ display:['none','none',null] }} lineHeight={1} variant='body2'>Juan Pablo Dela Cruz</Typography>
-              <Typography sx={{ display:['none', 'flex'] }} variant='body2'>Administrator</Typography>
+              <Typography sx={{ display: ['none', 'none', null] }} lineHeight={1} variant='body2'>
+                Juan Pablo Dela Cruz
+              </Typography>
+              <Typography sx={{ display: ['none', 'flex'] }} variant='body2'>
+                Administrator
+              </Typography>
             </Box>
-            
+
             <CustomUserDropdown settings={settings} />
           </Box>
 
-          <Grid sx={{display:'flex', justifyContent:'flex-end',alignItems:'center'}} container spacing={2}>
+          <Grid sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }} container spacing={2}>
             <Grid padding={0} item>
               <LanguageFlagsDropdown />
             </Grid>
@@ -102,9 +103,7 @@ const AppBarContent = (props: Props) => {
               <AppBarDate />
             </Grid>
           </Grid>
-
         </Box>
-
       </Box>
     </Box>
   )
