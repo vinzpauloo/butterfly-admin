@@ -15,7 +15,7 @@ import TextField from '@mui/material/TextField'
 import Switch from '@mui/material/Switch'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack';
-
+import Alert from '@mui/material/Alert'
 import FormGroup from '@mui/material/FormGroup'
 
 import Card from '@mui/material/Card';
@@ -27,7 +27,6 @@ import CardActions from '@mui/material/CardActions'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import InputAdornment from '@mui/material/InputAdornment'
 
-
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
@@ -36,6 +35,9 @@ import CustomButton from '@/layouts/components/shared-components/CustomButton/Cu
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
 import * as tus from "tus-js-client";
+import * as yup from 'yup'
+import { useForm, Controller } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 //* Context Import
 import { StudioContext, DisplayPage, StudioContextType, GenericDataType } from '..'
@@ -101,18 +103,46 @@ type Props = {}
 // ** Constant variables
 const URL : string = `${process.env.NEXT_PUBLIC_BASE_URL}/videos/upload-url`
 
+// ** Yup Schema
+const schema = yup.object().shape({
+  title: yup.string().required('Title is a required field.'),
+  description: yup.string(),
+  contentCreator : yup.string().required('Content creator is required')
+  
+})
+const defaultValues = {
+  title: '',
+  description : '',
+  contentCreator: '',
+}
+
 const UploadVideoStep1 = (props: Props) => {
   
   const studioContext = React.useContext(StudioContext)
+
+  // ** UseForm
+  const {
+    control,
+    watch,
+    getValues,
+    setValue,
+    formState: { errors }
+  } = useForm({
+    defaultValues,
+    mode: 'onBlur',
+    resolver: yupResolver(schema)
+  })
 
   // ** State
   const [files, setFiles] = React.useState<File[] | null>([])
   const [tags, setTags] =  React.useState<[] | null>([])
   const [groupings, setGroupings] =  React.useState<[] | null>([])
+
+  // ** Fields States
+  const [ title, setTitle ] = React.useState<string>('')
   
   // ** Hooks
   React.useEffect(() => {
-    console.log('studioContext', studioContext)
 
     //load content creator from API
     
@@ -130,6 +160,7 @@ const UploadVideoStep1 = (props: Props) => {
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
+      setValue('title', acceptedFiles[0].name)
     },
     onDropRejected: () => {
       toast.error('You can only upload video files.', {
@@ -169,7 +200,6 @@ const UploadVideoStep1 = (props: Props) => {
     }
     
     //mock data
-
     var file = files[0]
 
     const headerData = JSON.stringify({
@@ -234,7 +264,38 @@ const UploadVideoStep1 = (props: Props) => {
     setGroupings(filteredGroupings as [])
   }
   const dummyNavigate = () => {
+    
+    setContextTags()
+    setContextGroups()
+
+    if( !watch('contentCreator') ) {
+      toast.error("Content Creator is required", {position: 'top-center'})
+      return
+    }
+    if( !watch('title') ) {
+      toast.error("Title is required", {position: 'top-center'})
+      return
+    }
+    if(!files?.length) {
+      toast.error("Please upload a video", {position: 'top-center'})
+      return
+    }
+
+    //get fields from react hook form
+    const { title, contentCreator, description} = getValues()
+
+    // pass fields to Studio Context
+    studioContext?.setTitle(title)
+    studioContext?.setContentCreator(Number(contentCreator))
+    studioContext?.setDescription(description)
+    
     studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
+  }
+  const setContextTags = () => {
+    studioContext?.setTags( tags as [] )
+  }
+  const setContextGroups = () => {
+    studioContext?.setGroupings( groupings as [] )
   }
 
   return (
@@ -259,42 +320,77 @@ const UploadVideoStep1 = (props: Props) => {
           <Grid container spacing={10}>
             <Grid item sm={8}>
 
-              <form onSubmit={e => e.preventDefault()}>
+              <form>
                 <Grid container spacing={5}>
                   <Grid item xs={12}>
-                    <FormControl 
-                      fullWidth>
-                      <CustomSelect
-                        displayEmpty 
-                        inputProps={{ 'aria-label': 'Without label' }}
-                        label='Select Content Creator'
-                        defaultValue='' 
-                        id='cc-select'
-                        labelId='cc-select-label'
-                      >
-                        <MenuItem disabled value=''>
-                          Select Content Creator
-                        </MenuItem>
-                        <MenuItem value={1}>Content Creator 1</MenuItem>
-                        <MenuItem value={2}>Content Creator 2</MenuItem>
-                      </CustomSelect>
-                  </FormControl>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <CustomTextField
-                      fullWidth
-                      placeholder='Title'
-                      type='text'
+
+                  <Controller
+                      name='contentCreator'
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange, onBlur } }) => (
+                        <CustomSelect
+                          displayEmpty 
+                          inputProps={{ 'aria-label': 'Without label' }}
+                          label='Select Content Creator'
+                          defaultValue='' 
+                          id='contentCreator'
+                          labelId='cc-select-label'
+                          value={value}
+                          onBlur={onBlur}
+                          onChange={onChange}
+                          error={Boolean(errors.title)}
+                        >
+                          <MenuItem disabled value=''>
+                            Select Content Creator
+                          </MenuItem>
+                          <MenuItem value={1}>Content Creator 1</MenuItem>
+                          <MenuItem value={2}>Content Creator 2</MenuItem>
+                        </CustomSelect>
+                      )}
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <CustomTextField
+
+                  <Controller
+                    name='title'
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange, onBlur } }) => (
+                      <CustomTextField
+                        fullWidth
+                        id='title' 
+                        value={value}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        error={Boolean(errors.title)}
+                        placeholder='Title'
+                        type='text'
+                      />
+                    )}
+                  />
+
+                  </Grid>
+                  <Grid item xs={12}>
+
+                  <Controller
+                    name='description'
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange, onBlur } }) => (
+                      <CustomTextField
                         multiline 
                         rows={3}
                         fullWidth
                         placeholder='Description'
                         type='text'
+                        value={value}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        error={Boolean(errors.title)}
                       />
+                    )}
+                  />
                   </Grid>
                   <Grid item xs={12}>
 
@@ -420,7 +516,7 @@ const UploadVideoStep1 = (props: Props) => {
                           }}>
                           <Img src='/images/studio/butterfly_file_upload.png'  />
                           {files?.length ? (
-                            <Typography textAlign='center'>1 file uploaded</Typography>
+                            <Typography textAlign='center'>{ files[0].name } file uploaded</Typography>
                           ) : 
                           (
                             <CustomButton 
@@ -494,14 +590,21 @@ const UploadVideoStep1 = (props: Props) => {
                     <CustomButton onClick={handleCancelButton}>Cancel</CustomButton>
                   </Box>
                   <Box>
-                    <CustomButton
-                      onClick={dummyNavigate}
-                      sx={{ 
-                        bgcolor : 'primary.main',
-                        color : 'common.white'
-                      }}>
-                        Continue
-                      </CustomButton>
+                    {
+                      !files?.length 
+                        ? 
+                          <Alert severity='error'>Select a video</Alert>
+                        : 
+                          <CustomButton
+                          onClick={dummyNavigate}
+                          sx={{ 
+                            bgcolor : 'primary.main',
+                            color : 'common.white'
+                          }}>
+                            Start Upload
+                          </CustomButton>
+                    }
+                    
                   </Box>                 
               </Box>
             </Grid>

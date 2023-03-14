@@ -10,6 +10,7 @@ import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import { styled } from '@mui/material/styles'
+import Radio from '@mui/material/Radio'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -26,12 +27,14 @@ import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
 
 // ** Custom Component Imports
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
+import ProgressCircularWithLabel from '@/layouts/components/shared-components/ProgressCircular'
 
 // ** Styled Component
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 // ** Types
 import { DateType } from '@/types/forms/reactDatepickerTypes'
+import { PublishSchedule } from '..'
 
 // Styled components
 const HeaderBox = styled(Box)(({ theme }) => ({
@@ -65,20 +68,18 @@ const CustomAccordion = styled(Accordion)(({ theme }) => ({
 }))
 
 
-interface PickerProps {
-    label?: string
-  }
-type Props = {}
 
 const VideoVisibility = () => {
 
   // ** State
   const [expanded, setExpanded] = React.useState<string | false>('panel1')
-  // ** Date States
+
   const [date, setDate] = React.useState<DateType>(new Date())
 
+  const [selectedValue, setSelectedValue] = React.useState<string>('publish')
+  
+  //** Popper 
   const popperPlacement = 'bottom-end'
-
 
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false)
@@ -105,6 +106,14 @@ const VideoVisibility = () => {
     return {
         pointerEvents: flag ? 'none' : 'initial'
     }
+  }
+
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedValue(event.target.value)
+    setStudioPublishDate(event.target.value as PublishSchedule)
+  }
+  const setStudioPublishDate = (publish : PublishSchedule) => {
+    studioContext?.setPublishDate(publish)
   }
 
   return (
@@ -146,7 +155,13 @@ const VideoVisibility = () => {
                             >
                             <HeaderBox>
                                 <Box>
-                                    <Icon icon='mdi:circle-outline' />
+                                    <Radio
+                                        value='publish'
+                                        onChange={handleRadioChange}
+                                        name='radio-save'
+                                        checked={selectedValue === 'publish'}
+                                        inputProps={{ 'aria-label': 'Publish' }}
+                                    />
                                 </Box>
                                 <Box>
                                     <Typography fontWeight={500} color={ theme => theme.customBflyColors.primary }>Save or Publish</Typography>
@@ -177,7 +192,13 @@ const VideoVisibility = () => {
 
                             <HeaderBox sx={{marginTop:'.5rem'}}>
                                 <Box>
-                                    <Icon icon='mdi:circle-outline' />
+                                    <Radio
+                                        value='publish'
+                                        onChange={handleRadioChange}
+                                        name='radio-save'
+                                        checked={ selectedValue === 'publish' }
+                                        inputProps={{ 'aria-label': 'Public' }}
+                                    />
                                 </Box>
                                 <Box>
                                     <Typography fontWeight={500} fontSize={13} color={ theme => theme.customBflyColors.primary }>Public</Typography>
@@ -195,7 +216,13 @@ const VideoVisibility = () => {
                             >
                             <HeaderBox>
                                 <Box>
-                                    <Icon icon='mdi:circle-outline' />
+                                    <Radio
+                                        value='schedule'
+                                        onChange={handleRadioChange}
+                                        name='radio-schedule'
+                                        checked={selectedValue === 'schedule'}
+                                        inputProps={{ 'aria-label': 'B' }}
+                                    />
                                 </Box>
                                 <Box>
                                     <Typography fontWeight={500} color={ theme => theme.customBflyColors.primary }>Schedule Premiere</Typography>
@@ -246,44 +273,39 @@ const VideoVisibility = () => {
                             <UploadBox>
 
                                 <Box>
-                                    
                                     <Box 
                                         sx={{ 
                                             borderRadius: '15px',
                                             backgroundColor: '#C4C4C4',
-                                            display: 'block', 
+                                            display: 'flex', 
                                             padding:'.5rem',
+                                            gap:'1rem',
+                                            justifyContent:'center',
+                                            textAlign:'center',
+                                            minHeight:'150px',
                                             alignItems: 'center' }}>
-                                        <Box 
-                                            sx={{ 
-                                            border: '1px solid #8203BD',
-                                            borderRadius: '15px',
-                                            textAlign: ['center', 'center', 'inherit'],
-                                            }}>
-                                            <Img src='/images/studio/dummyUploadImage.png'  />
-                                        </Box>
+                                            <Typography>Work</Typography>
+                                            <ProgressCircularWithLabel dummyInterval={1500} />
                                     </Box>
 
                                 </Box>
 
                                 <Box>
-                                    
                                     <Box 
                                         sx={{ 
                                             borderRadius: '15px',
                                             backgroundColor: '#C4C4C4',
-                                            display: 'block', 
+                                            display: 'flex', 
                                             padding:'.5rem',
+                                            gap:'1rem',
+                                            justifyContent:'center',
+                                            textAlign:'center',
+                                            minHeight:'150px',
                                             alignItems: 'center' }}>
-                                        <Box 
-                                            sx={{ 
-                                            border: '1px solid #8203BD',
-                                            borderRadius: '15px',
-                                            textAlign: ['center', 'center', 'inherit'],
-                                            }}>
-                                            <Img src='/images/studio/dummyUploadImage.png'  />
-                                        </Box>
+                                            <Typography>Trial</Typography>
+                                            <ProgressCircularWithLabel dummyInterval={100} />
                                     </Box>
+
 
                                 </Box>
 
