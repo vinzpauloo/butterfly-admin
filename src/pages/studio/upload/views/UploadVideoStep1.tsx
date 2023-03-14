@@ -307,9 +307,8 @@ const UploadVideoStep1 = (props: Props) => {
                     </Grid>
                     <Grid item xs={6}>
                       <Typography maxWidth='23ch' color={theme => theme.palette.common.white}>
-                        THUMBNAIL <br />
+                        THUMBNAIL <br /></Typography>
                         <Typography fontSize={13} color={theme => theme.palette.common.white}>Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and draws viewers attention.</Typography>  
-                      </Typography>
                     </Grid>
                   </Grid>
                         
