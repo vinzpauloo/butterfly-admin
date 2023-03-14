@@ -62,9 +62,11 @@ const SidebarContent = () => {
             >
             <List sx={{paddingBottom: 0, marginBottom: 0}}>
                 {sideBarContent.map((item) => (
-                <Link href={`${item.link}`} component={NextLink}>
+                <Link 
+                  key={item.id}
+                  href={`${item.link}`} 
+                  component={NextLink}>
                 <ListItem
-                key={item.id}
                 disablePadding
                 sx={
                     !navCollapsed ? {
