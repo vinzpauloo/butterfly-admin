@@ -57,6 +57,8 @@ export enum DisplayPage {
     VideosList
 }
 
+export type PublishSchedule = 'schedule' | 'publish'
+
 export type RequestType = {
   user_id : number,
   title : string,
@@ -89,28 +91,36 @@ export type StudioFormDataType = {
 export type StudioContextType = {
     displayPage : DisplayPage,
     setDisplayPage : React.Dispatch<React.SetStateAction<DisplayPage>>,
-    contentCreator : GenericDataType,
-    setContentCreator : React.Dispatch<React.SetStateAction<GenericDataType>>
-    tags : GenericDataType[],
-    setTags : React.Dispatch<React.SetStateAction<GenericDataType[]>>,
-    groupings : GenericDataType[],
-    setGroupings : React.Dispatch<React.SetStateAction<GenericDataType[]>>,
+    contentCreator : number | null,
+    setContentCreator : React.Dispatch<React.SetStateAction<number | null>>
+    tags : [],
+    setTags : React.Dispatch<React.SetStateAction<[]>>,
+    groupings : [],
+    setGroupings : React.Dispatch<React.SetStateAction<[]>>,
+    title : string,
+    setTitle : React.Dispatch<React.SetStateAction<string>>,
+    description : string,
+    setDescription : React.Dispatch<React.SetStateAction<string>>,
+    publishDate : PublishSchedule,
+    setPublishDate : React.Dispatch<React.SetStateAction<PublishSchedule>>,
 }
 
 //** DATA */
 
 export const StudioContext = React.createContext<null | StudioContextType>(null)
 
-const bgPath = '/images/studio/uploadBG.jpg'
+const bgPath = ''
 
 const UploadContent = () => {
-  
   // ** States
   const [displayPage, setDisplayPage] = React.useState<DisplayPage>(DisplayPage.MainPage)
   //** Form states */
-  const [tags, setTags] = React.useState<GenericDataType[]>([])
-  const [groupings, setGroupings] = React.useState<GenericDataType[]>([])
-  const [contentCreator, setContentCreator] = React.useState<GenericDataType>({} as GenericDataType)
+  const [tags, setTags] = React.useState<[]>([])
+  const [groupings, setGroupings] = React.useState<[]>([])
+  const [contentCreator, setContentCreator] = React.useState<number | null>(null)
+  const [title, setTitle] = React.useState<string>('')
+  const [description, setDescription] = React.useState<string>('')
+  const [publishDate, setPublishDate] = React.useState<PublishSchedule>('publish')
 
   const PageDisplay = () => {
     if (displayPage == DisplayPage.MainPage) return <UploadMenu />
@@ -132,7 +142,13 @@ const UploadContent = () => {
       tags,
       setTags,
       groupings,
-      setGroupings
+      setGroupings,
+      title,
+      setTitle,
+      description,
+      setDescription,
+      publishDate,
+      setPublishDate
       }}>
       <BoxBG>
         {PageDisplay()}

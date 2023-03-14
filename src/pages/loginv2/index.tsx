@@ -17,6 +17,7 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import { styled, useTheme, darken } from '@mui/material/styles'
 import MuiCard, { CardProps } from '@mui/material/Card'
 import InputAdornment from '@mui/material/InputAdornment'
+import Grid from '@mui/material/Grid'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -32,7 +33,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 // ** Hooks
 import { useAuth } from 'src/hooks/useAuth'
 import { useSettings } from 'src/@core/hooks/useSettings'
-import Grid from '@mui/material/Grid'
+
 interface State {
   password: string
   showPassword: boolean
@@ -100,18 +101,9 @@ const LoginPage = () => {
   const { settings } = useSettings()
 
 
-  const handleChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
-
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword })
   }
-
-  const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-  }
-
 
   const {
     control,

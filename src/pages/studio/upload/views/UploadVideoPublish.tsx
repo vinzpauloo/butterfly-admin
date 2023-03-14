@@ -7,54 +7,19 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import { styled } from '@mui/material/styles'
-import Card from '@mui/material/Card'
-import Link from '@mui/material/Link'
-import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
 
+// ** Custom component imports
+import ProgressCircularWithLabel from '@/layouts/components/shared-components/ProgressCircular'
+
 //* Context Import
-import { StudioContext, DisplayPage, StudioContextType, GenericDataType } from '..'
-
-// ** Third Party Imports
-import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
-
-// ** Custom Component Imports
-import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
-
-// ** Styled Component
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-
-// ** Types
-import { DateType } from '@/types/forms/reactDatepickerTypes'
+import { StudioContext, DisplayPage } from '..'
 
 // Styled components
-const HeaderBox = styled(Box)(({ theme }) => ({
-    display:'flex',
-    flexDirection:'row',
-    columnGap : '1rem',
-}))
-
-const UploadBox = styled(Box)(({ theme }) => ({
-    display:'flex',
-    flexDirection:'column',
-    columnGap : '1rem',
-    gap: '2rem'
-}))
-
-const Img = styled('img')(({ theme }) => ({
-    width: '100%',
-    height:'100%',
-    objectFit: 'cover',
-    display: 'block'
-  }))
-
 const CustomTextField = styled(TextField)(({ theme }) => ({
     backgroundColor : theme.palette.common.white,
     borderRadius: '4px',
@@ -62,49 +27,39 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
       display: 'none'
     }
   }))
-  
 
-
-interface PickerProps {
-    label?: string
-  }
-type Props = {}
 
 const UploadVideoPublish = () => {
-
-  // ** State
-  const [expanded, setExpanded] = React.useState<string | false>('panel1')
-  // ** Date States
-  const [date, setDate] = React.useState<DateType>(new Date())
-
-  const popperPlacement = 'bottom-end'
-
-
-  const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpanded(isExpanded ? panel : false)
-  }
   
   const studioContext = React.useContext(StudioContext)
+  console.log('sc',studioContext)
+  // ** State
+  const [ finalTags, setFinalTags ] = React.useState<string | undefined>('')
+  const [ finalGroupings, setFinalGroupings ] = React.useState<string | undefined>('')
+
+  React.useEffect( ()=>{
+    renderTags()
+    renderGroups()
+  },[])
 
   const handleCancelButton = () => {
     //navigate back
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
+  const handleTitleChange = (event : React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    studioContext?.setTitle(event.target.value)
+  }
+  const handleDescriptionChange =(event : React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    studioContext?.setDescription(event.target.value)
+  }
+  const renderTags = () => {
+    setFinalTags(studioContext?.tags.join(', '))
+  }
+  const renderGroups = () => {
+    setFinalGroupings(studioContext?.groupings.join(', '))
+  }
   const dummyNavigate = () => {
     studioContext?.setDisplayPage(DisplayPage.VideosList)
-  }
-
-  const dimOnTrue = (flag : boolean) => {
-    return {
-        opacity: flag ? 0.3 : 1,
-        backgroundColor : 'black'
-    }
-  }
-
-  const disableOnTrue = (flag : boolean) => {
-    return {
-        pointerEvents: flag ? 'none' : 'initial'
-    }
   }
 
   return (
@@ -113,7 +68,6 @@ const UploadVideoPublish = () => {
         marginInline:'auto',
         minWidth:'85%'
     }}>
-        <DatePickerWrapper>
             <Typography
                 variant='h6'
                 sx={{
@@ -139,8 +93,8 @@ const UploadVideoPublish = () => {
                 <Grid container spacing={2}>
                     <Grid item sm={12}>
 
-                        <CustomTextField sx={{marginBlock: '.5rem'}} variant='filled' fullWidth placeholder='Title' />
-                        <CustomTextField rows={3} multiline variant='filled' fullWidth placeholder='Description or Caption' />
+                        <CustomTextField onChange={ (event) => { handleTitleChange(event) }} value={studioContext?.title} sx={{marginBlock: '.5rem'}} variant='filled' fullWidth placeholder='Title' />
+                        <CustomTextField onChange={ (event) => { handleDescriptionChange(event) }} value={studioContext?.description} rows={3} multiline variant='filled' fullWidth placeholder='Description or Caption' />
 
                     </Grid>
 
@@ -149,10 +103,22 @@ const UploadVideoPublish = () => {
                         <Grid container spacing={2}>
 
                             <Grid item sm={6}>
-                                <CustomTextField variant='filled' fullWidth placeholder='#TAGS' />
+                                <CustomTextField 
+                                    variant='filled' 
+                                    fullWidth 
+                                    placeholder='#TAGS' 
+                                    value={finalTags}
+                                    InputProps={{ readOnly: true }}
+                                />
                             </Grid>
                             <Grid item sm={6}>
-                                <CustomTextField variant='filled' fullWidth placeholder='GROUPING TEMPLATE' />
+                                <CustomTextField 
+                                    variant='filled' 
+                                    fullWidth 
+                                    placeholder='GROUPING TEMPLATE' 
+                                    value={finalGroupings}
+                                    InputProps={{ readOnly: true }}
+                                />
                             </Grid>
 
                         </Grid>
@@ -160,6 +126,26 @@ const UploadVideoPublish = () => {
                     </Grid>
                 </Grid>
                 
+                <Grid container spacing={2}>
+                  <Grid item sm={5}>
+                      <Box 
+                          sx={{ 
+                              marginTop:'1rem',
+                              borderRadius: '15px',
+                              backgroundColor: '#C4C4C4',
+                              display: 'flex', 
+                              padding:'.5rem',
+                              gap:'1rem',
+                              justifyContent:'center',
+                              textAlign:'center',
+                              minHeight:'160px',
+                              alignItems: 'center' }}>
+                              <Typography>Uploading Work Video</Typography>
+                              <ProgressCircularWithLabel dummyInterval={1500} />
+                      </Box>
+                  </Grid>
+                </Grid>
+
                 <Grid container>
                     <Grid item xs={12}>
                     <Box 
@@ -180,14 +166,13 @@ const UploadVideoPublish = () => {
                                 bgcolor : 'primary.main',
                                 color : 'common.white'
                             }}>
-                                Publish
+                                { (studioContext?.publishDate === 'publish') ? 'Publish' : 'Schedule' }
                             </CustomButton>
                         </Box>                 
                     </Box>
                     </Grid>
                 </Grid>
             </BasicCard>
-        </DatePickerWrapper>
     </Box>
         
   )
