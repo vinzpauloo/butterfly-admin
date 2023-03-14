@@ -9,6 +9,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { styled } from '@mui/material/styles'
+import NextLink from 'next/link'
+import Link from '@mui/material/Link';
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
@@ -20,7 +22,7 @@ const Img = styled('img')({
 })
 
 const sideBarContent = [
-  {id : 1, title : 'Dashboard', icon : 'dashboard', link : ''},
+  {id : 1, title : 'Dashboard', icon : 'dashboard', link : '/dashboard'},
   {id : 2, title : 'Users', icon : 'users', link : '/user/list'},
   {id : 3, title : 'Transaction', icon : 'transactions', link : ''},
   {id : 4, title : 'Reports', icon : 'reports', link : ''},
@@ -60,6 +62,7 @@ const SidebarContent = () => {
             >
             <List sx={{paddingBottom: 0, marginBottom: 0}}>
                 {sideBarContent.map((item) => (
+                <Link href={`${item.link}`} component={NextLink}>
                 <ListItem
                 key={item.id}
                 disablePadding
@@ -89,7 +92,7 @@ const SidebarContent = () => {
                 }
                 >
                     <ListItemButton
-                        href={`${item.link}`}
+                        
                         onClick={() => {
                           if (item.title === 'Settings') {
                             setShowSettingsSubMenu(!showSettingsSubMenu);
@@ -125,6 +128,7 @@ const SidebarContent = () => {
                         primary={item.title} />
                     </ListItemButton>
                 </ListItem>
+                </Link>
                 ))}
             </List>
 
