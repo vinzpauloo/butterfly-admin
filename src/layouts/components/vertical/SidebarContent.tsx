@@ -11,6 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { styled } from '@mui/material/styles'
 import NextLink from 'next/link'
 import Link from '@mui/material/Link';
+import Collapse from '@mui/material/Collapse';
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
@@ -26,7 +27,32 @@ const sideBarContent = [
   {id : 2, title : 'Users', icon : 'users', link : '/user/list'},
   {id : 3, title : 'Transaction', icon : 'transactions', link : ''},
   {id : 4, title : 'Reports', icon : 'reports', link : ''},
-  {id : 5, title : 'Studio', icon : 'studio', link : '/studio/upload'},
+  {
+    id : 5, 
+    title : 'Studio', 
+    icon : 'studio', 
+    children: [
+    {
+      title: 'Upload Contents',
+      path: '/studio/upload'
+    },
+    {
+      title: 'Content Approval',
+      path: '/studio/upload'
+    },
+    {
+      title: 'Newsfeed list',
+      path: '/studio/upload'
+    },
+    {
+      title: 'Newsfeed Approval',
+      path: '/studio/upload'
+    },
+    {
+      title: 'Video List',
+      path: '/studio/upload'
+    }
+  ]},
   {id : 6, title : 'Bundles', icon : 'bundles', link : ''},
   {id : 7, title : 'Settings', icon : 'settings', link : ''}
 ]
@@ -64,72 +90,122 @@ const SidebarContent = () => {
                 {sideBarContent.map((item) => (
                 <Link 
                   key={item.id}
-                  href={`${item.link}`} 
+                  href={ !item.children ? `${item.link}` : '' } 
                   component={NextLink}>
-                <ListItem
-                disablePadding
-                sx={
-                    !navCollapsed ? {
-                        '& .MuiButtonBase-root' : {
-                            display:'flex',
-                            gap:'1rem',
-                            paddingInline : '2.5rem',
-                            justifyContent:'flex-start',
-                            marginBottom : '.5rem'
-                        },
-                        '& .MuiTypography-root':{
+                  <ListItem
+                  disablePadding
+                  sx={
+                      !navCollapsed ? {
+                          '& .MuiButtonBase-root' : {
+                              display:'flex',
+                              gap:'1rem',
+                              paddingInline : '2.5rem',
+                              justifyContent:'flex-start',
+                              marginBottom : '.5rem'
+                          },
+                          '& .MuiTypography-root':{
+                              transition: 'color 0.5s'
+                          },
+                          '&:hover .MuiTypography-root' : {
+                              color : theme => theme.customBflyColors.green
+                          }
+                      } : {
+                          '& .MuiButtonBase-root' : {
+                              paddingInline : '1rem',
+                              display: 'flex',
+                              gap:3,
+                              marginBottom : '.5rem'
+                          },
+                      }
+                  }
+                  >
+                      <ListItemButton
+                          
+                          onClick={() => {
+                            if (item.title === 'Settings') {
+                              setShowSettingsSubMenu(!showSettingsSubMenu);
+                            }
+                          }}
+                          sx={{
+                              '& .iconContainer': {
+                                  position:'relative',
+                                  width:'30px',
+                                  height: '30px',
+                              },
+                              '& .iconContainer > img' : {
+                                  position:'absolute',
+                                  transition: 'opacity 0.5s'
+                              },
+                              '& .iconContainer > img:last-child': {
+                                  opacity:0
+                              },
+                              '&:hover .iconContainer > img:last-child': {
+                                  opacity:1
+                              }
+                          }}>
+                          <ListItemIcon className='iconContainer'>
+                              <Img src={`/images/sidebar/icons/${item.icon}.svg`} />
+                              <Img src={`/images/sidebar/icons/${item.icon}-hover.svg`} />
+                          </ListItemIcon>
+                          <ListItemText sx={{
+                              '& .MuiTypography-root': {
+                                  color : '#BFC6D0',
+                                  fontSize: '0.875rem'
+                              }
+                          }}
+                          primary={item.title} />
+                      </ListItemButton>
+                  </ListItem>
+                {
+                  item?.children && 
+                  <Collapse in={true} timeout="auto" unmountOnExit>
+                    <List 
+                      disablePadding
+                      sx={
+                        !navCollapsed ? {
+                          '& .MuiButtonBase-root': {
+                            gap: '1rem',
+                            display: 'flex',
+                            marginLeft: 25,
+                          },
+                          '& .MuiTypography-root':{
                             transition: 'color 0.5s'
-                        },
-                        '&:hover .MuiTypography-root' : {
-                            color : theme => theme.customBflyColors.green
-                        }
-                    } : {
-                        '& .MuiButtonBase-root' : {
+                          },
+                        } : {
+                          '& .MuiButtonBase-root': {
                             paddingInline : '1rem',
                             display: 'flex',
-                            gap:3,
+                            gap: 3,
                             marginBottom : '.5rem'
-                        },
+                          },
+                        }
+                      }>
+                      { item?.children.map( child => (
+                          <Link
+                            key={child.title}
+                            href={child.path}
+                            sx={{
+                              '&:hover .MuiTypography-root' : {
+                                color : theme => theme.customBflyColors.green
+                              }
+                            }}
+                          >
+                            <ListItemButton
+                              sx={{ margin: 0, padding: 0 }}
+                            >
+                              <ListItemText sx={{
+                                '& .MuiTypography-root': {
+                                  color : '#BFC6D0',
+                                  fontSize: '0.65rem',
+                                }
+                              }} primary={child.title} />
+                            </ListItemButton>
+                          </Link>
+                      ))
                     }
+                    </List>
+                  </Collapse>
                 }
-                >
-                    <ListItemButton
-                        
-                        onClick={() => {
-                          if (item.title === 'Settings') {
-                            setShowSettingsSubMenu(!showSettingsSubMenu);
-                          }
-                        }}
-                        sx={{
-                            '& .iconContainer': {
-                                position:'relative',
-                                width:'30px',
-                                height: '30px',
-                            },
-                            '& .iconContainer > img' : {
-                                position:'absolute',
-                                transition: 'opacity 0.5s'
-                            },
-                            '& .iconContainer > img:last-child': {
-                                opacity:0
-                            },
-                            '&:hover .iconContainer > img:last-child': {
-                                opacity:1
-                            }
-                        }}>
-                        <ListItemIcon className='iconContainer'>
-                            <Img src={`/images/sidebar/icons/${item.icon}.svg`} />
-                            <Img src={`/images/sidebar/icons/${item.icon}-hover.svg`} />
-                        </ListItemIcon>
-                        <ListItemText sx={{
-                            '& .MuiTypography-root': {
-                                color : '#BFC6D0',
-                                fontSize: '0.875rem'
-                            }
-                        }}
-                        primary={item.title} />
-                    </ListItemButton>
-                </ListItem>
                 </Link>
                 ))}
             </List>
