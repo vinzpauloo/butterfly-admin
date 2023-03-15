@@ -38,24 +38,21 @@ const UserTable = () => {
   const [columnType, setColumnType] = useState('operators')
   const [activeBtn, setActiveBtn] = useState('')
 
-  let filteredColumns: any = []
-  if (columnType === 'operators') {
-    filteredColumns = operatorColumns
-  } else if (columnType === 'superagent') {
-    filteredColumns = superAgentColumns
-  } else if (columnType === 'content-creators') {
-    filteredColumns = contentCreatorColumns
+  const columnsMap = new Map([
+    ['operators', operatorColumns],
+    ['superagent', superAgentColumns],
+    ['content-creators', contentCreatorColumns]
+  ])
+
+  const filteredColumns: any = columnsMap.get(columnType) ?? []
+
+  const rowsByType: any = {
+    operators: operatorRows,
+    superagent: superagentRows,
+    'content-creators': contentcreatorRows
   }
 
-  let filteredRows: any = []
-
-  if (dataType === 'operators') {
-    filteredRows = operatorRows
-  } else if (dataType === 'superagent') {
-    filteredRows = superagentRows
-  } else if (dataType === 'content-creators') {
-    filteredRows = contentcreatorRows
-  }
+  const filteredRows = rowsByType[dataType] || []
 
   const handleOperatorsClick = () => {
     setDataType('operators')
@@ -120,12 +117,7 @@ const UserTable = () => {
             <Link
               style={styles.linkButton}
               href={{
-                pathname:
-                  activeBtn === 'operators'
-                    ? 'list/CreateAccount'
-                    : activeBtn === 'superagent'
-                    ? 'list/CreateAccount'
-                    : 'list/CreateAccount',
+                pathname: 'list/CreateAccount',
                 query: { activeBtn }
               }}
             >
