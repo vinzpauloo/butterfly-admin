@@ -11,6 +11,10 @@ import AllPhoto from './views/AllPhoto'
 import AllVideo from './views/AllVideo'
 import VideosWithPhotos from './views/VideosWithPhotos'
 import TextField from '@mui/material/TextField'
+import InputAdornment from '@mui/material/InputAdornment'
+
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 
 const steps = [
     {
@@ -67,7 +71,20 @@ const NewsFeedList = (props: Props) => {
               })}
             </Box>
             <Box>
-              <TextField sx={{ '& fieldset' : { borderRadius : '0 !important'} }} variant='outlined' placeholder='Search' />
+              <TextField 
+                sx={{ 
+                  '& fieldset' : { 
+                    borderRadius : '0 !important'
+                  } }} 
+                variant='outlined' 
+                placeholder='Search' 
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <Icon icon='mdi:microphone' />
+                    </InputAdornment>
+                  )
+                }}/>
             </Box>
 
         </Box>

@@ -7,14 +7,16 @@ import CardContent from '@mui/material/CardContent'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/system'
 
+// ** Import Custom Components
+import FeedAttachments from './FeedAttachments' 
+
 // ** Custom Layout Style Components
-const LowerBox = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.customBflyColors.primary,
-  padding: '.5em .5em'
-}))
 
+interface FeedCardProps {
+    children?: React.ReactNode & React.ReactElement<typeof FeedAttachments> | React.ReactNode & React.ReactElement<typeof FeedAttachments>[]
+}
 
-const StoryCard = () => {
+const FeedCard = ({children} : FeedCardProps) => {
 
   // ** Hook
   const theme = useTheme()
@@ -65,21 +67,10 @@ const StoryCard = () => {
         </CardContent>
       </Card>
       
-      <Box sx={{ display:'flex',flexDirection: 'column',gap:'.5rem', marginTop:'.5rem'}}>
-
-        <LowerBox>
-          <Typography fontSize={11} color='common.white'>Location: Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-        </LowerBox>
-
-        <LowerBox>
-          <Typography fontSize={11} color='common.white'>Tagging:</Typography>
-          <Typography>#Active</Typography>
-        </LowerBox>
-
-      </Box>
+      <Box sx={{ display:'flex',flexDirection: 'column',gap:'.3rem', marginTop:'.3rem'}}>{children}</Box>
 
     </Box>
   )
 }
 
-export default StoryCard
+export default FeedCard
