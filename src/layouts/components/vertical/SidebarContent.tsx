@@ -42,7 +42,7 @@ const sideBarContent = [
     },
     {
       title: 'Newsfeed list',
-      path: '/studio/upload'
+      path: '/studio/newsfeed'
     },
     {
       title: 'Newsfeed Approval',
@@ -161,7 +161,7 @@ const SidebarContent = () => {
                   </ListItem>
                 {
                   item?.sub && 
-                  <Collapse in={showStudiosSub} timeout="auto" unmountOnExit>
+                  <Collapse in={showStudiosSub} timeout="auto">
                     <List 
                       disablePadding
                       sx={
