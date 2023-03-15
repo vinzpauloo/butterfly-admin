@@ -38,7 +38,7 @@ const sideBarContent = [
     },
     {
       title: 'Content Approval',
-      path: '/studio/upload'
+      path: '/studio/content'
     },
     {
       title: 'Newsfeed list',
