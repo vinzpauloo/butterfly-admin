@@ -2,33 +2,33 @@
 import { useState } from 'react'
 
 // ** Next Imports
-import Image from 'next/image'
 
 // ** MUI Imports
 import { Box, TextField, Typography, Button } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
 
 // ** Style Imports
 import styles from '../styles/workStyles'
 
 // ** Other Imports
 import TemplateModal from '../components/modal/TemplateModal'
-import rows from '../data/TemplateRows'
-import columns from '../data/TemplateColumns'
+import TemplateOne from '../components/templates/TemplateOne'
+import TemplateTwo from '../components/templates/TemplateTwo'
+import TemplateThree from '../components/templates/TemplateThree'
+import TemplateFour from '../components/templates/TemplateFour'
+import TemplateFive from '../components/templates/TemplateFive'
+import WorksModal from '../components/modal/WorksModal'
+
+type ModalType = 'template' | 'works' | null
 
 interface HeaderProps {
   activeBtnChange: (activeBtn: string) => void
 }
 
 const Header: React.FC<HeaderProps> = ({ activeBtnChange }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [openModal, setOpenModal] = useState<ModalType>(null)
 
-  const handleModalOpen = () => {
-    setIsModalOpen(true)
-  }
-
-  const handleModalClose = () => {
-    setIsModalOpen(false)
+  const handleModalToggle = (modalType: ModalType) => {
+    setOpenModal(prevModal => (prevModal === modalType ? null : modalType))
   }
 
   const handleActiveBtnChange = (activeBtn: string) => {
@@ -47,15 +47,21 @@ const Header: React.FC<HeaderProps> = ({ activeBtnChange }) => {
             ...styles.headBtns,
             ...styles.template
           }}
-          onClick={handleModalOpen}
+          onClick={() => handleModalToggle('template')}
         >
           <Typography>Select Template</Typography>
           <Typography>{`>`}</Typography>
         </Button>
-        <TemplateModal isOpen={isModalOpen} onClose={handleModalClose} onActiveBtnChange={handleActiveBtnChange} />
-        <Button sx={styles.headBtns}>
+        <TemplateModal
+          isOpen={openModal === 'template'}
+          onClose={() => handleModalToggle('template')}
+          onActiveBtnChange={handleActiveBtnChange}
+        />
+
+        <Button sx={styles.headBtns} onClick={() => handleModalToggle('works')}>
           <Typography>Select Multiple Contents</Typography>
         </Button>
+        <WorksModal isOpen={openModal === 'works'} onClose={() => handleModalToggle('works')} />
       </Box>
     </Box>
   )
@@ -72,84 +78,22 @@ const WorkGroupings = () => {
     <Box>
       <Header activeBtnChange={handleActiveBtnChange} />
 
-      {templateBtn === 'template1' ? (
-        <Box
-          sx={{
-            backgroundColor: '#2A3446',
-            width: '100%',
-            height: ['100dvh', '80dvh', '50dvh'],
-            marginTop: 10,
-            display: 'flex',
-            flexDirection: ['column', 'column', 'row'],
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 10,
-            gap: 10
-          }}
-        >
-          <Box
-            sx={{
-              backgroundColor: 'grey',
-              width: ['120%', '100%', '50%'],
-              height: ['300px', '520px', '400px'],
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <Image src='/images/icons/butterfly-template-icon.png' width={100} height={100} alt='operator-icon' />
-          </Box>
-
-          <Box
-            sx={{
-              backgroundColor: '#FFF',
-              width: ['120%', '100%', '50%'],
-              height: ['100%', '400px', '400px'],
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <DataGrid rows={rows} columns={columns} sx={{ width: '100%' }} rowHeight={80} />
-          </Box>
-        </Box>
-      ) : templateBtn === 'template2' ? (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: ['column', 'column', 'row'],
-            gap: 5,
-            marginTop: 5
-          }}
-        >
-          <Box
-            sx={{
-              backgroundColor: '#2A3446',
-              width: ['100%', '100%', '50%'],
-              height: '100dvh',
-              borderRadius: '12px',
-              padding: 5
-            }}
-          ></Box>
-
-          <Box
-            sx={{
-              backgroundColor: '#2A3446',
-              width: ['100%', '100%', '50%'],
-              height: '100dvh',
-              borderRadius: '12px'
-            }}
-          ></Box>
-        </Box>
-      ) : templateBtn === 'template3' ? (
-        <Box>Template 3</Box>
-      ) : templateBtn === 'template4' ? (
-        <Box>Template 4</Box>
-      ) : (
-        <Box>Template 5</Box>
-      )}
+      {(() => {
+        switch (templateBtn) {
+          case 'template1':
+            return <TemplateOne />
+          case 'template2':
+            return <TemplateTwo />
+          case 'template3':
+            return <TemplateThree />
+          case 'template4':
+            return <TemplateFour />
+          case 'template5':
+            return <TemplateFive />
+          default:
+            return <Box sx={styles.placeholder}>Please pick a template.</Box>
+        }
+      })()}
     </Box>
   )
 }

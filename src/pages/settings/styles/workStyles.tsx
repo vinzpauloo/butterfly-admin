@@ -41,9 +41,17 @@ const styles = {
   template: {
     display: 'flex',
     justifyContent: 'space-between'
-  }
+  },
 
-  //Body
+  //Please Pick A Template
+  placeholder: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: 50,
+    textTransform: 'uppercase',
+    fontWeight: '600',
+    fontSize: 20
+  }
 }
 
 export default styles
