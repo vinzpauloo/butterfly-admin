@@ -31,18 +31,18 @@ const sideBarContent = [
     id : 5, 
     title : 'Studio', 
     icon : 'studio', 
-    children: [
+    sub: [
     {
       title: 'Upload Contents',
       path: '/studio/upload'
     },
     {
       title: 'Content Approval',
-      path: '/studio/upload'
+      path: '/studio/content'
     },
     {
       title: 'Newsfeed list',
-      path: '/studio/upload'
+      path: '/studio/newsfeed'
     },
     {
       title: 'Newsfeed Approval',
@@ -77,6 +77,7 @@ const SidebarContent = () => {
   } = settings
 
   const [showSettingsSubMenu, setShowSettingsSubMenu] = useState(false);
+  const [showStudiosSub, setShowStudiosSub] = useState(false)
 
     return (
         <Box
@@ -90,8 +91,8 @@ const SidebarContent = () => {
                 {sideBarContent.map((item) => (
                 <Link 
                   key={item.id}
-                  href={ !item.children ? `${item.link}` : '' } 
-                  component={NextLink}>
+                  href={ !item.sub ? `${item.link}` : '' } 
+                  component={ item.sub ? Box : NextLink }>
                   <ListItem
                   disablePadding
                   sx={
@@ -119,9 +120,11 @@ const SidebarContent = () => {
                       }
                   }
                   >
-                      <ListItemButton
-                          
+                      <ListItemButton                          
                           onClick={() => {
+                            if (item.title === 'Studio') {
+                              setShowStudiosSub(!showStudiosSub);
+                            }
                             if (item.title === 'Settings') {
                               setShowSettingsSubMenu(!showSettingsSubMenu);
                             }
@@ -157,8 +160,8 @@ const SidebarContent = () => {
                       </ListItemButton>
                   </ListItem>
                 {
-                  item?.children && 
-                  <Collapse in={true} timeout="auto" unmountOnExit>
+                  item?.sub && 
+                  <Collapse in={showStudiosSub} timeout="auto">
                     <List 
                       disablePadding
                       sx={
@@ -180,10 +183,11 @@ const SidebarContent = () => {
                           },
                         }
                       }>
-                      { item?.children.map( child => (
+                      { item?.sub.map( child => (
                           <Link
                             key={child.title}
                             href={child.path}
+                            component={NextLink}
                             sx={{
                               '&:hover .MuiTypography-root' : {
                                 color : theme => theme.customBflyColors.green
