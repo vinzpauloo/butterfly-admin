@@ -5,13 +5,6 @@ import React, { ReactNode } from 'react'
 import Box, {BoxProps} from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
-// ** Third Party Imports
-import * as yup from 'yup'
-import toast from 'react-hot-toast'
-import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-
-
 // ** Layout Imports
 import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
 
@@ -129,8 +122,7 @@ const UploadContent = () => {
     if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
     if (displayPage == DisplayPage.VideoVisibility) return <VideoVisibility />
     if (displayPage == DisplayPage.UploadVideoPublish) return <UploadVideoPublish />
-    if (displayPage == DisplayPage.VideosList) return <VideosListTable />
-    
+    if (displayPage == DisplayPage.VideosList) return <VideosListTable />    
 }
 
   return (
