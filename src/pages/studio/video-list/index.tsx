@@ -4,24 +4,24 @@ import { useState } from 'react'
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 
-// ** Third Party Components
-
 // ** Custom Components
-import CustomChip from 'src/@core/components/mui/chip'
+import CustomAvatar from 'src/@core/components/mui/avatar'
 import SearchToolbar from '@/pages/studio/shared-component/SearchToolbar'
-import FeedDialog from '@/pages/studio/shared-component/FeedDialog'
+import VideoApprovalDialog from '@/pages/studio/shared-component/VideoApprovalDialog'
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DataGridRowType } from '@/pages/studio/types/types'
+import { DataVideosGridRowType } from '@/pages/studio/types/types'
+
+// ** Utils Import
+import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Data Import
-import { rows } from '@/data/dummyNewsFeedData'
+import { rows } from '@/data/dummyVideosUploaded'
 
 interface StatusObj {
   [key: number]: {
@@ -29,48 +29,34 @@ interface StatusObj {
     color: ThemeColor
   }
 }
-interface FeedsObj {
-    [key: number]: {
-      title: string
-      iconPath: string
-    }
+
+// ** renders client column
+const renderClient = (params: GridRenderCellParams) => {
+  const { row } = params
+  const stateNum = Math.floor(Math.random() * 6)
+  const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
+  const color = states[stateNum]
+
+  if (row.avatar.length) {
+    return <CustomAvatar src={`/images/avatars/cc/${row.avatar}`} sx={{ borderRadius:'10px', mr: 3, width: '5.875rem', height: '3rem' }} />
+  } else {
+    return (
+      <CustomAvatar
+        skin='light'
+        color={color as ThemeColor}
+        sx={{ borderRadius:'10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
+      >
+        {getInitials(row.full_name ? row.full_name : 'John Doe')}
+      </CustomAvatar>
+    )
   }
-
-const renderFeedType = (params: GridRenderCellParams) => {
-    const { row } = params
-    
-    if ( row.feedTypes.length ) {
-        
-        return (
-            <Box sx={{display:'flex',gap:'.5rem'}}>
-                {
-                    row.feedTypes.map( (feed : number, index : number) => (
-                        <img key={index} alt={`${feedsObj[feed].title}`} width={20} src={`${feedsObj[feed].iconPath}`} />
-                    ))
-                }
-            </Box>
-        )
-        
-
-        return 
-    } else {
-        return <></>
-    }
-
-    
-  }
-
-const statusObj: StatusObj = {
-    1: { title: 'pending', color: 'warning' },
-    2: { title: 'declined', color: 'error' },
 }
 
-const feedsObj: FeedsObj = {
-    1: { title: 'Story', iconPath: '/images/feeds/storyIcon.png' },
-    2: { title: 'Videos', iconPath: '/images/feeds/videoIcon.png' },
-    3: { title: 'Photos', iconPath: '/images/feeds/photoIcon.png' },
-  }
-  
+const statusObj: StatusObj = {
+  1: { title: 'pending', color: 'warning' },
+  2: { title: 'declined', color: 'error' },
+}
+
 const escapeRegExp = (value: string) => {
     return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
@@ -79,9 +65,9 @@ const VideosList = () => {
   // ** States
   const [pageSize, setPageSize] = useState<number>(7)
   const [hideNameColumn, setHideNameColumn] = useState(false)
-  const [data] = useState<DataGridRowType[]>(rows)
+  const [data] = useState<DataVideosGridRowType[]>(rows)
   const [searchText, setSearchText] = useState<string>('')
-  const [filteredData, setFilteredData] = useState<DataGridRowType[]>([])
+  const [filteredData, setFilteredData] = useState<DataVideosGridRowType[]>([])
 
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
@@ -90,8 +76,6 @@ const VideosList = () => {
       return Object.keys(row).some(field => {
         // @ts-ignore
         return searchRegex.test(row[field].toString())
-
-
     })
     })
     if (searchValue.length) {
@@ -105,15 +89,15 @@ const VideosList = () => {
     {
       flex: 0.1,
       minWidth: 150,
-      field: 'feed_type',
-      headerName: 'Feed Type',
+      field: 'video_thumbnail',
+      headerName: 'Video Thumbnail',
       align:'center',
       headerAlign:'center',
       hide: hideNameColumn,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {renderFeedType(params)}
+            {renderClient(params)}
           </Box>
         )
       }
@@ -156,7 +140,7 @@ const VideosList = () => {
       headerName: 'Video URL',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.email}
+          {params.row.videoUrl}
         </Typography>
       )
     },
@@ -174,34 +158,13 @@ const VideosList = () => {
     {
       flex: 0.1,
       minWidth: 140,
-      field: 'post_update',
-      headerName: 'Post Update',
+      field: 'last_update',
+      headerName: 'Last Update',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.post_update}
+          {params.row.last_update}
         </Typography>
       )
-    },
-    {
-      flex: 0.01,
-      minWidth: 140,
-      field: 'status',
-      headerName: 'Status',
-      align:'center',
-      headerAlign:'center',
-      renderCell: (params: GridRenderCellParams) => {
-        const status = statusObj[params.row.status]
-
-        return (
-          <CustomChip
-            size='small'
-            skin='light'
-            color={status.color}
-            label={status.title}
-            sx={{  '&':{ padding: '1em 1em',borderRadius: '3px !important' },'& .MuiChip-label': { textTransform: 'capitalize' } }}
-          />
-        )
-      }
     },
     {
       flex: 0.06,
@@ -211,64 +174,23 @@ const VideosList = () => {
       align:'center',
       renderCell: (params: GridRenderCellParams) => {
         return (
-            <FeedDialog param={params.row} />
+          <VideoApprovalDialog param={params.row} />
         )
       }
     }
   ]
 
   return (
-    <>
-    <Typography
-            variant='h6'
-            sx={{
-                marginInline:'auto',
-                mb:7,
-                mt:7,
-                lineHeight: 1,
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                fontSize: '1.3rem !important',
-                textAlign:'center'
-            }}
-            color={ theme => theme.customBflyColors.primary }
-            >
-            NEWSFEED LIST
-    </Typography>
     <Card>
       <CardHeader
-        sx={{
-            '& .MuiCardHeader-content' : {
-                display:'none'
-            }
-        }}
-        action={
-          <Box sx={{ display:'flex',gap:'1rem' }}>
-            <Button size='small' variant='contained' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              All Feeds
-            </Button>
-
-            <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              All Photo Feeds
-            </Button>
-
-            <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              All Video Feeds
-            </Button>
-
-            <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              Videos With Photos
-            </Button>
-          </Box>
-
-        }
+        title='VIDEOS LIST'
       />
       <DataGrid
-        disableSelectionOnClick
         autoHeight
         rows={filteredData.length ? filteredData : data}
         columns={columns}
         pageSize={pageSize}
+        disableSelectionOnClick
         rowsPerPageOptions={[7, 10, 25, 50]}
         components={{ Toolbar: SearchToolbar }}
         componentsProps={{
@@ -284,7 +206,6 @@ const VideosList = () => {
         onPageSizeChange={newPageSize => setPageSize(newPageSize)}
       />
     </Card>
-    </>
   )
 }
 
