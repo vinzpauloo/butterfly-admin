@@ -1,7 +1,7 @@
-import {Box} from "@mui/material";
-import ToggleButton from "@/pages/user/components/button/ToggleButton";
-import EditBtn from "@/pages/user/components/button/EditButton";
-import OperatorEditModal from "@/pages/user/components/modal/OperatorEditModal";
+import { Box } from '@mui/material'
+import ToggleButton from '@/pages/user/components/button/ToggleButton'
+import EditBtn from '@/pages/user/components/button/EditButton'
+import OperatorEditModal from '@/pages/user/components/modal/OperatorEditModal'
 
 const operatorColumns = [
   { field: 'userProfile', headerName: 'User Profile', width: 250 },
@@ -15,11 +15,11 @@ const operatorColumns = [
     width: 200,
     renderCell: () => (
       <Box>
-        <ToggleButton/>
-        <EditBtn modal={OperatorEditModal}/>
+        <ToggleButton />
+        <EditBtn modal={OperatorEditModal} />
       </Box>
-    ),
-  },
-];
+    )
+  }
+]
 
 export default operatorColumns
