@@ -2,18 +2,21 @@
 import React,{ Ref, useState, forwardRef, ReactElement } from 'react'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
+
 import Grid from '@mui/material/Grid'
 import Dialog from '@mui/material/Dialog'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
 import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
-// ** Custom Components
+// ** Custom Component
+import FeedVideoCard from './feed/FeedVideoCard'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -47,19 +50,30 @@ const PlayButtonImg = styled('img')(({ theme }) => ({
     cursor:'pointer'
 }))
 
-const VideoBG =  styled(Box)(({ theme }) => ({
+const ThumbnailBox =  styled(Box)(({ theme }) => ({
+   display:'grid',
+   gridTemplateColumns : 'repeat(3, 1fr)',
+   gap:'1rem',
+   '& img' : {
     width:'100%',
-    height:'240px', 
-    backgroundRepeat:'no-repeat',
-    backgroundSize: 'contain',
-    maxWidth: '540px',
-    backgroundColor: '#333',
-    backgroundPosition: 'center',
-    marginTop: '1rem',
-    borderRadius:'5px',
-    border:'5px solid gray'
+    height:'130px',
+    objectFit: 'cover'
+   }
 }))
 
+const ImgUpload =  styled('img')(({ theme }) => ({
+  width:'50px',
+  marginInline:'auto'
+}))
+
+
+const UploadBox =  styled(Box)(({ theme }) => ({
+  display:'flex',
+  justifyContent:'space-evenly',
+  width: '100%',
+  maxWidth:'145px',
+  paddingInline:'1em',
+}))
 
 const VideoApprovalDialog = ({param} : FeedDialogType) => {
   // ** States
@@ -71,7 +85,7 @@ const VideoApprovalDialog = ({param} : FeedDialogType) => {
     <>
       <Icon onClick={() => setShow(true)} icon='mdi:eye-outline' fontSize={20} cursor='pointer' />
       <Dialog
-        maxWidth='sm'
+        maxWidth='md'
         fullWidth
         open={show}
         scroll='body'
@@ -79,7 +93,7 @@ const VideoApprovalDialog = ({param} : FeedDialogType) => {
         TransitionComponent={Transition}
         onBackdropClick={() => setShow(false)}
       >
-        <DialogContent sx={{ pb: 8, px: { xs: 8, sm: 15 }, pt: { xs: 8, sm: 12.5 }, position: 'relative' }}>
+        <DialogContent sx={{ pb: 8, px: { xs: 8, sm: 5 }, pt: { xs: 8, sm: 5 }, position: 'relative' }}>
           <IconButton
             size='small'
             onClick={() => setShow(false)}
@@ -88,38 +102,103 @@ const VideoApprovalDialog = ({param} : FeedDialogType) => {
             <Icon icon='mdi:close' />
           </IconButton>
 
-          <Grid container spacing={3}>
-            <Grid item sm={12} xs={12}>
-              <Box
-                sx={{
-                  py: 3,
-                  px: 4,
-                  borderRadius: 1,
-                  cursor: 'pointer',
-                  backgroundColor: 'action.hover',
-                }}
-              >
-                <Box sx={{ mb: 1, display: 'flex', justifyContent:'center', flexDirection:'column', alignItems: 'center', '& svg': { mr: 2 } }}>
-                  <Typography textAlign='left' variant='body2'>Video Details</Typography>
+          <form onSubmit={e => e.preventDefault()}>
+            <Grid container spacing={3}>
+              <Grid item sm={12} xs={12}>
+                <Box
+                  sx={{
+                    px: 4,
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Box>
+                    <Typography component='div' textAlign='left' variant='body2'>Video Details</Typography>
+                  </Box>
                 </Box>
-              </Box>
+              </Grid>
+
+              <Grid item xs={12}>
+
+                  <Grid container spacing={5}>
+
+                    <Grid item sm={7}>
+
+                      <Box display='flex' flexDirection='column' sx={{gap:'1rem'}}>
+
+                        <TextField fullWidth placeholder='Title' />
+
+                        <TextField multiline rows={2} fullWidth placeholder='Description' />
+
+                      </Box>
+
+                      <Box>
+                        <Typography>THUMBNAIL (Optional)</Typography>
+                        <Typography>Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and draws viewers attention.</Typography>
+                        <Box sx={{display:'flex',flexDirection:'row', justifyContent:'space-between',marginBlock:'1rem'}}>
+
+                          <UploadBox sx={{display:'flex',flexDirection:'column'}}>
+                            <ImgUpload src='/images/studio/thumbnail.png' />
+                            <Button variant='contained' size='small'>Upload</Button>
+                          </UploadBox>
+                          <ThumbnailBox>
+                            <img src='/images/misc/profilePhoto.jpg' />
+                            <img src='/images/misc/profilePhoto1.jpg' />
+                            <img src='/images/misc/profilePhoto2.jpg' />
+                          </ThumbnailBox>
+                        </Box>
+                      </Box>
+
+                      <Box display='flex' sx={{ flexDirection:'column', gap:'1rem', marginBlock:'1rem'}}>
+                        <TextField fullWidth placeholder='Tagging' />
+                        <TextField multiline rows={2} fullWidth placeholder='Grouping' />
+                      </Box>
+                      
+
+                    </Grid>
+
+                    <Grid item sm={5}>
+
+                      <Box>
+                        
+                        <Box>
+                          
+                          <FeedVideoCard source='https://www.youtube.com/watch?v=JttqrqOfnC4'  />
+
+                        </Box>
+
+                        <Box>
+
+                            <Box>
+                              Link
+                            </Box>
+
+                            <Box>
+                              Uploaded by
+                            </Box>
+
+                        </Box>
+
+                      </Box>
+
+                    </Grid>
+
+                  </Grid>
+
+              </Grid>
+
+
+            
             </Grid>
+          </form>
 
-            <Grid item xs={12}>
-
-
-            </Grid>
-
-
-          
-          </Grid>
         </DialogContent>
-        <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'center' }}>
-          <Button variant='contained' color='error' sx={{ mr: 1 }} onClick={() => setShow(false)}>
-            Decline
+        <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'space-around' }}>
+          <Button variant='contained' color='warning' sx={{ mr: 1 }} onClick={() => setShow(false)}>
+            Cancel
           </Button>
           <Button variant='contained' color='primary' onClick={() => setShow(false)}>
-            Approve
+            Update
           </Button>
         </DialogActions>
       </Dialog>
