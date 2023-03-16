@@ -22,7 +22,7 @@ const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden
 const AllStory = (props: Props) => {
   return (
 
-    <Box sx={{ padding:'1.5em',backgroundColor:'#ededed', borderRadius:'5px', display:'flex', height: '70vh' }}>
+    <Box sx={{ display:'flex' }}>
       <ScrollWrapper hidden={true}>
         <Grid container spacing={10}>
 

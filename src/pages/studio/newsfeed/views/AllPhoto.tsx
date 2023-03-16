@@ -23,7 +23,7 @@ const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden
 
 const AllPhoto = (props: Props) => {
   return (
-    <Box sx={{ padding:'1.5em',backgroundColor:'#ededed', borderRadius:'5px', display:'flex',  }}>
+    <Box sx={{ display:'flex',  }}>
       <ScrollWrapper hidden={true}>
         <Grid container spacing={10}>
 

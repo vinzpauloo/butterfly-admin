@@ -24,7 +24,7 @@ const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden
 
 const VideosWithPhotos = (props: Props) => {
   return (
-    <Box sx={{ padding:'1.5em',backgroundColor:'#ededed', borderRadius:'5px', display:'flex' }}>
+    <Box sx={{ display:'flex' }}>
       <ScrollWrapper hidden={true}>
         <Grid container spacing={10}>
 
@@ -113,7 +113,7 @@ const VideosWithPhotos = (props: Props) => {
                 </FeedAttachments>
 
                 <FeedAttachments>
-                  <FeedVideoCard source='https://www.youtube.com/watch?v=DxmdySilOAI&t=1s'></FeedVideoCard>
+                  <FeedVideoCard source='https://www.twitch.tv/tarik'></FeedVideoCard>
                 </FeedAttachments>
 
                 <FeedAttachments>
