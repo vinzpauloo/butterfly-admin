@@ -32,34 +32,35 @@ const sideBarContent = [
     title: 'Studio',
     icon: 'studio',
     sub: [
-    {
-      title: 'Upload Contents',
-      path: '/studio/upload'
-    },
-    {
-      title: 'Content Approval',
-      path: '/studio/content'
-    },
-    {
-      title: 'Newsfeed list',
-      path: '/studio/newsfeed'
-    },
-    {
-      title: 'Newsfeed Approval',
-      path: '/studio/newsfeed/approval'
-    },
-    {
-      title: 'Video List',
-      path: '/studio/upload'
-    }
-  ]},
-  {id : 6, title : 'Bundles', icon : 'bundles', link : ''},
-  {id : 7, title : 'Settings', icon : 'settings', link : ''}
+      {
+        title: 'Upload Contents',
+        path: '/studio/upload'
+      },
+      {
+        title: 'Content Approval',
+        path: '/studio/content'
+      },
+      {
+        title: 'Newsfeed list',
+        path: '/studio/newsfeed'
+      },
+      {
+        title: 'Newsfeed Approval',
+        path: '/studio/newsfeed/approval'
+      },
+      {
+        title: 'Video List',
+        path: '/studio/upload'
+      }
+    ]
+  },
+  { id: 6, title: 'Bundles', icon: 'bundles', link: '' },
+  { id: 7, title: 'Settings', icon: 'settings', link: '' }
 ]
 
 const settingsSubMenu = [
   { id: 1, title: 'Work Groupings', link: '/settings' },
-  { id: 2, title: 'Feed Features', link: '/user/list' },
+  { id: 2, title: 'Feed Features', link: '/settings/pages/feedfeatures' },
   { id: 3, title: 'Advertisements', link: '' },
   { id: 4, title: 'Announcements', link: '/settings/pages/announcements' },
   { id: 5, title: 'Privacy Policy', link: '/settings/pages/privacypolicy' },

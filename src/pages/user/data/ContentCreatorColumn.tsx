@@ -1,7 +1,7 @@
-import {Box} from "@mui/material";
-import ToggleButton from "@/pages/user/components/button/ToggleButton";
-import EditBtn from "@/pages/user/components/button/EditButton";
-import contentCreatorEditModal from "@/pages/user/components/modal/ContentCreatorEditModal";
+import { Box } from '@mui/material'
+import ToggleButton from '@/pages/user/components/button/ToggleButton'
+import EditBtn from '@/pages/user/components/button/EditButton'
+import contentCreatorEditModal from '@/pages/user/components/modal/ContentCreatorEditModal'
 
 const contentCreatorColumns = [
   { field: 'UserName', headerName: 'User Name', width: 250 },
@@ -15,11 +15,11 @@ const contentCreatorColumns = [
     width: 200,
     renderCell: () => (
       <Box>
-        <ToggleButton/>
-        <EditBtn modal={contentCreatorEditModal}/>
+        <ToggleButton />
+        <EditBtn modal={contentCreatorEditModal} />
       </Box>
-    ),
-  },
-];
+    )
+  }
+]
 
 export default contentCreatorColumns
