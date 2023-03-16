@@ -50,7 +50,7 @@ const sideBarContent = [
     },
     {
       title: 'Video List',
-      path: '/studio/upload'
+      path: '/studio/video-list'
     }
   ]},
   {id : 6, title : 'Bundles', icon : 'bundles', link : ''},
