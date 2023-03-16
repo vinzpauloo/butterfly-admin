@@ -24,6 +24,12 @@ import operatorRows from '@/pages/user/data/OperatorData'
 import superagentRows from '@/pages/user/data/SuperAgentData'
 import contentcreatorRows from '@/pages/user/data/ContentCreatorData'
 
+type UserData = {
+  dataType: any
+  columnType: string
+  activeBtn: string
+}
+
 const UserTable = () => {
   const [value, setValue] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
@@ -41,7 +47,7 @@ const UserTable = () => {
   const columnsMap = new Map([
     ['operators', operatorColumns],
     ['superagent', superAgentColumns],
-    ['content-creators', contentCreatorColumns]
+    ['contentcreators', contentCreatorColumns]
   ])
 
   const filteredColumns: any = columnsMap.get(columnType) ?? []
@@ -49,28 +55,22 @@ const UserTable = () => {
   const rowsByType: any = {
     operators: operatorRows,
     superagent: superagentRows,
-    'content-creators': contentcreatorRows
+    contentcreators: contentcreatorRows
   }
 
   const filteredRows = rowsByType[dataType] || []
 
-  const handleOperatorsClick = () => {
-    setDataType('operators')
-    setColumnType('operators')
-    setActiveBtn('operators')
+  const handleClick = ({ dataType, columnType, activeBtn }: UserData) => {
+    setDataType(dataType)
+    setColumnType(columnType)
+    setActiveBtn(activeBtn)
   }
 
-  const handleSuperAgentClick = () => {
-    setDataType('superagent')
-    setColumnType('superagent')
-    setActiveBtn('superagent')
-  }
-
-  const handleContentCreatorsClick = () => {
-    setDataType('content-creators')
-    setColumnType('content-creators')
-    setActiveBtn('contentcreators')
-  }
+  const createUserData = (value: string): UserData => ({
+    dataType: value,
+    columnType: value,
+    activeBtn: value
+  })
 
   useEffect(() => {
     setActiveBtn('operators')
@@ -83,7 +83,7 @@ const UserTable = () => {
           <Box sx={{ padding: 5, ...styles.buttonContainer }}>
             <Box sx={styles.usersButtons}>
               <Button
-                onClick={handleOperatorsClick}
+                onClick={() => handleClick(createUserData('operators'))}
                 sx={{
                   ...styles.userButton,
                   backgroundColor: activeBtn === 'operators' ? '#9747FF' : '#FFF',
@@ -93,7 +93,7 @@ const UserTable = () => {
                 Operators
               </Button>
               <Button
-                onClick={handleSuperAgentClick}
+                onClick={() => handleClick(createUserData('superagent'))}
                 sx={{
                   ...styles.userButton,
                   backgroundColor: activeBtn === 'superagent' ? '#9747FF' : '#FFF',
@@ -103,7 +103,7 @@ const UserTable = () => {
                 Super Agent
               </Button>
               <Button
-                onClick={handleContentCreatorsClick}
+                onClick={() => handleClick(createUserData('contentcreators'))}
                 sx={{
                   ...styles.userButton,
                   backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : '#FFF',
