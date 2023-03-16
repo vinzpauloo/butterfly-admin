@@ -7,10 +7,10 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 // ** Custom Components
-import FeedCard from './feed/FeedCard'
-import FeedAttachments from './feed/FeedAttachments'
-import FeedVideoCard from './feed/FeedVideoCard'
-import PhotoGridCard from './feed/PhotoGridCard'
+import FeedCard from '../../shared-component/feed/FeedCard'
+import FeedAttachments from '../../shared-component/feed/FeedAttachments'
+import FeedVideoCard from '../../shared-component/feed/FeedVideoCard'
+import PhotoGridCard from '../../shared-component/feed/PhotoGridCard'
 
 // ** Third Party Components
 import PerfectScrollbar from 'react-perfect-scrollbar'

@@ -7,8 +7,8 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 // ** Custom Components
-import FeedCard from './feed/FeedCard'
-import FeedAttachments from './feed/FeedAttachments'
+import FeedCard from '../../shared-component/feed/FeedCard'
+import FeedAttachments from '../../shared-component/feed/FeedAttachments'
 
 // ** Third Party Components
 import PerfectScrollbar from 'react-perfect-scrollbar'

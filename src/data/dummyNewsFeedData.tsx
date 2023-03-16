@@ -1,0 +1,58 @@
+export const rows = [
+    {
+      id: 1,
+      avatar: '1.png',
+      full_name: "Shi Kai Ding Bang",
+      post: 'Nuclear Power Engineer',
+      email: 'kocrevy0@thetimes.co.uk',
+      title: 'Krasnosilka',
+      post_update: '09/23/2016',
+      salary: 23896.35,
+      age: '61',
+      experience: '1 Year',
+      status: 2,
+      feedTypes : [1, 2]
+    },
+    {
+      id: 2,
+      avatar: '2.png',
+      full_name: 'Chun Fang Hua',
+      post: 'Environmental Specialist',
+      email: 'ediehn6@163.com',
+      title: 'Lampuyang',
+      post_update: '10/15/2017',
+      salary: 18991.67,
+      age: '59',
+      experience: '9 Years',
+      status: 1,
+      feedTypes : [1,2,3]
+    },
+    {
+      id: 3,
+      avatar: '3.png',
+      full_name: "Chéngshì lǐ dì xìng'ài",
+      post: 'Sales Representative',
+      email: 'dfalloona@ifeng.com',
+      title: 'Colima',
+      post_update: '06/12/2018',
+      salary: 19252.12,
+      age: '30',
+      experience: '0 Year',
+      status: 1,
+      feedTypes : [1]
+    },
+    {
+      id: 4,
+      avatar: '4.png',
+      full_name: 'Xìnggǎn yěshòu',
+      post: 'Operator',
+      email: 'sganderton2@tuttocitta.it',
+      title: 'Golcowa',
+      post_update: '03/24/2018',
+      salary: 13076.28,
+      age: '66',
+      experience: '6 Years',
+      status: 2,
+      feedTypes : [2]
+    },
+  ]

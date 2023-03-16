@@ -46,7 +46,7 @@ const sideBarContent = [
     },
     {
       title: 'Newsfeed Approval',
-      path: '/studio/upload'
+      path: '/studio/newsfeed/approval'
     },
     {
       title: 'Video List',
