@@ -50,7 +50,7 @@ const sideBarContent = [
       },
       {
         title: 'Video List',
-        path: '/studio/upload'
+        path: '/studio/video-list'
       }
     ]
   },

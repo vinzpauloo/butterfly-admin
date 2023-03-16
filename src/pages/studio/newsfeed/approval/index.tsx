@@ -13,12 +13,12 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 
 // ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
-import SearchToolbar from '../shared-component/SearchToolbar'
+import SearchToolbar from '@/pages/studio/shared-component/SearchToolbar'
 import FeedDialog from '@/pages/studio/shared-component/FeedDialog'
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DataGridRowType } from '../types/types'
+import { DataGridRowType } from '../../types/types'
 
 // ** Data Import
 import { rows } from '@/data/dummyNewsFeedData'
@@ -51,12 +51,9 @@ const renderFeedType = (params: GridRenderCellParams) => {
             </Box>
         )
         
-
-        return 
     } else {
         return <></>
     }
-
     
   }
 
@@ -90,8 +87,6 @@ const NewsFeedApproval = () => {
       return Object.keys(row).some(field => {
         // @ts-ignore
         return searchRegex.test(row[field].toString())
-
-
     })
     })
     if (searchValue.length) {
@@ -219,71 +214,71 @@ const NewsFeedApproval = () => {
 
   return (
     <>
-    <Typography
-            variant='h6'
-            sx={{
-                marginInline:'auto',
-                mb:7,
-                mt:7,
-                lineHeight: 1,
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                fontSize: '1.3rem !important',
-                textAlign:'center'
-            }}
-            color={ theme => theme.customBflyColors.primary }
-            >
-            NEWSFEED LIST
-    </Typography>
-    <Card>
-      <CardHeader
-        sx={{
-            '& .MuiCardHeader-content' : {
-                display:'none'
-            }
-        }}
-        action={
-          <Box sx={{ display:'flex',gap:'1rem' }}>
-            <Button size='small' variant='contained' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              All Feeds
-            </Button>
-
-            <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              All Photo Feeds
-            </Button>
-
-            <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              All Video Feeds
-            </Button>
-
-            <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              Videos With Photos
-            </Button>
-          </Box>
-
-        }
-      />
-      <DataGrid
-        disableSelectionOnClick
-        autoHeight
-        rows={filteredData.length ? filteredData : data}
-        columns={columns}
-        pageSize={pageSize}
-        rowsPerPageOptions={[7, 10, 25, 50]}
-        components={{ Toolbar: SearchToolbar }}
-        componentsProps={{
-            baseButton: {
-              variant: 'outlined'
-            },
-            toolbar: {
-              value: searchText,
-              clearSearch: () => handleSearch(''),
-              onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-            }
+      <Typography
+              variant='h6'
+              sx={{
+                  marginInline:'auto',
+                  mb:7,
+                  mt:7,
+                  lineHeight: 1,
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  fontSize: '1.3rem !important',
+                  textAlign:'center'
+              }}
+              color={ theme => theme.customBflyColors.primary }
+              >
+              NEWSFEED LIST
+      </Typography>
+      <Card>
+        <CardHeader
+          sx={{
+              '& .MuiCardHeader-content' : {
+                  display:'none'
+              }
           }}
-        onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-      />
-    </Card>
+          action={
+            <Box sx={{ display:'flex',gap:'1rem' }}>
+              <Button size='small' variant='contained' onClick={() => setHideNameColumn(!hideNameColumn)}>
+                All Feeds
+              </Button>
+
+              <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
+                All Photo Feeds
+              </Button>
+
+              <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
+                All Video Feeds
+              </Button>
+
+              <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
+                Videos With Photos
+              </Button>
+            </Box>
+
+          }
+        />
+        <DataGrid
+          disableSelectionOnClick
+          autoHeight
+          rows={filteredData.length ? filteredData : data}
+          columns={columns}
+          pageSize={pageSize}
+          rowsPerPageOptions={[7, 10, 25, 50]}
+          components={{ Toolbar: SearchToolbar }}
+          componentsProps={{
+              baseButton: {
+                variant: 'outlined'
+              },
+              toolbar: {
+                value: searchText,
+                clearSearch: () => handleSearch(''),
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
+              }
+            }}
+          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+        />
+      </Card>
     </>
   )
 }
