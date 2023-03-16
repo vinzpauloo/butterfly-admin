@@ -5,135 +5,116 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 
 // ** MUI Imports
-import { Box, Dialog, DialogContent, DialogTitle, Backdrop, Grid, Paper, Button, TextField } from '@mui/material'
+import { Button, Grid, Dialog, DialogContent, Card, CardMedia, Box } from '@mui/material'
+
+// ** Other Imports
+import videoThumbnails from '../../data/VideoThumbnails'
+
+// ** Styles Imports
+import styles from '../../styles/worksModal'
 
 interface FormModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
+type WorkBtnProps = {
+  worksBtn: string
+  backgroundColor: string
+  color: string
+  hoverBG: string
+  hoverColor: string
+  onClick?: () => void
+}
+
+const WorksButton = (props: WorkBtnProps) => {
+  return (
+    <Button
+      sx={[
+        styles.workBtn,
+        {
+          backgroundColor: props.backgroundColor,
+          color: props.color,
+          '&:hover': {
+            backgroundColor: props.hoverBG,
+            color: props.hoverColor
+          }
+        }
+      ]}
+      onClick={props.onClick}
+    >
+      {props.worksBtn}
+    </Button>
+  )
+}
+
 const WorksModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
-  const handleBackdropClick = () => {
+  const [selectedThumbnails, setSelectedThumbnails] = useState(new Set<number>())
+
+  const handleThumbnailClick = (index: number) => {
+    const newSelectedThumbnails = new Set(selectedThumbnails)
+
+    if (selectedThumbnails.has(index)) {
+      newSelectedThumbnails.delete(index)
+    } else {
+      newSelectedThumbnails.add(index)
+    }
+
+    setSelectedThumbnails(newSelectedThumbnails)
+  }
+
+  const handleBackButtonClick = () => {
     onClose()
   }
 
-  const [backgroundColor, setBackgroundColor] = useState(Array(5).fill('grey'))
-
-  const [activeBtn, setActiveBtn] = useState('')
-
-  const handleHoverIn = (index: any) => {
-    setBackgroundColor(prevColors => {
-      const newColors = [...prevColors]
-      newColors[index] = 'purple'
-
-      return newColors
-    })
-  }
-
-  const handleHoverOut = (index: any) => {
-    setBackgroundColor(prevColors => {
-      const newColors = [...prevColors]
-      newColors[index] = 'grey'
-
-      return newColors
-    })
-  }
-
-  const handleTemplateClick = (templateName: string) => {
-    setActiveBtn(templateName)
-    // onActiveBtnChange(templateName)
-  }
-
   return (
-    <Dialog open={isOpen} onClose={onClose}>
-      <Box
-        sx={{
-          height: '80dvh',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'grey'
-        }}
-      >
-        <Box sx={{ width: [400, 700, 1200], padding: 0 }}>
-          <Box
-            sx={{
-              backgroundColor: 'inherit',
-              display: 'flex',
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              margin: '0 50px 0 50px'
-            }}
-          >
-            <Button
-              sx={{ backgroundColor: '#FFF', width: 120, height: '4dvh', fontSize: 11, textTransform: 'uppercase' }}
-            >
-              All
-            </Button>
-            <Button
-              sx={{ backgroundColor: '#FFF', width: 120, height: '4dvh', fontSize: 11, textTransform: 'uppercase' }}
-            >
-              Selected
-            </Button>
-            <Button
-              sx={{ backgroundColor: '#FFF', width: 120, height: '4dvh', fontSize: 11, textTransform: 'uppercase' }}
-            >
-              Not Selected
-            </Button>
-            <TextField label={`Search`} name={`Search`} placeholder={`Search`} variant={`outlined`} />
-          </Box>
-          <DialogContent sx={{}}>
-            {/* Templates */}
-            <Box
-              sx={{
-                display: 'flex',
-                position: 'relative',
-                flexDirection: 'column',
-                gap: 10,
-                overflow: 'auto',
-                maxHeight: '70vh',
-                scrollbarWidth: 'thin',
-                '&::-webkit-scrollbar': {
-                  width: '4px'
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: 'rgba(0,0,0,0.1)'
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: 'rgba(255,255,255,0.3)',
-                  borderRadius: '20px'
-                }
-              }}
-            ></Box>
-          </DialogContent>
+    <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'lg'}>
+      <DialogContent sx={styles.content}>
+        <Box sx={styles.topButtons}>
+          <WorksButton worksBtn='All' backgroundColor='#FFF' color='#000' hoverBG='#9747FF' hoverColor='#FFF' />
+          <WorksButton worksBtn='SELECTED' backgroundColor='#FFF' color='#000' hoverBG='#9747FF' hoverColor='#FFF' />
+          <WorksButton
+            worksBtn='NOT SELECTED'
+            backgroundColor='#FFF'
+            color='#000'
+            hoverBG='#9747FF'
+            hoverColor='#FFF'
+          />
+          <WorksButton worksBtn='SEARCH' backgroundColor='#FFF' color='#000' hoverBG='#9747FF' hoverColor='#FFF' />
         </Box>
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 10,
-          backgroundColor: 'transparent'
-        }}
-      >
-        <Button
-          sx={{
-            backgroundColor: '#FFF',
-            width: 120
-          }}
-        >
-          Back
-        </Button>
-        <Button
-          sx={{
-            backgroundColor: '#FFF',
-            width: 120
-          }}
-        >
-          Continue
-        </Button>
+
+        <Grid container spacing={5} maxHeight={600}>
+          {videoThumbnails.map((thumbnail, index) => (
+            <Grid key={index} item xs={12} sm={6} md={3}>
+              <Card
+                onClick={() => handleThumbnailClick(index)}
+                sx={{
+                  ...(selectedThumbnails.has(index) && { border: '3px solid #9747FF' })
+                }}
+              >
+                <CardMedia sx={styles.media} image={thumbnail.url} title={thumbnail.title} />
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </DialogContent>
+      <Box sx={styles.bottomButtons}>
+        <WorksButton
+          worksBtn='Back'
+          backgroundColor='#FFF'
+          color='#000'
+          hoverBG='#7B0BB0'
+          hoverColor='#FFF'
+          onClick={handleBackButtonClick}
+        />
+        <WorksButton
+          worksBtn='Continue'
+          backgroundColor='#9747FF'
+          color='#FFF'
+          hoverBG='#7B0BB0'
+          hoverColor='#FFF'
+          onClick={handleBackButtonClick}
+        />
       </Box>
     </Dialog>
   )
