@@ -12,7 +12,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 // ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import ContentDialog from './ContentDialog'
+import ContentDialog from '@/pages/studio/shared-component/ContentDialog'
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
