@@ -61,7 +61,7 @@ const sideBarContent = [
 const settingsSubMenu = [
   { id: 1, title: 'Work Groupings', link: '/settings' },
   { id: 2, title: 'Feed Features', link: '/settings/pages/feedfeatures' },
-  { id: 3, title: 'Advertisements', link: '' },
+  { id: 3, title: 'Advertisements', link: '/settings/pages/advertisements' },
   { id: 4, title: 'Announcements', link: '/settings/pages/announcements' },
   { id: 5, title: 'Privacy Policy', link: '/settings/pages/privacypolicy' },
   { id: 6, title: 'Terms and Services', link: '/settings/pages/tos' }
@@ -93,28 +93,28 @@ const SidebarContent = () => {
               sx={
                 !navCollapsed
                   ? {
-                      '& .MuiButtonBase-root': {
-                        display: 'flex',
-                        gap: '1rem',
-                        paddingInline: '2.5rem',
-                        justifyContent: 'flex-start',
-                        marginBottom: '.5rem'
-                      },
-                      '& .MuiTypography-root': {
-                        transition: 'color 0.5s'
-                      },
-                      '&:hover .MuiTypography-root': {
-                        color: theme => theme.customBflyColors.green
-                      }
+                    '& .MuiButtonBase-root': {
+                      display: 'flex',
+                      gap: '1rem',
+                      paddingInline: '2.5rem',
+                      justifyContent: 'flex-start',
+                      marginBottom: '.5rem'
+                    },
+                    '& .MuiTypography-root': {
+                      transition: 'color 0.5s'
+                    },
+                    '&:hover .MuiTypography-root': {
+                      color: theme => theme.customBflyColors.green
                     }
+                  }
                   : {
-                      '& .MuiButtonBase-root': {
-                        paddingInline: '1rem',
-                        display: 'flex',
-                        gap: 3,
-                        marginBottom: '.5rem'
-                      }
+                    '& .MuiButtonBase-root': {
+                      paddingInline: '1rem',
+                      display: 'flex',
+                      gap: 3,
+                      marginBottom: '.5rem'
                     }
+                  }
               }
             >
               <ListItemButton
@@ -166,23 +166,23 @@ const SidebarContent = () => {
                   sx={
                     !navCollapsed
                       ? {
-                          '& .MuiButtonBase-root': {
-                            gap: '1rem',
-                            display: 'flex',
-                            marginLeft: 25
-                          },
-                          '& .MuiTypography-root': {
-                            transition: 'color 0.5s'
-                          }
+                        '& .MuiButtonBase-root': {
+                          gap: '1rem',
+                          display: 'flex',
+                          marginLeft: 25
+                        },
+                        '& .MuiTypography-root': {
+                          transition: 'color 0.5s'
                         }
+                      }
                       : {
-                          '& .MuiButtonBase-root': {
-                            paddingInline: '1rem',
-                            display: 'flex',
-                            gap: 3,
-                            marginBottom: '.5rem'
-                          }
+                        '& .MuiButtonBase-root': {
+                          paddingInline: '1rem',
+                          display: 'flex',
+                          gap: 3,
+                          marginBottom: '.5rem'
                         }
+                      }
                   }
                 >
                   {item?.sub.map(child => (
@@ -220,47 +220,47 @@ const SidebarContent = () => {
         <List disablePadding>
           {!navCollapsed
             ? settingsSubMenu.map(item => (
-                <ListItem
-                  key={item.id}
-                  disablePadding
-                  sx={
-                    !navCollapsed
-                      ? {
-                          '& .MuiButtonBase-root': {
-                            gap: '1rem',
-                            display: 'flex',
-                            marginLeft: 25
-                          },
-                          '& .MuiTypography-root': {
-                            transition: 'color 0.5s'
-                          },
-                          '&:hover .MuiTypography-root': {
-                            color: theme => theme.customBflyColors.green
-                          }
-                        }
-                      : {
-                          '& .MuiButtonBase-root': {
-                            paddingInline: '1rem',
-                            display: 'flex',
-                            gap: 3,
-                            marginBottom: '.5rem'
-                          }
-                        }
-                  }
-                >
-                  <ListItemButton href={`${item.link}`} sx={{ margin: 0, padding: 0 }}>
-                    <ListItemText
-                      sx={{
-                        '& .MuiTypography-root': {
-                          color: '#BFC6D0',
-                          fontSize: '0.65rem'
-                        }
-                      }}
-                      primary={item.title}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))
+              <ListItem
+                key={item.id}
+                disablePadding
+                sx={
+                  !navCollapsed
+                    ? {
+                      '& .MuiButtonBase-root': {
+                        gap: '1rem',
+                        display: 'flex',
+                        marginLeft: 25
+                      },
+                      '& .MuiTypography-root': {
+                        transition: 'color 0.5s'
+                      },
+                      '&:hover .MuiTypography-root': {
+                        color: theme => theme.customBflyColors.green
+                      }
+                    }
+                    : {
+                      '& .MuiButtonBase-root': {
+                        paddingInline: '1rem',
+                        display: 'flex',
+                        gap: 3,
+                        marginBottom: '.5rem'
+                      }
+                    }
+                }
+              >
+                <ListItemButton href={`${item.link}`} sx={{ margin: 0, padding: 0 }}>
+                  <ListItemText
+                    sx={{
+                      '& .MuiTypography-root': {
+                        color: '#BFC6D0',
+                        fontSize: '0.65rem'
+                      }
+                    }}
+                    primary={item.title}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))
             : null}
         </List>
       )}

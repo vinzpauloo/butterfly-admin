@@ -23,102 +23,102 @@ const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden
 
 const AllVideo = (props: Props) => {
   return (
-    <Box sx={{ display:'flex',  }}>
+    <Box sx={{ display: 'flex', }}>
       <ScrollWrapper hidden={true}>
         <Grid container spacing={10}>
 
-            <Grid item sm={6}>
+          <Grid item sm={6}>
 
-              <FeedCard>
+            <FeedCard>
 
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
 
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
-                  </Box>
-                </FeedAttachments>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
+                </Box>
+              </FeedAttachments>
 
-                <FeedAttachments>
-                  <FeedVideoCard source='https://www.youtube.com/watch?v=2860XzQ9c28'></FeedVideoCard>
-                </FeedAttachments>
+              <FeedAttachments>
+                <FeedVideoCard source='https://www.youtube.com/watch?v=2860XzQ9c28'></FeedVideoCard>
+              </FeedAttachments>
 
-              </FeedCard>
+            </FeedCard>
 
 
-            </Grid>
+          </Grid>
 
-            <Grid item sm={6}>
-              
-              <FeedCard>
+          <Grid item sm={6}>
 
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
+            <FeedCard>
 
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
-                  </Box>
-                </FeedAttachments>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
 
-                <FeedAttachments>
-                  <FeedVideoCard source='https://www.youtube.com/watch?v=DxmdySilOAI&t=1s'></FeedVideoCard>
-                </FeedAttachments>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
+                </Box>
+              </FeedAttachments>
 
-              </FeedCard>
+              <FeedAttachments>
+                <FeedVideoCard source='https://www.youtube.com/watch?v=DxmdySilOAI&t=1s'></FeedVideoCard>
+              </FeedAttachments>
 
-            </Grid>
+            </FeedCard>
 
-            <Grid item sm={6}>
-              
-              <FeedCard>
+          </Grid>
 
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
+          <Grid item sm={6}>
 
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
-                  </Box>
-                </FeedAttachments>
+            <FeedCard>
 
-                <FeedAttachments>
-                  <FeedVideoCard source='https://www.twitch.tv/esl_csgo'></FeedVideoCard>
-                </FeedAttachments>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
 
-              </FeedCard>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
+                </Box>
+              </FeedAttachments>
 
-            </Grid>
+              <FeedAttachments>
+                <FeedVideoCard source='https://www.twitch.tv/esl_csgo'></FeedVideoCard>
+              </FeedAttachments>
 
-            <Grid item sm={6}>
-              
-              <FeedCard>
+            </FeedCard>
 
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
+          </Grid>
 
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
-                  </Box>
-                </FeedAttachments>
+          <Grid item sm={6}>
 
-                <FeedAttachments>
-                  <FeedVideoCard source='https://www.youtube.com/watch?v=2860XzQ9c28'></FeedVideoCard>
-                </FeedAttachments>
+            <FeedCard>
 
-              </FeedCard>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
 
-            </Grid>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
+                </Box>
+              </FeedAttachments>
+
+              <FeedAttachments>
+                <FeedVideoCard source='https://www.youtube.com/watch?v=2860XzQ9c28'></FeedVideoCard>
+              </FeedAttachments>
+
+            </FeedCard>
+
+          </Grid>
 
         </Grid>
       </ScrollWrapper>

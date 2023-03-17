@@ -1,35 +1,28 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import Link from 'next/link'
-
 // ** MUI Imports
 import { Box, Card, Grid, Divider, Typography, Button } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 
-// ** Third Party Components
-import axios from 'axios'
-
 // ** Other Imports
 import feedFeatureColumns from '../data/FeedFeatureColumns'
 import feedFeatureRows from '../data/FeedFeatureRows'
-import AnnouncementModal from '../components/modal/AnnouncementModal'
+import SelectFeedsModal from '../components/modal/SelectFeedsModal'
+import CreateFeedModal from '../components/modal/CreateFeedModal'
 
 // ** Style Imports
 import styles from '../styles/feedFeatureStyles'
 
+type ModalType = 'select' | 'create' | null
+
 const FeedFeatures = () => {
   const [pageSize, setPageSize] = useState<number>(10)
 
-  const [openModal, setOpenModal] = useState(false)
+  const [openModal, setOpenModal] = useState<ModalType>(null)
 
-  const handleOpen = () => {
-    setOpenModal(true)
-  }
-
-  const handleClose = () => {
-    setOpenModal(false)
+  const handleModalToggle = (modalType: ModalType) => {
+    setOpenModal(prevModal => (prevModal === modalType ? null : modalType))
   }
 
   return (
@@ -37,16 +30,16 @@ const FeedFeatures = () => {
       <Grid item xs={12}>
         <Card>
           <Box sx={styles.header}>
-            <Box sx={styles.announcements}>
-              <Typography sx={styles.announceText}>Feed Features</Typography>
+            <Box sx={styles.feeds}>
+              <Typography sx={styles.feedText}>Feed Features</Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 5 }}>
-              <Button sx={styles.createAccount} onClick={handleOpen}>
+            <Box sx={styles.buttonContainer}>
+              <Button sx={styles.button} onClick={() => handleModalToggle('select')}>
                 Select Featured Feeds
               </Button>
 
-              <Button sx={styles.createAccount} onClick={handleOpen}>
+              <Button sx={styles.button} onClick={() => handleModalToggle('create')}>
                 Create Feed
               </Button>
             </Box>
@@ -64,7 +57,8 @@ const FeedFeatures = () => {
           />
         </Card>
       </Grid>
-      <AnnouncementModal isOpen={openModal} onClose={handleClose} />
+      <SelectFeedsModal isOpen={openModal === 'select'} onClose={() => handleModalToggle('select')} />
+      <CreateFeedModal isOpen={openModal === 'create'} onClose={() => handleModalToggle('create')} />
     </Grid>
   )
 }

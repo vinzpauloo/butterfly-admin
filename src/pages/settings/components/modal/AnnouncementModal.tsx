@@ -1,4 +1,5 @@
-import React, { useState, forwardRef } from 'react'
+// ** React Imports
+import React from 'react'
 
 // ** MUI Imports
 import {
@@ -6,16 +7,12 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Grid,
   Button,
-  Card,
-  CardMedia,
   TextField,
   Typography
 } from '@mui/material'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 
-import styles from '../../styles/worksModal'
+// ** Custom Imports
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import { DateType } from '@/types/forms/reactDatepickerTypes'

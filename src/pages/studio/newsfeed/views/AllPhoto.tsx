@@ -23,117 +23,117 @@ const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden
 
 const AllPhoto = (props: Props) => {
   return (
-    <Box sx={{ display:'flex',  }}>
+    <Box sx={{ display: 'flex', }}>
       <ScrollWrapper hidden={true}>
         <Grid container spacing={10}>
 
           <Grid item sm={6}>
-              
-              <FeedCard>
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
-                  </Box>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <PhotoGridCard>
-                    <img src='/images/misc/grid/3.jpg' />
-                    <img src='/images/misc/grid/1.jpg' />
-                    <img src='/images/misc/grid/2.jpg' />
-                    <img src='/images/misc/grid/3.jpg' />
-                    <img src='/images/misc/grid/1.jpg' />
-                    <img src='/images/misc/grid/2.jpg' />
-                  </PhotoGridCard>
-                </FeedAttachments>
-              </FeedCard>
 
-            </Grid>
+            <FeedCard>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
+                </Box>
+              </FeedAttachments>
+              <FeedAttachments>
+                <PhotoGridCard>
+                  <img src='/images/misc/grid/3.jpg' />
+                  <img src='/images/misc/grid/1.jpg' />
+                  <img src='/images/misc/grid/2.jpg' />
+                  <img src='/images/misc/grid/3.jpg' />
+                  <img src='/images/misc/grid/1.jpg' />
+                  <img src='/images/misc/grid/2.jpg' />
+                </PhotoGridCard>
+              </FeedAttachments>
+            </FeedCard>
 
-            <Grid item sm={6}>
-              
-              <FeedCard>
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
-                  </Box>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <PhotoGridCard>
-                    <img src='/images/misc/grid/1.jpg' />
-                    <img src='/images/misc/grid/2.jpg' />
-                    <img src='/images/misc/grid/3.jpg' />
-                    <img src='/images/misc/grid/1.jpg' />
-                    <img src='/images/misc/grid/2.jpg' />
-                    <img src='/images/misc/grid/3.jpg' />
-                  </PhotoGridCard>
-                </FeedAttachments>
-              </FeedCard>
+          </Grid>
 
-            </Grid>
+          <Grid item sm={6}>
 
-            <Grid item sm={6}>
-              
-              <FeedCard>
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
-                  </Box>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <PhotoGridCard>
-                    <img src='/images/misc/grid/3.jpg' />
-                    <img src='/images/misc/grid/1.jpg' />
-                    <img src='/images/misc/grid/2.jpg' />
-                    <img src='/images/misc/grid/2.jpg' />
-                    <img src='/images/misc/grid/3.jpg' />
-                    <img src='/images/misc/grid/1.jpg' />
-                  </PhotoGridCard>
-                </FeedAttachments>
-              </FeedCard>
+            <FeedCard>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
+                </Box>
+              </FeedAttachments>
+              <FeedAttachments>
+                <PhotoGridCard>
+                  <img src='/images/misc/grid/1.jpg' />
+                  <img src='/images/misc/grid/2.jpg' />
+                  <img src='/images/misc/grid/3.jpg' />
+                  <img src='/images/misc/grid/1.jpg' />
+                  <img src='/images/misc/grid/2.jpg' />
+                  <img src='/images/misc/grid/3.jpg' />
+                </PhotoGridCard>
+              </FeedAttachments>
+            </FeedCard>
 
-            </Grid>
+          </Grid>
 
-            <Grid item sm={6}>
-              
-              <FeedCard>
-                <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
-                    <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
-                  </Box>
-                </FeedAttachments>
-                <FeedAttachments>
-                  <PhotoGridCard>
-                    <img src='/images/misc/grid/2.jpg' />
-                    <img src='/images/misc/grid/3.jpg' />
-                    <img src='/images/misc/grid/1.jpg' />
-                    <img src='/images/misc/grid/2.jpg' />
-                    <img src='/images/misc/grid/3.jpg' />
-                    <img src='/images/misc/grid/1.jpg' />
-                  </PhotoGridCard>
-                </FeedAttachments>
-              </FeedCard>
+          <Grid item sm={6}>
 
-            </Grid>
+            <FeedCard>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
+                </Box>
+              </FeedAttachments>
+              <FeedAttachments>
+                <PhotoGridCard>
+                  <img src='/images/misc/grid/3.jpg' />
+                  <img src='/images/misc/grid/1.jpg' />
+                  <img src='/images/misc/grid/2.jpg' />
+                  <img src='/images/misc/grid/2.jpg' />
+                  <img src='/images/misc/grid/3.jpg' />
+                  <img src='/images/misc/grid/1.jpg' />
+                </PhotoGridCard>
+              </FeedAttachments>
+            </FeedCard>
+
+          </Grid>
+
+          <Grid item sm={6}>
+
+            <FeedCard>
+              <FeedAttachments>
+                <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+              </FeedAttachments>
+              <FeedAttachments>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                  <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                  <Typography fontSize={11} color='#00C2FF'>#Tag13 #Tag14</Typography>
+                </Box>
+              </FeedAttachments>
+              <FeedAttachments>
+                <PhotoGridCard>
+                  <img src='/images/misc/grid/2.jpg' />
+                  <img src='/images/misc/grid/3.jpg' />
+                  <img src='/images/misc/grid/1.jpg' />
+                  <img src='/images/misc/grid/2.jpg' />
+                  <img src='/images/misc/grid/3.jpg' />
+                  <img src='/images/misc/grid/1.jpg' />
+                </PhotoGridCard>
+              </FeedAttachments>
+            </FeedCard>
+
+          </Grid>
 
         </Grid>
       </ScrollWrapper>
-    </Box>  
+    </Box>
   )
 }
 

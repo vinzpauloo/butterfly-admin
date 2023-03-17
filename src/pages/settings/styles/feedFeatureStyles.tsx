@@ -23,12 +23,12 @@ const styles = {
     padding: 10,
     gap: [5, 5, 0]
   },
-  announcements: {
+  feeds: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
   },
-  announceText: {
+  feedText: {
     fontSize: 20,
     textTransform: 'uppercase',
     fontWeight: 500
@@ -36,7 +36,17 @@ const styles = {
   linkButton: {
     textDecoration: 'none'
   },
-  createAccount: {
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      sm: 'column',
+      md: 'row',
+      lg: 'row'
+    },
+    gap: 5
+  },
+  button: {
     border: 1,
     height: '56px',
     minWidth: '224px',
