@@ -1,45 +1,43 @@
-import Image from 'next/image'
-
 const TemplateRows = [
   {
     id: 1,
-    thumbnail: '/images/misc/profilePhoto2.jpg',
+    thumbnail: '/images/avatars/cc/1.png',
     title: 'Wholesome Video',
     lastUpdate: '2022-03-14'
   },
   {
     id: 2,
-    thumbnail: '/images/misc/profilePhoto.jpg',
+    thumbnail: '/images/avatars/cc/2.png',
     title: 'Bended Silver Spoon',
     lastUpdate: '2022-03-14'
   },
   {
     id: 3,
-    thumbnail: '/images/misc/profilePhoto3.jpg',
+    thumbnail: '/images/avatars/cc/3.png',
     title: 'Wish You Were Here',
     lastUpdate: '2022-03-14'
   },
   {
     id: 4,
-    thumbnail: '/images/misc/profilePhoto4.jpg',
+    thumbnail: '/images/avatars/cc/4.png',
     title: 'Wish You Were Here',
     lastUpdate: '2022-03-14'
   },
   {
     id: 5,
-    thumbnail: '/images/misc/profilePhoto5.png',
+    thumbnail: '/images/avatars/cc/5.png',
     title: 'Wish You Were Here',
     lastUpdate: '2022-03-14'
   },
   {
     id: 6,
-    thumbnail: '/images/misc/profilePhoto.jpg',
+    thumbnail: '/images/avatars/cc/6.png',
     title: 'Wish You Were Here',
     lastUpdate: '2022-03-14'
   },
   {
     id: 7,
-    thumbnail: '/images/misc/profilePhoto3.jpg',
+    thumbnail: '/images/avatars/cc/7.png',
     title: 'Wish You Were Here',
     lastUpdate: '2022-03-14'
   }
