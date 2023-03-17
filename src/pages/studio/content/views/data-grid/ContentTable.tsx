@@ -21,7 +21,7 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Data Import
-import { rows } from '@/data/dummyVideosUploaded'
+import { rows } from '@/data/dummyNewsFeedData'
 
 interface StatusObj {
   [key: number]: {

@@ -21,11 +21,12 @@ const UploadBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
     [theme.breakpoints.up('sm')]: {
         maxWidth:'416px',
         marginInline: 'auto'
-    }
+    },
+    color : theme.palette.primary.dark
 }))
 
 const TOSLink = styled(Link)(({ theme }) => ({
-    color : theme.palette.common.white
+    color : theme.customBflyColors.primaryTextContrast
 }))
 
 // ** Types & Interfaces
@@ -56,7 +57,7 @@ const UploadMenu = (props: Props) => {
                 fontSize: '1.5rem !important',
                 textAlign:'center'
             }}
-            color={ theme => theme.customBflyColors.primary }
+            color={ theme => theme.customBflyColors.primaryText }
             >
             THE STUDIO PAGE - UPLOAD
         </Typography>
@@ -69,7 +70,7 @@ const UploadMenu = (props: Props) => {
                 }}>
             <Grid maxWidth={700} container rowGap={5}>
                 <Grid xs={12} item>
-                <Typography color={theme => theme.palette.common.white} variant='body1' 
+                <Typography color={theme => theme.customBflyColors.primaryTextContrast} variant='body1' 
                     sx={{ 
                         mb: 2,
                         textAlign:'center',
@@ -89,7 +90,7 @@ const UploadMenu = (props: Props) => {
                     </UploadBoxContainer>
                 </Grid>
                 <Grid xs={12} item>
-                    <Typography fontSize='0.8125rem' textAlign='center' sx={{fontWeight : 'normal'}} color={ theme => theme.palette.common.white }>
+                    <Typography fontSize='0.8125rem' textAlign='center' sx={{fontWeight : 'normal'}} color={ theme => theme.customBflyColors.primaryTextContrast }>
                         <br />
                     Your videos or photos will be private until you publish them.
                     <br /><br />

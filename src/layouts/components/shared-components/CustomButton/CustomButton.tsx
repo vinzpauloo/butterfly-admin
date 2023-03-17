@@ -10,7 +10,7 @@ type Props = {
 }
 
 const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  color: theme.customBflyColors.primary,
+  color: theme.customBflyColors.alwaysPrimary,
   backgroundColor: theme.palette.common.white,
   width: '100%',
   fontWeight: 'normal',

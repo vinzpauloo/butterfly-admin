@@ -133,7 +133,7 @@ const VideoVisibility = () => {
                     fontSize: '1.5rem !important',
                     textAlign:'left'
                 }}
-                color={ theme => theme.customBflyColors.primary }
+                color={ theme => theme.customBflyColors.primaryText }
                 >
                 VIDEO VISIBILITY
             </Typography>
@@ -164,8 +164,8 @@ const VideoVisibility = () => {
                                     />
                                 </Box>
                                 <Box>
-                                    <Typography fontWeight={500} color={ theme => theme.customBflyColors.primary }>Save or Publish</Typography>
-                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primary }>Make your video public, private, or for selected followers only</Typography>
+                                    <Typography fontWeight={500} color={ theme => theme.customBflyColors.primaryTextContrast }>Save or Publish</Typography>
+                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primaryTextContrast }>Make your video public, private, or for selected followers only</Typography>
                                 </Box>
                             </HeaderBox>
                         </AccordionSummary>
@@ -176,7 +176,7 @@ const VideoVisibility = () => {
                                     <Icon icon='mdi:circle-outline' />
                                 </Box>
                                 <Box>
-                                    <Typography fontWeight={500} fontSize={13} color={ theme => theme.customBflyColors.primary }>Selected Viewers Only</Typography>
+                                    <Typography fontWeight={500} fontSize={13} color={ theme => theme.customBflyColors.primaryTextContrast }>Selected Viewers Only</Typography>
                                 </Box>
                             </HeaderBox>
 
@@ -185,8 +185,8 @@ const VideoVisibility = () => {
                                     <Icon icon='mdi:circle-outline' />
                                 </Box>
                                 <Box>
-                                    <Typography fontWeight={500} fontSize={13} color={ theme => theme.customBflyColors.primary }>Unlisted</Typography>
-                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primary }>Anyone with the video link can watch your video</Typography>
+                                    <Typography fontWeight={500} fontSize={13} color={ theme => theme.customBflyColors.primaryTextContrast }>Unlisted</Typography>
+                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primaryTextContrast }>Anyone with the video link can watch your video</Typography>
                                 </Box>
                             </HeaderBox>
 
@@ -201,8 +201,8 @@ const VideoVisibility = () => {
                                     />
                                 </Box>
                                 <Box>
-                                    <Typography fontWeight={500} fontSize={13} color={ theme => theme.customBflyColors.primary }>Public</Typography>
-                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primary }>Everyone can watch your video (Can set as PREMIERE)</Typography>
+                                    <Typography fontWeight={500} fontSize={13} color={ theme => theme.customBflyColors.primaryTextContrast }>Public</Typography>
+                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primaryTextContrast }>Everyone can watch your video (Can set as PREMIERE)</Typography>
                                 </Box>
                             </HeaderBox>
 
@@ -225,8 +225,8 @@ const VideoVisibility = () => {
                                     />
                                 </Box>
                                 <Box>
-                                    <Typography fontWeight={500} color={ theme => theme.customBflyColors.primary }>Schedule Premiere</Typography>
-                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primary }>Select date to make your video public</Typography>
+                                    <Typography fontWeight={500} color={ theme => theme.customBflyColors.primaryTextContrast }>Schedule Premiere</Typography>
+                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primaryTextContrast }>Select date to make your video public</Typography>
                                 </Box>
                             </HeaderBox>
                             
@@ -255,8 +255,8 @@ const VideoVisibility = () => {
                                     <Icon icon='mdi:circle-outline' />
                                 </Box>
                                 <Box>
-                                    <Typography fontWeight={500} color={ theme => theme.customBflyColors.primary }>Add Subtitle</Typography>
-                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primary }>Reach a broader audience by adding subtitles on your video</Typography>
+                                    <Typography fontWeight={500} color={ theme => theme.customBflyColors.primaryTextContrast }>Add Subtitle</Typography>
+                                    <Typography fontWeight={500} fontSize={10} color={ theme => theme.customBflyColors.primaryTextContrast }>Reach a broader audience by adding subtitles on your video</Typography>
                                 </Box>
                             </HeaderBox>
                             

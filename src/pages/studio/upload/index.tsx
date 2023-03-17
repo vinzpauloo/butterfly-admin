@@ -24,7 +24,6 @@ const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
   backgroundPosition: '100% 75%',
-  backgroundColor: '#d3d6df',
   display: 'flex',
   justifyContent: 'flex-start',
   alignItems: 'center',

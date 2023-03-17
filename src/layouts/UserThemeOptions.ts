@@ -5,11 +5,12 @@ import React from 'react'
 import { ThemeOptions } from '@mui/system'
 
 // ** To use core palette, uncomment the below import
-// import corePalette from 'src/@core/theme/palette'
+import corePalette from 'src/@core/theme/palette'
 
 // ** To use mode (light/dark/semi-dark), skin(default/bordered), direction(ltr/rtl), etc. for conditional styles, uncomment below line
 import { useSettings } from 'src/@core/hooks/useSettings'
 
+import { useTheme } from '@mui/material/styles'
 
 declare module '@mui/system' {
   interface Theme {
@@ -20,9 +21,13 @@ declare module '@mui/system' {
       dateColorBG?: React.CSSProperties['color'],
       borderBrown?: React.CSSProperties['color'],
       menuBG? : React.CSSProperties['color'],
+      grayBG? : React.CSSProperties['color'],
       menuItemsBG? : React.CSSProperties['color'],
       sidebarHeaderBG? : React.CSSProperties['color'],
       primary? : React.CSSProperties['color'],
+      primaryText? : React.CSSProperties['color'],
+      primaryTextContrast? : React.CSSProperties['color'],
+      alwaysPrimary? : React.CSSProperties['color'],
       bodyText? : React.CSSProperties['color'],
       sidebarLinkColor? : React.CSSProperties['color'],
       green? : React.CSSProperties['color']
@@ -39,10 +44,14 @@ declare module '@mui/system' {
       grayInputText?: React.CSSProperties['color'], 
       dateColorBG?: React.CSSProperties['color'],
       borderBrown?: React.CSSProperties['color'],
+      grayBG?: React.CSSProperties['color'],
       menuBG? : React.CSSProperties['color'],
       menuItemsBG? : React.CSSProperties['color'],
       sidebarHeaderBG? : React.CSSProperties['color'],
       primary? : React.CSSProperties['color'],
+      primaryText? : React.CSSProperties['color'],
+      primaryTextContrast? : React.CSSProperties['color'],
+      alwaysPrimary? : React.CSSProperties['color'],
       bodyText? : React.CSSProperties['color'],
       sidebarLinkColor? : React.CSSProperties['color'],
       green? : React.CSSProperties['color']
@@ -62,21 +71,26 @@ const UserThemeOptions = (): ThemeOptions => {
   const { mode, skin, themeColor } = settings
 
   // ** To use core palette, uncomment the below line
-  // const palette = corePalette(mode, skin, themeColor)
+  const palette = corePalette(mode as any, skin, themeColor)
+
+  const theme = useTheme()
 
   return {
     customBflyColors: {
-      darkBg: '#020308',
+      darkBg: mode === 'light' ? '#ededed' : '#020308',
       grayInputBG: '#F1F1F1',
       grayInputText: '#757575',
       dateColorBG : '#3C4B64',
       borderBrown : '#B59770',
-      menuBG : '#090909',
+      grayBG: mode === 'light' ? '#ffffff' : (mode === 'dark') ? palette.background.default : '#d3d6df',
       menuItemsBG : '#0e0e0e',
       sidebarHeaderBG: '#1D1D1D',
-      primary : '#2A3446',
+      primary : mode === 'light' ? '#EDEDED' : '#2A3446', 
+      primaryText : mode === 'light' ? '#000000' : (mode === 'dark') ? '#ffffff' : '#2A3446', 
+      primaryTextContrast : mode === 'light' ? '#2A3446' : (mode === 'dark') ? '#ffffff' : '#ffffff', 
+      alwaysPrimary : '#2A3446',
       bodyText : '#D3D7DC',
-      sidebarLinkColor : '#BFC6D0',
+      sidebarLinkColor : mode === 'light' ? '#000000' : '#BFC6D0',
       green : '#60FF00'
 
     },
@@ -167,7 +181,8 @@ const UserThemeOptions = (): ThemeOptions => {
             flex: '1 1 auto',
             flexDirection: 'column',
             minHeight: '100%',
-            width: '100%'
+            width: '100%', 
+            backgroundColor : mode === 'light' ? palette.grey[100] : (mode === 'dark') ? palette.background.paper : palette.common.white
           },
           '#__next': {
             display: 'flex',

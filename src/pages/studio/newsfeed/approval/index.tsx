@@ -226,7 +226,7 @@ const NewsFeedApproval = () => {
                   fontSize: '1.3rem !important',
                   textAlign:'center'
               }}
-              color={ theme => theme.customBflyColors.primary }
+              color={ theme => theme.customBflyColors.primaryText }
               >
               NEWSFEED LIST
       </Typography>
