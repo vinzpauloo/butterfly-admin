@@ -21,7 +21,7 @@ import { StudioContext, DisplayPage } from '..'
 
 // Styled components
 const CustomTextField = styled(TextField)(({ theme }) => ({
-    backgroundColor : theme.palette.common.white,
+    backgroundColor : theme.palette.background.paper,
     borderRadius: '4px',
     '& .MuiOutlinedInput-notchedOutline' : {
       display: 'none'
@@ -78,7 +78,7 @@ const UploadVideoPublish = () => {
                     fontSize: '1.5rem !important',
                     textAlign:'left'
                 }}
-                color={ theme => theme.customBflyColors.primary }
+                color={ theme => theme.customBflyColors.primaryText }
                 >
                 VIDEO PUBLISH
             </Typography>

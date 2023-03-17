@@ -32,12 +32,12 @@ const AllVideo = (props: Props) => {
               <FeedCard>
 
                 <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+                  <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
                 </FeedAttachments>
 
                 <FeedAttachments>
                   <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                    <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Taggings : </Typography>
                     <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
                   </Box>
                 </FeedAttachments>
@@ -56,12 +56,12 @@ const AllVideo = (props: Props) => {
               <FeedCard>
 
                 <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+                  <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
                 </FeedAttachments>
 
                 <FeedAttachments>
                   <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                    <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Taggings : </Typography>
                     <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
                   </Box>
                 </FeedAttachments>
@@ -79,12 +79,12 @@ const AllVideo = (props: Props) => {
               <FeedCard>
 
                 <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+                  <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
                 </FeedAttachments>
 
                 <FeedAttachments>
                   <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                    <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Taggings : </Typography>
                     <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
                   </Box>
                 </FeedAttachments>
@@ -102,12 +102,12 @@ const AllVideo = (props: Props) => {
               <FeedCard>
 
                 <FeedAttachments>
-                  <Typography fontSize={11} color='common.white'>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
+                  <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Location : Four Seasons Hotel, Hangzhou Westlake, China</Typography>
                 </FeedAttachments>
 
                 <FeedAttachments>
                   <Box sx={{display:'flex', justifyContent:'flex-start', gap: '.5rem'}}>
-                    <Typography fontSize={11} color='common.white'>Taggings : </Typography>
+                    <Typography fontSize={11} color={theme => theme.customBflyColors.primaryTextContrast}>Taggings : </Typography>
                     <Typography fontSize={11} color='#00C2FF'>#Tag1 #Tag2</Typography>
                   </Box>
                 </FeedAttachments>

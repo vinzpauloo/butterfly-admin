@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 import Menu, {MenuProps} from '@mui/material/Menu'
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem'
-import { styled, useTheme, lighten } from '@mui/material/styles'
+import { styled, useTheme } from '@mui/material/styles'
 
 // ** Third Party Import
 import { useTranslation } from 'react-i18next'
@@ -24,9 +24,11 @@ interface Props {
 }
 
 // ** Styled Components
+const defaultBG = 'linear-gradient(137.43deg, rgba(255, 255, 255, 0.0385) 3.89%, rgba(195, 210, 191, 0.0245) 54.78%, rgba(255, 255, 255, 0.042) 100%)'
+
 const LanguageMenu = styled(Menu)<MenuProps>(({ theme }) => ({
     '& .MuiPaper-root' : {
-        background: 'linear-gradient(137.43deg, rgba(255, 255, 255, 0.0385) 3.89%, rgba(195, 210, 191, 0.0245) 54.78%, rgba(255, 255, 255, 0.042) 100%)',
+        background: ( useTheme().palette.mode == 'dark' ) ? defaultBG : '#000',
         border: '1px solid #B59770',
         backdropFilter: 'blur(7px)',
         paddingInline: '1.4rem',

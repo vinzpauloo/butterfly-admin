@@ -151,7 +151,7 @@ const SidebarContent = () => {
                 <ListItemText
                   sx={{
                     '& .MuiTypography-root': {
-                      color: '#BFC6D0',
+                      color: theme => theme.customBflyColors.sidebarLinkColor,
                       fontSize: '0.875rem'
                     }
                   }}
@@ -200,7 +200,7 @@ const SidebarContent = () => {
                         <ListItemText
                           sx={{
                             '& .MuiTypography-root': {
-                              color: '#BFC6D0',
+                              color: theme => theme.customBflyColors.sidebarLinkColor,
                               fontSize: '0.65rem'
                             }
                           }}
@@ -265,7 +265,6 @@ const SidebarContent = () => {
         </List>
       )}
 
-      <Divider />
     </Box>
   )
 }

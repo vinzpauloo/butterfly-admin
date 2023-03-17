@@ -51,7 +51,7 @@ const Img = styled('img')(({ theme }) => ({
 }))
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
-  backgroundColor : theme.palette.common.white,
+  backgroundColor : theme.palette.background.paper,
   borderRadius: '4px',
   '& .MuiOutlinedInput-notchedOutline' : {
     display: 'none'
@@ -59,7 +59,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }))
 
 const CustomSelect = styled(Select)(({ theme }) => ({
-  backgroundColor : theme.palette.common.white,
+  backgroundColor : theme.palette.background.paper,
   borderRadius:'5px',
   '& .MuiSelect-select': {
     paddingBlock:'.5em'
@@ -314,7 +314,7 @@ const UploadVideoStep1 = (props: Props) => {
             mb: ['.8rem']
           }}
           variant='h6'
-          color={theme => theme.palette.common.white}
+          color={theme => theme.customBflyColors.primaryTextContrast}
           textTransform='uppercase'>Video Details</Typography>
 
           <Grid container spacing={10}>

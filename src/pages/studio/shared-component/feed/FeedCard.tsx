@@ -43,8 +43,8 @@ const FeedCard = ({children} : FeedCardProps) => {
                   }}
               />
               <Box sx={{marginLeft: '1rem'}}>
-                <Typography variant='body1' sx={{ color: 'common.white' }}>阿库姆</Typography>
-                <Typography variant='body2' sx={{ color: 'common.white' }}>02-02-2023</Typography>
+                <Typography variant='body1' sx={{ color: theme => theme.customBflyColors.primaryTextContrast }}>阿库姆</Typography>
+                <Typography variant='body2' sx={{ color: theme => theme.customBflyColors.primaryTextContrast }}>02-02-2023</Typography>
               </Box>
               
             </Box>
@@ -57,7 +57,7 @@ const FeedCard = ({children} : FeedCardProps) => {
 
         <CardContent sx={{padding:'1.5em 0em'}}>
           <Box sx={{ gap: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography sx={{ fontSize:'11px', color: 'common.white' }}>
+            <Typography sx={{ fontSize:'11px', color: theme => theme.customBflyColors.primaryTextContrast }}>
             首先，如果你想勾引一个性感的朋友或一个新情人，或者想通过短信开始第一次说脏话，你需要阅读我们下面提到的这两个功能。他们将指导您的每一步，
             从您需要发送的第一个微妙的文本到您想要与之开始性感文本对话的文本，到打开它们后需要发送的文本
             <br /><br />
