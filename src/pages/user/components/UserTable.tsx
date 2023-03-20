@@ -19,9 +19,6 @@ import styles from '@/pages/user/list/styles'
 import operatorColumns from '@/pages/user/data/OperatorColumn'
 import superAgentColumns from '@/pages/user/data/SuperAgentColumn'
 import contentCreatorColumns from '@/pages/user/data/ContentCreatorColumn'
-import operatorRows from '@/pages/user/data/OperatorData'
-import superagentRows from '@/pages/user/data/SuperAgentData'
-import contentcreatorRows from '@/pages/user/data/ContentCreatorData'
 
 // ** Hooks
 import { useUsersTable } from '../../../hooks/useUsersTable'
@@ -36,13 +33,15 @@ type UserData = {
   activeBtn: string
 }
 
-const UserTable = () => {
+const Operator = () => {
+  const [operatorData, setOperatorData] = useState([])
 
   const { getOperators } = useUsersTable();
-  const { data, isLoading } = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ["operators"],
     queryFn: getOperators,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setOperatorData(data?.data)
       console.log(`SUCCESSFUL FETCH`)
     },
     onError: (error) => {
@@ -50,22 +49,52 @@ const UserTable = () => {
     }
   })
 
-  // console.log(`SUCCESS`, data?.data)
+  return { operatorData }
+}
 
-  // data?.data.map((item: any) => {
-  //   const keys = Object.keys(item);
-  //   console.log(`KEYS`, keys)
-  //   console.log(`TEST@@@`, item?.username)
-  // })
+const SuperAgent = () => {
+  const [superAgentData, setSuperAgentData] = useState([])
 
-  const keys = data?.data.map((item: any) => {
-    const keys = Object.keys(item);
-
-    console.log(keys)
-
-    return keys
+  const { getSuperAgents } = useUsersTable();
+  const { isLoading } = useQuery({
+    queryKey: ["superagents"],
+    queryFn: getSuperAgents,
+    onSuccess: (data) => {
+      setSuperAgentData(data?.data)
+      console.log(`FETCH SA`)
+    },
+    onError: (error) => {
+      console.log(`ERROR`, error)
+    }
   })
 
+  return { superAgentData };
+}
+
+const ContentCreator = () => {
+  const [contentCreatorData, setContentCreatorData] = useState([])
+
+  const { getContentCreators } = useUsersTable();
+  const { isLoading } = useQuery({
+    queryKey: ["contentcreators"],
+    queryFn: getContentCreators,
+    onSuccess: (data) => {
+      setContentCreatorData(data?.data)
+      console.log(`FETCH SA`)
+    },
+    onError: (error) => {
+      console.log(`ERROR`, error)
+    }
+  })
+
+  return { contentCreatorData };
+}
+
+const UserTable = () => {
+
+  const { operatorData } = Operator();
+  const { superAgentData } = SuperAgent();
+  const { contentCreatorData } = ContentCreator();
 
   const [value, setValue] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
@@ -81,9 +110,7 @@ const UserTable = () => {
   const [activeBtn, setActiveBtn] = useState('')
 
   const columnsMap = new Map([
-    // ['operators', operatorColumns],
-
-    ['operators', keys],
+    ['operators', operatorColumns],
     ['superagent', superAgentColumns],
     ['contentcreators', contentCreatorColumns]
   ])
@@ -91,9 +118,9 @@ const UserTable = () => {
   const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   const rowsByType: any = {
-    operators: operatorRows,
-    superagent: superagentRows,
-    contentcreators: contentcreatorRows
+    operators: operatorData,
+    superagent: superAgentData,
+    contentcreators: contentCreatorData
   }
 
   const filteredRows = rowsByType[dataType] || []

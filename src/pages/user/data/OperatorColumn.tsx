@@ -1,14 +1,34 @@
+// ** MUI Imports
 import { Box } from '@mui/material'
+
+// ** Other Imports
 import ToggleButton from '@/pages/user/components/button/ToggleButton'
 import EditBtn from '@/pages/user/components/button/EditButton'
 import OperatorEditModal from '@/pages/user/components/modal/OperatorEditModal'
 
+// ** Utils Imports
+import formatDate from '@/utils/formatDate'
+
 const operatorColumns = [
-  { field: 'userProfile', headerName: 'User Profile', width: 250 },
-  { field: 'mobileNumber', headerName: 'Mobile Number', width: 250 },
-  { field: 'email', headerName: 'Email', width: 250 },
-  { field: 'dateCreated', headerName: 'Date Created', width: 250 },
-  { field: 'lastLogIn', headerName: 'Last Log In', width: 250 },
+  { field: 'username', headerName: 'User Profile', width: 300 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 300 },
+  { field: 'email', headerName: 'Email', width: 300 },
+  {
+    field: 'created_at',
+    headerName: 'Date Created',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+  {
+    field: 'updated_at',
+    headerName: 'Last Log In',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
   {
     field: 'action',
     headerName: 'Action',
@@ -19,7 +39,7 @@ const operatorColumns = [
         <EditBtn modal={OperatorEditModal} />
       </Box>
     )
-  }
+  },
 ]
 
 export default operatorColumns

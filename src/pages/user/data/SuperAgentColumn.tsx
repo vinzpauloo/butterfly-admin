@@ -1,7 +1,13 @@
-import {Box} from "@mui/material";
-import ToggleButton from "@/pages/user/components/button/ToggleButton";
-import EditBtn from "@/pages/user/components/button/EditButton";
+// ** MUI Imports
+import { Box } from '@mui/material'
+
+// ** Other Imports
+import ToggleButton from '@/pages/user/components/button/ToggleButton'
+import EditBtn from '@/pages/user/components/button/EditButton'
 import superAgentEditModal from "@/pages/user/components/modal/SuperAgentEditModal";
+
+// ** Utils Imports
+import formatDate from '@/utils/formatDate'
 
 // interface SuperAgentColumn {
 //   id: 'SuperAgent' | 'SiteName' | 'MobileNumber' | 'Email' | 'DateCreated' | 'LastUpdate' | 'SecurityFunds' | 'Action';
@@ -66,21 +72,37 @@ import superAgentEditModal from "@/pages/user/components/modal/SuperAgentEditMod
 // ];
 
 const superAgentColumns = [
-  { field: 'SuperAgent', headerName: 'Super Agent', width: 250 },
-  { field: 'SiteName', headerName: 'Site Name', width: 250 },
-  { field: 'MobileNumber', headerName: 'Mobile Number', width: 250 },
-  { field: 'Email', headerName: 'Email', width: 250 },
-  { field: 'DateCreated', headerName: 'Date Created', width: 250 },
-  { field: 'LastUpdate', headerName: 'Last Update', width: 250 },
-  { field: 'SecurityFunds', headerName: 'Security Funds', width: 250 },
+  { field: 'username', headerName: 'Super Agent', width: 250 },
+
+  // { field: 'SiteName', headerName: 'Site Name', width: 250 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 250 },
+  { field: 'email', headerName: 'Email', width: 250 },
+  {
+    field: 'created_at',
+    headerName: 'Date Created',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+  {
+    field: 'updated_at',
+    headerName: 'Last Log In',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+
+  // { field: 'SecurityFunds', headerName: 'Security Funds', width: 250 },
   {
     field: 'Action',
     headerName: 'Action',
     width: 200,
     renderCell: () => (
       <Box>
-        <ToggleButton/>
-        <EditBtn modal={superAgentEditModal}/>
+        <ToggleButton />
+        <EditBtn modal={superAgentEditModal} />
       </Box>
     ),
   },

@@ -13,5 +13,27 @@ export const useUsersTable = () => {
         })
     }
 
-    return { getOperators }
+    const getSuperAgents = () => {
+        return request({
+            headers: {
+                'X-Authorization': 'postman|1',
+            },
+            url: '/users?role=SA&page=1',
+
+            method: 'GET',
+        })
+    }
+
+    const getContentCreators = () => {
+        return request({
+            headers: {
+                'X-Authorization': 'postman|1',
+            },
+            url: '/users?role=CC&page=1',
+
+            method: 'GET',
+        })
+    }
+
+    return { getOperators, getSuperAgents, getContentCreators }
 }
