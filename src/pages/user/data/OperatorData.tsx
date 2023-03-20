@@ -26,16 +26,16 @@ function createOperatorData(
     .getDate()
     .toString()
     .padStart(2, '0')} ${formattedHours}:${date.getMinutes().toString().padStart(2, '0')}:${date
-    .getSeconds()
-    .toString()
-    .padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`
+      .getSeconds()
+      .toString()
+      .padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`
   const formattedLastLog = `${lastLog.getFullYear()}-${(lastLog.getMonth() + 1).toString().padStart(2, '0')}-${lastLog
     .getDate()
     .toString()
     .padStart(2, '0')} ${formattedHours}:${lastLog.getMinutes().toString().padStart(2, '0')}:${lastLog
-    .getSeconds()
-    .toString()
-    .padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`
+      .getSeconds()
+      .toString()
+      .padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`
 
   return {
     id,

@@ -8,21 +8,27 @@ import Link from 'next/link'
 import { Box, Card, Grid, Divider, CardHeader, TextField, Button } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 
-// ** Third Party Components
-import axios from 'axios'
-
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
 import AddUserDrawer from 'src/views/apps/user/list/AddUserDrawer'
 
+// ** Style Imports
 import styles from '@/pages/user/list/styles'
 
+// ** Other Imports
 import operatorColumns from '@/pages/user/data/OperatorColumn'
 import superAgentColumns from '@/pages/user/data/SuperAgentColumn'
 import contentCreatorColumns from '@/pages/user/data/ContentCreatorColumn'
 import operatorRows from '@/pages/user/data/OperatorData'
 import superagentRows from '@/pages/user/data/SuperAgentData'
 import contentcreatorRows from '@/pages/user/data/ContentCreatorData'
+
+// ** Hooks
+import { useUsersTable } from '../../../hooks/useUsersTable'
+
+// ** TanStack Query
+import { useQuery } from "@tanstack/react-query";
+
 
 type UserData = {
   dataType: any
@@ -31,6 +37,36 @@ type UserData = {
 }
 
 const UserTable = () => {
+
+  const { getOperators } = useUsersTable();
+  const { data, isLoading } = useQuery({
+    queryKey: ["operators"],
+    queryFn: getOperators,
+    onSuccess: () => {
+      console.log(`SUCCESSFUL FETCH`)
+    },
+    onError: (error) => {
+      console.log(`ERROR`, error)
+    }
+  })
+
+  // console.log(`SUCCESS`, data?.data)
+
+  // data?.data.map((item: any) => {
+  //   const keys = Object.keys(item);
+  //   console.log(`KEYS`, keys)
+  //   console.log(`TEST@@@`, item?.username)
+  // })
+
+  const keys = data?.data.map((item: any) => {
+    const keys = Object.keys(item);
+
+    console.log(keys)
+
+    return keys
+  })
+
+
   const [value, setValue] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
   const [addUserOpen, setAddUserOpen] = useState<boolean>(false)
@@ -45,7 +81,9 @@ const UserTable = () => {
   const [activeBtn, setActiveBtn] = useState('')
 
   const columnsMap = new Map([
-    ['operators', operatorColumns],
+    // ['operators', operatorColumns],
+
+    ['operators', keys],
     ['superagent', superAgentColumns],
     ['contentcreators', contentCreatorColumns]
   ])

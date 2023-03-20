@@ -30,46 +30,46 @@ interface StatusObj {
   }
 }
 interface FeedsObj {
-    [key: number]: {
-      title: string
-      iconPath: string
-    }
+  [key: number]: {
+    title: string
+    iconPath: string
   }
+}
 
 const renderFeedType = (params: GridRenderCellParams) => {
-    const { row } = params
-    
-    if ( row.feedTypes.length ) {
-        
-        return (
-            <Box sx={{display:'flex',gap:'.5rem'}}>
-                {
-                    row.feedTypes.map( (feed : number, index : number) => (
-                        <img key={index} alt={`${feedsObj[feed].title}`} width={20} src={`${feedsObj[feed].iconPath}`} />
-                    ))
-                }
-            </Box>
-        )
-        
-    } else {
-        return <></>
-    }
-    
+  const { row } = params
+
+  if (row.feedTypes.length) {
+
+    return (
+      <Box sx={{ display: 'flex', gap: '.5rem' }}>
+        {
+          row.feedTypes.map((feed: number, index: number) => (
+            <img key={index} alt={`${feedsObj[feed].title}`} width={20} src={`${feedsObj[feed].iconPath}`} />
+          ))
+        }
+      </Box>
+    )
+
+  } else {
+    return <></>
   }
 
+}
+
 const statusObj: StatusObj = {
-    1: { title: 'pending', color: 'warning' },
-    2: { title: 'declined', color: 'error' },
+  1: { title: 'pending', color: 'warning' },
+  2: { title: 'declined', color: 'error' },
 }
 
 const feedsObj: FeedsObj = {
-    1: { title: 'Story', iconPath: '/images/feeds/storyIcon.png' },
-    2: { title: 'Videos', iconPath: '/images/feeds/videoIcon.png' },
-    3: { title: 'Photos', iconPath: '/images/feeds/photoIcon.png' },
-  }
-  
+  1: { title: 'Story', iconPath: '/images/feeds/storyIcon.png' },
+  2: { title: 'Videos', iconPath: '/images/feeds/videoIcon.png' },
+  3: { title: 'Photos', iconPath: '/images/feeds/photoIcon.png' },
+}
+
 const escapeRegExp = (value: string) => {
-    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
 const NewsFeedApproval = () => {
@@ -87,7 +87,7 @@ const NewsFeedApproval = () => {
       return Object.keys(row).some(field => {
         // @ts-ignore
         return searchRegex.test(row[field].toString())
-    })
+      })
     })
     if (searchValue.length) {
       setFilteredData(filteredRows)
@@ -102,8 +102,8 @@ const NewsFeedApproval = () => {
       minWidth: 150,
       field: 'feed_type',
       headerName: 'Feed Type',
-      align:'center',
-      headerAlign:'center',
+      align: 'center',
+      headerAlign: 'center',
       hide: hideNameColumn,
       renderCell: (params: GridRenderCellParams) => {
         return (
@@ -182,8 +182,8 @@ const NewsFeedApproval = () => {
       minWidth: 140,
       field: 'status',
       headerName: 'Status',
-      align:'center',
-      headerAlign:'center',
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
         const status = statusObj[params.row.status]
 
@@ -193,7 +193,7 @@ const NewsFeedApproval = () => {
             skin='light'
             color={status.color}
             label={status.title}
-            sx={{  '&':{ padding: '1em 1em',borderRadius: '3px !important' },'& .MuiChip-label': { textTransform: 'capitalize' } }}
+            sx={{ '&': { padding: '1em 1em', borderRadius: '3px !important' }, '& .MuiChip-label': { textTransform: 'capitalize' } }}
           />
         )
       }
@@ -203,10 +203,10 @@ const NewsFeedApproval = () => {
       minWidth: 50,
       field: 'actions',
       headerName: '',
-      align:'center',
+      align: 'center',
       renderCell: (params: GridRenderCellParams) => {
         return (
-            <FeedDialog param={params.row} />
+          <FeedDialog param={params.row} />
         )
       }
     }
@@ -215,30 +215,30 @@ const NewsFeedApproval = () => {
   return (
     <>
       <Typography
-              variant='h6'
-              sx={{
-                  marginInline:'auto',
-                  mb:7,
-                  mt:7,
-                  lineHeight: 1,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  fontSize: '1.3rem !important',
-                  textAlign:'center'
-              }}
-              color={ theme => theme.customBflyColors.primaryText }
-              >
-              NEWSFEED LIST
+        variant='h6'
+        sx={{
+          marginInline: 'auto',
+          mb: 7,
+          mt: 7,
+          lineHeight: 1,
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          fontSize: '1.3rem !important',
+          textAlign: 'center'
+        }}
+        color={theme => theme.customBflyColors.primaryText}
+      >
+        NEWSFEED LIST
       </Typography>
       <Card>
         <CardHeader
           sx={{
-              '& .MuiCardHeader-content' : {
-                  display:'none'
-              }
+            '& .MuiCardHeader-content': {
+              display: 'none'
+            }
           }}
           action={
-            <Box sx={{ display:'flex',gap:'1rem' }}>
+            <Box sx={{ display: 'flex', gap: '1rem' }}>
               <Button size='small' variant='contained' onClick={() => setHideNameColumn(!hideNameColumn)}>
                 All Feeds
               </Button>
@@ -267,15 +267,15 @@ const NewsFeedApproval = () => {
           rowsPerPageOptions={[7, 10, 25, 50]}
           components={{ Toolbar: SearchToolbar }}
           componentsProps={{
-              baseButton: {
-                variant: 'outlined'
-              },
-              toolbar: {
-                value: searchText,
-                clearSearch: () => handleSearch(''),
-                onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-              }
-            }}
+            baseButton: {
+              variant: 'outlined'
+            },
+            toolbar: {
+              value: searchText,
+              clearSearch: () => handleSearch(''),
+              onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
+            }
+          }}
           onPageSizeChange={newPageSize => setPageSize(newPageSize)}
         />
       </Card>
