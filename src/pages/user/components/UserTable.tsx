@@ -33,68 +33,30 @@ type UserData = {
   activeBtn: string
 }
 
-const Operator = () => {
-  const [operatorData, setOperatorData] = useState([])
-
-  const { getOperators } = useUsersTable();
-  const { isLoading } = useQuery({
-    queryKey: ["operators"],
-    queryFn: getOperators,
-    onSuccess: (data) => {
-      setOperatorData(data?.data)
-      console.log(`SUCCESSFUL FETCH`)
-    },
-    onError: (error) => {
-      console.log(`ERROR`, error)
-    }
-  })
-
-  return { operatorData }
+interface UserTypeData {
+  data: any[];
 }
 
-const SuperAgent = () => {
-  const [superAgentData, setSuperAgentData] = useState([])
+const useUserData = (getUsers: any) => {
+  const [userData, setUserData] = useState<UserTypeData>({ data: [] });
 
-  const { getSuperAgents } = useUsersTable();
-  const { isLoading } = useQuery({
-    queryKey: ["superagents"],
-    queryFn: getSuperAgents,
-    onSuccess: (data) => {
-      setSuperAgentData(data?.data)
-      console.log(`FETCH SA`)
+  const { isLoading } = useQuery<UserTypeData>({
+    queryKey: [getUsers.name],
+    queryFn: getUsers,
+    onSuccess: (data: any) => {
+      setUserData({ data: data?.data });
     },
-    onError: (error) => {
-      console.log(`ERROR`, error)
-    }
-  })
-
-  return { superAgentData };
-}
-
-const ContentCreator = () => {
-  const [contentCreatorData, setContentCreatorData] = useState([])
-
-  const { getContentCreators } = useUsersTable();
-  const { isLoading } = useQuery({
-    queryKey: ["contentcreators"],
-    queryFn: getContentCreators,
-    onSuccess: (data) => {
-      setContentCreatorData(data?.data)
-      console.log(`FETCH SA`)
+    onError: (error: any) => {
+      console.log(`ERROR`, error);
     },
-    onError: (error) => {
-      console.log(`ERROR`, error)
-    }
-  })
+  });
 
-  return { contentCreatorData };
-}
+  return userData.data;
+};
 
 const UserTable = () => {
 
-  const { operatorData } = Operator();
-  const { superAgentData } = SuperAgent();
-  const { contentCreatorData } = ContentCreator();
+  const { getOperators, getSuperAgents, getContentCreators } = useUsersTable();
 
   const [value, setValue] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
@@ -118,9 +80,9 @@ const UserTable = () => {
   const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   const rowsByType: any = {
-    operators: operatorData,
-    superagent: superAgentData,
-    contentcreators: contentCreatorData
+    operators: useUserData(getOperators),
+    superagent: useUserData(getSuperAgents),
+    contentcreators: useUserData(getContentCreators),
   }
 
   const filteredRows = rowsByType[dataType] || []
