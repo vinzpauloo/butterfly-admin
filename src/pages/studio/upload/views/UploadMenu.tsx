@@ -7,10 +7,14 @@ import Typography from '@mui/material/Typography'
 import Box, {BoxProps} from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 
+// ** Next Imports
+import Link from 'next/link'
+
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
-import Link from 'next/link'
+import CreateFeedModal from '@/pages/settings/components/modal/CreateFeedModal'
+
 
 //* Context Import
 import { StudioContext } from '..'
@@ -34,6 +38,8 @@ type Props = {}
 
 const UploadMenu = (props: Props) => {
   
+  const [ feedModal, setFeedModal ] = React.useState(false)
+
   const studioContext = React.useContext(StudioContext)
   
   const handleUploadButtonClick = () => {
@@ -41,7 +47,8 @@ const UploadMenu = (props: Props) => {
   }
 
   const handleNewsfeedsButtonClick = () => {
-    studioContext?.setDisplayPage(DisplayPage.UploadNewsfeedsStep1)
+    //studioContext?.setDisplayPage(DisplayPage.UploadNewsfeedsStep1)
+    setFeedModal(true)
   }
 
   return (
@@ -85,8 +92,14 @@ const UploadMenu = (props: Props) => {
                     </UploadBoxContainer>
                 </Grid>
                 <Grid xs={12} item>
+                    <UploadBoxContainer>
+                        <CustomButton onClick={()=>{console.log('upload image')}}>Upload Album</CustomButton>
+                    </UploadBoxContainer>
+                </Grid>
+                <Grid xs={12} item>
                     <UploadBoxContainer sx={{mt: '.5rem'}}>
                         <CustomButton onClick={handleNewsfeedsButtonClick}>Upload NEWSFEEDS</CustomButton>
+                        <CreateFeedModal isOpen={feedModal} onClose={() => setFeedModal(false) } />
                     </UploadBoxContainer>
                 </Grid>
                 <Grid xs={12} item>

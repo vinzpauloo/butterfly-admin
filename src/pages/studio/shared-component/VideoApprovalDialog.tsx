@@ -122,7 +122,7 @@ const VideoApprovalDialog = ({param} : FeedDialogType) => {
 
                   <Grid container spacing={5}>
 
-                    <Grid item sm={7}>
+                    <Grid item sm={8}>
 
                       <Box display='flex' flexDirection='column' sx={{gap:'1rem'}}>
 
@@ -133,8 +133,8 @@ const VideoApprovalDialog = ({param} : FeedDialogType) => {
                       </Box>
 
                       <Box>
-                        <Typography>THUMBNAIL (Optional)</Typography>
-                        <Typography>Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and draws viewers attention.</Typography>
+                        <Typography fontSize={13}>THUMBNAIL (Optional)</Typography>
+                        <Typography fontSize={11}>Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and draws viewers attention.</Typography>
                         <Box sx={{display:'flex',flexDirection:'row', justifyContent:'space-between',marginBlock:'1rem'}}>
 
                           <UploadBox sx={{display:'flex',flexDirection:'column'}}>
@@ -142,9 +142,13 @@ const VideoApprovalDialog = ({param} : FeedDialogType) => {
                             <Button variant='contained' size='small'>Upload</Button>
                           </UploadBox>
                           <ThumbnailBox>
-                            <img src='/images/misc/profilePhoto.jpg' />
-                            <img src='/images/misc/profilePhoto1.jpg' />
-                            <img src='/images/misc/profilePhoto2.jpg' />
+                            { ['/images/misc/profilePhoto.jpg', 
+                                '/images/misc/profilePhoto1.jpg',
+                                '/images/misc/profilePhoto2.jpg'].map( item => (
+                                  <img key={item} src={item} />
+                              ))
+                            }
+                            
                           </ThumbnailBox>
                         </Box>
                       </Box>
@@ -157,7 +161,7 @@ const VideoApprovalDialog = ({param} : FeedDialogType) => {
 
                     </Grid>
 
-                    <Grid item sm={5}>
+                    <Grid item sm={4}>
 
                       <Box>
                         

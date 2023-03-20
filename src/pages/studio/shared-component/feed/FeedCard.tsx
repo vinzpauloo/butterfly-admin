@@ -12,6 +12,12 @@ import FeedAttachments from './FeedAttachments'
 
 // ** Custom Layout Style Components
 
+// ** Styled Components
+const FeedTextContent = styled(Typography)(({ theme }) => ({
+  fontSize: '13px', 
+  color : theme.palette.common.white
+}))
+
 interface FeedCardProps {
   children?: React.ReactNode & React.ReactElement<typeof FeedAttachments> | React.ReactNode & React.ReactElement<typeof FeedAttachments>[]
 }
@@ -57,12 +63,12 @@ const FeedCard = ({ children }: FeedCardProps) => {
 
         <CardContent sx={{ padding: '1.5em 0em' }}>
           <Box sx={{ gap: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography sx={{ fontSize: '11px', color: 'common.white' }}>
+            <FeedTextContent>
               首先，如果你想勾引一个性感的朋友或一个新情人，或者想通过短信开始第一次说脏话，你需要阅读我们下面提到的这两个功能。他们将指导您的每一步，
               从您需要发送的第一个微妙的文本到您想要与之开始性感文本对话的文本，到打开它们后需要发送的文本
               <br /><br />
               Shǒuxiān, rúguǒ nǐ xiǎng gōuyǐn yīgè xìnggǎn de péngyǒu huò yīgè xīn qíngrén, huòzhě xiǎng tōngguò duǎnxìn kāishǐ dì yī cì shuō zānghuà
-            </Typography>
+            </FeedTextContent>
           </Box>
         </CardContent>
       </Card>

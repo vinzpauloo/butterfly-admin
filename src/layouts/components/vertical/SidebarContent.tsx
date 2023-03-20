@@ -201,7 +201,7 @@ const SidebarContent = () => {
                           sx={{
                             '& .MuiTypography-root': {
                               color: theme => theme.customBflyColors.sidebarLinkColor,
-                              fontSize: '0.65rem'
+                              fontSize: '0.8125rem'
                             }
                           }}
                           primary={child.title}
@@ -253,7 +253,7 @@ const SidebarContent = () => {
                     sx={{
                       '& .MuiTypography-root': {
                         color: '#BFC6D0',
-                        fontSize: '0.65rem'
+                        fontSize: '0.8125rem'
                       }
                     }}
                     primary={item.title}
