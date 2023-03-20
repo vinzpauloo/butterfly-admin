@@ -42,7 +42,8 @@ const UserTable = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["operators"],
     queryFn: getOperators,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setTableData(data?.data)
       console.log(`SUCCESSFUL FETCH`)
     },
     onError: (error) => {
@@ -50,21 +51,9 @@ const UserTable = () => {
     }
   })
 
-  // console.log(`SUCCESS`, data?.data)
-
-  // data?.data.map((item: any) => {
-  //   const keys = Object.keys(item);
-  //   console.log(`KEYS`, keys)
-  //   console.log(`TEST@@@`, item?.username)
-  // })
-
-  const keys = data?.data.map((item: any) => {
-    const keys = Object.keys(item);
-
-    console.log(keys)
-
-    return keys
-  })
+  const [tableData, setTableData] = useState([])
+  console.log(`tabledata`, tableData)
+  console.log(`data`, data)
 
 
   const [value, setValue] = useState<string>('')
@@ -81,9 +70,7 @@ const UserTable = () => {
   const [activeBtn, setActiveBtn] = useState('')
 
   const columnsMap = new Map([
-    // ['operators', operatorColumns],
-
-    ['operators', keys],
+    ['operators', operatorColumns],
     ['superagent', superAgentColumns],
     ['contentcreators', contentCreatorColumns]
   ])
@@ -91,7 +78,9 @@ const UserTable = () => {
   const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   const rowsByType: any = {
-    operators: operatorRows,
+    operators: tableData,
+
+    // operators: operatorRows,
     superagent: superagentRows,
     contentcreators: contentcreatorRows
   }
