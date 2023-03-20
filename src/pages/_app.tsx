@@ -64,6 +64,23 @@ import 'src/iconify-bundle/icons-bundle-react'
 // ** Global css styles
 import '../../styles/globals.css'
 
+// ** TanStack Query
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+
+// ** Axios Defaults
+import axios from 'axios';
+
+// ** Set axios defaults
+// Local 
+// axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL;
+
+// SIT
+// axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL_SIT;
+
+
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
   Component: NextPage
@@ -103,6 +120,10 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
 
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {
+
+  // Create a client
+  const queryClient = new QueryClient();
+
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
   // Variables
@@ -119,7 +140,7 @@ const App = (props: ExtendedAppProps) => {
   const aclAbilities = Component.acl ?? defaultACLObj
 
   return (
-    <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
       <CacheProvider value={emotionCache}>
         <Head>
           <title>{`${themeConfig.templateName}`}</title>
@@ -154,7 +175,7 @@ const App = (props: ExtendedAppProps) => {
           </SettingsProvider>
         </AuthProvider>
       </CacheProvider>
-    </Provider>
+    </QueryClientProvider>
   )
 }
 

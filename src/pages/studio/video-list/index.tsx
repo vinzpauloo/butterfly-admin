@@ -38,13 +38,13 @@ const renderClient = (params: GridRenderCellParams) => {
   const color = states[stateNum]
 
   if (row.avatar.length) {
-    return <CustomAvatar src={`/images/avatars/cc/${row.avatar}`} sx={{ borderRadius:'10px', mr: 3, width: '5.875rem', height: '3rem' }} />
+    return <CustomAvatar src={`/images/avatars/cc/${row.avatar}`} sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }} />
   } else {
     return (
       <CustomAvatar
         skin='light'
         color={color as ThemeColor}
-        sx={{ borderRadius:'10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
+        sx={{ borderRadius: '10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
       >
         {getInitials(row.full_name ? row.full_name : 'John Doe')}
       </CustomAvatar>
@@ -58,7 +58,7 @@ const statusObj: StatusObj = {
 }
 
 const escapeRegExp = (value: string) => {
-    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
 const VideosList = () => {
@@ -76,7 +76,7 @@ const VideosList = () => {
       return Object.keys(row).some(field => {
         // @ts-ignore
         return searchRegex.test(row[field].toString())
-    })
+      })
     })
     if (searchValue.length) {
       setFilteredData(filteredRows)
@@ -91,8 +91,8 @@ const VideosList = () => {
       minWidth: 150,
       field: 'video_thumbnail',
       headerName: 'Video Thumbnail',
-      align:'center',
-      headerAlign:'center',
+      align: 'center',
+      headerAlign: 'center',
       hide: hideNameColumn,
       renderCell: (params: GridRenderCellParams) => {
         return (
@@ -171,7 +171,7 @@ const VideosList = () => {
       minWidth: 50,
       field: 'actions',
       headerName: '',
-      align:'center',
+      align: 'center',
       renderCell: (params: GridRenderCellParams) => {
         return (
           <VideoApprovalDialog param={params.row} />
@@ -194,15 +194,15 @@ const VideosList = () => {
         rowsPerPageOptions={[7, 10, 25, 50]}
         components={{ Toolbar: SearchToolbar }}
         componentsProps={{
-            baseButton: {
-              variant: 'outlined'
-            },
-            toolbar: {
-              value: searchText,
-              clearSearch: () => handleSearch(''),
-              onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-            }
-          }}
+          baseButton: {
+            variant: 'outlined'
+          },
+          toolbar: {
+            value: searchText,
+            clearSearch: () => handleSearch(''),
+            onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
+          }
+        }}
         onPageSizeChange={newPageSize => setPageSize(newPageSize)}
       />
     </Card>

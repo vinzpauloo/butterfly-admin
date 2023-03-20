@@ -11,7 +11,8 @@ interface TextAreaProps {
   title: string
 }
 
-const TextArea: React.FC<TextAreaProps> = props => {
+const TextArea: React.FC<TextAreaProps> = (props) => {
+
   return (
     <Box sx={styles.container}>
       <Box>
