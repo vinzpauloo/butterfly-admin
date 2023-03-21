@@ -31,7 +31,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 // ** Hooks
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth } from '@/services/useAuth'
 import { useSettings } from 'src/@core/hooks/useSettings'
 
 interface State {
@@ -58,38 +58,38 @@ const RightLogoImage = styled('img')(({ theme }) => ({
   [theme.breakpoints.up('xl')]: { width: '220px' },
 }))
 
-const LoginButton = styled(Button)<ButtonProps>(({theme}) => ({
-    display:'block', 
-    mb: 7, width:'100%', 
-    maxWidth:'170px', 
-    marginInline:'auto',
-    '&:hover' : {
-      backgroundColor: darken( theme.palette.primary.main, 0.5 )
-    }
-}))  
+const LoginButton = styled(Button)<ButtonProps>(({ theme }) => ({
+  display: 'block',
+  mb: 7, width: '100%',
+  maxWidth: '170px',
+  marginInline: 'auto',
+  '&:hover': {
+    backgroundColor: darken(theme.palette.primary.main, 0.5)
+  }
+}))
 
 // ** Yup Schema
 const schema = yup.object().shape({
-    email: yup.string().email('Email must be a valid email.').required('Email is a required field.'),
-    password: yup.string().min(5).required('Password is required')
-  })
+  email: yup.string().email('Email must be a valid email.').required('Email is a required field.'),
+  password: yup.string().min(5).required('Password is required')
+})
 
-  //remove default values if you want no initial values on render page
-  const defaultValues : FormData = {
-    password: 'admin101^',
-    email: 'dexi@1bit.com.ph'
-  }
-  
-  interface FormData {
-    email: string
-    password: string
-  }
+//remove default values if you want no initial values on render page
+const defaultValues: FormData = {
+  password: 'admin101^',
+  email: 'dexi@1bit.com.ph'
+}
+
+interface FormData {
+  email: string
+  password: string
+}
 
 const LoginPage = () => {
 
   // ** State
   const [rememberMe, setRememberMe] = useState<boolean>(true)
- 
+
   const [values, setValues] = useState<State>({
     password: '',
     showPassword: false
@@ -127,73 +127,74 @@ const LoginPage = () => {
   }
 
   return (
-    <Box className='content-center' sx={{ 
-      
-      backgroundSize:['contain','contain','cover'],
-      backgroundColor: theme.customBflyColors.darkBg, 
-      backgroundImage: 'url("/images/login/loginbg.png")' }}>
+    <Box className='content-center' sx={{
 
-      <Card sx={{ zIndex: 1, borderRadius:0, border:'1px solid #fff' }}>
-        <CardContent sx={{ padding:'0 !important' }}>
+      backgroundSize: ['contain', 'contain', 'cover'],
+      backgroundColor: theme.customBflyColors.darkBg,
+      backgroundImage: 'url("/images/login/loginbg.png")'
+    }}>
 
-        <Grid className='loginFormGrid' container spacing={1}>
-          <Grid xs={12} sm={7} lg={6} item order={{ xs:2, sm:1 }}>
-            <Box gap={6} sx={{ 
-              p:'2rem', 
-              mb: [0,null,null,8], 
-              display: 'flex', 
-              flexDirection:'column', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              padding: [null,null,null,'5rem 3rem'] 
+      <Card sx={{ zIndex: 1, borderRadius: 0, border: '1px solid #fff' }}>
+        <CardContent sx={{ padding: '0 !important' }}>
+
+          <Grid className='loginFormGrid' container spacing={1}>
+            <Grid xs={12} sm={7} lg={6} item order={{ xs: 2, sm: 1 }}>
+              <Box gap={6} sx={{
+                p: '2rem',
+                mb: [0, null, null, 8],
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: [null, null, null, '5rem 3rem']
 
               }}>
-              <Typography
-                variant='h5'
-                fontWeight='normal'
-                color={theme.palette.common.black}
-                sx={{
-                  ml: 3,
-                  lineHeight: 1.5,
-                  textTransform: 'uppercase',
-                }}
-              >
-                LOG IN DETAILS
-              </Typography>
+                <Typography
+                  variant='h5'
+                  fontWeight='normal'
+                  color={theme.palette.common.black}
+                  sx={{
+                    ml: 3,
+                    lineHeight: 1.5,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  LOG IN DETAILS
+                </Typography>
 
-              <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
+                <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
 
-                <Controller
-                      name='email'
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field: { value, onChange, onBlur } }) => (
-                        <TextField
-                          autoFocus
-                          label='Email'
-                          fullWidth
-                          id='email' 
-                          value={value}
-                          onBlur={onBlur}
-                          onChange={onChange}
-                          error={Boolean(errors.email)}
-                          placeholder=''
-                          sx={{ mb: 4, backgroundColor:theme.customBflyColors.grayInputBG }} 
-                          variant="filled"
-                        />
-                      )}
-                />
-
-                <FormControl fullWidth>
-                  <InputLabel htmlFor='auth-login-password'>Password</InputLabel>
-                
                   <Controller
+                    name='email'
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange, onBlur } }) => (
+                      <TextField
+                        autoFocus
+                        label='Email'
+                        fullWidth
+                        id='email'
+                        value={value}
+                        onBlur={onBlur}
+                        onChange={onChange}
+                        error={Boolean(errors.email)}
+                        placeholder=''
+                        sx={{ mb: 4, backgroundColor: theme.customBflyColors.grayInputBG }}
+                        variant="filled"
+                      />
+                    )}
+                  />
+
+                  <FormControl fullWidth>
+                    <InputLabel htmlFor='auth-login-password'>Password</InputLabel>
+
+                    <Controller
                       name='password'
                       control={control}
                       rules={{ required: true }}
                       render={({ field: { value, onChange, onBlur } }) => (
                         <OutlinedInput
-                          sx={{backgroundColor:theme.customBflyColors.grayInputBG, marginTop:[4,4,4,4,6]}}
+                          sx={{ backgroundColor: theme.customBflyColors.grayInputBG, marginTop: [4, 4, 4, 4, 6] }}
                           value={value}
                           onBlur={onBlur}
                           label='Password'
@@ -215,31 +216,32 @@ const LoginPage = () => {
                         />
                       )}
                     />
-                </FormControl>
-                <Box
-                  sx={{ mt:2, mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
-                >
-                  <Typography color={theme.palette.error.main} variant='caption'>{errors.email && errors.email.message}</Typography>
-                  <LinkStyled href='/forgot-password'>Forgot Password?</LinkStyled>
-                </Box>
-                <LoginButton color='primary' size='large' type='submit' variant='contained'>
-                  Login
-                </LoginButton>
-              </form>
-            </Box>
+                  </FormControl>
+                  <Box
+                    sx={{ mt: 2, mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
+                  >
+                    <Typography color={theme.palette.error.main} variant='caption'>{errors.email && errors.email.message}</Typography>
+                    <LinkStyled href='/forgot-password'>Forgot Password?</LinkStyled>
+                  </Box>
+                  <LoginButton color='primary' size='large' type='submit' variant='contained'>
+                    Login
+                  </LoginButton>
+                </form>
+              </Box>
+            </Grid>
+            <Grid xs={12} sm={5} lg={6} item order={{ xs: 1, sm: 2 }} sx={{ height: ['230px', 'initial', 'initial'] }}>
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+                backgroundSize: 'cover',
+                backgroundImage: 'url("/images/login/smallbg.png")'
+              }}>
+                <RightLogoImage src="/images/logo_image.png" />
+              </Box>
+            </Grid>
           </Grid>
-          <Grid xs={12} sm={5} lg={6} item order={{ xs:1, sm:2 }} sx={{ height:['230px','initial', 'initial'] }}>
-            <Box sx={{ 
-              display:'flex',
-              justifyContent:'center',
-              alignItems:'center',
-              height: '100%',
-              backgroundSize:'cover',
-              backgroundImage:'url("/images/login/smallbg.png")'}}>
-              <RightLogoImage src="/images/logo_image.png" />
-            </Box>                       
-          </Grid>
-        </Grid>
 
         </CardContent>
       </Card>
