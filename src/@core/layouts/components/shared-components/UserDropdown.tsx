@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography'
 import Icon from 'src/@core/components/icon'
 
 // ** Context
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth } from '@/services/useAuth'
 
 // ** Type Imports
 import { Settings } from 'src/@core/context/settingsContext'

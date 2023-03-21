@@ -21,7 +21,7 @@ import superAgentColumns from '@/pages/user/data/SuperAgentColumn'
 import contentCreatorColumns from '@/pages/user/data/ContentCreatorColumn'
 
 // ** Hooks
-import { useUsersTable } from '../../../hooks/useUsersTable'
+import { useUsersTable } from '../../../services/api/useUsersTable'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -41,7 +41,7 @@ const useUserData = (getUsers: any, page: number) => {
 
   const { isLoading } = useQuery<UserTypeData>({
     queryKey: [getUsers.name, page],
-    queryFn: getUsers(page),
+    queryFn: () => getUsers(page),
     onSuccess: (data: any) => {
       setUserData({ data: data?.data })
     },
