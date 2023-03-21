@@ -7,6 +7,9 @@ DateTimeZ|IntegrationKey
 */
 import CryptoJS from 'crypto-js'
 
+const AUTH_INTEGRATION_KEY = process.env.NEXT_PUBLIC_AUTH_INTEGRATION_KEY
+const AUTH_PASSPHRASE = process.env.NEXT_PUBLIC_AUTH_PASSPHRASE
+
 const CryptoJSAesJson = {
   stringify: function (cipherParams) {
     const j = { ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64) }
