@@ -62,22 +62,22 @@ const CreateAccount = () => {
   }
 
   const handleOperatorClick = () => {
-    setActiveBtn('operators')
+    setActiveBtn('SUPERVISOR')
   }
 
   const handleSuperAgentClick = () => {
-    setActiveBtn('superagent')
+    setActiveBtn('SA')
   }
 
   const handleCreatorClick = () => {
-    setActiveBtn('contentcreators')
+    setActiveBtn('CC')
   }
 
   const [isMobile, setIsMobile] = useState(false)
   const [activeBtn, setActiveBtn] = useState('')
   useEffect(() => {
-    setActiveBtn(`${param.activeBtn}`)
-    console.log('operator')
+    setActiveBtn(`${param.role}`)
+    console.log(param.role)
     setSubmitted(false)
     const handleResize = () => setIsMobile(window.innerWidth < 1024)
     handleResize()
@@ -94,46 +94,46 @@ const CreateAccount = () => {
             <Button
               sx={{
                 ...styles.userButton,
-                backgroundColor: activeBtn === 'operators' ? '#9747FF' : 'white',
-                color: activeBtn === 'operators' ? 'white' : 'black'
+                backgroundColor: activeBtn === 'SUPERVISOR' ? '#9747FF' : 'white',
+                color: activeBtn === 'SUPERVISOR' ? 'white' : 'black'
               }}
               onClick={handleOperatorClick}
             >
               <Image src='/images/icons/project-icons/operator-icon.png' width={40} height={40} alt='operator-icon' />
-              <Typography sx={{ ...styles.text, color: activeBtn === 'operators' ? 'white' : 'black' }}>
+              <Typography sx={{ ...styles.text, color: activeBtn === 'SUPERVISOR' ? 'white' : 'black' }}>
                 Operator
               </Typography>
             </Button>
             <Button
               sx={{
                 ...styles.userButton,
-                backgroundColor: activeBtn === 'superagent' ? '#9747FF' : 'white',
-                color: activeBtn === 'superagent' ? 'white' : 'black'
+                backgroundColor: activeBtn === 'SA' ? '#9747FF' : 'white',
+                color: activeBtn === 'SA' ? 'white' : 'black'
               }}
               onClick={handleSuperAgentClick}
             >
               <Image src='/images/icons/project-icons/superagent-icon.png' width={40} height={40} alt='operator-icon' />
-              <Typography sx={{ ...styles.text, color: activeBtn === 'superagent' ? 'white' : 'black' }}>
+              <Typography sx={{ ...styles.text, color: activeBtn === 'SA' ? 'white' : 'black' }}>
                 Super Agent
               </Typography>
             </Button>
             <Button
               sx={{
                 ...styles.userButton,
-                backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : 'white',
-                color: activeBtn === 'contentcreators' ? 'white' : 'black'
+                backgroundColor: activeBtn === 'CC' ? '#9747FF' : 'white',
+                color: activeBtn === 'CC' ? 'white' : 'black'
               }}
               onClick={handleCreatorClick}
             >
               <Image src='/images/icons/project-icons/creator-icon.png' width={40} height={40} alt='operator-icon' />
-              <Typography sx={{ ...styles.text, color: activeBtn === 'contentcreators' ? 'white' : 'black' }}>
+              <Typography sx={{ ...styles.text, color: activeBtn === 'CC' ? 'white' : 'black' }}>
                 Content Creator
               </Typography>
             </Button>
           </Box>
         </Box>
 
-        {activeBtn === 'operators' ? (
+        {activeBtn === 'SUPERVISOR' ? (
           <Box>
             {!submitted ? (
               <Box sx={styles.formContainer}>
@@ -163,7 +163,7 @@ const CreateAccount = () => {
               <CreatedSuccessful />
             )}
           </Box>
-        ) : activeBtn === 'superagent' ? (
+        ) : activeBtn === 'SA' ? (
           <Box>
             {!continueBtn ? (
               <Box sx={styles.formContainer}>
@@ -349,7 +349,7 @@ const CreateAccount = () => {
             )}
           </Box>
         ) : (
-          activeBtn === 'contentcreators' && (
+          activeBtn === 'CC' && (
             <Box>
               {!submitted ? (
                 <Box sx={styles.formContainer}>
