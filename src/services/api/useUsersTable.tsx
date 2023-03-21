@@ -1,38 +1,23 @@
 import request from '../../lib/request'
 
+interface UsersData {
+  data: {
+    role?: string;
+    page?: number;
+  }
+}
+
 export const useUsersTable = () => {
-  const getOperators = (page = 1) => {
+
+  const getUsers = (params: UsersData) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1'
+        "X-Authorization": "postman|1"
       },
-      url: `/users?role=SUPERVISOR&page=${page}`,
-
-      method: 'GET'
+      url: "/users",
+      params: params.data,
     })
   }
 
-  const getSuperAgents = (page = 1) => {
-    return request({
-      headers: {
-        'X-Authorization': 'postman|1'
-      },
-      url: `/users?role=SA&page=${page}`,
-
-      method: 'GET'
-    })
-  }
-
-  const getContentCreators = (page = 1) => {
-    return request({
-      headers: {
-        'X-Authorization': 'postman|1'
-      },
-      url: `/users?role=CC&page=${page}`,
-
-      method: 'GET'
-    })
-  }
-
-  return { getOperators, getSuperAgents, getContentCreators }
+  return { getUsers }
 }
