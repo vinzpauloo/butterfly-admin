@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, ChangeEvent } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -11,6 +11,7 @@ import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
 import AddUserDrawer from 'src/views/apps/user/list/AddUserDrawer'
+import ServerSideToolbar from 'src/views/table/data-grid/ServerSideToolbar'
 
 // ** Style Imports
 import styles from '@/pages/user/list/styles'
@@ -26,6 +27,8 @@ import { useUsersTable } from '../../../services/api/useUsersTable'
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
 
+
+
 type SortType = 'asc' | 'desc' | undefined | null
 
 const UserTable = () => {
@@ -39,15 +42,28 @@ const UserTable = () => {
   const [sort, setSort] = useState<SortType>('asc')
   const [sortName, setSortName] = useState<string>('username');
 
+  const [search, setSearch] = useState("username")
+  const [searchValue, setSearchValue] = useState<string>('')
+
   const { isLoading } = useQuery({
-    queryKey: ["allUsers", page, role, sort, sortName],
+    queryKey:
+      [
+        "allUsers",
+        page,
+        role,
+        sort,
+        sortName,
+        search,
+        searchValue],
     queryFn: () =>
       getUsers({
         data: {
           role: role,
           page: page,
           sort: sort,
-          sort_by: sortName
+          sort_by: sortName,
+          search_by: search,
+          search_value: searchValue,
         }
       }),
     onSuccess: (data: any) => {
@@ -109,6 +125,10 @@ const UserTable = () => {
       setSort('asc')
       setSortName('username')
     }
+  }
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value)
   }
 
   return (
@@ -185,6 +205,17 @@ const UserTable = () => {
             onPageChange={handlePageChange}
             rowCount={rowCount}
             onSortModelChange={handleSortModel}
+            components={{ Toolbar: ServerSideToolbar }}
+            componentsProps={{
+              baseButton: {
+                variant: 'outlined'
+              },
+              toolbar: {
+                value: searchValue,
+                clearSearch: () => handleSearch(''),
+                onChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
+              }
+            }}
           />
         </Card>
       </Grid>
