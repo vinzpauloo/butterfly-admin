@@ -1,16 +1,17 @@
 // ** React Imports
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, ChangeEvent } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
 
 // ** MUI Imports
 import { Box, Card, Grid, Divider, CardHeader, TextField, Button } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
 import AddUserDrawer from 'src/views/apps/user/list/AddUserDrawer'
+import ServerSideToolbar from 'src/views/table/data-grid/ServerSideToolbar'
 
 // ** Style Imports
 import styles from '@/pages/user/list/styles'
@@ -26,48 +27,79 @@ import { useUsersTable } from '../../../services/api/useUsersTable'
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
 
-type UserData = {
-  dataType: any
-  columnType: string
-  activeBtn: string
-}
 
-interface UserTypeData {
-  data: any[]
-}
 
-const useUserData = (getUsers: any, page: number) => {
-  const [userData, setUserData] = useState<UserTypeData>({ data: [] })
-
-  const { isLoading } = useQuery<UserTypeData>({
-    queryKey: [getUsers.name, page],
-    queryFn: () => getUsers(page),
-    onSuccess: (data: any) => {
-      setUserData({ data: data?.data })
-    },
-    onError: (error: any) => {
-      console.log(`ERROR`, error)
-    }
-  })
-
-  return userData.data
-}
+type SortType = 'asc' | 'desc' | undefined | null
 
 const UserTable = () => {
-  const { getOperators, getSuperAgents, getContentCreators } = useUsersTable()
+  const { getUsers } = useUsersTable()
+  const [page, setPage] = useState<number>()
+  const [pageSize, setPageSize] = useState<number>();
+  const [role, setRole] = useState("SUPERVISOR")
+  const [columnType, setColumnType] = useState('SUPERVISOR')
+  const [rowCount, setRowCount] = useState<any>()
 
-  const [value, setValue] = useState<string>('')
-  const [pageSize, setPageSize] = useState<number>(10)
-  const [addUserOpen, setAddUserOpen] = useState<boolean>(false)
+  const [sort, setSort] = useState<SortType>('asc')
+  const [sortName, setSortName] = useState<string>('username');
 
-  const handleFilter = () => {
-    //Test
+  const [search, setSearch] = useState("username")
+  const [searchValue, setSearchValue] = useState<string>('')
+
+  const { isLoading } = useQuery({
+    queryKey:
+      [
+        "allUsers",
+        page,
+        role,
+        sort,
+        sortName,
+        search,
+        searchValue],
+    queryFn: () =>
+      getUsers({
+        data: {
+          role: role,
+          page: page,
+          sort: sort,
+          sort_by: sortName,
+          search_by: search,
+          search_value: searchValue,
+        }
+      }),
+    onSuccess: (data: any) => {
+      console.log(`onSUCCESS`, data)
+      setRowCount(data?.total)
+      setRowData(data?.data)
+      setPageSize(data?.per_page)
+      setPage(data?.current_page)
+    },
+  })
+
+  const handleRoleChange = (newRole: any) => {
+    setRole(newRole);
+
+    // Updates the row data based on the newRole
+    switch (newRole) {
+      case "SUPERVISOR":
+        setColumnType("operators");
+        break;
+      case "SA":
+        setColumnType("superagent");
+        break;
+      case "CC":
+        setColumnType("contentcreators");
+        break;
+      default:
+        break;
+    }
+  };
+
+  const [rowData, setRowData] = useState<any>()
+
+  const handlePageChange = (newPage: any) => {
+    setPage(newPage + 1)
+    console.log(page)
   }
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
-
-  const [dataType, setDataType] = useState('operators')
-  const [columnType, setColumnType] = useState('operators')
-  const [activeBtn, setActiveBtn] = useState('')
 
   const columnsMap = new Map([
     ['operators', operatorColumns],
@@ -77,31 +109,27 @@ const UserTable = () => {
 
   const filteredColumns: any = columnsMap.get(columnType) ?? []
 
-  const [currentPage, setCurrentPage] = useState(1)
-
-  const rowsByType: any = {
-    operators: useUserData(getOperators, currentPage),
-    superagent: useUserData(getSuperAgents, currentPage),
-    contentcreators: useUserData(getContentCreators, currentPage)
-  }
-
-  const filteredRows = rowsByType[dataType] || []
-
-  const handleClick = ({ dataType, columnType, activeBtn }: UserData) => {
-    setDataType(dataType)
-    setColumnType(columnType)
-    setActiveBtn(activeBtn)
-  }
-
-  const createUserData = (value: string): UserData => ({
-    dataType: value,
-    columnType: value,
-    activeBtn: value
-  })
+  const [addUserOpen, setAddUserOpen] = useState<boolean>(false)
+  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
 
   useEffect(() => {
-    setActiveBtn('operators')
+    setRole('SUPERVISOR')
+    setColumnType("operators");
   }, [])
+
+  const handleSortModel = (newModel: GridSortModel) => {
+    if (newModel.length) {
+      setSort(newModel[0].sort)
+      setSortName(newModel[0].field)
+    } else {
+      setSort('asc')
+      setSortName('username')
+    }
+  }
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value)
+  }
 
   return (
     <Grid container spacing={6}>
@@ -110,31 +138,31 @@ const UserTable = () => {
           <Box sx={{ padding: 5, ...styles.buttonContainer }}>
             <Box sx={styles.usersButtons}>
               <Button
-                onClick={() => handleClick(createUserData('operators'))}
+                onClick={() => handleRoleChange("SUPERVISOR")}
                 sx={{
                   ...styles.userButton,
-                  backgroundColor: activeBtn === 'operators' ? '#9747FF' : '#FFF',
-                  color: activeBtn === 'operators' ? '#FFF' : 'black'
+                  backgroundColor: role === 'SUPERVISOR' ? '#9747FF' : '#FFF',
+                  color: role === 'SUPERVISOR' ? '#FFF' : 'black'
                 }}
               >
                 Operators
               </Button>
               <Button
-                onClick={() => handleClick(createUserData('superagent'))}
+                onClick={() => handleRoleChange("SA")}
                 sx={{
                   ...styles.userButton,
-                  backgroundColor: activeBtn === 'superagent' ? '#9747FF' : '#FFF',
-                  color: activeBtn === 'superagent' ? '#FFF' : 'black'
+                  backgroundColor: role === 'SA' ? '#9747FF' : '#FFF',
+                  color: role === 'SA' ? '#FFF' : 'black'
                 }}
               >
                 Super Agent
               </Button>
               <Button
-                onClick={() => handleClick(createUserData('contentcreators'))}
+                onClick={() => handleRoleChange("CC")}
                 sx={{
                   ...styles.userButton,
-                  backgroundColor: activeBtn === 'contentcreators' ? '#9747FF' : '#FFF',
-                  color: activeBtn === 'contentcreators' ? '#FFF' : 'black'
+                  backgroundColor: role === 'CC' ? '#9747FF' : '#FFF',
+                  color: role === 'CC' ? '#FFF' : 'black'
                 }}
               >
                 Content Creators
@@ -145,7 +173,7 @@ const UserTable = () => {
               style={styles.linkButton}
               href={{
                 pathname: 'list/CreateAccount',
-                query: { activeBtn }
+                query: { role }
               }}
             >
               <Button sx={styles.createAccount}>Create Account</Button>
@@ -162,18 +190,32 @@ const UserTable = () => {
           </Box>
           <Divider />
 
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
+          {/* Temporary Disable */}
+          {/* <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} /> */}
 
           <DataGrid
+            loading={isLoading}
+            paginationMode="server"
+            sortingMode="server"
             autoHeight
-            rows={filteredRows}
+            rows={rowData ?? []}
             columns={filteredColumns}
             pageSize={pageSize}
-            disableSelectionOnClick
-            checkboxSelection={true}
-            sx={styles.dataGrid}
-            onPageChange={newPage => setCurrentPage(newPage + 1)}
             pagination
+            onPageChange={handlePageChange}
+            rowCount={rowCount}
+            onSortModelChange={handleSortModel}
+            components={{ Toolbar: ServerSideToolbar }}
+            componentsProps={{
+              baseButton: {
+                variant: 'outlined'
+              },
+              toolbar: {
+                value: searchValue,
+                clearSearch: () => handleSearch(''),
+                onChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
+              }
+            }}
           />
         </Card>
       </Grid>
