@@ -24,8 +24,7 @@ import contentCreatorColumns from '@/pages/user/data/ContentCreatorColumn'
 import { useUsersTable } from '../../../hooks/useUsersTable'
 
 // ** TanStack Query
-import { useQuery } from "@tanstack/react-query";
-
+import { useQuery } from '@tanstack/react-query'
 
 type UserData = {
   dataType: any
@@ -34,29 +33,28 @@ type UserData = {
 }
 
 interface UserTypeData {
-  data: any[];
+  data: any[]
 }
 
-const useUserData = (getUsers: any) => {
-  const [userData, setUserData] = useState<UserTypeData>({ data: [] });
+const useUserData = (getUsers: any, page: number) => {
+  const [userData, setUserData] = useState<UserTypeData>({ data: [] })
 
   const { isLoading } = useQuery<UserTypeData>({
-    queryKey: [getUsers.name],
-    queryFn: getUsers,
+    queryKey: [getUsers.name, page],
+    queryFn: getUsers(page),
     onSuccess: (data: any) => {
-      setUserData({ data: data?.data });
+      setUserData({ data: data?.data })
     },
     onError: (error: any) => {
-      console.log(`ERROR`, error);
-    },
-  });
+      console.log(`ERROR`, error)
+    }
+  })
 
-  return userData.data;
-};
+  return userData.data
+}
 
 const UserTable = () => {
-
-  const { getOperators, getSuperAgents, getContentCreators } = useUsersTable();
+  const { getOperators, getSuperAgents, getContentCreators } = useUsersTable()
 
   const [value, setValue] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
@@ -79,10 +77,12 @@ const UserTable = () => {
 
   const filteredColumns: any = columnsMap.get(columnType) ?? []
 
+  const [currentPage, setCurrentPage] = useState(1)
+
   const rowsByType: any = {
-    operators: useUserData(getOperators),
-    superagent: useUserData(getSuperAgents),
-    contentcreators: useUserData(getContentCreators),
+    operators: useUserData(getOperators, currentPage),
+    superagent: useUserData(getSuperAgents, currentPage),
+    contentcreators: useUserData(getContentCreators, currentPage)
   }
 
   const filteredRows = rowsByType[dataType] || []
@@ -172,6 +172,8 @@ const UserTable = () => {
             disableSelectionOnClick
             checkboxSelection={true}
             sx={styles.dataGrid}
+            onPageChange={newPage => setCurrentPage(newPage + 1)}
+            pagination
           />
         </Card>
       </Grid>

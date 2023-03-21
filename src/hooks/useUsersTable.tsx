@@ -1,39 +1,38 @@
-import request from "@/lib/request";
+import request from '@/lib/request'
 
 export const useUsersTable = () => {
+  const getOperators = (page = 1) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1'
+      },
+      url: `/users?role=SUPERVISOR&page=${page}`,
 
-    const getOperators = () => {
-        return request({
-            headers: {
-                'X-Authorization': 'postman|1',
-            },
-            url: '/users?role=SUPERVISOR&page=1',
+      method: 'GET'
+    })
+  }
 
-            method: 'GET',
-        })
-    }
+  const getSuperAgents = (page = 1) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1'
+      },
+      url: `/users?role=SA&page=${page}`,
 
-    const getSuperAgents = () => {
-        return request({
-            headers: {
-                'X-Authorization': 'postman|1',
-            },
-            url: '/users?role=SA&page=1',
+      method: 'GET'
+    })
+  }
 
-            method: 'GET',
-        })
-    }
+  const getContentCreators = (page = 1) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1'
+      },
+      url: `/users?role=CC&page=${page}`,
 
-    const getContentCreators = () => {
-        return request({
-            headers: {
-                'X-Authorization': 'postman|1',
-            },
-            url: '/users?role=CC&page=1',
+      method: 'GET'
+    })
+  }
 
-            method: 'GET',
-        })
-    }
-
-    return { getOperators, getSuperAgents, getContentCreators }
+  return { getOperators, getSuperAgents, getContentCreators }
 }
