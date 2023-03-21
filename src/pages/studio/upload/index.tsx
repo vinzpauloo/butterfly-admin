@@ -83,8 +83,8 @@ export type StudioFormDataType = {
 export type StudioContextType = {
     displayPage : DisplayPage,
     setDisplayPage : React.Dispatch<React.SetStateAction<DisplayPage>>,
-    contentCreator : number | null,
-    setContentCreator : React.Dispatch<React.SetStateAction<number | null>>
+    contentCreator : string | null,
+    setContentCreator : React.Dispatch<React.SetStateAction<string | null>>
     tags : [],
     setTags : React.Dispatch<React.SetStateAction<[]>>,
     groupings : [],
@@ -109,7 +109,7 @@ const UploadContent = () => {
   //** Form states */
   const [tags, setTags] = React.useState<[]>([])
   const [groupings, setGroupings] = React.useState<[]>([])
-  const [contentCreator, setContentCreator] = React.useState<number | null>(null)
+  const [contentCreator, setContentCreator] = React.useState<string | null>(null)
   const [title, setTitle] = React.useState<string>('')
   const [description, setDescription] = React.useState<string>('')
   const [publishDate, setPublishDate] = React.useState<PublishSchedule>('publish')
