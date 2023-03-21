@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography'
 import Icon from 'src/@core/components/icon'
 
 // ** Context
-import { useAuth } from 'src/hooks/useAuth'
+import { useAuth } from '@/services/useAuth'
 
 // ** Type Imports
 import { Settings } from 'src/@core/context/settingsContext'
@@ -26,7 +26,6 @@ import { Settings } from 'src/@core/context/settingsContext'
 interface Props {
   settings: Settings
 }
-
 
 const UserDropdown = (props: Props) => {
   // ** Props
@@ -87,14 +86,14 @@ const UserDropdown = (props: Props) => {
         <Avatar
           alt='Pablo Dela Cruz'
           onClick={handleDropdownOpen}
-          sx={{ 
-            width: 66, 
-            height: 41, 
-            borderRadius:0,
-            '& > .MuiAvatar-img' : {
-              objectFit:'contain',
-              width:'100%',
-              height:'auto'
+          sx={{
+            width: 66,
+            height: 41,
+            borderRadius: 0,
+            '& > .MuiAvatar-img': {
+              objectFit: 'contain',
+              width: '100%',
+              height: 'auto'
             }
           }}
           src='/images/topbar/user.png'
