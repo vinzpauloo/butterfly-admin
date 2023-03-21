@@ -4,6 +4,8 @@ interface UsersData {
   data: {
     role?: string;
     page?: number;
+    sort?: any;
+    sort_by?: string;
   }
 }
 

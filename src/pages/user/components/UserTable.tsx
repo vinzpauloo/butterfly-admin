@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 // ** MUI Imports
 import { Box, Card, Grid, Divider, CardHeader, TextField, Button } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
@@ -26,6 +26,7 @@ import { useUsersTable } from '../../../services/api/useUsersTable'
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
 
+type SortType = 'asc' | 'desc' | undefined | null
 
 const UserTable = () => {
   const { getUsers } = useUsersTable()
@@ -35,13 +36,18 @@ const UserTable = () => {
   const [columnType, setColumnType] = useState('SUPERVISOR')
   const [rowCount, setRowCount] = useState<any>()
 
+  const [sort, setSort] = useState<SortType>('asc')
+  const [sortName, setSortName] = useState<string>('username');
+
   const { isLoading } = useQuery({
-    queryKey: ["allUsers", page, role],
+    queryKey: ["allUsers", page, role, sort, sortName],
     queryFn: () =>
       getUsers({
         data: {
           role: role,
-          page: page
+          page: page,
+          sort: sort,
+          sort_by: sortName
         }
       }),
     onSuccess: (data: any) => {
@@ -94,6 +100,16 @@ const UserTable = () => {
     setRole('SUPERVISOR')
     setColumnType("operators");
   }, [])
+
+  const handleSortModel = (newModel: GridSortModel) => {
+    if (newModel.length) {
+      setSort(newModel[0].sort)
+      setSortName(newModel[0].field)
+    } else {
+      setSort('asc')
+      setSortName('username')
+    }
+  }
 
   return (
     <Grid container spacing={6}>
@@ -160,6 +176,7 @@ const UserTable = () => {
           <DataGrid
             loading={isLoading}
             paginationMode="server"
+            sortingMode="server"
             autoHeight
             rows={rowData ?? []}
             columns={filteredColumns}
@@ -167,6 +184,7 @@ const UserTable = () => {
             pagination
             onPageChange={handlePageChange}
             rowCount={rowCount}
+            onSortModelChange={handleSortModel}
           />
         </Card>
       </Grid>
