@@ -6,6 +6,8 @@ interface UsersData {
     page?: number;
     sort?: any;
     sort_by?: string;
+    search_by?: string;
+    search_value?: string;
   }
 }
 
