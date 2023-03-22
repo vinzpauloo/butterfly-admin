@@ -5,13 +5,11 @@ import React, { useState, useEffect, ChangeEvent } from 'react'
 import Link from 'next/link'
 
 // ** MUI Imports
-import { Box, Card, Grid, Divider, CardHeader, TextField, Button } from '@mui/material'
+import { Box, Card, Grid, Button } from '@mui/material'
 import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
 // ** Custom Table Components Imports
-import TableHeader from 'src/views/apps/user/list/TableHeader'
-import AddUserDrawer from 'src/views/apps/user/list/AddUserDrawer'
-import ServerSideToolbar from 'src/views/table/data-grid/ServerSideToolbar'
+import UserTableToolbar from './UserTableToolbar'
 
 // ** Style Imports
 import styles from '@/pages/user/list/styles'
@@ -27,8 +25,6 @@ import { useUsersTable } from '../../../services/api/useUsersTable'
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
 
-
-
 type SortType = 'asc' | 'desc' | undefined | null
 
 const UserTable = () => {
@@ -42,7 +38,9 @@ const UserTable = () => {
   const [sort, setSort] = useState<SortType>('asc')
   const [sortName, setSortName] = useState<string>('username');
 
-  const [search, setSearch] = useState("username")
+  const [search, setSearch] = useState<string>()
+  const [emailSearchValue, setEmailSearchValue] = useState<string>('');
+  const [mobileSearchValue, setMobileSearchValue] = useState<string>("");
   const [searchValue, setSearchValue] = useState<string>('')
 
   const { isLoading } = useQuery({
@@ -54,7 +52,8 @@ const UserTable = () => {
         sort,
         sortName,
         search,
-        searchValue],
+        search === 'username' ? searchValue : search === 'email' ? emailSearchValue : mobileSearchValue,
+      ],
     queryFn: () =>
       getUsers({
         data: {
@@ -63,7 +62,7 @@ const UserTable = () => {
           sort: sort,
           sort_by: sortName,
           search_by: search,
-          search_value: searchValue,
+          search_value: search === 'username' ? searchValue : search === 'email' ? emailSearchValue : mobileSearchValue,
         }
       }),
     onSuccess: (data: any) => {
@@ -109,9 +108,6 @@ const UserTable = () => {
 
   const filteredColumns: any = columnsMap.get(columnType) ?? []
 
-  const [addUserOpen, setAddUserOpen] = useState<boolean>(false)
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
-
   useEffect(() => {
     setRole('SUPERVISOR')
     setColumnType("operators");
@@ -127,9 +123,20 @@ const UserTable = () => {
     }
   }
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value)
-  }
+  const handleSearch = (value: string, type: string) => {
+    setSearch(type);
+    switch (type) {
+      case 'username':
+        setSearchValue(value);
+        break;
+      case 'email':
+        setEmailSearchValue(value);
+        break;
+      case 'mobile':
+        setMobileSearchValue(value);
+        break;
+    }
+  };
 
   return (
     <Grid container spacing={6}>
@@ -180,19 +187,6 @@ const UserTable = () => {
             </Link>
           </Box>
 
-          <Box sx={styles.searchContainer}>
-            <CardHeader title='Search Filters' sx={styles.cardHeader} />
-            <Box sx={styles.searchInput}>
-              <TextField sx={styles.fullWidth} label={`Search User`} />
-              <TextField sx={styles.fullWidth} label={`Search Mobile Number`} />
-              <TextField sx={styles.fullWidth} label={`Search Email`} />
-            </Box>
-          </Box>
-          <Divider />
-
-          {/* Temporary Disable */}
-          {/* <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} /> */}
-
           <DataGrid
             loading={isLoading}
             paginationMode="server"
@@ -205,21 +199,28 @@ const UserTable = () => {
             onPageChange={handlePageChange}
             rowCount={rowCount}
             onSortModelChange={handleSortModel}
-            components={{ Toolbar: ServerSideToolbar }}
+            components={{ Toolbar: UserTableToolbar }}
             componentsProps={{
-              baseButton: {
-                variant: 'outlined'
-              },
               toolbar: {
-                value: searchValue,
-                clearSearch: () => handleSearch(''),
-                onChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-              }
+                usernameValue: searchValue,
+                emailValue: emailSearchValue,
+                mobileValue: mobileSearchValue,
+                clearSearch: () => {
+                  handleSearch('', 'username');
+                  handleSearch('', 'email');
+                  handleSearch('', 'mobile');
+                },
+                onUsernameChange: (event: ChangeEvent<HTMLInputElement>) =>
+                  handleSearch(event.target.value, 'username'),
+                onEmailChange: (event: ChangeEvent<HTMLInputElement>) =>
+                  handleSearch(event.target.value, 'email'),
+                onMobileChange: (event: ChangeEvent<HTMLInputElement>) =>
+                  handleSearch(event.target.value, 'mobile'),
+              },
             }}
           />
         </Card>
       </Grid>
-      <AddUserDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
     </Grid>
   )
 }
