@@ -1,7 +1,7 @@
 import * as yup from "yup";
-import React, {useState} from "react";
-import {useForm} from "react-hook-form";
-import {yupResolver} from '@hookform/resolvers/yup';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
   Button,
@@ -92,23 +92,23 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
-      <div style={{display: 'flex', backgroundColor: '#A459D1'}}>
-        <DialogTitle sx={{color: 'white'}}>Operator</DialogTitle>
+      <div style={{ display: 'flex', backgroundColor: '#A459D1' }}>
+        <DialogTitle sx={{ color: 'white' }}>Operator</DialogTitle>
         <Checkbox
           name="operator"
           checked={formValue.operator}
           onChange={handleFormInputChange}
           inputProps={{ 'aria-label': 'primary checkbox' }}
-          sx={{color: 'white'}}
+          sx={{ color: 'white' }}
           color="default"
         />
-        <DialogTitle sx={{color: 'white'}}>Supervisor</DialogTitle>
+        <DialogTitle sx={{ color: 'white' }}>Supervisor</DialogTitle>
         <Checkbox
           name="supervisor"
           checked={formValue.supervisor}
           onChange={handleFormInputChange}
           inputProps={{ 'aria-label': 'primary checkbox' }}
-          sx={{color: 'white'}}
+          sx={{ color: 'white' }}
           color="default"
         />
       </div>
@@ -126,8 +126,8 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
             onChange={handleFormInputChange}
             name="username"
           />
-          <Box style={{display: 'flex', gap: 20, marginTop: 20, marginBottom: 20}}>
-            <Box sx={{width: '50%'}}>
+          <Box style={{ display: 'flex', gap: 20, marginTop: 20, marginBottom: 20 }}>
+            <Box sx={{ width: '50%' }}>
               <Typography>Password</Typography>
               <TextField
                 label="Enter Password"
@@ -142,7 +142,7 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
                 name="password"
               />
             </Box>
-            <Box sx={{width: '50%'}}>
+            <Box sx={{ width: '50%' }}>
               <Typography>Re-enter Password</Typography>
               <TextField
                 label="Re-enter Password"
@@ -158,8 +158,8 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
               />
             </Box>
           </Box>
-          <Box style={{display: 'flex', gap: 20, marginBottom: 20}}>
-            <Box sx={{width: '50%'}}>
+          <Box style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
+            <Box sx={{ width: '50%' }}>
               <Typography>Mobile No.</Typography>
               <TextField
                 label="Mobile No."
@@ -173,7 +173,7 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
                 name="mobileNo"
               />
             </Box>
-            <Box sx={{width: '50%'}}>
+            <Box sx={{ width: '50%' }}>
               <Typography>Email Address</Typography>
               <TextField
                 label="Email Address"
@@ -201,19 +201,29 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
             name="notes"
           />
           <DialogActions>
-            <Button onClick={onClose} sx={{ backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
+            <Button onClick={onClose} sx={{
+              backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
                 backgroundColor: '#7899ac',
-              }, }}>
-              <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
+              },
+            }}>
+              <Typography sx={{
+                color: 'white', textTransform: 'uppercase', '&:hover': {
+                  transform: 'scale(1.1)',
                   transition: 'transform 0.2s ease-in-out',
-                },}}>Cancel</Typography>
+                },
+              }}>Cancel</Typography>
             </Button>
-            <Button type="submit" sx={{ backgroundColor: '#9747FF', color: 'white', width: '200px', '&:hover': {
+            <Button type="submit" sx={{
+              backgroundColor: '#9747FF', color: 'white', width: '200px', '&:hover': {
                 backgroundColor: '#9747FF',
-              }, }}>
-              <Typography sx={{color: 'white', textTransform: 'uppercase','&:hover': {transform: 'scale(1.1)',
+              },
+            }}>
+              <Typography sx={{
+                color: 'white', textTransform: 'uppercase', '&:hover': {
+                  transform: 'scale(1.1)',
                   transition: 'transform 0.2s ease-in-out',
-                },}}>Update</Typography>
+                },
+              }}>Update</Typography>
             </Button>
           </DialogActions>
         </form>
