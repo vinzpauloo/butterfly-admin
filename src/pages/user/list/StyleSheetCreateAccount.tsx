@@ -4,14 +4,14 @@ const styles = {
     flexDirection: {
       xs: 'column',
       md: 'column',
-      lg: 'row',
+      lg: 'row'
     },
     justifyContent: {
       xs: 'flex-start',
       md: 'flex-start',
-      lg: 'center',
+      lg: 'center'
     },
-    gap: 10,
+    gap: 10
   },
   userButtons: {
     display: 'flex',
@@ -21,7 +21,10 @@ const styles = {
   userButton: {
     border: 1,
     height: '62px',
-    minWidth: '332px',
+    minWidth: {
+      xs: '232px',
+      lg: '332px'
+    },
     flex: 1,
     display: 'flex',
     alignItems: 'center',
@@ -30,11 +33,11 @@ const styles = {
     transition: 'background-color 0.1s',
     '&:hover': {
       backgroundColor: `#9747FF`,
-      color: 'white',
-    },
+      color: 'white'
+    }
   },
   text: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   formContainer: {
     border: '1px solid grey',
@@ -88,10 +91,10 @@ const styles = {
     flexDirection: {
       xs: 'column',
       md: 'column',
-      lg: 'row',
+      lg: 'row'
     },
     mt: 5,
-    gap:3,
+    gap: 3,
     justifyContent: 'space-between',
     alignItems: 'center'
   },
@@ -100,23 +103,24 @@ const styles = {
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#7899ac',
-    },
+      backgroundColor: '#7899ac'
+    }
   },
   buttonText: {
     color: 'white',
     textTransform: 'uppercase',
-    '&:hover': {transform: 'scale(1.1)',
-      transition: 'transform 0.2s ease-in-out',
-    },
+    '&:hover': {
+      transform: 'scale(1.1)',
+      transition: 'transform 0.2s ease-in-out'
+    }
   },
   continueButton: {
     backgroundColor: '#9747FF',
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#9747FF',
-    },
+      backgroundColor: '#9747FF'
+    }
   },
 
   // Logo Styling
@@ -125,7 +129,7 @@ const styles = {
   },
   upload: {
     backgroundColor: '#979797',
-    padding: "8px 12px 8px 12px",
+    padding: '8px 12px 8px 12px',
     borderRadius: '5px'
   }
 }

@@ -25,35 +25,54 @@ import { useUsersTable } from '../../../services/api/useUsersTable'
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
 
+const useDebounce = (value: any, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
 type SortType = 'asc' | 'desc' | undefined | null
 
 const UserTable = () => {
   const { getUsers } = useUsersTable()
   const [page, setPage] = useState<number>()
-  const [pageSize, setPageSize] = useState<number>();
-  const [role, setRole] = useState("SUPERVISOR")
+  const [pageSize, setPageSize] = useState<number>()
+  const [role, setRole] = useState('SUPERVISOR')
   const [columnType, setColumnType] = useState('SUPERVISOR')
   const [rowCount, setRowCount] = useState<any>()
 
   const [sort, setSort] = useState<SortType>('asc')
-  const [sortName, setSortName] = useState<string>('username');
+  const [sortName, setSortName] = useState<string>('username')
 
   const [search, setSearch] = useState<string>()
-  const [emailSearchValue, setEmailSearchValue] = useState<string>('');
-  const [mobileSearchValue, setMobileSearchValue] = useState<string>("");
+  const [emailSearchValue, setEmailSearchValue] = useState<string>('')
+  const [mobileSearchValue, setMobileSearchValue] = useState<string>('')
   const [searchValue, setSearchValue] = useState<string>('')
 
+  const debouncedUsername = useDebounce(searchValue, 1000)
+  const debouncedEmail = useDebounce(emailSearchValue, 1000)
+  const debouncedMobile = useDebounce(mobileSearchValue, 1000)
+
   const { isLoading } = useQuery({
-    queryKey:
-      [
-        "allUsers",
-        page,
-        role,
-        sort,
-        sortName,
-        search,
-        search === 'username' ? searchValue : search === 'email' ? emailSearchValue : mobileSearchValue,
-      ],
+    queryKey: [
+      'allUsers',
+      page,
+      role,
+      sort,
+      sortName,
+      search,
+      search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
+    ],
     queryFn: () =>
       getUsers({
         data: {
@@ -62,7 +81,8 @@ const UserTable = () => {
           sort: sort,
           sort_by: sortName,
           search_by: search,
-          search_value: search === 'username' ? searchValue : search === 'email' ? emailSearchValue : mobileSearchValue,
+          search_value:
+            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
         }
       }),
     onSuccess: (data: any) => {
@@ -71,27 +91,27 @@ const UserTable = () => {
       setRowData(data?.data)
       setPageSize(data?.per_page)
       setPage(data?.current_page)
-    },
+    }
   })
 
   const handleRoleChange = (newRole: any) => {
-    setRole(newRole);
+    setRole(newRole)
 
     // Updates the row data based on the newRole
     switch (newRole) {
-      case "SUPERVISOR":
-        setColumnType("operators");
-        break;
-      case "SA":
-        setColumnType("superagent");
-        break;
-      case "CC":
-        setColumnType("contentcreators");
-        break;
+      case 'SUPERVISOR':
+        setColumnType('operators')
+        break
+      case 'SA':
+        setColumnType('superagent')
+        break
+      case 'CC':
+        setColumnType('contentcreators')
+        break
       default:
-        break;
+        break
     }
-  };
+  }
 
   const [rowData, setRowData] = useState<any>()
 
@@ -110,7 +130,7 @@ const UserTable = () => {
 
   useEffect(() => {
     setRole('SUPERVISOR')
-    setColumnType("operators");
+    setColumnType('operators')
   }, [])
 
   const handleSortModel = (newModel: GridSortModel) => {
@@ -124,19 +144,19 @@ const UserTable = () => {
   }
 
   const handleSearch = (value: string, type: string) => {
-    setSearch(type);
+    setSearch(type)
     switch (type) {
       case 'username':
-        setSearchValue(value);
-        break;
+        setSearchValue(value)
+        break
       case 'email':
-        setEmailSearchValue(value);
-        break;
+        setEmailSearchValue(value)
+        break
       case 'mobile':
-        setMobileSearchValue(value);
-        break;
+        setMobileSearchValue(value)
+        break
     }
-  };
+  }
 
   return (
     <Grid container spacing={6}>
@@ -145,7 +165,7 @@ const UserTable = () => {
           <Box sx={{ padding: 5, ...styles.buttonContainer }}>
             <Box sx={styles.usersButtons}>
               <Button
-                onClick={() => handleRoleChange("SUPERVISOR")}
+                onClick={() => handleRoleChange('SUPERVISOR')}
                 sx={{
                   ...styles.userButton,
                   backgroundColor: role === 'SUPERVISOR' ? '#9747FF' : '#FFF',
@@ -155,7 +175,7 @@ const UserTable = () => {
                 Operators
               </Button>
               <Button
-                onClick={() => handleRoleChange("SA")}
+                onClick={() => handleRoleChange('SA')}
                 sx={{
                   ...styles.userButton,
                   backgroundColor: role === 'SA' ? '#9747FF' : '#FFF',
@@ -165,7 +185,7 @@ const UserTable = () => {
                 Super Agent
               </Button>
               <Button
-                onClick={() => handleRoleChange("CC")}
+                onClick={() => handleRoleChange('CC')}
                 sx={{
                   ...styles.userButton,
                   backgroundColor: role === 'CC' ? '#9747FF' : '#FFF',
@@ -189,8 +209,8 @@ const UserTable = () => {
 
           <DataGrid
             loading={isLoading}
-            paginationMode="server"
-            sortingMode="server"
+            paginationMode='server'
+            sortingMode='server'
             autoHeight
             rows={rowData ?? []}
             columns={filteredColumns}
@@ -206,17 +226,15 @@ const UserTable = () => {
                 emailValue: emailSearchValue,
                 mobileValue: mobileSearchValue,
                 clearSearch: () => {
-                  handleSearch('', 'username');
-                  handleSearch('', 'email');
-                  handleSearch('', 'mobile');
+                  handleSearch('', 'username')
+                  handleSearch('', 'email')
+                  handleSearch('', 'mobile')
                 },
                 onUsernameChange: (event: ChangeEvent<HTMLInputElement>) =>
                   handleSearch(event.target.value, 'username'),
-                onEmailChange: (event: ChangeEvent<HTMLInputElement>) =>
-                  handleSearch(event.target.value, 'email'),
-                onMobileChange: (event: ChangeEvent<HTMLInputElement>) =>
-                  handleSearch(event.target.value, 'mobile'),
-              },
+                onEmailChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'email'),
+                onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
+              }
             }}
           />
         </Card>

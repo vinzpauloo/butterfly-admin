@@ -5,12 +5,12 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import { Box, Button, TextField, Typography, Radio, RadioGroup } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 
 // ** Form and Validation Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 // ** Other Imports
 import CreatedSuccessful from './CreatedSuccessful'
@@ -22,7 +22,7 @@ import { useMutation } from '@tanstack/react-query'
 import { CreateAccount } from '@/services/api/CreateAccount'
 
 interface FormValues {
-  role: 'operator' | 'supervisor' | ''
+  role: string
   username: string
   password: string
   password_confirmation: string
@@ -32,10 +32,6 @@ interface FormValues {
 }
 
 const schema = yup.object().shape({
-  role: yup
-    .string()
-    .oneOf(['operator', 'supervisor'], 'Role must be Operator or Supervisor')
-    .required('Role is required'),
   username: yup.string().min(7, 'Username must be at least 7 characters').required(),
   password: yup.string().min(7, 'Password must be at least 7 characters').required(),
   password_confirmation: yup
@@ -49,13 +45,13 @@ const schema = yup.object().shape({
   email: yup.string().email().required()
 })
 
-const CreateForm = () => {
+const CreateCreator = () => {
   const router = useRouter()
 
   const [submitted, setSubmitted] = useState<boolean>()
 
   const [formValue, setFormValue] = useState<FormValues>({
-    role: '',
+    role: 'cc',
     username: '',
     password: '',
     password_confirmation: '',
@@ -65,7 +61,6 @@ const CreateForm = () => {
   })
 
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors }
@@ -76,17 +71,10 @@ const CreateForm = () => {
   const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
 
-    if (name === 'role') {
-      setFormValue(prevState => ({
-        ...prevState,
-        role: value as 'operator' | 'supervisor' | ''
-      }))
-    } else {
-      setFormValue(prevState => ({
-        ...prevState,
-        [name]: value
-      }))
-    }
+    setFormValue(prevState => ({
+      ...prevState,
+      [name]: value
+    }))
   }
 
   const { createUser } = CreateAccount()
@@ -111,48 +99,10 @@ const CreateForm = () => {
     <Box>
       {!submitted ? (
         <Box sx={styles.container}>
+          <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
+            <Typography sx={styles.white}>Content Creator</Typography>
+          </Box>
           <form onSubmit={handleSubmit(handleFormSubmit)}>
-            <Box sx={styles.header}>
-              <Controller
-                name='role'
-                control={control}
-                defaultValue=''
-                rules={{ required: 'Please select a role' }}
-                render={({ field }) => (
-                  <RadioGroup
-                    {...field}
-                    onChange={e => {
-                      field.onChange(e)
-                      handleFormInputChange(e)
-                    }}
-                  >
-                    <Box sx={styles.radio}>
-                      <Typography sx={styles.white}>Operator</Typography>
-                      <Radio
-                        name='role'
-                        value='operator'
-                        inputProps={{ 'aria-label': 'Operator' }}
-                        sx={styles.white}
-                        color='default'
-                      />
-                      <Typography sx={styles.white}>Supervisor</Typography>
-                      <Radio
-                        name='role'
-                        value='supervisor'
-                        inputProps={{ 'aria-label': 'Supervisor' }}
-                        sx={styles.white}
-                        color='default'
-                      />
-                    </Box>
-                  </RadioGroup>
-                )}
-              />
-              {errors.role && (
-                <Typography variant='caption' color='error'>
-                  {errors.role.message}
-                </Typography>
-              )}
-            </Box>
             <Box sx={styles.formContent}>
               <Box sx={styles.fullWidth}>
                 <Typography>Username</Typography>
@@ -348,4 +298,4 @@ const styles = {
   }
 }
 
-export default CreateForm
+export default CreateCreator
