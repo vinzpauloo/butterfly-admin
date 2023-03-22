@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import React,{ useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -23,189 +23,22 @@ import { getInitials } from 'src/@core/utils/get-initials'
 // ** Data Import
 import { rows } from '@/data/dummyVideosUploaded'
 
-interface StatusObj {
-  [key: number]: {
-    title: string
-    color: ThemeColor
-  }
-}
+// ** API Imports
+import VideoService from '@/services/api/VideoService'
 
-// ** renders client column
-const renderClient = (params: GridRenderCellParams) => {
-  const { row } = params
-  const stateNum = Math.floor(Math.random() * 6)
-  const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
-  const color = states[stateNum]
-
-  if (row.avatar.length) {
-    return <CustomAvatar src={`/images/avatars/cc/${row.avatar}`} sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }} />
-  } else {
-    return (
-      <CustomAvatar
-        skin='light'
-        color={color as ThemeColor}
-        sx={{ borderRadius: '10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
-      >
-        {getInitials(row.full_name ? row.full_name : 'John Doe')}
-      </CustomAvatar>
-    )
-  }
-}
-
-const statusObj: StatusObj = {
-  1: { title: 'pending', color: 'warning' },
-  2: { title: 'declined', color: 'error' },
-}
-
-const escapeRegExp = (value: string) => {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-}
+import TableVideos from './table/TableVideos'
 
 const VideosList = () => {
-  // ** States
-  const [pageSize, setPageSize] = useState<number>(7)
-  const [hideNameColumn, setHideNameColumn] = useState(false)
-  const [data] = useState<DataVideosGridRowType[]>(rows)
-  const [searchText, setSearchText] = useState<string>('')
-  const [filteredData, setFilteredData] = useState<DataVideosGridRowType[]>([])
 
-  const handleSearch = (searchValue: string) => {
-    setSearchText(searchValue)
-    const searchRegex = new RegExp(escapeRegExp(searchValue), 'i')
-    const filteredRows = data.filter(row => {
-      return Object.keys(row).some(field => {
-        // @ts-ignore
-        return searchRegex.test(row[field].toString())
-      })
-    })
-    if (searchValue.length) {
-      setFilteredData(filteredRows)
-    } else {
-      setFilteredData([])
-    }
-  }
+  React.useEffect( ()=>{
+    //initial state load
 
-  const columns: GridColDef[] = [
-    {
-      flex: 0.1,
-      minWidth: 150,
-      field: 'video_thumbnail',
-      headerName: 'Video Thumbnail',
-      align: 'center',
-      headerAlign: 'center',
-      hide: hideNameColumn,
-      renderCell: (params: GridRenderCellParams) => {
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {renderClient(params)}
-          </Box>
-        )
-      }
-    },
-    {
-      flex: 0.15,
-      minWidth: 150,
-      field: 'full_name',
-      headerName: 'Content Creator',
-      hide: hideNameColumn,
-      renderCell: (params: GridRenderCellParams) => {
-        const { row } = params
-
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {row.full_name}
-              </Typography>
-            </Box>
-          </Box>
-        )
-      }
-    },
-    {
-      flex: 0.1,
-      minWidth: 120,
-      headerName: 'Title',
-      field: 'title',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.title}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.15,
-      minWidth: 110,
-      field: 'video_url',
-      headerName: 'Video URL',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.videoUrl}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.13,
-      minWidth: 140,
-      field: 'category',
-      headerName: 'Category',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          Multiple Categories
-        </Typography>
-      )
-    },
-    {
-      flex: 0.1,
-      minWidth: 140,
-      field: 'last_update',
-      headerName: 'Last Update',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.last_update}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.06,
-      minWidth: 50,
-      field: 'actions',
-      headerName: '',
-      align: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return (
-          <VideoApprovalDialog param={params.row} />
-        )
-      }
-    }
-  ]
+  },[])
 
   return (
-    <Card>
-      <CardHeader
-        title='VIDEOS LIST'
-      />
-      <DataGrid
-        autoHeight
-        rows={filteredData.length ? filteredData : data}
-        columns={columns}
-        pageSize={pageSize}
-        disableSelectionOnClick
-        rowsPerPageOptions={[7, 10, 25, 50]}
-        components={{ Toolbar: SearchToolbar }}
-        componentsProps={{
-          baseButton: {
-            variant: 'outlined'
-          },
-          toolbar: {
-            value: searchText,
-            clearSearch: () => handleSearch(''),
-            onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-          }
-        }}
-        onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-      />
-    </Card>
+    <>
+      <TableVideos />
+    </>
   )
 }
 

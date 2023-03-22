@@ -147,9 +147,6 @@ const UploadVideoStep1 = (props: Props) => {
   const [groupings, setGroupings] =  React.useState<[] | null>([])
   const [groupingsOptions, setGroupingsOptions] =  React.useState<IItemType[]>([])
 
-  const [hasNextPage, setHasNextPage] = React.useState(true);
-  const [isNextPageLoading, setNextPageLoading] = React.useState(false);
-  const [paginationPageNo, setPaginationPageNo] = React.useState(0);
 
   // ** Hooks
   React.useEffect( () => {
@@ -167,35 +164,16 @@ const UploadVideoStep1 = (props: Props) => {
   }, [])
 
 
-  const loadGroupings = async (pageNum : number) => {
+  const loadGroupings = async () => {
 
     const { getGroupings } = useGroupingService()
     try {
-
-      const params = {
-        page : pageNum,
-      };
-
-      setNextPageLoading(true);
-      const { per_page, data, total }  = await getGroupings({data : params});
-      const dataOptions = data.map( ({ _id, title } : IItemType ) => ({ _id : _id, title : title }))
-
-      const groupItemsData = groupingsOptions?.concat(dataOptions);
-      setGroupingsOptions( groupItemsData as [] ); //refactor
-      setNextPageLoading(false);
-      setHasNextPage(groupItemsData.length < total);
-      setPaginationPageNo(pageNum);
-
+      const { per_page, data, total }  = await getGroupings({data :{}});
     } catch (err) {
       console.log(err); // eslint-disable
     }
   };
 
-  const loadNextSetOfGroupings = async () => {
-    console.log('call loadNextSet')
-    await loadGroupings(paginationPageNo + 1);
-  };
-  
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     accept: {
@@ -525,7 +503,7 @@ const UploadVideoStep1 = (props: Props) => {
                     </Grid>
                     <Grid item xs={6}>
                       
-                      {/* <FormControl fullWidth>
+                      <FormControl fullWidth>
                         <InputLabel id='multiple-taggings-label'>Select Groupings</InputLabel>
                         <CustomSelect
                           multiple
@@ -551,7 +529,7 @@ const UploadVideoStep1 = (props: Props) => {
                         </CustomStack>
                         : null
                       }
-                      </FormControl> */}
+                      </FormControl>
 
                     </Grid>
                   </Grid>
@@ -626,14 +604,7 @@ const UploadVideoStep1 = (props: Props) => {
                       </FormGroup>
                       { !trialUpload && 
                         <FormGroup sx={{rowGap:'1rem'}} row>
-                          <TextField fullWidth id='start' placeholder='Start' />
-                          <FormControl>
-                            <OutlinedInput
-                              placeholder='End'
-                              value={''}
-                              type='text'
-                            />
-                          </FormControl>
+                          <TextField fullWidth id='start' placeholder='Start time' />
                         </FormGroup>
                       }
                       
