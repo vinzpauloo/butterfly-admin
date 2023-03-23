@@ -20,9 +20,11 @@ import FormGroup from '@mui/material/FormGroup'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
+import CircularProgress from '@mui/material/CircularProgress'
 
-// ** Icon Imports
-import OutlinedInput from '@mui/material/OutlinedInput'
+// ** Services Import
+import useGroupingService from '@/services/useGroupings'
+import VideoService from '@/services/api/VideoService'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
@@ -35,13 +37,11 @@ import * as tus from "tus-js-client";
 import * as yup from 'yup'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useQuery } from '@tanstack/react-query'
 
 //* Context Import
 import { StudioContext, DisplayPage, StudioContextType, GenericDataType } from '..'
-import InfiniteLoaderWrapper from '@/shared-components/InfiniteLoaderWrapper'
 
-// ** Hooks
-import useGroupingService from '@/services/useGroupings'
 
 // Styled components
 const Img = styled('img')(({ theme }) => ({
@@ -92,18 +92,17 @@ const ThumbnailBox = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   display:'flex',
   alignItems:'center',
-  gap:'1rem'
+  gap:'1rem',
+  paddingBlock:'.5rem'
 }))
 
 // ** Data
-import { ContentCreatorsDummy, TaggingsDummy, GroupingsDummy } from '@/data/uploadVideoData'
+import { TaggingsDummy, GroupingsDummy } from '@/data/uploadVideoData'
 import { IItemType } from '@/shared-components/InfiniteLoaderWrapper'
 
 
 // ** Props and interfaces 
 type Props = {}
-
-
 
 // ** Constant variables
 const URL : string = `${process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL}/videos/upload-url`
@@ -120,11 +119,12 @@ const defaultValues = {
   title: '',
   description : '',
   contentCreator: '',
+  startTime : ''
 }
 
 const UploadVideoStep1 = (props: Props) => {
 
-  const [trialUpload, setTrialUpload] = React.useState<boolean>(false)
+  const [trialUploadSwitch, setTrialUploadSwitch] = React.useState<boolean>(false)
 
   const studioContext = React.useContext(StudioContext)
 
@@ -143,44 +143,34 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** State
   const [files, setFiles] = React.useState<File[] | null>([])
+  const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
+  const [thumbnailFile, setThumbnailFile] = React.useState<File[] | null>([])
   const [tags, setTags] =  React.useState<[] | null>([])
   const [groupings, setGroupings] =  React.useState<[] | null>([])
-  const [groupingsOptions, setGroupingsOptions] =  React.useState<IItemType[]>([])
+  const [groupingsOptions, setGroupingsOptions] =  React.useState<[{title:string, _id : string}] | []>([])
+
+  // react query / api services
+  const { getGroupings } = useGroupingService()
+  const { updateVideoByWorkId } = VideoService()
+
+  const { isLoading : isGrpLoading } = useQuery( { 
+          queryKey: ['groupingsOptions'], 
+          queryFn: () => { return getGroupings({ data : {all : 'true'} }) },
+          onSuccess: (data: any) => {
+            setGroupingsOptions(data)
+          },
+        } )
 
 
-  // ** Hooks
-  React.useEffect( () => {
-    
-    //load content creator from API
-    
-    //load groupings async
-
-
-    //unmount
-    return () => {
-
-    };
-
-  }, [])
-
-
-  const loadGroupings = async () => {
-
-    const { getGroupings } = useGroupingService()
-    try {
-      const { per_page, data, total }  = await getGroupings({data :{}});
-    } catch (err) {
-      console.log(err); // eslint-disable
-    }
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps : mainFileRootProps , getInputProps : mainFileInputProps } = useDropzone({
     maxFiles: 1,
     accept: {
       'video/*': ['.mp4','.avi']
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
+      console.log('file',acceptedFiles.map((file: File) => Object.assign(file)))
+
       setValue('title', acceptedFiles[0].name)
       studioContext?.setTitle(acceptedFiles[0].name)
     },
@@ -190,9 +180,44 @@ const UploadVideoStep1 = (props: Props) => {
       })
     }
   })
+
+  const { getRootProps : trailerFileRootProps , getInputProps : trailerFileInputProps } = useDropzone({
+    maxFiles: 1,
+    maxSize : 41943040, //40mb
+    accept: {
+      'video/*': ['.mp4','.avi']
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      setTrailerFile(acceptedFiles.map((file: File) => Object.assign(file)))
+      studioContext?.setHasTrial(true)
+    },
+    onDropRejected: () => {
+      toast.error('File size is too large.', {
+        duration: 2000
+      })
+    }
+  })
+
+  const { getRootProps : thumbnailFileRootProps , getInputProps : thumbnailFileInputProps } = useDropzone({
+    multiple: false,
+    maxFiles: 1,
+    maxSize : 41943040, //40mb
+    accept: {
+      'image/*': ['.jpeg','.png', '.jpg']
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      console.log('thumbs',acceptedFiles.map((file: File) => Object.assign(file)))
+      setThumbnailFile(acceptedFiles.map((file: File) => Object.assign(file)))
+
+    },
+    onDropRejected: () => {
+      toast.error('File type or size not accepted.', {
+        duration: 2000
+      })
+    }
+  })
   
   // ** Functions
-
   const handleCancelButton = () => {
     //navigate back
     studioContext?.setDisplayPage(DisplayPage.MainPage)
@@ -221,16 +246,16 @@ const UploadVideoStep1 = (props: Props) => {
       return;
     }
     
-    //mock data
     var file = files[0]
 
     //get fields from react hook form
     const { title, contentCreator} = getValues()
-
+    console.log('values', getValues())
+ 
     const headerData = JSON.stringify({
       "username": contentCreator,
       "file_name": title,
-      "video_type" : "full",
+      "video_type" : "full_video",
     })
     
     const upload = new tus.Upload(file, {
@@ -257,12 +282,39 @@ const UploadVideoStep1 = (props: Props) => {
       },
       onAfterResponse: (req, res) => {
         if ( res.getHeader('works') != null ) {
+
+          let trial_upload_url = ''
+          if( res.getHeader('location') )   {
+            trial_upload_url = res.getHeader('location')
+          }
+
           let data = JSON.parse(res.getHeader('works'))
           console.log('data',data)
-          const { work_id } = data
+          const { work_id } = data.data
           
-          //update the table with the work_id
+          //update the table with the work_id -- Refactor this formData values 
           console.log('getValues', getValues() )
+
+          const {title, description, startTime} = getValues()
+
+          const formData = new FormData()
+
+          formData.append('work_id', work_id) 
+          formData.append('title', title) 
+          formData.append('description', description) 
+          formData.append('orientation', 'landscape') 
+          formData.append('startTimeSeconds', startTime) 
+          
+          if( thumbnailFile?.length ) {
+            console.log('thumbnail', thumbnailFile)
+            formData.append('thumbnail',thumbnailFile[0])
+          }
+
+          //pass this as arrays LOOP?
+          formData.append('tags[]', 'sexy') 
+          formData.append('groups[]', '98acfaa9-6ced-4e51-b2e2-12ab56120bd8') 
+
+          updateVideoByWorkId({ formData : formData })
 
         }
       }
@@ -286,6 +338,23 @@ const UploadVideoStep1 = (props: Props) => {
     //set page
     studioContext?.setDisplayPage(DisplayPage.LoadingScreen)
   }
+
+  //temporary trailer video function for start time
+  const checkStartTimeValidity = (event : React.ChangeEvent<HTMLInputElement> ) => {
+    
+    const target = event.target as HTMLInputElement;
+
+    if( Number(target.value) > 10){
+      target.value = '10';
+    }
+    if(  Number(target.value) < 0){
+      target.value = '0';
+    }
+   
+    setValue('startTime', target.value)
+
+  }
+
   const handleTaggingsChange = (event : React.ChangeEvent, child : { props : { children : string, value : number } }) => { 
     setTags( (event.target as HTMLInputElement).value as any )
   }
@@ -343,22 +412,6 @@ const UploadVideoStep1 = (props: Props) => {
 
   return (
     <>
-      {/* <Box sx={{paddingBlock:'3rem'}}>
-      {
-        groupings && 
-        <InfiniteLoaderWrapper 
-        hasNextPage={hasNextPage} 
-        items={groupingsOptions} 
-        isNextPageLoading={isNextPageLoading}
-        loadNextPage={ ()=>{  
-          console.log('load next page')
-          loadNextSetOfGroupings()
-        }}
-      />
-      }
-        
-
-      </Box> */}
 
       <BasicCard
         sx={{
@@ -404,8 +457,7 @@ const UploadVideoStep1 = (props: Props) => {
                           <MenuItem disabled value=''>
                             Select Content Creator
                           </MenuItem>
-                          <MenuItem value='yanchai919'>Content Creator 1</MenuItem>
-                          <MenuItem value='yanchai919'>Content Creator 2</MenuItem>
+                          <MenuItem value='yanchai919'>Dummy Content Creator 1</MenuItem>
                         </CustomSelect>
                       )}
                     />
@@ -456,10 +508,19 @@ const UploadVideoStep1 = (props: Props) => {
 
                   <Grid container justifyContent="space-between" spacing={4} sx={{marginBottom:5}}>
                     <Grid justifySelf='flex-end' item xs={6}>
+                        <div {...thumbnailFileRootProps({ className: 'dropzone' })}>
+                            <input {...thumbnailFileInputProps()} />
                          <ThumbnailBox>
-                            <img width='48' src="/images/studio/thumbnail.png" />
-                            <Button size='small' variant='contained'>Upload</Button>
+                            {
+                              thumbnailFile?.length 
+                              ? `Selected 1 File`
+                              :
+                              <img width='48' src="/images/studio/thumbnail.png" />
+                            }
+                            
+                            <Button size='small' variant='contained'>{ thumbnailFile?.length ? 'Change' : 'Upload' }</Button>
                          </ThumbnailBox>
+                         </div>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography maxWidth='23ch' color={theme => theme.palette.common.white}>
@@ -503,34 +564,40 @@ const UploadVideoStep1 = (props: Props) => {
                     </Grid>
                     <Grid item xs={6}>
                       
-                      <FormControl fullWidth>
-                        <InputLabel id='multiple-taggings-label'>Select Groupings</InputLabel>
-                        <CustomSelect
-                          multiple
-                          label='Chip'
-                          value={groupings}
-                          id='multiple-taggings'
-                          onChange={(event) => { handleGroupingsChange(event as any) }}
-                          labelId='multiple-taggings-label'
-                        >
-                          {GroupingsDummy.map(tag => (
-                            <MenuItem key={tag.id} value={tag.name}>
-                              {tag.name}
-                            </MenuItem>
-                          ))}
-                        </CustomSelect>
+                      {
+                        isGrpLoading 
+                          ? <CircularProgress />
+                          : 
+                          <FormControl fullWidth>
+                            <InputLabel id='multiple-taggings-label'>Select Groupings</InputLabel>
+                            <CustomSelect
+                              multiple
+                              label='Chip'
+                              value={groupings}
+                              id='multiple-taggings'
+                              onChange={(event) => { handleGroupingsChange(event as any) }}
+                              labelId='multiple-taggings-label'
+                            >
+                              {groupingsOptions.map(tag => (
+                                <MenuItem key={tag._id} value={tag.title}>
+                                  {tag.title}
+                                </MenuItem>
+                              ))}
+                            </CustomSelect>
 
-                        {
-                        (groupings?.length != 0) ? 
-                        <CustomStack>
-                          {
-                            groupings && groupings.map( group => <Chip key={group} label={group} onDelete={ (e) => handleGroupingsDelete(group)  } /> )
+                            {
+                            (groupings?.length != 0) ? 
+                            <CustomStack>
+                              {
+                                groupings && groupings.map( group => <Chip key={group} label={group} onDelete={ (e) => handleGroupingsDelete(group)  } /> )
+                              }
+                            </CustomStack>
+                            : null
                           }
-                        </CustomStack>
-                        : null
-                      }
-                      </FormControl>
+                        </FormControl>
 
+                      }
+                      
                     </Grid>
                   </Grid>
 
@@ -557,8 +624,8 @@ const UploadVideoStep1 = (props: Props) => {
 
                 <Box className='uploadWorkVidBox'>
 
-                  <div {...getRootProps({ className: 'dropzone' })}>
-                    <input {...getInputProps()} />
+                  <div {...mainFileRootProps({ className: 'dropzone' })}>
+                    <input {...mainFileInputProps()} />
                     <Box 
                       sx={{ 
                         borderRadius: '15px',
@@ -572,24 +639,26 @@ const UploadVideoStep1 = (props: Props) => {
                           border: '1px solid #8203BD',
                           borderRadius: '15px',
                           textAlign: ['center', 'center', 'inherit'],
-                          padding:'3em'
+                          padding:'3em',
                           }}>
-                          <Img src='/images/studio/butterfly_file_upload.png'  />
-                          {files?.length ? (
-                            <Typography textAlign='center'>{ files[0].name } file uploaded</Typography>
-                          ) : 
-                          (
-                            <CustomButton 
-                              sx={{ 
-                              bgcolor : 'primary.main',
-                              color : 'common.white'
-                              }}>Upload Work Video</CustomButton>
-                          )
-                            
+                          {
+                            files?.length 
+                            ? <Typography textAlign='center'>Selected 1 file</Typography>
+                            : <Img src='/images/studio/butterfly_file_upload.png'  />
                           }
                           
                       </Box>
                     </Box>
+                    <CustomButton 
+                      sx={{ 
+                      bgcolor : 'primary.main',
+                      color : 'common.white',
+                      mt: 5,
+                      maxWidth:'16rem',
+                      marginInline : 'auto',
+                      display:'block',
+                      }}>Upload Work Video
+                    </CustomButton>
                   </div>
     
                 </Box>  
@@ -600,11 +669,13 @@ const UploadVideoStep1 = (props: Props) => {
                     <CardContent sx={{paddingBlock:'1rem'}}>
                       <FormGroup sx={{ justifyContent:'space-between', alignItems:'center'}} row>
                         <Typography fontSize={12}>Do you want to upload your own trailer video?</Typography>
-                        <Switch onClick={ () => { setTrialUpload(!trialUpload) } } checked={trialUpload} color='error' />
+                        <Switch onClick={ () => { setTrialUploadSwitch(!trialUploadSwitch) } } checked={trialUploadSwitch} color='error' />
                       </FormGroup>
-                      { !trialUpload && 
+                      { !trialUploadSwitch && 
                         <FormGroup sx={{rowGap:'1rem'}} row>
-                          <TextField fullWidth id='start' placeholder='Start time' />
+                          <TextField onChange={( event ) => { 
+                                  checkStartTimeValidity(event)
+                                }} type='number' InputProps={{ inputProps: { min: 0, max: 10 } }} fullWidth id='start' placeholder='Start time' />
                         </FormGroup>
                       }
                       
@@ -612,7 +683,11 @@ const UploadVideoStep1 = (props: Props) => {
                     </CardContent>
                     <CardActions sx={{display:'flex', justifyContent:'center'}} className='card-action-dense'>
                       {
-                        trialUpload && <Button variant='contained'>Upload Trailer Video</Button>
+                        trialUploadSwitch && 
+                          <div {...trailerFileRootProps({ className: 'dropzone' })}>
+                            <input {...trailerFileInputProps()} />
+                            <Button variant='contained'>{ trailerFile?.length ? 'Selected 1 file' : 'Upload Trailer Video' }</Button>
+                          </div>
                       }                     
                     </CardActions>
                   </Card>

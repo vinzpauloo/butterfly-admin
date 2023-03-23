@@ -95,6 +95,8 @@ export type StudioContextType = {
     setDescription : React.Dispatch<React.SetStateAction<string>>,
     publishDate : PublishSchedule,
     setPublishDate : React.Dispatch<React.SetStateAction<PublishSchedule>>,
+    hasTrial : boolean,
+    setHasTrial : React.Dispatch<React.SetStateAction<boolean>>
 }
 
 //** DATA */
@@ -113,6 +115,7 @@ const UploadContent = () => {
   const [title, setTitle] = React.useState<string>('')
   const [description, setDescription] = React.useState<string>('')
   const [publishDate, setPublishDate] = React.useState<PublishSchedule>('publish')
+  const [hasTrial, setHasTrial] = React.useState<boolean>(false)
 
   const PageDisplay = () => {
     if (displayPage == DisplayPage.MainPage) return <UploadMenu />
@@ -139,7 +142,9 @@ const UploadContent = () => {
       description,
       setDescription,
       publishDate,
-      setPublishDate
+      setPublishDate,
+      hasTrial,
+      setHasTrial
       }}>
       <BoxBG>
         {PageDisplay()}
