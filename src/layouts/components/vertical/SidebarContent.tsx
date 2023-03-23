@@ -54,7 +54,7 @@ const sideBarContent = [
       }
     ]
   },
-  { id: 6, title: 'Bundles', icon: 'bundles', link: '' },
+  { id: 6, title: 'Bundles', icon: 'bundles', link: '/bundles' },
   { id: 7, title: 'Settings', icon: 'settings', link: '' }
 ]
 
