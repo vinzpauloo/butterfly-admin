@@ -80,6 +80,23 @@ const promoBundleData = [
 			{ promoName: "Offline Benefits", isPromoIncluded: false },
 		]
 	},
+	{
+		bundleName: "Iron",
+		bundlePrice: "¥50 (CNY)",
+		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et.",
+		isBundleOn: true,
+		promoBundle: [
+			{ promoName: "Video", isPromoIncluded: false },
+			{ promoName: "Photos", isPromoIncluded: true },
+			{ promoName: "Live Stream", isPromoIncluded: false },
+			{ promoName: "Video Call", isPromoIncluded: false },
+			{ promoName: "Live Chat", isPromoIncluded: false },
+			{ promoName: "Forever VIP", isPromoIncluded: false },
+			{ promoName: "Download", isPromoIncluded: false },
+			{ promoName: "Watch Ticket", isPromoIncluded: false },
+			{ promoName: "Offline Benefits", isPromoIncluded: false },
+		]
+	},
 ]
 
 const VIPBundlesCard = () => {
@@ -88,13 +105,18 @@ const VIPBundlesCard = () => {
 
 	return (
 		<>
-			<Card sx={{ backgroundColor: theme => theme.customBflyColors.alwaysPrimary }}>
+			<Card sx={{ backgroundColor: theme => theme.customBflyColors.alwaysPrimary }} >
 				<CardContent sx={{ padding: { xs: 4, sm: 8 } }}>
 					<Stack justifyContent={{ xs: "center", sm: "space-between" }} alignItems="center" flexDirection={{ xs: "column", sm: "row" }} gap={2} mb={4}>
 						<Typography variant="h5" component="div" color="white"> VIP BUNDLES - MEMBERSHIP </Typography>
 						<Button variant="contained" onClick={() => setOpen(true)}>CREATE VIP BUNDLE</Button>
 					</Stack>
-					<Grid container gap={4} justifyContent={{ xs: "center", sm: "space-between" }}>
+					<Grid
+						container
+						pr={promoBundleData.length > 4 ? {sm:4} : undefined}
+						gap={4}
+						justifyContent={{xs: "center", sm: promoBundleData.length >= 4 ? "space-between" : "flex-start"}}
+						sx={{ maxHeight: 525, overflowY: "auto" }}>
 						{promoBundleData.map((item, index) =>
 							<VIPBundleItem
 								key={index}

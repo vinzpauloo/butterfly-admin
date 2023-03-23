@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import GoldCoinBundleItem from './GoldCoinBundleItem';
 import Modal from '@mui/material/Modal';
 import GoldCoinBundleModal from './GoldCoinBundleModal';
-
+import Grid from '@mui/material/Grid';
 
 // FETCHED FAKE DATA
 const goldCoinBundleData = [
@@ -35,6 +35,12 @@ const goldCoinBundleData = [
 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et. Pharetra nulla sit facilisis scelerisque et ultricies eu aliquet.",
 		isBundleOn: false,
 	},
+	{
+		bundleName: "Low Ball 2",
+		bundlePrice: "200 Gold Coins",
+		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et. Pharetra nulla sit facilisis scelerisque et ultricies eu aliquet.",
+		isBundleOn: false,
+	},
 ]
 
 const GoldCoinBundlesCard = () => {
@@ -49,7 +55,12 @@ const GoldCoinBundlesCard = () => {
 						<Typography variant="h5" component="div" color="white"> GOLD COIN BUNDLES </Typography>
 						<Button variant="contained" onClick={() => setOpen(true)}>CREATE GOLD BUNDLE</Button>
 					</Stack>
-					<Stack flexDirection={{ xs: "column", md: "row" }} gap={2} justifyContent="space-between" alignItems="center">
+					<Grid
+						container
+						gap={4}
+						pr={goldCoinBundleData.length > 4 ? { sm: 4 } : undefined}
+						justifyContent={{xs: "center", sm: goldCoinBundleData.length >= 4 ? "space-between" : "flex-start"}}
+						sx={{ maxHeight: 348, overflowY: "auto" }}>
 						{goldCoinBundleData.map((item, index) => 
 							<GoldCoinBundleItem
 								key={index}
@@ -59,7 +70,7 @@ const GoldCoinBundlesCard = () => {
 								isBundleOn={item.isBundleOn}
 							/>
 						)}
-					</Stack>
+					</Grid>
 				</CardContent>
 			</Card>
 			{/* TO BE GLOBALIZED LATER SO WE DONT NEED TO RENDER THIS HERE */}
