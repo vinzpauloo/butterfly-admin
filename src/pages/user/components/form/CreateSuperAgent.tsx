@@ -1,25 +1,16 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
-import { Box, Button, TextField, Typography, MenuItem, InputAdornment } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 
 // ** Form and Validation Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm } from 'react-hook-form'
-
-// ** Other Imports
-import CreatedSuccessful from './CreatedSuccessful'
-
-// ** TanStack Query
-import { useMutation } from '@tanstack/react-query'
+import { PathString, useForm } from 'react-hook-form'
 
 // ** Hooks
-import { CreateAccount } from '@/services/api/CreateAccount'
+import CreateSuperAgent2 from './CreateSuperAgent2'
 
 interface FormValues {
   role: string
@@ -28,15 +19,9 @@ interface FormValues {
   password_confirmation: string
   mobile: string
   email: string
-  partner: string // Set string of "true"
-  name: string //Company Name
-  code: string // Company Code
-  note: string
-  site: string // Set string of "true"
-  currency_id: number
-  language_id: number
-  site_name: string // Name of Site
-  description: string
+  partner_name: string
+  partner_code: PathString
+  partner_note: string
 }
 
 const schema = yup.object().shape({
@@ -50,13 +35,13 @@ const schema = yup.object().shape({
     .string()
     .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number')
     .required(),
-  email: yup.string().email().required()
+  email: yup.string().email().required(),
+  partner_name: yup.string().required(),
+  partner_code: yup.string().required(),
+  partner_note: yup.string().min(3, 'Note must be at least 3 characters').required()
 })
 
 const CreateSuperAgent = () => {
-  const router = useRouter()
-
-  const [submitted, setSubmitted] = useState<boolean>()
   const [continueBtn, setContinueBtn] = useState<boolean>()
   const [continueBtnTwo, setContinueBtnTwo] = useState<boolean>()
 
@@ -67,7 +52,9 @@ const CreateSuperAgent = () => {
     password_confirmation: '',
     mobile: '',
     email: '',
-    note: ''
+    partner_name: '',
+    partner_code: '',
+    partner_note: ''
   })
 
   const {
@@ -87,37 +74,12 @@ const CreateSuperAgent = () => {
     }))
   }
 
-  const superAgentContinueBtn = (event: any) => {
-    event.preventDefault()
-
-    setContinueBtn(true)
-  }
-
-  const superAgentContinueBtnTwo = (event: any) => {
-    event.preventDefault()
-
-    setContinueBtnTwo(true)
-    setTimeout(() => {
-      router.push('/user/list')
-    }, 1000)
-  }
-
-  const { createUser } = CreateAccount()
-  const mutation = useMutation(createUser)
-
   const handleFormSubmit = async () => {
     console.log(formValue)
 
-    const userData = {
-      data: formValue
-    }
+    await localStorage.setItem('createSA', JSON.stringify(formValue))
 
-    await mutation.mutateAsync(userData)
-
-    setSubmitted(true)
-    setTimeout(() => {
-      router.push('/user/list')
-    }, 1000)
+    setContinueBtn(true)
   }
 
   return (
@@ -133,37 +95,66 @@ const CreateSuperAgent = () => {
             </Box>
           </Box>
           <Box sx={styles.innerFormContainer}>
-            <form>
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box style={styles.formMargin}>
                 <Box sx={styles.halfWidth}>
                   <Typography>Company Name</Typography>
                   <TextField
-                    label='Enter Company Name'
+                    label='Company Name'
                     variant='outlined'
                     fullWidth
-                    type='companyName'
-                    name='companyName'
+                    {...register('partner_name')}
+                    error={!!errors.partner_name}
+                    helperText={errors.partner_name?.message}
+                    value={formValue.partner_name}
+                    onChange={handleFormInputChange}
+                    name='partner_name'
                   />
                 </Box>
                 <Box sx={styles.halfWidth}>
                   <Typography>Company Code</Typography>
                   <TextField
-                    label='Enter Company Code'
+                    label='Company Code'
                     variant='outlined'
                     fullWidth
-                    type='password'
-                    name='confirmPassword'
+                    {...register('partner_code')}
+                    error={!!errors.partner_code}
+                    helperText={errors.partner_code?.message}
+                    value={formValue.partner_code}
+                    onChange={handleFormInputChange}
+                    name='partner_code'
                   />
                 </Box>
               </Box>
               <Box sx={styles.fullWidth}>
                 <Typography>Username</Typography>
-                <TextField label='Entire Desired Username' variant='outlined' fullWidth name='username' />
+                <TextField
+                  label='Username'
+                  variant='outlined'
+                  fullWidth
+                  {...register('username')}
+                  error={!!errors.username}
+                  helperText={errors.username?.message}
+                  value={formValue.username}
+                  onChange={handleFormInputChange}
+                  name='username'
+                />
               </Box>
               <Box style={styles.formMargin}>
                 <Box sx={styles.halfWidth}>
                   <Typography>Password</Typography>
-                  <TextField label='Enter Password' variant='outlined' fullWidth type='password' name='password' />
+                  <TextField
+                    label='Enter Password'
+                    variant='outlined'
+                    fullWidth
+                    type='password'
+                    {...register('password')}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                    value={formValue.password}
+                    onChange={handleFormInputChange}
+                    name='password'
+                  />
                 </Box>
                 <Box sx={styles.halfWidth}>
                   <Typography>Re-enter Password</Typography>
@@ -172,113 +163,59 @@ const CreateSuperAgent = () => {
                     variant='outlined'
                     fullWidth
                     type='password'
-                    name='confirmPassword'
+                    {...register('password_confirmation')}
+                    error={!!errors.password_confirmation}
+                    helperText={errors.password_confirmation?.message}
+                    value={formValue.password_confirmation}
+                    onChange={handleFormInputChange}
+                    name='password_confirmation'
                   />
                 </Box>
               </Box>
               <Box style={styles.formMargin}>
                 <Box sx={styles.halfWidth}>
                   <Typography>Mobile No.</Typography>
-                  <TextField label='Mobile No.' variant='outlined' fullWidth name='mobileNo' />
-                </Box>
-                <Box sx={styles.halfWidth}>
-                  <Typography>Email Address</Typography>
-                  <TextField label='Email Address' variant='outlined' fullWidth name='emailAddress' />
-                </Box>
-              </Box>
-              <Typography>Notes (Optional)</Typography>
-              <TextField label='Notes' variant='outlined' fullWidth multiline rows={4} name='notes' />
-              <Box sx={styles.bottomFormButtons}>
-                <Box>
-                  <Button sx={styles.cancelButton}>
-                    <Typography sx={styles.buttonText}>Cancel</Typography>
-                  </Button>
-                </Box>
-
-                <Box>
-                  <Button type='submit' sx={styles.continueButton} onClick={superAgentContinueBtn}>
-                    <Typography sx={styles.buttonText}>Continue</Typography>
-                  </Button>
-                </Box>
-              </Box>
-            </form>
-          </Box>
-        </Box>
-      ) : !continueBtnTwo ? (
-        <Box sx={styles.formContainer}>
-          <Box sx={styles.headerContainer}>
-            <Box sx={styles.header}>
-              <Typography sx={styles.white}>Step 2</Typography>
-            </Box>
-            <Box sx={styles.header}>
-              <Typography sx={styles.white}>Create Site</Typography>
-            </Box>
-          </Box>
-          <Box sx={styles.innerFormContainer}>
-            <form>
-              <Box style={styles.formMargin}>
-                <Box sx={styles.halfWidth}>
-                  <Typography>Name of Site</Typography>
                   <TextField
-                    label='Please input site name'
+                    label='Mobile No.'
                     variant='outlined'
                     fullWidth
-                    type='password'
-                    name='confirmPassword'
+                    {...register('mobile')}
+                    error={!!errors.mobile}
+                    helperText={errors.mobile?.message}
+                    value={formValue.mobile}
+                    onChange={handleFormInputChange}
+                    name='mobile'
                   />
                 </Box>
                 <Box sx={styles.halfWidth}>
-                  <Typography>Language</Typography>
-                  <TextField select label='Choose Language' variant='outlined' fullWidth name='language'>
-                    <MenuItem value='en'>English</MenuItem>
-                    <MenuItem value='es'>Spanish</MenuItem>
-                    <MenuItem value='fr'>French</MenuItem>
-                  </TextField>
+                  <Typography>Email Address</Typography>
+                  <TextField
+                    label='Email Address'
+                    variant='outlined'
+                    fullWidth
+                    {...register('email')}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                    value={formValue.email}
+                    onChange={handleFormInputChange}
+                    name='email'
+                  />
                 </Box>
               </Box>
-              <Box style={styles.formMargin}>
-                <Box sx={styles.halfWidth}>
-                  <Typography>Currency</Typography>
-                  <TextField select label='Choose Currency' variant='outlined' fullWidth name='currency'>
-                    <MenuItem value='usd'>USD</MenuItem>
-                    <MenuItem value='eur'>EUR</MenuItem>
-                    <MenuItem value='gbp'>GBP</MenuItem>
-                  </TextField>
-                </Box>
-                <Box sx={styles.halfWidth}>
-                  <Typography>Access URL</Typography>
-                  <TextField label='' variant='outlined' fullWidth type='password' name='confirmPassword' />
-                </Box>
-              </Box>
-              <Box style={styles.formMargin}>
-                <Box sx={styles.halfWidth}>
-                  <Typography>Add Security Funds</Typography>
-                  <TextField label='Amount' variant='outlined' fullWidth name='mobileNo' />
-                </Box>
-                <Box sx={styles.halfWidth}>
-                  <Typography>Logo</Typography>
-                  <Box>
-                    <input type='file' accept='.jpg, .jpeg, .png' style={styles.input} name='logo' id='logo' />
-                    <label htmlFor='logo'>
-                      <TextField
-                        variant='outlined'
-                        fullWidth
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <Box sx={styles.upload}>
-                                <Typography sx={styles.white}>UPLOAD</Typography>
-                              </Box>
-                            </InputAdornment>
-                          )
-                        }}
-                      />
-                    </label>
-                  </Box>
-                </Box>
-              </Box>
-              <Typography>Description (Optional)</Typography>
-              <TextField label='Notes' variant='outlined' fullWidth multiline rows={4} name='notes' />
+              <Typography>Notes (Required)</Typography>
+              <TextField
+                label='Notes'
+                variant='outlined'
+                fullWidth
+                multiline
+                rows={4}
+                {...register('partner_note')}
+                error={!!errors.partner_note}
+                helperText={errors.partner_note?.message}
+                value={formValue.partner_note}
+                onChange={handleFormInputChange}
+                name='partner_note'
+              />
               <Box sx={styles.bottomFormButtons}>
                 <Box>
                   <Button sx={styles.cancelButton}>
@@ -287,7 +224,7 @@ const CreateSuperAgent = () => {
                 </Box>
 
                 <Box>
-                  <Button type='submit' sx={styles.continueButton} onClick={superAgentContinueBtnTwo}>
+                  <Button type='submit' sx={styles.continueButton}>
                     <Typography sx={styles.buttonText}>Continue</Typography>
                   </Button>
                 </Box>
@@ -296,7 +233,7 @@ const CreateSuperAgent = () => {
           </Box>
         </Box>
       ) : (
-        <CreatedSuccessful />
+        !continueBtnTwo && <CreateSuperAgent2 />
       )}
     </Box>
   )

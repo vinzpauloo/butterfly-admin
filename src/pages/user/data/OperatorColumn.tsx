@@ -39,7 +39,7 @@ const operatorColumns = [
         <EditBtn modal={OperatorEditModal} />
       </Box>
     )
-  },
+  }
 ]
 
 export default operatorColumns
