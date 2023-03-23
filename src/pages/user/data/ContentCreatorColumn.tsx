@@ -10,9 +10,9 @@ import contentCreatorEditModal from '@/pages/user/components/modal/ContentCreato
 import formatDate from '@/utils/formatDate'
 
 const contentCreatorColumns = [
-  { field: 'username', headerName: 'User Name', width: 250 },
-  { field: 'mobile', headerName: 'Mobile Number', width: 250 },
-  { field: 'email', headerName: 'Email', width: 250 },
+  { field: 'username', headerName: 'User Name', width: 300 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 300 },
+  { field: 'email', headerName: 'Email', width: 300 },
   {
     field: 'created_at',
     headerName: 'Date Created',

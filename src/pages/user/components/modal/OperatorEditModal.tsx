@@ -1,7 +1,7 @@
-import * as yup from "yup";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Box,
   Button,
@@ -12,33 +12,33 @@ import {
   DialogTitle,
   TextField,
   Typography
-} from "@mui/material";
+} from '@mui/material'
 
 interface FormValues {
-  operator: boolean;
-  supervisor: boolean;
-  username: string;
-  password: string;
-  confirmPassword: string;
-  mobileNo: string;
-  emailAddress: string;
-  notes: string;
+  operator: boolean
+  supervisor: boolean
+  username: string
+  password: string
+  confirmPassword: string
+  mobileNo: string
+  emailAddress: string
+  notes: string
 }
 
 const schema = yup.object().shape({
-  username: yup.string().required(),
-  password: yup.string().required(),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required(),
-  mobileNo: yup.string().required(),
-  emailAddress: yup.string().email().required(),
-});
+  // username: yup.string().required(),
+  // password: yup.string().required(),
+  // confirmPassword: yup
+  //   .string()
+  //   .oneOf([yup.ref('password'), null], 'Passwords must match')
+  //   .required(),
+  // mobileNo: yup.string().required(),
+  // emailAddress: yup.string().email().required()
+})
 
 interface FormModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
@@ -50,111 +50,115 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
     confirmPassword: '',
     mobileNo: '',
     emailAddress: '',
-    notes: '',
-  });
+    notes: ''
+  })
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-  });
+    resolver: yupResolver(schema)
+  })
 
   const handleFormSubmit = () => {
-    alert(JSON.stringify(formValue));
-    onClose();
-  };
+    alert(JSON.stringify(formValue))
+    onClose()
+  }
 
   const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
+    const { name, checked } = event.target
 
     if (name === 'operator' && checked) {
-      setFormValue((prevState) => ({
+      setFormValue(prevState => ({
         ...prevState,
         operator: true,
-        supervisor: false,
-      }));
+        supervisor: false
+      }))
     } else if (name === 'supervisor' && checked) {
-      setFormValue((prevState) => ({
+      setFormValue(prevState => ({
         ...prevState,
         operator: false,
-        supervisor: true,
-      }));
+        supervisor: true
+      }))
     } else {
-      setFormValue((prevState) => ({
+      setFormValue(prevState => ({
         ...prevState,
-        [name]:
-          event.target.type === 'checkbox' ? event.target.checked : event.target.value,
-      }));
+        [name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
+      }))
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <div style={{ display: 'flex', backgroundColor: '#A459D1' }}>
-        <DialogTitle sx={{ color: 'white' }}>Operator</DialogTitle>
+        {/* <DialogTitle sx={{ color: 'white' }}>Operator</DialogTitle>
         <Checkbox
-          name="operator"
+          name='operator'
           checked={formValue.operator}
           onChange={handleFormInputChange}
           inputProps={{ 'aria-label': 'primary checkbox' }}
           sx={{ color: 'white' }}
-          color="default"
-        />
+          color='default'
+          disabled
+        /> */}
         <DialogTitle sx={{ color: 'white' }}>Supervisor</DialogTitle>
-        <Checkbox
-          name="supervisor"
+        {/* <Checkbox
+          name='supervisor'
           checked={formValue.supervisor}
           onChange={handleFormInputChange}
           inputProps={{ 'aria-label': 'primary checkbox' }}
           sx={{ color: 'white' }}
-          color="default"
-        />
+          color='default'
+          disabled
+        /> */}
       </div>
       <DialogContent>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Typography>Username</Typography>
           <TextField
-            label="Entire Desired Username"
-            variant="outlined"
+            label='**********'
+            variant='outlined'
             fullWidth
             {...register('username')}
             error={!!errors.username}
             helperText={errors.username?.message}
             value={formValue.username}
             onChange={handleFormInputChange}
-            name="username"
+            name='username'
+            disabled
           />
           <Box style={{ display: 'flex', gap: 20, marginTop: 20, marginBottom: 20 }}>
             <Box sx={{ width: '50%' }}>
               <Typography>Password</Typography>
               <TextField
-                label="Enter Password"
-                variant="outlined"
+                label='**********'
+                variant='outlined'
                 fullWidth
-                type="password"
+                type='password'
                 {...register('password')}
                 error={!!errors.password}
                 helperText={errors.password?.message}
                 value={formValue.password}
                 onChange={handleFormInputChange}
-                name="password"
+                name='password'
+                disabled
               />
             </Box>
             <Box sx={{ width: '50%' }}>
               <Typography>Re-enter Password</Typography>
               <TextField
-                label="Re-enter Password"
-                variant="outlined"
+                label='**********'
+                variant='outlined'
                 fullWidth
-                type="password"
+                type='password'
                 {...register('confirmPassword')}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
                 value={formValue.confirmPassword}
                 onChange={handleFormInputChange}
-                name="confirmPassword"
+                name='confirmPassword'
+                disabled
               />
             </Box>
           </Box>
@@ -162,74 +166,99 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
             <Box sx={{ width: '50%' }}>
               <Typography>Mobile No.</Typography>
               <TextField
-                label="Mobile No."
-                variant="outlined"
+                label='Mobile No.'
+                variant='outlined'
                 fullWidth
                 {...register('mobileNo')}
                 error={!!errors.mobileNo}
                 helperText={errors.mobileNo?.message}
                 value={formValue.mobileNo}
                 onChange={handleFormInputChange}
-                name="mobileNo"
+                name='mobileNo'
               />
             </Box>
             <Box sx={{ width: '50%' }}>
               <Typography>Email Address</Typography>
               <TextField
-                label="Email Address"
-                variant="outlined"
+                label='Email Address'
+                variant='outlined'
                 fullWidth
                 {...register('emailAddress')}
                 error={!!errors.emailAddress}
                 helperText={errors.emailAddress?.message}
                 value={formValue.emailAddress}
                 onChange={handleFormInputChange}
-                name="emailAddress"
+                name='emailAddress'
               />
             </Box>
           </Box>
           <Typography>Notes (Optional)</Typography>
           <TextField
-            label="Notes"
-            variant="outlined"
+            label='**********'
+            variant='outlined'
             fullWidth
             multiline
             rows={4}
             {...register('notes')}
             value={formValue.notes}
             onChange={handleFormInputChange}
-            name="notes"
+            name='notes'
+            disabled
           />
           <DialogActions>
-            <Button onClick={onClose} sx={{
-              backgroundColor: '#98A9BC', color: 'white', width: '200px', '&:hover': {
-                backgroundColor: '#7899ac',
-              },
-            }}>
-              <Typography sx={{
-                color: 'white', textTransform: 'uppercase', '&:hover': {
-                  transform: 'scale(1.1)',
-                  transition: 'transform 0.2s ease-in-out',
-                },
-              }}>Cancel</Typography>
+            <Button
+              onClick={onClose}
+              sx={{
+                backgroundColor: '#98A9BC',
+                color: 'white',
+                width: '200px',
+                '&:hover': {
+                  backgroundColor: '#7899ac'
+                }
+              }}
+            >
+              <Typography
+                sx={{
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    transition: 'transform 0.2s ease-in-out'
+                  }
+                }}
+              >
+                Cancel
+              </Typography>
             </Button>
-            <Button type="submit" sx={{
-              backgroundColor: '#9747FF', color: 'white', width: '200px', '&:hover': {
+            <Button
+              // type='submit'
+              sx={{
                 backgroundColor: '#9747FF',
-              },
-            }}>
-              <Typography sx={{
-                color: 'white', textTransform: 'uppercase', '&:hover': {
-                  transform: 'scale(1.1)',
-                  transition: 'transform 0.2s ease-in-out',
-                },
-              }}>Update</Typography>
+                color: 'white',
+                width: '200px',
+                '&:hover': {
+                  backgroundColor: '#9747FF'
+                }
+              }}
+            >
+              <Typography
+                sx={{
+                  color: 'white',
+                  textTransform: 'uppercase',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    transition: 'transform 0.2s ease-in-out'
+                  }
+                }}
+              >
+                Update
+              </Typography>
             </Button>
           </DialogActions>
         </form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default FormModal;
+export default FormModal

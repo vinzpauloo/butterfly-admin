@@ -34,7 +34,9 @@ interface FormValues {
 const schema = yup.object().shape({
   currency_id: yup.string().required(),
   language_id: yup.string().required(),
-  site_name: yup.string().required()
+  site_name: yup.string().required(),
+  description: yup.string().min(3, 'Description must be at least 3 characters').required(),
+  note: yup.string().min(3, 'Description must be at least 3 characters').required()
 })
 
 const CreateSuperAgent2 = () => {
