@@ -8,8 +8,10 @@ import VIPBundleItem from './VIPBundleItem';
 import Stack from '@mui/material/Stack';
 import Modal from '@mui/material/Modal';
 import VIPBundleModal from './VIPBundleModal';
+import  BundlesService  from '../../../services/api/BudlesService'
+import { useQuery } from '@tanstack/react-query';
 
-// FETCHED FAKE DATA
+// FAKE DATA FOR NOW
 const promoBundleData = [
 	{
 		bundleName: "Platinum",
@@ -102,6 +104,19 @@ const promoBundleData = [
 const VIPBundlesCard = () => {
 	const [open, setOpen] = useState(false);
 	const handleClose = () => setOpen(false);
+
+	// FETCH ALL VIP BUNDLES
+	// const { getAllVIPBundles } = BundlesService()
+	// const { isLoading, isError, data, error } = useQuery({
+	// 	queryKey: ['allVIPBundles'],
+	// 	queryFn: () => getAllVIPBundles({
+	// 		data: {
+	// 			site_id: 1
+	// 		},
+	// 	}),
+	// 	onSuccess: (data) => { console.log("VIP BUNDLES:",data?.bundles) },
+	// 	onError: (error) => { console.log(error) }
+	// })
 
 	return (
 		<>
