@@ -20,7 +20,7 @@ const BundleFeatureCard = (props: Props) => {
 	return (
 		<Stack bgcolor="#D9D9D9" borderRadius={.5} p={2} >
 			<Stack bgcolor="white" borderRadius={.5} gap={4} p={1}>
-				<Typography variant="body1" borderRadius={.5} textAlign="center">{props.bundleName} Features</Typography>
+				<Typography variant="body1" borderRadius={.5} textAlign="center">{props.bundleName} Perks</Typography>
 				<Grid container gap={2} >
 					{props.promoBundle.map((item, index) => 
 						<Grid item  key={index} {...gridItemProps}>

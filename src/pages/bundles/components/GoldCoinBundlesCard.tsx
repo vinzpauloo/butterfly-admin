@@ -8,6 +8,8 @@ import GoldCoinBundleItem from './GoldCoinBundleItem';
 import Modal from '@mui/material/Modal';
 import GoldCoinBundleModal from './GoldCoinBundleModal';
 import Grid from '@mui/material/Grid';
+import { useQuery } from '@tanstack/react-query';
+import BundlesService from '../../../services/api/BudlesService'
 
 // FETCHED FAKE DATA
 const goldCoinBundleData = [
@@ -46,6 +48,19 @@ const goldCoinBundleData = [
 const GoldCoinBundlesCard = () => {
 	const [open, setOpen] = useState(false);
 	const handleClose = () => setOpen(false);
+
+	// FETCH ALL VIP BUNDLES
+	// const { getAllCoinsBundle } = BundlesService()
+	// const { isLoading, isError, data, error } = useQuery({
+	// 	queryKey: ['allVIPBundles'],
+	// 	queryFn: () => getAllCoinsBundle({
+	// 		data: {
+	// 			site_id: 1
+	// 		}
+	// 	}),
+	// 	onSuccess: (data) => { console.log("COINS BUNDLE:",data?.bundles) },
+	// 	onError: (error) => { console.log(error) }
+	// })
 
 	return (
 		<>
