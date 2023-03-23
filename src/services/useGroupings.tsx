@@ -3,6 +3,7 @@ import request from "@/lib/request";
 interface IGroupingServiceParams {
   data: {
     page?: number;
+    all? : 'true' | ''
   };
 }
 

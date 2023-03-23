@@ -9,6 +9,10 @@ interface IVideoParams {
 	token?: string
 }
 
+interface IUpdateVideoParams {
+	formData : FormData
+}
+
 const VideoService = () => {
 
 	const getAllVideos = (params: IVideoParams) => {
@@ -23,7 +27,18 @@ const VideoService = () => {
 		});
 	};
 
-	return { getAllVideos };
+	const updateVideoByWorkId = (params : IUpdateVideoParams) => {
+		return request({
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			},
+			url: "/videos/update",
+			method: "POST",
+			data : params.formData
+		})
+	}
+
+	return { getAllVideos, updateVideoByWorkId };
 };
 
 export default VideoService;
