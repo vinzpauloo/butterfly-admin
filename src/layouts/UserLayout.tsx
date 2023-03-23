@@ -66,53 +66,7 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       contentHeightFixed={contentHeightFixed}
       verticalLayoutProps={{
         navMenu: {
-          componentProps: {
-            sx: {
-              '& .MuiPaper-root': {
-                backgroundColor: theme => theme.customBflyColors.primary,
-                boxShadow: '5px 2px 2px rgb(0 0 0 / 25%)'
-              },
-              '& .nav-header': {
-                backgroundColor: theme => theme.customBflyColors.sidebarHeaderBG,
-                borderBottom: '1px solid #FFFFFF'
-              },
-              '& .scrollbar-container .nav-link .active': {
-                backgroundColor: 'none',
-                backgroundImage: 'none',
-                boxShadow: 'none',
-                borderRadius: 0
-              },
-              '& .scrollbar-container  a': {
-                color: theme => theme.palette.common.white
-              }
-            }
-          },
-          branding: props => <AppBrand {...props} />,
-          navItems: VerticalNavItems(),
-          lockedIcon: (
-            <Box
-              sx={{
-                '&:hover': {
-                  backgroundColor: theme => theme.customBflyColors.green
-                },
-                backgroundColor: '#fff',
-                cursor: 'pointer',
-                ml: 6,
-                display: 'flex',
-                color: '#3C4B64',
-                boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.5)',
-                borderRadius: 0.3,
-                border: '1px solid #3C4B64'
-              }}
-            >
-              <Icon icon='mdi:menu' fontSize={20} />
-            </Box>
-          ),
-
-          // unlockedIcon: <></>,
-          // { hidden, settings, children, scrollToTop, footerProps, contentHeightFixed, verticalLayoutProps }
-          content: () => <SidebarContent />,
-          afterContent: () => <SidebarFooter />
+          navItems: VerticalNavItems()
 
           // Uncomment the below line when using server-side menu in vertical layout and comment the above line
           // navItems: verticalMenuItems

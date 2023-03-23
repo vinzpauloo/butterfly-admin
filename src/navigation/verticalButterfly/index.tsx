@@ -9,69 +9,20 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Dashboard',
       icon: 'mdi:home-outline',
-      path: '/dashboards/crm'
+      path: '/dashboards'
     },
     {
       title: 'Users',
       icon: 'mdi:user-circle',
-      children: [
-        {
-          title: 'Operators',
-          path: '/apps/user/list/'
-        },
-        {
-          title: 'Super Agent',
-          path: '/dashboards/analytics'
-        },
-        {
-          title: 'Content Creators',
-          path: '/dashboards/ecommerce'
-        }
-      ]
+      path: '/user/list'
     },
     {
         title: 'Transactions',
         icon: 'mdi:file-document-outline',
-        children: [
-          {
-            title: 'Donations',
-            path: '/apps/user/list/'
-          },
-          {
-            title: 'Commissions',
-            path: '/dashboards/analytics'
-          },
-          {
-            title: 'Withdrawal',
-            path: '/dashboards/ecommerce'
-          },
-          {
-            title: 'Security Funds',
-            path: '/dashboards/ecommerce'
-          }
-        ]
       },
       {
         title: 'Reports',
         icon: 'mdi:grid-large',
-        children: [
-          {
-            title: 'All',
-            path: '/apps/user/list/'
-          },
-          {
-            title: 'Commissions',
-            path: '/dashboards/analytics'
-          },
-          {
-            title: 'Balance History',
-            path: '/dashboards/ecommerce'
-          },
-          {
-            title: 'Security Funds',
-            path: '/dashboards/ecommerce'
-          }
-        ]
       },
       {
         title: 'Studio',
@@ -83,15 +34,15 @@ const navigation = (): VerticalNavItemsType => {
           },
           {
             title: 'Content Approval',
-            path: '/dashboards/analytics'
+            path: '/studio/content'
           },
           {
-            title: 'Feed List',
-            path: '/dashboards/ecommerce'
+            title: 'Newsfeed List',
+            path: '/studio/newsfeed'
           },
           {
             title: 'Video List',
-            path: '/dashboards/ecommerce'
+            path: '/studio/video-list'
           }
         ]
       },
@@ -101,43 +52,34 @@ const navigation = (): VerticalNavItemsType => {
         children: [
           {
             title: 'Works Groupings',
-            path: '/apps/user/list/'
+            path: '/settings'
           },
           {
             title: 'Feed Features',
-            path: '/dashboards/analytics'
+            path: '/settings/pages/feedfeatures'
           },
           {
             title: 'Advertisements',
-            path: '/dashboards/ecommerce'
+            path: '/settings/pages/advertisements'
           },
           {
             title: 'Announcements',
-            path: '/dashboards/ecommerce'
+            path: '/settings/pages/announcements'
           },
           {
             title: 'Privacy Policy',
-            path: '/dashboards/ecommerce'
+            path: '/settings/pages/privacypolicy'
           },
           {
             title: 'Terms of Services',
-            path: '/dashboards/ecommerce'
+            path: '/settings/pages/tos'
           }
         ]
       },
       {
         title: 'Bundles',
         icon: 'mdi:tag-multiple',
-        children: [
-            {
-                title: 'Coin Bundles',
-                path: '/dashboards/ecommerce'
-            },
-            {
-                title: 'VIP Subscription',
-                path: '/dashboards/ecommerce'
-            }
-        ]
+        path: '/bundles'
       }
   ]
 }

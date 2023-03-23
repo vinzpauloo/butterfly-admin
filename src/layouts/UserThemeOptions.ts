@@ -101,12 +101,6 @@ const UserThemeOptions = (): ThemeOptions => {
         dark: '#25A510',
         contrastText: '#FFF'
       },
-      secondary: {
-        main : '#EDEDED'
-      },
-      background: {
-        default: '#FFF'
-      },
     },
     breakpoints: {
       values: {
