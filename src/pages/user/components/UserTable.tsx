@@ -51,8 +51,8 @@ const UserTable = () => {
   const [columnType, setColumnType] = useState('SUPERVISOR')
   const [rowCount, setRowCount] = useState<any>()
 
-  const [sort, setSort] = useState<SortType>('asc')
-  const [sortName, setSortName] = useState<string>('username')
+  const [sort, setSort] = useState<SortType>('desc')
+  const [sortName, setSortName] = useState<string>('created_at')
 
   const [search, setSearch] = useState<string>()
   const [emailSearchValue, setEmailSearchValue] = useState<string>('')

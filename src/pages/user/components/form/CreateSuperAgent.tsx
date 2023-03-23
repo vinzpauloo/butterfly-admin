@@ -1,25 +1,15 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
-import { Box, Button, TextField, Typography, MenuItem, InputAdornment } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 
 // ** Form and Validation Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm } from 'react-hook-form'
-
-// ** Other Imports
-import CreatedSuccessful from './CreatedSuccessful'
-
-// ** TanStack Query
-import { useMutation, useQuery, useQueries } from '@tanstack/react-query'
+import { PathString, useForm } from 'react-hook-form'
 
 // ** Hooks
-import { CreateAccount } from '@/services/api/CreateAccount'
 import CreateSuperAgent2 from './CreateSuperAgent2'
 
 interface FormValues {
@@ -29,17 +19,9 @@ interface FormValues {
   password_confirmation: string
   mobile: string
   email: string
-  partner_name: string //e.g. txvlog
-  partner_code: string // e.g. txv
+  partner_name: string
+  partner_code: PathString
   partner_note: string
-
-  // currency_id: number
-  // language_id: number
-  // site_name: string // e.g. meow vlog
-  // description: string // e.g. site desc
-  // logo: File | null
-  // amount: number
-  // note: string // e.g. for approval
 }
 
 const schema = yup.object().shape({
@@ -60,8 +42,6 @@ const schema = yup.object().shape({
 })
 
 const CreateSuperAgent = () => {
-  const router = useRouter()
-
   const [continueBtn, setContinueBtn] = useState<boolean>()
   const [continueBtnTwo, setContinueBtnTwo] = useState<boolean>()
 
@@ -100,10 +80,6 @@ const CreateSuperAgent = () => {
     await localStorage.setItem('createSA', JSON.stringify(formValue))
 
     setContinueBtn(true)
-
-    // setTimeout(() => {
-    //   router.push('/user/list')
-    // }, 1000)
   }
 
   return (
