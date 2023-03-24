@@ -49,5 +49,17 @@ export const useUsersTable = () => {
     })
   }
 
-  return { getUsers, getAllDataFromSupervisor, getAllDataFromSuperAgent, getAllDataFromCreator }
+  const updateUser = (id: any, status: string) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|0',
+        'Content-Type': 'application/json'
+      },
+      url: `/users/${id}`,
+      method: 'PUT',
+      data: { status }
+    })
+  }
+
+  return { getUsers, getAllDataFromSupervisor, getAllDataFromSuperAgent, getAllDataFromCreator, updateUser }
 }
