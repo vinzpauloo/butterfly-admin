@@ -13,7 +13,7 @@ type Props = {
 	// optional props to be passed if editing a bundle instead
 	isEditingVIPBundle?: boolean
 	bundleName?: string
-	bundlePrice?: string
+	bundlePrice?: number
 	bundleDescription?: string
 	isBundleOn?: boolean
 	isVideoIncluded?: boolean
@@ -125,6 +125,11 @@ const VIPBundleModal = (props: Props) => {
 		return true
 	}
 
+	const editVIPBundle = () => {
+		alert("WIP: edit vip bundle")
+		props.onClose()
+	}
+
 	const addNewVIPBundle = () => {
 		if (validateInputs()) {
 			// POST TO BACK-END
@@ -187,7 +192,7 @@ const VIPBundleModal = (props: Props) => {
 			</Stack>
 			<Stack flexDirection="row" gap={2} mt={4}>
 				<Button variant="contained" color="error" onClick={props.onClose} fullWidth>CANCEL</Button>
-				<Button variant="contained" color="success" onClick={addNewVIPBundle} fullWidth>SAVE</Button>
+				<Button variant="contained" color="success" onClick={props.isEditingVIPBundle? editVIPBundle : addNewVIPBundle} fullWidth>SAVE</Button>
 			</Stack>
 		</Stack>
 	)

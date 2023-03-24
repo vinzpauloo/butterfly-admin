@@ -7,8 +7,9 @@ import IconList from './IconList';
 
 
 type bundleObject = {
-	promoName: string
-	isPromoIncluded: boolean
+	_id: string
+	name: string
+	permission: boolean
 }
 
 type Props = {
@@ -20,12 +21,12 @@ const BundleFeatureCard = (props: Props) => {
 	return (
 		<Stack bgcolor="#D9D9D9" borderRadius={.5} p={2} >
 			<Stack bgcolor="white" borderRadius={.5} gap={4} p={1}>
-				<Typography variant="body1" borderRadius={.5} textAlign="center">{props.bundleName} Perks</Typography>
+				<Typography variant="body1" borderRadius={.5} textAlign="center">{props.bundleName}</Typography>
 				<Grid container gap={2} >
 					{props.promoBundle.map((item, index) => 
 						<Grid item  key={index} {...gridItemProps}>
-							<Icon component={IconList(index, item.isPromoIncluded)}  {...iconItemProps} />
-							<Typography {...typographyItemProps}>{item.promoName}</Typography>
+							<Icon component={IconList(index, item?.permission)}  {...iconItemProps} />
+							<Typography {...typographyItemProps}>{item.name}</Typography>
 						</Grid>	
 					)}
 				</Grid>

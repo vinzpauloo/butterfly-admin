@@ -2,13 +2,17 @@ import Typography from '@mui/material/Typography';
 import React, { useState } from 'react'
 import Stack, { StackProps } from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import ToggleButton from '../../user/components/button/ToggleButton';
+import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import BundlesService from "../../../services/api/BudlesService"
 
 type Props = {
 
 	// optional props to be passed if editing a bundle instead
 	isEditingGoldCoinBundle?: boolean
+	bundleID?: string
 	bundleName?: string
 	bundlePrice?: string
 	bundleDescription?: string
@@ -25,6 +29,8 @@ const GoldCoinBundleModal = (props: Props) => {
 
 	const [bundleDescription, setBundleDescription] = useState(props.bundleDescription ?? "")
 	const [bundleDescriptionError, setBundleDescriptionError] = useState(false)
+
+	const [isBundleActive, setIsBundleActive] = useState(props.isBundleOn ?? false)
 
 	const validateInputs = () => {
 		if (bundleName === "") {
@@ -46,35 +52,89 @@ const GoldCoinBundleModal = (props: Props) => {
 		return true
 	}
 
-	const addNewGoldCoinBundle = () => {
-		if (validateInputs()) {
-			// POST TO BACK-END
-			console.log("Name:", bundleName)
-			console.log("Price:", bundlePrice)
-			console.log("Description:", bundleDescription)
+	// Get QueryClient from the context
+	const queryClient = useQueryClient();
+	const { addCoinsBundle, editCoinsBundle } = BundlesService();
+
+	const { mutate: mutateAddNewCoinBundle, isLoading: addedLoading, isSuccess: addedSuccess } = useMutation(addCoinsBundle, {
+		onSuccess: (data) => {
+			console.log(data);
+			queryClient.invalidateQueries({
+				queryKey: ["allCoinsBundle"],
+			});
 			props.onClose()
+		},
+		onError: (error) => {
+			alert(error);
+		},
+	});
+
+	const { mutate: mutateEditCoinBundle, isLoading: editingLoading, isSuccess: editingSuccess } = useMutation(editCoinsBundle, {
+		onSuccess: (data) => {
+			console.log(data);
+			queryClient.invalidateQueries({
+				queryKey: ["allCoinsBundle"],
+			});
+			props.onClose()
+		},
+		onError: (error) => {
+			alert(error);
+		},
+	});
+
+	const editGoldCoinBundle = () => {
+		if (validateInputs()) {
+			mutateEditCoinBundle({
+				data: {
+					bundle_id: props.bundleID,
+					name: bundleName,
+					price: Number(bundlePrice),
+					amount: Number(bundlePrice),
+					description: bundleDescription,
+					active: isBundleActive,
+				},
+			});
 		}
 	}
+
+	const addGoldCoinBundle = () => {
+		if (validateInputs()) {
+			mutateAddNewCoinBundle({
+				data: {
+					name: bundleName,
+					price: Number(bundlePrice),
+					amount: Number(bundlePrice),
+					description: bundleDescription,
+					active: isBundleActive,
+				},
+			});
+		}
+	}
+
+	const isBeingAddedOrEdited = (addedLoading || addedSuccess) || (editingLoading || editingSuccess)
+	const loadingStyle = isBeingAddedOrEdited ? {opacity: 0.5, cursor: "not-allowed"} : null
 	
 	return (
 		<Stack {...modalContainer}>
 			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingGoldCoinBundle ? "EDIT" : "ADD"} GOLD COIN BUNDLE</Typography>
-			<Stack gap={2} width={300}>
+			<Stack gap={2} width={300} sx={loadingStyle}>
+				{isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
 				<Stack {...cardContainer}>
 					<Stack flexDirection="row" alignItems="center" justifyContent="space-between">
 						<TextField
 							error={bundleName !== "" ? false : undefined || bundleNameError}
 							sx={textFieldStyle}
 							value={bundleName}
-							onChange={(event) => setBundleName(event.target.value)}
+							onChange={(event) => { setBundleName(event.target.value); console.log(bundleName)}}
 							label="Bundle Name" />
-						<ToggleButton />
+						<Switch checked={isBundleActive} onChange={event => { setIsBundleActive(event.target.checked)}} />
 					</Stack>
 					<TextField
+						type="number"
 						error={bundlePrice !== "" ? false : undefined || bundlePriceError}
 						sx={textFieldStyle}
 						value={bundlePrice}
-						onChange={(event) => setBundlePrice(event.target.value)}
+						onChange={(event) => {setBundlePrice(event.target.value); console.log(bundlePrice)}}
 						label="Gold Coins" />
 				</Stack>
 				<Stack {...cardContainer}>
@@ -89,7 +149,7 @@ const GoldCoinBundleModal = (props: Props) => {
 				</Stack>
 				<Stack flexDirection="row" gap={2} mt={4}>
 					<Button variant="contained" color="error" onClick={props.onClose} fullWidth>CANCEL</Button>
-					<Button variant="contained" color="success" onClick={addNewGoldCoinBundle} fullWidth>SAVE</Button>
+					<Button variant="contained" color="success" onClick={props.isEditingGoldCoinBundle? editGoldCoinBundle : addGoldCoinBundle} fullWidth>SAVE</Button>
 				</Stack>
 			</Stack>
 		</Stack>
@@ -120,4 +180,15 @@ const cardContainer: StackProps = {
 const textFieldStyle = {
 	backgroundColor: "white",
 	borderRadius: 1,
+}
+
+const loaderStyle =
+{
+	position: "absolute",
+	top: 0,
+	bottom: 0,
+	left: 0,
+	right: 0,
+	margin: "auto",
+	zIndex: 1,
 }
