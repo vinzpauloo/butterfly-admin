@@ -42,7 +42,7 @@ interface State {
 // ** Styled Components
 const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
   [theme.breakpoints.up('sm')]: { width: '40rem' },
-  [theme.breakpoints.up('lg')]: { width: '60rem' },
+  [theme.breakpoints.up('lg')]: { width: '60rem' }
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -55,12 +55,13 @@ const RightLogoImage = styled('img')(({ theme }) => ({
   [theme.breakpoints.up('xs')]: { width: '172px' },
   // [theme.breakpoints.up('sm')]: { width: '125px' },
   [theme.breakpoints.up('md')]: { width: '182px' },
-  [theme.breakpoints.up('xl')]: { width: '220px' },
+  [theme.breakpoints.up('xl')]: { width: '220px' }
 }))
 
 const LoginButton = styled(Button)<ButtonProps>(({ theme }) => ({
   display: 'block',
-  mb: 7, width: '100%',
+  mb: 7,
+  width: '100%',
   maxWidth: '170px',
   marginInline: 'auto',
   '&:hover': {
@@ -70,7 +71,8 @@ const LoginButton = styled(Button)<ButtonProps>(({ theme }) => ({
 
 // ** Yup Schema
 const schema = yup.object().shape({
-  email: yup.string().email('Email must be a valid email.').required('Email is a required field.'),
+  // email: yup.string().email('Email must be a valid email.').required('Email is a required field.'),
+  email: yup.string().min(1).required('Email is required'),
   password: yup.string().min(5).required('Password is required')
 })
 
@@ -86,7 +88,6 @@ interface FormData {
 }
 
 const LoginPage = () => {
-
   // ** State
   const [rememberMe, setRememberMe] = useState<boolean>(true)
 
@@ -99,7 +100,6 @@ const LoginPage = () => {
   const auth = useAuth()
   const theme = useTheme()
   const { settings } = useSettings()
-
 
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword })
@@ -127,28 +127,30 @@ const LoginPage = () => {
   }
 
   return (
-    <Box className='content-center' sx={{
-
-      backgroundSize: ['contain', 'contain', 'cover'],
-      backgroundColor: theme.customBflyColors.darkBg,
-      backgroundImage: 'url("/images/login/loginbg.png")'
-    }}>
-
+    <Box
+      className='content-center'
+      sx={{
+        backgroundSize: ['contain', 'contain', 'cover'],
+        backgroundColor: theme.customBflyColors.darkBg,
+        backgroundImage: 'url("/images/login/loginbg.png")'
+      }}
+    >
       <Card sx={{ zIndex: 1, borderRadius: 0, border: '1px solid #fff' }}>
         <CardContent sx={{ padding: '0 !important' }}>
-
           <Grid className='loginFormGrid' container spacing={1}>
             <Grid xs={12} sm={7} lg={6} item order={{ xs: 2, sm: 1 }}>
-              <Box gap={6} sx={{
-                p: '2rem',
-                mb: [0, null, null, 8],
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: [null, null, null, '5rem 3rem']
-
-              }}>
+              <Box
+                gap={6}
+                sx={{
+                  p: '2rem',
+                  mb: [0, null, null, 8],
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: [null, null, null, '5rem 3rem']
+                }}
+              >
                 <Typography
                   variant='h5'
                   fontWeight='normal'
@@ -156,14 +158,13 @@ const LoginPage = () => {
                   sx={{
                     ml: 3,
                     lineHeight: 1.5,
-                    textTransform: 'uppercase',
+                    textTransform: 'uppercase'
                   }}
                 >
                   LOG IN DETAILS
                 </Typography>
 
                 <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
-
                   <Controller
                     name='email'
                     control={control}
@@ -180,7 +181,7 @@ const LoginPage = () => {
                         error={Boolean(errors.email)}
                         placeholder=''
                         sx={{ mb: 4, backgroundColor: theme.customBflyColors.grayInputBG }}
-                        variant="filled"
+                        variant='filled'
                       />
                     )}
                   />
@@ -209,7 +210,10 @@ const LoginPage = () => {
                                 onMouseDown={e => e.preventDefault()}
                                 onClick={handleClickShowPassword}
                               >
-                                <Icon icon={values.showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} fontSize={20} />
+                                <Icon
+                                  icon={values.showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'}
+                                  fontSize={20}
+                                />
                               </IconButton>
                             </InputAdornment>
                           }
@@ -218,9 +222,18 @@ const LoginPage = () => {
                     />
                   </FormControl>
                   <Box
-                    sx={{ mt: 2, mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
+                    sx={{
+                      mt: 2,
+                      mb: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between'
+                    }}
                   >
-                    <Typography color={theme.palette.error.main} variant='caption'>{errors.email && errors.email.message}</Typography>
+                    <Typography color={theme.palette.error.main} variant='caption'>
+                      {errors.email && errors.email.message}
+                    </Typography>
                     <LinkStyled href='/forgot-password'>Forgot Password?</LinkStyled>
                   </Box>
                   <LoginButton color='primary' size='large' type='submit' variant='contained'>
@@ -230,19 +243,20 @@ const LoginPage = () => {
               </Box>
             </Grid>
             <Grid xs={12} sm={5} lg={6} item order={{ xs: 1, sm: 2 }} sx={{ height: ['230px', 'initial', 'initial'] }}>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-                backgroundSize: 'cover',
-                backgroundImage: 'url("/images/login/smallbg.png")'
-              }}>
-                <RightLogoImage src="/images/logo_image.png" />
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  backgroundSize: 'cover',
+                  backgroundImage: 'url("/images/login/smallbg.png")'
+                }}
+              >
+                <RightLogoImage src='/images/logo_image.png' />
               </Box>
             </Grid>
           </Grid>
-
         </CardContent>
       </Card>
     </Box>
