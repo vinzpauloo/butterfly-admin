@@ -63,7 +63,7 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
     if (password === password_confirmation) {
       await mutation.mutateAsync({
         id: userId,
-        data: { password, password_confirmation }
+        data: { password, password_confirmation, _method: 'put' }
       })
       alert(JSON.stringify(formValue))
       onClose()
