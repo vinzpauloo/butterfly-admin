@@ -5,7 +5,7 @@ import { Stack } from '@mui/material';
 
 type Props = {
 	bundleName: string
-	bundlePrice: string
+	bundlePrice: number
 	bundleDescription: string,
 	isBundleOn: boolean,
 }
