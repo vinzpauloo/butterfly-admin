@@ -49,7 +49,7 @@ export const useUsersTable = () => {
     })
   }
 
-  const updateUser = (id: any, status: string) => {
+  const updateUser = (id: any, data: any) => {
     return request({
       headers: {
         'X-Authorization': 'postman|0',
@@ -57,7 +57,7 @@ export const useUsersTable = () => {
       },
       url: `/users/${id}`,
       method: 'PUT',
-      data: { status }
+      data: data
     })
   }
 

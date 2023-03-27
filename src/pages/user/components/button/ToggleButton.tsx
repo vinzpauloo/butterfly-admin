@@ -61,7 +61,7 @@ const ToggleButton = ({ onChange, checked, onToggle, ...otherProps }: ToggleBtnP
       onChange={event => {
         const isChecked = event.target.checked
         if (isChecked) {
-          console.log(`Test Toggle`)
+          console.log(`Toggle Checked`)
         }
         onChange?.()
         onToggle?.(isChecked)

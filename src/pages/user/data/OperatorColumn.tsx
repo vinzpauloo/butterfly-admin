@@ -10,7 +10,7 @@ import OperatorEditModal from '@/pages/user/components/modal/OperatorEditModal'
 import formatDate from '@/utils/formatDate'
 
 // ** TanStack Imports
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { useUsersTable } from '@/services/api/useUsersTable'
@@ -21,23 +21,28 @@ interface ToggleActionProps {
 }
 
 const ToggleAction = ({ value, id }: ToggleActionProps) => {
+  const queryClient = useQueryClient()
   const { updateUser } = useUsersTable()
-  const mutation = useMutation(async (data: { id: string; status: string }) => {
-    console.log(`TEST@@@###`, data.status)
-    const response = await updateUser(data.id, data.status)
-    if (response.ok) {
-      await response.json()
-    } else {
-      console.log('Error updating status')
+  const mutation = useMutation(
+    async (data: { id: string; data: any }) => {
+      const response = await updateUser(data.id, data.data)
+      if (response.ok) {
+        await response.json()
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
+      }
     }
-  })
+  )
 
   const handleToggle = async (newValue: boolean) => {
     // Determine the new status
     const newStatus = value === 'Applied' || value === 'Approved' ? 'hold' : 'approved'
 
     // Update the status in the backend
-    await mutation.mutateAsync({ id, status: newStatus })
+    await mutation.mutateAsync({ id, data: { status: newStatus } })
   }
 
   return (
@@ -70,13 +75,10 @@ const operatorColumns = [
     headerName: 'Action',
     width: 200,
     renderCell: (params: any) => {
-      console.log(`ACTION STAT FROM BE`, params.value)
-
       return (
         <Box>
-          {/* <ToggleButton checked={params.value === 'Approved' || params.value === 'Applied'} /> */}
           <ToggleAction id={params.row.id} value={params.value} />
-          <EditBtn modal={OperatorEditModal} />
+          <EditBtn modal={OperatorEditModal} userId={params.row.id} data={params.row} />
         </Box>
       )
     }
