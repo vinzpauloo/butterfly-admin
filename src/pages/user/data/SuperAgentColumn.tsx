@@ -4,10 +4,51 @@ import { Box } from '@mui/material'
 // ** Other Imports
 import ToggleButton from '@/pages/user/components/button/ToggleButton'
 import EditBtn from '@/pages/user/components/button/EditButton'
-import superAgentEditModal from '@/pages/user/components/modal/SuperAgentEditModal'
+import SuperAgentEditModal from '@/pages/user/components/modal/SuperAgentEditModal'
 
 // ** Utils Imports
 import formatDate from '@/utils/formatDate'
+
+// ** TanStack Imports
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// ** Hooks
+import { useUsersTable } from '@/services/api/useUsersTable'
+
+interface ToggleActionProps {
+  value: string
+  id: any
+}
+
+const ToggleAction = ({ value, id }: ToggleActionProps) => {
+  const queryClient = useQueryClient()
+  const { updateUser } = useUsersTable()
+  const mutation = useMutation(
+    async (data: { id: string; data: any }) => {
+      const response = await updateUser(data.id, data.data)
+      if (response.ok) {
+        await response.json()
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
+      }
+    }
+  )
+
+  const handleToggle = async (newValue: boolean) => {
+    // Determine the new status
+    const newStatus = value === 'Applied' || value === 'Approved' ? 'hold' : 'approved'
+
+    // Update the status in the backend
+    await mutation.mutateAsync({ id, data: { status: newStatus } })
+  }
+
+  return (
+    <ToggleButton checked={value === 'Approved' || value === 'Applied'} onToggle={newValue => handleToggle(newValue)} />
+  )
+}
 
 const superAgentColumns = [
   { field: 'username', headerName: 'Super Agent', width: 300 },
@@ -34,15 +75,17 @@ const superAgentColumns = [
 
   // { field: 'SecurityFunds', headerName: 'Security Funds', width: 250 },
   {
-    field: 'Action',
+    field: 'status',
     headerName: 'Action',
     width: 200,
-    renderCell: () => (
-      <Box>
-        <ToggleButton />
-        <EditBtn modal={superAgentEditModal} />
-      </Box>
-    )
+    renderCell: (params: any) => {
+      return (
+        <Box>
+          <ToggleAction id={params.row.id} value={params.value} />
+          <EditBtn modal={SuperAgentEditModal} userId={params.row.id} data={params.row} />
+        </Box>
+      )
+    }
   }
 ]
 

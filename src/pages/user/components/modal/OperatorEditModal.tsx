@@ -1,56 +1,44 @@
-import * as yup from 'yup'
+// ** React Imports
 import React, { useState } from 'react'
+
+// ** Yup and Form Imports
+import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Typography
-} from '@mui/material'
+
+// ** MUI Imports
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
+
+// ** Hooks
+import { useUsersTable } from '@/services/api/useUsersTable'
+
+// ** TanStack
+import { useMutation } from '@tanstack/react-query'
 
 interface FormValues {
-  operator: boolean
-  supervisor: boolean
-  username: string
   password: string
-  confirmPassword: string
-  mobileNo: string
-  emailAddress: string
-  notes: string
+  password_confirmation: string
 }
 
 const schema = yup.object().shape({
-  // username: yup.string().required(),
-  // password: yup.string().required(),
-  // confirmPassword: yup
-  //   .string()
-  //   .oneOf([yup.ref('password'), null], 'Passwords must match')
-  //   .required(),
-  // mobileNo: yup.string().required(),
-  // emailAddress: yup.string().email().required()
+  password: yup.string().required('Please enter your desired new password.'),
+  password_confirmation: yup
+    .string()
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
+    .required('Please re-enter your new password to confirm.')
 })
 
 interface FormModalProps {
   isOpen: boolean
   onClose: () => void
+  userId: number
+  data: any
 }
 
-const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
+const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) => {
   const [formValue, setFormValue] = useState<FormValues>({
-    operator: false,
-    supervisor: false,
-    username: '',
     password: '',
-    confirmPassword: '',
-    mobileNo: '',
-    emailAddress: '',
-    notes: ''
+    password_confirmation: ''
   })
 
   const {
@@ -61,78 +49,55 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
     resolver: yupResolver(schema)
   })
 
-  const handleFormSubmit = () => {
+  const { updateUser } = useUsersTable()
+  const mutation = useMutation(async (data: { id: any; data: any }) => {
+    const response = await updateUser(data.id, data.data)
+    if (response.ok) {
+      await response.json()
+    }
+  })
+
+  const handleFormSubmit = async () => {
+    const { password, password_confirmation } = formValue
+
+    if (password === password_confirmation) {
+      await mutation.mutateAsync({
+        id: userId,
+        data: { password, password_confirmation }
+      })
+      alert(JSON.stringify(formValue))
+      onClose()
+    } else {
+      alert('Passwords do not match')
+    }
+
     alert(JSON.stringify(formValue))
     onClose()
   }
 
   const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target
+    const { name, value } = event.target
 
-    if (name === 'operator' && checked) {
-      setFormValue(prevState => ({
-        ...prevState,
-        operator: true,
-        supervisor: false
-      }))
-    } else if (name === 'supervisor' && checked) {
-      setFormValue(prevState => ({
-        ...prevState,
-        operator: false,
-        supervisor: true
-      }))
-    } else {
-      setFormValue(prevState => ({
-        ...prevState,
-        [name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
-      }))
-    }
+    setFormValue(prevState => ({
+      ...prevState,
+      [name]: value
+    }))
   }
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <div style={{ display: 'flex', backgroundColor: '#A459D1' }}>
-        {/* <DialogTitle sx={{ color: 'white' }}>Operator</DialogTitle>
-        <Checkbox
-          name='operator'
-          checked={formValue.operator}
-          onChange={handleFormInputChange}
-          inputProps={{ 'aria-label': 'primary checkbox' }}
-          sx={{ color: 'white' }}
-          color='default'
-          disabled
-        /> */}
         <DialogTitle sx={{ color: 'white' }}>Supervisor</DialogTitle>
-        {/* <Checkbox
-          name='supervisor'
-          checked={formValue.supervisor}
-          onChange={handleFormInputChange}
-          inputProps={{ 'aria-label': 'primary checkbox' }}
-          sx={{ color: 'white' }}
-          color='default'
-          disabled
-        /> */}
       </div>
       <DialogContent>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Typography>Username</Typography>
-          <TextField
-            label='**********'
-            variant='outlined'
-            fullWidth
-            {...register('username')}
-            error={!!errors.username}
-            helperText={errors.username?.message}
-            value={formValue.username}
-            onChange={handleFormInputChange}
-            name='username'
-            disabled
-          />
+          <TextField label={data.username} variant='outlined' fullWidth name='username' disabled />
           <Box style={{ display: 'flex', gap: 20, marginTop: 20, marginBottom: 20 }}>
             <Box sx={{ width: '50%' }}>
               <Typography>Password</Typography>
               <TextField
-                label='**********'
+                label='Enter New Password'
                 variant='outlined'
                 fullWidth
                 type='password'
@@ -142,69 +107,36 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
                 value={formValue.password}
                 onChange={handleFormInputChange}
                 name='password'
-                disabled
               />
             </Box>
             <Box sx={{ width: '50%' }}>
-              <Typography>Re-enter Password</Typography>
+              <Typography>Re-enter New Password</Typography>
               <TextField
-                label='**********'
+                label='Re-enter New Password'
                 variant='outlined'
                 fullWidth
                 type='password'
-                {...register('confirmPassword')}
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword?.message}
-                value={formValue.confirmPassword}
+                {...register('password_confirmation')}
+                error={!!errors.password_confirmation}
+                helperText={errors.password_confirmation?.message}
+                value={formValue.password_confirmation}
                 onChange={handleFormInputChange}
-                name='confirmPassword'
-                disabled
+                name='password_confirmation'
               />
             </Box>
           </Box>
           <Box style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
             <Box sx={{ width: '50%' }}>
               <Typography>Mobile No.</Typography>
-              <TextField
-                label='Mobile No.'
-                variant='outlined'
-                fullWidth
-                {...register('mobileNo')}
-                error={!!errors.mobileNo}
-                helperText={errors.mobileNo?.message}
-                value={formValue.mobileNo}
-                onChange={handleFormInputChange}
-                name='mobileNo'
-              />
+              <TextField label={data.mobile} variant='outlined' fullWidth name='mobileNo' disabled />
             </Box>
             <Box sx={{ width: '50%' }}>
               <Typography>Email Address</Typography>
-              <TextField
-                label='Email Address'
-                variant='outlined'
-                fullWidth
-                {...register('emailAddress')}
-                error={!!errors.emailAddress}
-                helperText={errors.emailAddress?.message}
-                value={formValue.emailAddress}
-                onChange={handleFormInputChange}
-                name='emailAddress'
-              />
+              <TextField label={data.email} variant='outlined' fullWidth name='emailAddress' disabled />
             </Box>
           </Box>
           <Typography>Notes (Optional)</Typography>
-          <TextField
-            label='**********'
-            variant='outlined'
-            fullWidth
-            multiline
-            rows={4}
-            {...register('notes')}
-            value={formValue.notes}
-            onChange={handleFormInputChange}
-            name='notes'
-            disabled
-          />
+          <TextField label={data.note} variant='outlined' fullWidth multiline rows={4} name='notes' disabled />
           <DialogActions>
             <Button
               onClick={onClose}
@@ -231,7 +163,7 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose }) => {
               </Typography>
             </Button>
             <Button
-              // type='submit'
+              type='submit'
               sx={{
                 backgroundColor: '#9747FF',
                 color: 'white',
