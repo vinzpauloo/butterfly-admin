@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 
 // ** Next Imports
 import { useRouter } from 'next/router'
@@ -45,6 +45,10 @@ const CreateSuperAgent2 = () => {
   const [submitted, setSubmitted] = useState<boolean>()
   const [continueBtnTwo, setContinueBtnTwo] = useState<boolean>()
 
+  const fileInputRef: any = useRef(null)
+  const handleUploadBtnClick = () => {
+    fileInputRef.current.click()
+  }
   const [fileName, setFileName] = useState('')
 
   const [formValue, setFormValue] = useState<FormValues>({
@@ -89,6 +93,15 @@ const CreateSuperAgent2 = () => {
   const { createUser, getLanguages, getCurrency } = CreateAccount()
   const mutation = useMutation(createUser)
 
+  const fileToBase64 = async (file: any) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = error => reject(error)
+    })
+  }
+
   const handleFormSubmit = async () => {
     console.log(`SA TWO `, formValue)
 
@@ -102,11 +115,34 @@ const CreateSuperAgent2 = () => {
 
     console.log(`MERGED SA INFO`, merged)
 
+    const formData = new FormData()
+    for (const key in merged) {
+      if (key === 'logo' && merged[key]) {
+        formData.append(key, merged[key], merged[key].name)
+      } else {
+        formData.append(key, merged[key])
+      }
+    }
+
     const userData = {
       data: merged
     }
 
-    await mutation.mutateAsync(userData)
+    const form: any = {
+      data: formData
+    }
+
+    console.log(`USERDATA`, form)
+
+    // if (merged.logo instanceof File || merged.logo instanceof Blob) {
+    //   try {
+    //     merged.logo = await fileToBase64(merged.logo)
+    //   } catch (error) {
+    //     console.error('Error converting logo to base64:', error)
+    //   }
+    // }
+
+    await mutation.mutateAsync(form)
 
     setSubmitted(true)
     setTimeout(() => {
@@ -267,11 +303,11 @@ const CreateSuperAgent2 = () => {
                     <input
                       type='file'
                       accept='.jpg, .jpeg, .png'
-                      style={styles.input}
+                      style={{ display: 'none' }}
                       name='logo'
                       id='logo'
                       onChange={handleFormInputChange}
-                      hidden
+                      ref={fileInputRef}
                     />
                     <label htmlFor='logo'>
                       <TextField
@@ -279,6 +315,7 @@ const CreateSuperAgent2 = () => {
                         placeholder='Select a file'
                         variant='outlined'
                         fullWidth
+                        onClick={handleUploadBtnClick}
                         InputProps={{
                           readOnly: true,
                           endAdornment: (
@@ -472,7 +509,7 @@ const styles = {
 
   // Logo Styling
   input: {
-    display: 'none'
+    display: 'block'
   },
   upload: {
     backgroundColor: '#979797',
