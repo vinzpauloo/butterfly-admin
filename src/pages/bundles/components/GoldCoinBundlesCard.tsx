@@ -12,40 +12,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useQuery } from '@tanstack/react-query';
 import BundlesService from '../../../services/api/BudlesService'
 
-// FETCHED FAKE DATA
-// const goldCoinBundleData = [
-// 	{
-// 		bundleName: "Best Deal",
-// 		bundlePrice: "500 Gold Coins",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et. Pharetra nulla sit facilisis scelerisque et ultricies eu aliquet.",
-// 		isBundleOn: true,
-// 	},
-// 	{
-// 		bundleName: "Limited",
-// 		bundlePrice: "400 Gold Coins",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et. Pharetra nulla sit facilisis scelerisque et ultricies eu aliquet.",
-// 		isBundleOn: true,
-// 	},
-// 	{
-// 		bundleName: "Season",
-// 		bundlePrice: "350 Gold Coins",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et. Pharetra nulla sit facilisis scelerisque et ultricies eu aliquet.",
-// 		isBundleOn: true,
-// 	},
-// 	{
-// 		bundleName: "Low Ball",
-// 		bundlePrice: "300 Gold Coins",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et. Pharetra nulla sit facilisis scelerisque et ultricies eu aliquet.",
-// 		isBundleOn: false,
-// 	},
-// 	{
-// 		bundleName: "Low Ball 2",
-// 		bundlePrice: "200 Gold Coins",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et. Pharetra nulla sit facilisis scelerisque et ultricies eu aliquet.",
-// 		isBundleOn: false,
-// 	},
-// ]
-
 const GoldCoinBundlesCard = () => {
 	const [open, setOpen] = useState(false);
 	const handleClose = () => setOpen(false);
