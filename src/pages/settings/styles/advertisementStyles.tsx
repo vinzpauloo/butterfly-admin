@@ -22,7 +22,7 @@ export const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#D9D9D9',
-        height: '40dvh',
+        height: 400,
         width: 300,
         border: '1px solid #000'
     },
@@ -49,7 +49,7 @@ export const styles = {
         display: 'flex',
         flexDirection: {
             xs: 'column',
-            sm: 'row',
+            sm: 'column',
             md: 'row',
             lg: 'row'
         },

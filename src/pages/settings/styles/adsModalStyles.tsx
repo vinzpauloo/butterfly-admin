@@ -1,6 +1,6 @@
 export const styles = {
     dialogContent: {
-        padding: 10
+        padding: 10,
     },
     title: {
         padding: 0,
@@ -17,7 +17,7 @@ export const styles = {
             sm: 'column',
             md: 'row',
             lg: 'row'
-        }
+        },
     },
     left: {
         display: 'flex',
@@ -46,14 +46,13 @@ export const styles = {
     },
     uploadContainer: {
         backgroundColor: '#D9D9D9',
-        height: '40dvh',
+        height: 400,
         width: {
             xs: 'auto',
             sm: 'auto',
             md: 300,
             lg: 300
         },
-        border: '1px solid #000',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -115,5 +114,15 @@ export const styles = {
             backgroundColor: '#9747FF',
             color: '#FFF'
         }
+    },
+    loaderStyle:
+    {
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        margin: "auto",
+        zIndex: 1
     }
 }

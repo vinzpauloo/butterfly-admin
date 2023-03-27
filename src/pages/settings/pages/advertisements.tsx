@@ -45,7 +45,6 @@ const Advertisements = () => {
 
     const adTitles = [
         'Pre-Loading Screen Ad',
-        'Landing Page Ad',
         'Carousel (Slider) Ad',
         'Single Video Ad (Grid)',
         'Pop Up Ad',
@@ -55,7 +54,7 @@ const Advertisements = () => {
     return (
         <Box >
             <Typography sx={styles.ads}>Advertisements</Typography>
-            <Grid container spacing={7} sx={styles.gridContainer}>
+            <Grid gap={5} sx={styles.gridContainer}>
                 {adTitles.map((title, index) => <GridContent title={title} key={index} />)}
             </Grid>
         </Box>
