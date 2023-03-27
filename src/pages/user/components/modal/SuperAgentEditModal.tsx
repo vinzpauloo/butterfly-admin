@@ -28,7 +28,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 interface FormValues {
   partner_name: string
-  // companyCode: string
+  partner_code: string
   // accessURL: string
   // siteName: string
   // username: string
@@ -59,7 +59,6 @@ const schema = yup.object().shape({
   // language: yup.string().required(),
   // currency: yup.string().required(),
   // securityFunds: yup.string().required(),
-
   // logo: yup.mixed().test("fileSize", "File size is too large", (value) => {
   //   return !value || value[0].size <= 1024 * 1024;
   // }),
@@ -76,7 +75,7 @@ interface FormModalProps {
 const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) => {
   const [formValue, setFormValue] = useState<FormValues>({
     partner_name: '',
-    // companyCode: '',
+    partner_code: '',
     // accessURL: '',
     // siteName: '',
     // username: '',
@@ -126,12 +125,12 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
   })
 
   const handleFormSubmit = async () => {
-    const { password, password_confirmation, partner_name } = formValue
+    const { password, password_confirmation, partner_name, partner_code } = formValue
 
     if (password === password_confirmation) {
       await mutation.mutateAsync({
         id: userId,
-        data: { password, password_confirmation, _method: 'put', partner_name }
+        data: { password, password_confirmation, _method: 'put', partner_name, partner_code }
       })
       alert(JSON.stringify(formValue))
       onClose()
@@ -197,13 +196,12 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
                         label={specificUser?.partner?.code}
                         variant='outlined'
                         fullWidth
-                        // {...register('companyCode')}
-                        // error={!!errors.companyCode}
-                        // helperText={errors.companyCode?.message}
-                        // value={formValue.companyCode}
-                        // onChange={handleFormInputChange}
-                        name='companyCode'
-                        disabled
+                        {...register('partner_code')}
+                        error={!!errors.partner_code}
+                        helperText={errors.partner_code?.message}
+                        value={formValue.partner_code}
+                        onChange={handleFormInputChange}
+                        name='partner_code'
                       />
                     </Box>
                   </Box>
@@ -302,6 +300,9 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
                         disabled
                       />
                     </Box>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 2 } }}>
                     <Box sx={{ width: '100%' }}>
                       <Typography>Language</Typography>
                       <TextField
@@ -322,9 +323,6 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
                         <MenuItem value='fr'>French</MenuItem>
                       </TextField>
                     </Box>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 2 } }}>
                     <Box sx={{ width: '100%' }}>
                       <Typography>Currency</Typography>
                       <TextField
@@ -345,7 +343,7 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
                         <MenuItem value='gbp'>GBP</MenuItem>
                       </TextField>
                     </Box>
-                    <Box sx={{ width: '100%' }}>
+                    {/* <Box sx={{ width: '100%' }}>
                       <Typography>Access URL</Typography>
                       <TextField
                         label='Access URL'
@@ -359,7 +357,7 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
                         // name='accessURL'
                         disabled
                       />
-                    </Box>
+                    </Box> */}
                   </Box>
                 </Box>
 
