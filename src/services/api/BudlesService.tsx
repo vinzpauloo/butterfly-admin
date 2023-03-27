@@ -3,6 +3,15 @@ import request from "@/lib/request";
 interface IBundlesParams {
 	data: {
 		site_id?: number
+		bundle_id?: string
+		name?: string
+		description?: string
+		price?: number
+		currency?: string
+		currency_code?: string
+		product?: string
+		amount?: number
+		active?: boolean
 	},
 	token?: string
 }
@@ -12,7 +21,8 @@ const BundlesService = () => {
 		return request({
 			headers: {
 				"X-Authorization": "postman|1",
-				"ngrok-skip-browser-warning": "69420" // only for dev
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
 			},
 			url: "/subcriptions/bundles",
 			method: "GET",
@@ -20,11 +30,51 @@ const BundlesService = () => {
 		});
 	};
 
+	const addVIPBundle = (params: IBundlesParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
+			},
+			url: "/subcriptions",
+			method: "POST",
+			data: params.data, // if body is JSON
+		});
+	};
+
+	const deleteVIPBundle = (params: IBundlesParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
+			},
+			url: "/subcriptions",
+			method: "DELETE",
+			params: params.data,
+		});
+	};
+
+	const editVIPBundle = (params: IBundlesParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
+			},
+			url: "/subcriptions",
+			method: "PUT",
+			data: params.data, // if body is JSON
+		});
+	};
+
 	const getAllCoinsBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
 				"X-Authorization": "postman|1",
-				"ngrok-skip-browser-warning": "69420" // only for dev
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
 			},
 			url: "/coins/bundles",
 			method: "GET",
@@ -32,7 +82,55 @@ const BundlesService = () => {
 		});
 	};
 
-	return { getAllVIPBundles, getAllCoinsBundle };
+	const addCoinsBundle = (params: IBundlesParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
+			},
+			url: "/coins",
+			method: "POST",
+			data: params.data, // if body is JSON
+		});
+	};
+
+	const deleteCoinsBundle = (params: IBundlesParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
+			},
+			url: "/coins",
+			method: "DELETE",
+			params: params.data,
+		});
+	};
+
+	const editCoinsBundle = (params: IBundlesParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
+			},
+			url: "/coins",
+			method: "PUT",
+			data: params.data, // if body is JSON
+		});
+	};
+
+	return {
+		getAllVIPBundles,
+		addVIPBundle,
+		deleteVIPBundle,
+		editVIPBundle,
+		getAllCoinsBundle,
+		addCoinsBundle,
+		deleteCoinsBundle,
+		editCoinsBundle
+	};
 };
 
 export default BundlesService;
