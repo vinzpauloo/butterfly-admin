@@ -12,6 +12,17 @@ interface IBundlesParams {
 		product?: string
 		amount?: number
 		active?: boolean
+
+		// POST create subscription
+		videos?: boolean
+		photos?: boolean
+		live_streaming?: boolean
+		video_call?: boolean
+		live_chat?: boolean
+		forever_vip?: boolean
+		download?: boolean
+		watch_ticket?: boolean
+		offline_benefit?: boolean
 	},
 	token?: string
 }

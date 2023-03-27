@@ -12,96 +12,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import  BundlesService  from '../../../services/api/BudlesService'
 import { useQuery } from '@tanstack/react-query';
 
-// FAKE DATA FOR NOW
-// const promoBundleData = [
-// 	{
-// 		bundleName: "Platinum",
-// 		bundlePrice: "¥500 (CNY)",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et.",
-// 		isBundleOn: true,
-// 		promoBundle: [
-// 			{ promoName: "Video", isPromoIncluded: true },
-// 			{ promoName: "Photos", isPromoIncluded: true },
-// 			{ promoName: "Live Stream", isPromoIncluded: true },
-// 			{ promoName: "Video Call", isPromoIncluded: true },
-// 			{ promoName: "Live Chat", isPromoIncluded: true },
-// 			{ promoName: "Forever VIP", isPromoIncluded: true },
-// 			{ promoName: "Download", isPromoIncluded: true },
-// 			{ promoName: "Watch Ticket", isPromoIncluded: true },
-// 			{ promoName: "Offline Benefits", isPromoIncluded: true },
-// 		]
-// 	},
-
-// 	{
-// 		bundleName: "Gold",
-// 		bundlePrice: "¥300 (CNY)",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et.",
-// 		isBundleOn: true,
-// 		promoBundle: [
-// 			{ promoName: "Video", isPromoIncluded: true },
-// 			{ promoName: "Photos", isPromoIncluded: true },
-// 			{ promoName: "Live Stream", isPromoIncluded: true },
-// 			{ promoName: "Video Call", isPromoIncluded: true },
-// 			{ promoName: "Live Chat", isPromoIncluded: true },
-// 			{ promoName: "Forever VIP", isPromoIncluded: false },
-// 			{ promoName: "Download", isPromoIncluded: true },
-// 			{ promoName: "Watch Ticket", isPromoIncluded: true },
-// 			{ promoName: "Offline Benefits", isPromoIncluded: false },
-// 		]
-// 	},
-// 	{
-// 		bundleName: "Silver",
-// 		bundlePrice: "¥200 (CNY)",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et.",
-// 		isBundleOn: true,
-// 		promoBundle: [
-// 			{ promoName: "Video", isPromoIncluded: true },
-// 			{ promoName: "Photos", isPromoIncluded: true },
-// 			{ promoName: "Live Stream", isPromoIncluded: true },
-// 			{ promoName: "Video Call", isPromoIncluded: false },
-// 			{ promoName: "Live Chat", isPromoIncluded: false },
-// 			{ promoName: "Forever VIP", isPromoIncluded: false },
-// 			{ promoName: "Download", isPromoIncluded: false },
-// 			{ promoName: "Watch Ticket", isPromoIncluded: true },
-// 			{ promoName: "Offline Benefits", isPromoIncluded: false },
-// 		]
-// 	},
-// 	{
-// 		bundleName: "Bronze",
-// 		bundlePrice: "¥100 (CNY)",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et.",
-// 		isBundleOn: true,
-// 		promoBundle: [
-// 			{ promoName: "Video", isPromoIncluded: true },
-// 			{ promoName: "Photos", isPromoIncluded: true },
-// 			{ promoName: "Live Stream", isPromoIncluded: false },
-// 			{ promoName: "Video Call", isPromoIncluded: false },
-// 			{ promoName: "Live Chat", isPromoIncluded: false },
-// 			{ promoName: "Forever VIP", isPromoIncluded: false },
-// 			{ promoName: "Download", isPromoIncluded: false },
-// 			{ promoName: "Watch Ticket", isPromoIncluded: false },
-// 			{ promoName: "Offline Benefits", isPromoIncluded: false },
-// 		]
-// 	},
-// 	{
-// 		bundleName: "Iron",
-// 		bundlePrice: "¥50 (CNY)",
-// 		bundleDescription: "Lorem ipsum dolor sit amet consectetur. Enim vel elit venenatis ultrices vel feugiat varius aenean. Pellentesque nisl dolor et magna neque pharetra in porttitor. Sit id rhoncus viverra et.",
-// 		isBundleOn: true,
-// 		promoBundle: [
-// 			{ promoName: "Video", isPromoIncluded: false },
-// 			{ promoName: "Photos", isPromoIncluded: true },
-// 			{ promoName: "Live Stream", isPromoIncluded: false },
-// 			{ promoName: "Video Call", isPromoIncluded: false },
-// 			{ promoName: "Live Chat", isPromoIncluded: false },
-// 			{ promoName: "Forever VIP", isPromoIncluded: false },
-// 			{ promoName: "Download", isPromoIncluded: false },
-// 			{ promoName: "Watch Ticket", isPromoIncluded: false },
-// 			{ promoName: "Offline Benefits", isPromoIncluded: false },
-// 		]
-// 	},
-// ]
-
 const VIPBundlesCard = () => {
 	const [open, setOpen] = useState(false);
 	const handleClose = () => setOpen(false);
@@ -115,7 +25,7 @@ const VIPBundlesCard = () => {
 				site_id: 1
 			},
 		}),
-		onSuccess: (data) => { console.log("VIP BUNDLES:",data?.bundles) },
+		onSuccess: (data) => { console.log("VIP BUNDLES:", data?.bundles) },
 		onError: (error) => { console.log(error) }
 	})
 
@@ -136,16 +46,17 @@ const VIPBundlesCard = () => {
 							container
 							pr={data?.bundles?.length > 4 ? {sm:4} : undefined}
 							gap={4}
-							justifyContent={{xs: "center", sm: data?.bundles?.length >= 4 ? "space-between" : "flex-start"}}
+							justifyContent={{xs: "center", sm: data?.bundles?.length% 4 === 0 ? "space-between" : "flex-start"}}
 							sx={{ maxHeight: 525, overflowY: "auto" }}>
 							{data?.bundles.map((item: any) =>
 								<VIPBundleItem
-									key={item._id}
+									key={item.bundle_id}
+									bundleID={item.bundle_id}
 									bundleName={item.name}
 									bundlePrice={item.price}
 									bundleDescription={item.description}
 									isBundleOn={item.active}
-									promoBundle={item.perks}
+									bundlePerks={item.perks}
 								/>
 							)}
 						</Grid>
@@ -153,6 +64,7 @@ const VIPBundlesCard = () => {
 				</CardContent>
 			</Card>
 			{/* TO BE GLOBALIZED LATER SO WE DONT NEED TO RENDER THIS HERE */}
+			{/* CREATING VIP MODAL */}
 			<Modal open={open} onClose={handleClose}>
 				<VIPBundleModal onClose={handleClose}/>
 			</Modal>
