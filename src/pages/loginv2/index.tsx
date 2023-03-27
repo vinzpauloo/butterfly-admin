@@ -161,7 +161,7 @@ const LoginPage = () => {
                     textTransform: 'uppercase'
                   }}
                 >
-                  LOG IN DETAILS
+                  LOG IN DETAILS (TEST)
                 </Typography>
 
                 <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
