@@ -92,6 +92,7 @@ const CreateSuperAgent2 = () => {
 
   const { createUser, getLanguages, getCurrency } = CreateAccount()
   const mutation = useMutation(createUser)
+  const [responseError, setResponseError] = useState<any>()
 
   const fileToBase64 = async (file: any) => {
     return new Promise((resolve, reject) => {
@@ -142,12 +143,19 @@ const CreateSuperAgent2 = () => {
     //   }
     // }
 
-    await mutation.mutateAsync(form)
+    try {
+      await mutation.mutateAsync(form)
 
-    setSubmitted(true)
-    setTimeout(() => {
-      router.push('/user/list')
-    }, 1000)
+      setSubmitted(true)
+      setTimeout(() => {
+        router.push('/user/list')
+      }, 1000)
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      setResponseError(error)
+    }
   }
 
   const { data } = useQueries({
@@ -187,6 +195,22 @@ const CreateSuperAgent2 = () => {
 
   const [languages, setLanguages] = useState([])
   const [currencies, setCurrencies] = useState([])
+
+  const displayErrors = () => {
+    const errorElements: any = []
+
+    for (const key in responseError) {
+      responseError[key].forEach((value: any) => {
+        errorElements.push(
+          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
+            {value}
+          </Typography>
+        )
+      })
+    }
+
+    return errorElements
+  }
 
   return (
     <Box>
@@ -359,6 +383,8 @@ const CreateSuperAgent2 = () => {
                 onChange={handleFormInputChange}
                 name='note'
               />
+
+              {displayErrors()}
               <Box sx={styles.bottomFormButtons}>
                 <Box>
                   <Button sx={styles.cancelButton}>

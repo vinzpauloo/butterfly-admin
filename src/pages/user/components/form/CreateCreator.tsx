@@ -79,6 +79,7 @@ const CreateCreator = () => {
 
   const { createUser } = CreateAccount()
   const mutation = useMutation(createUser)
+  const [responseError, setResponseError] = useState<any>()
 
   const handleFormSubmit = async () => {
     console.log(formValue)
@@ -87,12 +88,34 @@ const CreateCreator = () => {
       data: formValue
     }
 
-    await mutation.mutateAsync(userData)
+    try {
+      await mutation.mutateAsync(userData)
+      setSubmitted(true)
+      setTimeout(() => {
+        router.push('/user/list')
+      }, 1000)
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      setResponseError(error)
+    }
+  }
 
-    setSubmitted(true)
-    setTimeout(() => {
-      router.push('/user/list')
-    }, 1000)
+  const displayErrors = () => {
+    const errorElements: any = []
+
+    for (const key in responseError) {
+      responseError[key].forEach((value: any) => {
+        errorElements.push(
+          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
+            {value}
+          </Typography>
+        )
+      })
+    }
+
+    return errorElements
   }
 
   return (
@@ -192,6 +215,8 @@ const CreateCreator = () => {
                 onChange={handleFormInputChange}
                 name='note'
               />
+
+              {displayErrors()}
               <Box sx={styles.formButtonContainer}>
                 <Box>
                   <Button sx={styles.cancelButton}>

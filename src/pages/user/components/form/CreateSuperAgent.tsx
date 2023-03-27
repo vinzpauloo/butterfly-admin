@@ -30,14 +30,14 @@ const schema = yup.object().shape({
   password_confirmation: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required(),
+    .required('Confirm Password is required.'),
   mobile: yup
     .string()
     .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number')
     .required(),
-  email: yup.string().email().required(),
-  partner_name: yup.string().required(),
-  partner_code: yup.string().required(),
+  email: yup.string().email().required('Email is required.'),
+  partner_name: yup.string().required('Company Name is required.'),
+  partner_code: yup.string().required('Company Code is required.'),
   partner_note: yup.string().min(3, 'Note must be at least 3 characters').required()
 })
 
