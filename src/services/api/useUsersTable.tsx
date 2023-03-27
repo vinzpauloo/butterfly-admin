@@ -11,6 +11,13 @@ interface UsersData {
   }
 }
 
+interface UserData {
+  data: {
+    id?: string
+    with?: string
+  }
+}
+
 export const useUsersTable = () => {
   const getUsers = (params: UsersData) => {
     return request({
@@ -61,5 +68,24 @@ export const useUsersTable = () => {
     })
   }
 
-  return { getUsers, getAllDataFromSupervisor, getAllDataFromSuperAgent, getAllDataFromCreator, updateUser }
+  const getSpecificUser = (params: UserData) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|0',
+        'Content-Type': 'application/json'
+      },
+      url: `/users/${params.data.id}`,
+      method: 'GET',
+      params: params.data
+    })
+  }
+
+  return {
+    getUsers,
+    getAllDataFromSupervisor,
+    getAllDataFromSuperAgent,
+    getAllDataFromCreator,
+    updateUser,
+    getSpecificUser
+  }
 }

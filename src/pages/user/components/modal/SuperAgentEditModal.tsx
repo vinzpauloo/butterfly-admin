@@ -24,10 +24,10 @@ import {
 import { useUsersTable } from '@/services/api/useUsersTable'
 
 // ** TanStack
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 interface FormValues {
-  // companyName: string
+  partner_name: string
   // companyCode: string
   // accessURL: string
   // siteName: string
@@ -69,13 +69,13 @@ const schema = yup.object().shape({
 interface FormModalProps {
   isOpen: boolean
   onClose: () => void
-  userId: number
+  userId: string
   data: any
 }
 
 const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) => {
   const [formValue, setFormValue] = useState<FormValues>({
-    // companyName: '',
+    partner_name: '',
     // companyCode: '',
     // accessURL: '',
     // siteName: '',
@@ -99,7 +99,25 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
     resolver: yupResolver(schema)
   })
 
-  const { updateUser } = useUsersTable()
+  const { updateUser, getSpecificUser } = useUsersTable()
+
+  const [specificUser, setSpecificUser] = useState<any>()
+
+  const { isLoading } = useQuery({
+    queryKey: ['specificUser', userId],
+    queryFn: () =>
+      getSpecificUser({
+        data: {
+          id: userId,
+          with: 'partner'
+        }
+      }),
+    onSuccess: (data: any) => {
+      setSpecificUser(data)
+    }
+  })
+  console.log(specificUser)
+
   const mutation = useMutation(async (data: { id: any; data: any }) => {
     const response = await updateUser(data.id, data.data)
     if (response.ok) {
@@ -108,12 +126,12 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
   })
 
   const handleFormSubmit = async () => {
-    const { password, password_confirmation } = formValue
+    const { password, password_confirmation, partner_name } = formValue
 
     if (password === password_confirmation) {
       await mutation.mutateAsync({
         id: userId,
-        data: { password, password_confirmation, _method: 'put' }
+        data: { password, password_confirmation, _method: 'put', partner_name }
       })
       alert(JSON.stringify(formValue))
       onClose()
@@ -162,22 +180,21 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
                     <Box sx={{ width: '100%' }}>
                       <Typography>Company Name</Typography>
                       <TextField
-                        label='Company Name'
+                        label={specificUser?.partner?.name}
                         variant='outlined'
                         fullWidth
-                        // {...register('companyName')}
-                        // error={!!errors.companyName}
-                        // helperText={errors.companyName?.message}
-                        // value={formValue.companyName}
-                        // onChange={handleFormInputChange}
-                        name='companyName'
-                        disabled
+                        {...register('partner_name')}
+                        error={!!errors.partner_name}
+                        helperText={errors.partner_name?.message}
+                        value={formValue.partner_name}
+                        onChange={handleFormInputChange}
+                        name='partner_name'
                       />
                     </Box>
                     <Box sx={{ width: '100%' }}>
                       <Typography>Company Code</Typography>
                       <TextField
-                        label='Company Code'
+                        label={specificUser?.partner?.code}
                         variant='outlined'
                         fullWidth
                         // {...register('companyCode')}
@@ -410,7 +427,7 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
 
                   <Typography sx={{ marginTop: { md: 15 } }}>Notes (Optional)</Typography>
                   <TextField
-                    label='Notes'
+                    label={specificUser?.partner?.note}
                     variant='outlined'
                     fullWidth
                     multiline
