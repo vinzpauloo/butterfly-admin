@@ -5,7 +5,7 @@ export const styles = {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 2
+        gap: 2,
     },
     titleWrapper: {
         border: '1px solid #000',
@@ -22,9 +22,15 @@ export const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#D9D9D9',
-        height: '40dvh',
-        width: 300,
-        border: '1px solid #000'
+        border: '1px solid #000',
+        cursor:"pointer",
+        ":hover": {
+            backgroundColor: (theme: any) => theme.palette.primary.main,
+            opacity: 0.5,
+            scale: 0.5,
+            border: '1px solid',
+            borderColor: (theme: any) => theme.palette.primary.main,
+        }
     },
     uploadBtn: {
         backgroundColor: '#9747FF',
@@ -45,15 +51,4 @@ export const styles = {
         fontWeight: '600',
         fontSize: 25
     },
-    gridContainer: {
-        display: 'flex',
-        flexDirection: {
-            xs: 'column',
-            sm: 'row',
-            md: 'row',
-            lg: 'row'
-        },
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
 }
