@@ -63,30 +63,37 @@ const ExportButton = (props: Props) => {
   }, [props.emailValue, props.mobileValue, props.usernameValue])
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: ['column', 'row'],
-        gap: 10,
-        mb: 5,
-        mt: {
-          xs: 0,
-          sm: 0,
-          md: 0,
-          lg: 5
-        }
-      }}
+    // <Box
+    //   sx={{
+    //     display: 'flex',
+    //     flexDirection: ['column', 'row'],
+    //     gap: 10,
+    //     mb: 5,
+    //     mt: {
+    //       xs: 0,
+    //       sm: 0,
+    //       md: 0,
+    //       lg: 5
+    //     }
+    //   }}
+    // >
+    //   <Button
+    //     color='secondary'
+    //     variant='outlined'
+    //     startIcon={<Icon icon='mdi:export-variant' fontSize={20} />}
+    //     onClick={handleExport}
+    //   >
+    //     Export
+    //   </Button>
+    // </Box>
+    <Button
+      color='secondary'
+      variant='outlined'
+      startIcon={<Icon icon='mdi:export-variant' fontSize={20} />}
+      onClick={handleExport}
     >
-      <Button
-        sx={{ mr: 4, mb: 2 }}
-        color='secondary'
-        variant='outlined'
-        startIcon={<Icon icon='mdi:export-variant' fontSize={20} />}
-        onClick={handleExport}
-      >
-        Export
-      </Button>
-    </Box>
+      Export
+    </Button>
   )
 }
 

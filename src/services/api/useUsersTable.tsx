@@ -43,7 +43,7 @@ export const useUsersTable = () => {
         headers: {
           'X-Authorization': 'postman|0'
         },
-        url: `/users?export=true&role=${params.data.role}&paginate=0`,
+        url: `/users?export=true&role=${params.data.role}`,
         method: 'GET',
         params: params.data
       },
