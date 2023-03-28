@@ -79,7 +79,20 @@ const navigation = (): VerticalNavItemsType => {
       {
         title: 'Bundles',
         icon: 'mdi:tag-multiple',
-        path: '/bundles'
+        children: [
+          {
+            title: 'VIP Bundles',
+            path: '/bundles/pages/VIPBundlesPage'
+          },
+          {
+            title: 'Gold Coin Bundles',
+            path: '/bundles/pages/GoldCoinBundlesPage'
+          },
+          {
+            title: 'Gold Coin Table',
+            path: '/bundles/pages/GoldCoinTablesPage'
+          },
+        ]
       }
   ]
 }
