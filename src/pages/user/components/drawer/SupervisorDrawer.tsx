@@ -1,7 +1,10 @@
 // ** React Imports
 import { useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
+import { Radio, RadioGroup } from '@mui/material'
 import Drawer from '@mui/material/Drawer'
 import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
@@ -32,28 +35,45 @@ import { addUser } from 'src/store/apps/user'
 // ** Types Imports
 import { AppDispatch } from 'src/store'
 
+// ** Other Imports
+import CreatedSuccessful from '../form/CreatedSuccessful'
+
+// ** TanStack Query
+import { useMutation } from '@tanstack/react-query'
+
+// ** Hooks
+import { CreateAccount } from '@/services/api/CreateAccount'
+
+interface FormValues {
+  role: 'operator' | 'supervisor' | ''
+  username: string
+  password: string
+  password_confirmation: string
+  mobile: string
+  email: string
+  note: string
+}
+
+const schema = yup.object().shape({
+  role: yup
+    .string()
+    .oneOf(['operator', 'supervisor'], 'Role must be Operator or Supervisor')
+    .required('Role is required'),
+  username: yup.string().min(7, 'Username must be at least 7 characters').required(),
+  password: yup.string().min(7, 'Password must be at least 7 characters').required(),
+  password_confirmation: yup
+    .string()
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
+    .required(),
+  mobile: yup
+    .string()
+    .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number')
+    .required(),
+  email: yup.string().email().required()
+})
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
-}
-
-interface UserData {
-  email: string
-  company: string
-  country: string
-  contact: number
-  fullName: string
-  username: string
-}
-
-const showErrors = (field: string, valueLen: number, min: number) => {
-  if (valueLen === 0) {
-    return `${field} field is required`
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`
-  } else {
-    return ''
-  }
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -64,68 +84,92 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundColor: theme.palette.background.default
 }))
 
-const schema = yup.object().shape({
-  company: yup.string().required(),
-  country: yup.string().required(),
-  email: yup.string().email().required(),
-  contact: yup
-    .number()
-    .typeError('Contact Number field is required')
-    .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
-    .required(),
-  fullName: yup
-    .string()
-    .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
-    .required(),
-  username: yup
-    .string()
-    .min(3, obj => showErrors('Username', obj.value.length, obj.min))
-    .required()
-})
-
-const defaultValues = {
-  email: '',
-  company: '',
-  country: '',
-  fullName: '',
-  username: '',
-  contact: Number('')
-}
-
 const SupervisorDrawer = (props: SidebarAddUserType) => {
+  const router = useRouter()
+
   // ** Props
   const { open, toggle } = props
 
   // ** State
-  const [plan, setPlan] = useState<string>('basic')
-  const [role, setRole] = useState<string>('subscriber')
+  const [submitted, setSubmitted] = useState<boolean>()
+  const [formValue, setFormValue] = useState<FormValues>({
+    role: '',
+    username: '',
+    password: '',
+    password_confirmation: '',
+    mobile: '',
+    email: '',
+    note: ''
+  })
 
-  // ** Hooks
-  //   const dispatch = useDispatch<AppDispatch>()
   const {
-    reset,
     control,
-    setValue,
+    register,
     handleSubmit,
     formState: { errors }
-  } = useForm({
-    defaultValues,
-    mode: 'onChange',
+  } = useForm<FormValues>({
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = (data: UserData) => {
-    dispatch(addUser({ ...data, role, currentPlan: plan }))
-    toggle()
-    reset()
+  const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+
+    if (name === 'role') {
+      setFormValue(prevState => ({
+        ...prevState,
+        role: value as 'operator' | 'supervisor' | ''
+      }))
+    } else {
+      setFormValue(prevState => ({
+        ...prevState,
+        [name]: value
+      }))
+    }
+  }
+
+  const { createUser } = CreateAccount()
+  const mutation = useMutation(createUser)
+  const [responseError, setResponseError] = useState<any>()
+
+  const handleFormSubmit = async () => {
+    console.log(formValue)
+
+    const userData = {
+      data: formValue
+    }
+
+    try {
+      await mutation.mutateAsync(userData)
+      setSubmitted(true)
+      setTimeout(() => {
+        router.push('/user/list')
+      }, 1000)
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      setResponseError(error)
+    }
+  }
+
+  const displayErrors = () => {
+    const errorElements: any = []
+
+    for (const key in responseError) {
+      responseError[key].forEach((value: any) => {
+        errorElements.push(
+          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
+            {value}
+          </Typography>
+        )
+      })
+    }
+
+    return errorElements
   }
 
   const handleClose = () => {
-    setPlan('basic')
-    setRole('subscriber')
-    setValue('contact', Number(''))
     toggle()
-    reset()
   }
 
   return (
@@ -144,158 +188,246 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
         </IconButton>
       </Header>
       <Box sx={{ p: 5 }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name='fullName'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  value={value}
-                  label='Full Name'
-                  onChange={onChange}
-                  placeholder='John Doe'
-                  error={Boolean(errors.fullName)}
+        {!submitted ? (
+          <Box sx={styles.container}>
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
+              <Box sx={styles.header}>
+                <Controller
+                  name='role'
+                  control={control}
+                  defaultValue=''
+                  rules={{ required: 'Please select a role' }}
+                  render={({ field }) => (
+                    <RadioGroup
+                      {...field}
+                      onChange={e => {
+                        field.onChange(e)
+                        handleFormInputChange(e)
+                      }}
+                    >
+                      <Box sx={styles.radio}>
+                        <Typography sx={styles.white}>Operator</Typography>
+                        <Radio
+                          name='role'
+                          value='operator'
+                          inputProps={{ 'aria-label': 'Operator' }}
+                          sx={styles.white}
+                          color='default'
+                        />
+                        <Typography sx={styles.white}>Supervisor</Typography>
+                        <Radio
+                          name='role'
+                          value='supervisor'
+                          inputProps={{ 'aria-label': 'Supervisor' }}
+                          sx={styles.white}
+                          color='default'
+                        />
+                      </Box>
+                    </RadioGroup>
+                  )}
                 />
-              )}
-            />
-            {errors.fullName && <FormHelperText sx={{ color: 'error.main' }}>{errors.fullName.message}</FormHelperText>}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name='username'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
+                {errors.role && (
+                  <Typography variant='caption' color='error'>
+                    {errors.role.message}
+                  </Typography>
+                )}
+              </Box>
+              <Box sx={styles.formContent}>
+                <Box sx={styles.fullWidth}>
+                  <Typography>Username</Typography>
+                  <TextField
+                    label='Entire Desired Username'
+                    variant='outlined'
+                    fullWidth
+                    {...register('username')}
+                    error={!!errors.username}
+                    helperText={errors.username?.message}
+                    value={formValue.username}
+                    onChange={handleFormInputChange}
+                    name='username'
+                  />
+                </Box>
+                <Box sx={styles.fullWidth}>
+                  <Typography>Password</Typography>
+                  <TextField
+                    label='Enter Password'
+                    variant='outlined'
+                    fullWidth
+                    type='password'
+                    {...register('password')}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                    value={formValue.password}
+                    onChange={handleFormInputChange}
+                    name='password'
+                  />
+                </Box>
+                <Box sx={styles.fullWidth}>
+                  <Typography>Re-enter Password</Typography>
+                  <TextField
+                    label='Re-enter Password'
+                    variant='outlined'
+                    fullWidth
+                    type='password'
+                    {...register('password_confirmation')}
+                    error={!!errors.password_confirmation}
+                    helperText={errors.password_confirmation?.message}
+                    value={formValue.password_confirmation}
+                    onChange={handleFormInputChange}
+                    name='password_confirmation'
+                  />
+                </Box>
+
+                <Box sx={styles.fullWidth}>
+                  <Typography>Mobile No.</Typography>
+                  <TextField
+                    label='Mobile No.'
+                    variant='outlined'
+                    fullWidth
+                    {...register('mobile')}
+                    error={!!errors.mobile}
+                    helperText={errors.mobile?.message}
+                    value={formValue.mobile}
+                    onChange={handleFormInputChange}
+                    name='mobile'
+                  />
+                </Box>
+
+                <Box sx={styles.fullWidth}>
+                  <Typography>Email Address</Typography>
+                  <TextField
+                    label='Email Address'
+                    variant='outlined'
+                    fullWidth
+                    {...register('email')}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                    value={formValue.email}
+                    onChange={handleFormInputChange}
+                    name='email'
+                  />
+                </Box>
+
+                <Typography>Notes (Optional)</Typography>
                 <TextField
-                  value={value}
-                  label='Username'
-                  onChange={onChange}
-                  placeholder='johndoe'
-                  error={Boolean(errors.username)}
+                  label='Notes'
+                  variant='outlined'
+                  fullWidth
+                  multiline
+                  rows={4}
+                  {...register('note')}
+                  value={formValue.note}
+                  onChange={handleFormInputChange}
+                  name='note'
                 />
-              )}
-            />
-            {errors.username && <FormHelperText sx={{ color: 'error.main' }}>{errors.username.message}</FormHelperText>}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name='email'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  type='email'
-                  value={value}
-                  label='Email'
-                  onChange={onChange}
-                  placeholder='johndoe@email.com'
-                  error={Boolean(errors.email)}
-                />
-              )}
-            />
-            {errors.email && <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name='company'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  value={value}
-                  label='Company'
-                  onChange={onChange}
-                  placeholder='Company PVT LTD'
-                  error={Boolean(errors.company)}
-                />
-              )}
-            />
-            {errors.company && <FormHelperText sx={{ color: 'error.main' }}>{errors.company.message}</FormHelperText>}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name='country'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  value={value}
-                  label='Country'
-                  onChange={onChange}
-                  placeholder='Australia'
-                  error={Boolean(errors.country)}
-                />
-              )}
-            />
-            {errors.country && <FormHelperText sx={{ color: 'error.main' }}>{errors.country.message}</FormHelperText>}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name='contact'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  type='number'
-                  value={value}
-                  label='Contact'
-                  onChange={onChange}
-                  placeholder='(397) 294-5153'
-                  error={Boolean(errors.contact)}
-                />
-              )}
-            />
-            {errors.contact && <FormHelperText sx={{ color: 'error.main' }}>{errors.contact.message}</FormHelperText>}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <InputLabel id='role-select'>Select Role</InputLabel>
-            <Select
-              fullWidth
-              value={role}
-              id='select-role'
-              label='Select Role'
-              labelId='role-select'
-              onChange={e => setRole(e.target.value)}
-              inputProps={{ placeholder: 'Select Role' }}
-            >
-              <MenuItem value='admin'>Admin</MenuItem>
-              <MenuItem value='author'>Author</MenuItem>
-              <MenuItem value='editor'>Editor</MenuItem>
-              <MenuItem value='maintainer'>Maintainer</MenuItem>
-              <MenuItem value='subscriber'>Subscriber</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <InputLabel id='plan-select'>Select Plan</InputLabel>
-            <Select
-              fullWidth
-              value={plan}
-              id='select-plan'
-              label='Select Plan'
-              labelId='plan-select'
-              onChange={e => setPlan(e.target.value)}
-              inputProps={{ placeholder: 'Select Plan' }}
-            >
-              <MenuItem value='basic'>Basic</MenuItem>
-              <MenuItem value='company'>Company</MenuItem>
-              <MenuItem value='enterprise'>Enterprise</MenuItem>
-              <MenuItem value='team'>Team</MenuItem>
-            </Select>
-          </FormControl>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>
-              Submit
-            </Button>
-            <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
-              Cancel
-            </Button>
+
+                {displayErrors()}
+                <Box sx={styles.formButtonContainer}>
+                  <Box>
+                    <Button sx={styles.cancelButton}>
+                      <Typography sx={styles.text}>Cancel</Typography>
+                    </Button>
+                  </Box>
+
+                  <Box>
+                    <Button type='submit' sx={styles.continueButton}>
+                      <Typography sx={styles.text}>Continue</Typography>
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
+            </form>
           </Box>
-        </form>
+        ) : (
+          <CreatedSuccessful />
+        )}
       </Box>
     </Drawer>
   )
+}
+
+const styles = {
+  container: {
+    // backgroundColor: 'white',
+    // display: 'flex',
+    // flexDirection: 'column',
+    // border: '1px solid grey'
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#A459D1',
+    padding: 4
+  },
+  radio: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  white: {
+    color: 'white'
+  },
+  formContent: {
+    padding: 4
+  },
+  fullWidth: {
+    width: '100%',
+    mt: 1
+  },
+  textInput: {
+    width: {
+      xs: '100%',
+      sm: '100%',
+      md: '100%',
+      lg: '50%'
+    }
+  },
+  formContainer: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      lg: 'row'
+    },
+    gap: {
+      xs: 0,
+      lg: 5
+    }
+  },
+  formButtonContainer: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      md: 'column',
+      lg: 'column'
+    },
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    mt: 5,
+    gap: 3
+  },
+  cancelButton: {
+    backgroundColor: '#98A9BC',
+    color: 'white',
+    width: '200px',
+    '&:hover': {
+      backgroundColor: '#7899ac'
+    }
+  },
+  text: {
+    color: 'white',
+    textTransform: 'uppercase',
+    '&:hover': {
+      transform: 'scale(1.1)',
+      transition: 'transform 0.2s ease-in-out'
+    }
+  },
+  continueButton: {
+    backgroundColor: '#9747FF',
+    color: 'white',
+    width: '200px',
+    '&:hover': {
+      backgroundColor: '#9747FF'
+    }
+  }
 }
 
 export default SupervisorDrawer

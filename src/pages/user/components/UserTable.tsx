@@ -90,7 +90,7 @@ const UserTable = () => {
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
   const debouncedMobile = useDebounce(mobileSearchValue, 1000)
 
-  const { isLoading } = useQuery({
+  const { isLoading, isRefetching } = useQuery({
     queryKey: [
       'allUsers',
       page,
@@ -284,7 +284,7 @@ const UserTable = () => {
           </Box>
 
           <DataGrid
-            loading={isLoading}
+            loading={isLoading || isRefetching}
             checkboxSelection={false}
             disableSelectionOnClick
             paginationMode='server'
