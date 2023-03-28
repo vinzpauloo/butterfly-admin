@@ -51,6 +51,16 @@ export const useUsersTable = () => {
     )
   }
 
+  const getAllDataFromCreator = () => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1',
+        "ngrok-skip-browser-warning": "69420" // only for dev
+      },
+      url: `/users?role=CC`
+    })
+  }
+
   const updateUser = (id: any, data: any) => {
     return request({
       headers: {
@@ -79,6 +89,7 @@ export const useUsersTable = () => {
     getUsers,
     getAllDataForCSV,
     updateUser,
-    getSpecificUser
+    getSpecificUser,
+    getAllDataFromCreator
   }
 }
