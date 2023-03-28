@@ -19,6 +19,7 @@ interface Props {
   onUsernameChange: (e: ChangeEvent) => void
   onEmailChange: (e: ChangeEvent) => void
   onMobileChange: (e: ChangeEvent) => void
+  role: any
 }
 
 const UserTableToolbar = (props: Props) => {
@@ -50,7 +51,12 @@ const UserTableToolbar = (props: Props) => {
             }
           }}
         >
-          <ExportButton />
+          <ExportButton
+            role={props.role}
+            emailValue={props.emailValue}
+            mobileValue={props.mobileValue}
+            usernameValue={props.usernameValue}
+          />
         </Box>
         <CardHeader
           title='Search Filters'

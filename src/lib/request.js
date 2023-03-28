@@ -13,12 +13,17 @@ const client = (() => {
   })
 })()
 
-const request = async function (options, store) {
+const request = async function (options, processData) {
   //success handler
   const onSuccess = async function (response) {
     const {
-      data: { message, data }
+      data: { data }
     } = response
+
+    if (processData) {
+      return processData(response)
+    }
+
     await sleep() // for delaying the return of data
 
     return data

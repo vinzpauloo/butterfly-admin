@@ -86,7 +86,6 @@ const UserTable = () => {
         }
       }),
     onSuccess: (data: any) => {
-      console.log(`onSUCCESS`, data)
       setRowCount(data?.total)
       setRowData(data?.data)
       setPageSize(data?.per_page)
@@ -222,6 +221,7 @@ const UserTable = () => {
             components={{ Toolbar: UserTableToolbar }}
             componentsProps={{
               toolbar: {
+                role: role,
                 usernameValue: searchValue,
                 emailValue: emailSearchValue,
                 mobileValue: mobileSearchValue,
