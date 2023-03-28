@@ -44,20 +44,6 @@ export const styles = {
         textTransform: 'uppercase',
         p: 1
     },
-    uploadContainer: {
-        backgroundColor: '#D9D9D9',
-        height: 400,
-        width: {
-            xs: 'auto',
-            sm: 'auto',
-            md: 300,
-            lg: 300
-        },
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative'
-    },
     imgWrapper: {
         display: 'flex',
         flexDirection: 'column',
@@ -74,7 +60,7 @@ export const styles = {
             backgroundColor: '#7B0BB0'
         },
         position: 'absolute',
-        bottom: 15
+        bottom: 12
     },
     right: {
         width: {
@@ -89,11 +75,7 @@ export const styles = {
             xs: 0,
             lg: 10
         },
-        justifyContent: 'space-around',
-        gap: {
-            xs: 5,
-            lg: 0
-        }
+        gap: 4
     },
     fullWidth: {
         width: '100%'
