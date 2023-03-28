@@ -18,6 +18,14 @@ interface UserData {
   }
 }
 
+const processData = (response: any) => {
+  if (response && response.data) {
+    return response.data
+  }
+
+  return {}
+}
+
 export const useUsersTable = () => {
   const getUsers = (params: UsersData) => {
     return request({
@@ -29,31 +37,18 @@ export const useUsersTable = () => {
     })
   }
 
-  const getAllDataFromSupervisor = () => {
-    return request({
-      headers: {
-        'X-Authorization': 'postman|1'
+  const getAllDataForCSV = async (params: UsersData) => {
+    return request(
+      {
+        headers: {
+          'X-Authorization': 'postman|0'
+        },
+        url: `/users?export=true&role=${params.data.role}&paginate=0`,
+        method: 'GET',
+        params: params.data
       },
-      url: `/users?role=SUPERVISOR&paginate=500`
-    })
-  }
-
-  const getAllDataFromSuperAgent = () => {
-    return request({
-      headers: {
-        'X-Authorization': 'postman|1'
-      },
-      url: `/users?role=SA&paginate=500`
-    })
-  }
-
-  const getAllDataFromCreator = () => {
-    return request({
-      headers: {
-        'X-Authorization': 'postman|1'
-      },
-      url: `/users?role=CC&paginate=500`
-    })
+      processData
+    )
   }
 
   const updateUser = (id: any, data: any) => {
@@ -82,9 +77,7 @@ export const useUsersTable = () => {
 
   return {
     getUsers,
-    getAllDataFromSupervisor,
-    getAllDataFromSuperAgent,
-    getAllDataFromCreator,
+    getAllDataForCSV,
     updateUser,
     getSpecificUser
   }
