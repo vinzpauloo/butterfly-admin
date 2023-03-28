@@ -32,7 +32,7 @@ const VideoService = () => {
 			headers: {
 				'Content-Type': 'multipart/form-data'
 			},
-			url: "/videos/update",
+			url: "/videos",
 			method: "POST",
 			data : params.formData
 		})

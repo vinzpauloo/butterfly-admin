@@ -23,7 +23,7 @@ const Progress = (props: CircularProgressProps) => {
         }}
       >
         <Typography variant='caption' component='div' color='text.secondary'>
-          { Math.round(props.value as number)}%
+          {Math.round(props.value as number)}%
         </Typography>
       </Box>
     </Box>
@@ -31,23 +31,10 @@ const Progress = (props: CircularProgressProps) => {
 }
 
 interface ProgressProps {
-    dummyInterval : number
+  progress: number
 }
 
-const ProgressCircularWithLabel = ({dummyInterval} : ProgressProps) => {
-  // ** State
-  const [progress, setProgress] = useState<number>(10)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress(prevProgress => (prevProgress >= 100 ? 100 : prevProgress + 1))
-    }, dummyInterval)
-
-    return () => {
-      clearInterval(timer)
-    }
-  }, [])
-
+const ProgressCircularWithLabel = ({ progress }: ProgressProps) => {
   return <Progress value={progress} />
 }
 

@@ -11,6 +11,8 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import { styled } from '@mui/material/styles'
 import Radio from '@mui/material/Radio'
+import NextLink from 'next/link'
+import Link from '@mui/material/Link'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -289,7 +291,7 @@ const VideoVisibility = () => {
                                             minHeight:'150px',
                                             alignItems: 'center' }}>
                                             <Typography>Work</Typography>
-                                            <ProgressCircularWithLabel dummyInterval={1500} />
+                                            <ProgressCircularWithLabel progress={Number(studioContext?.workProgress)} />
                                     </Box>
 
                                 </Box>
@@ -312,7 +314,7 @@ const VideoVisibility = () => {
                                                     studioContext?.hasTrial ?
                                                     <>
                                                         <Typography>Trial</Typography>
-                                                        <ProgressCircularWithLabel dummyInterval={100} />
+                                                        <ProgressCircularWithLabel progress={Number(studioContext?.trialProgress)} />
                                                     </>
                                                     
                                                     : 'No Trial Video Uploaded'
@@ -343,12 +345,18 @@ const VideoVisibility = () => {
                         </Box>
                         <Box>
                             <CustomButton
-                                onClick={dummyNavigate}
+                                
+                                // onClick={dummyNavigate}
                                 sx={{ 
                                     bgcolor : 'primary.main',
                                     color : 'common.white'
                                 }}>
-                                Save
+                                    <Link
+                                        href='/video-list'
+                                        sx={{color:'#fff'}}>
+                                        Save
+                                    </Link>
+                                
                             </CustomButton>
                         </Box>                 
                     </Box>

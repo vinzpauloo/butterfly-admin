@@ -109,6 +109,7 @@ const TableVideos = () => {
   const [rows, setRows] = useState<VideoType[]>([])
   const [searchValue, setSearchValue] = useState<string>('')
   const [sortColumn, setSortColumn] = useState<string>('')
+  const [isLoading, setLoading] = useState<boolean>(true)
 
   // ** Service API Calls
   const { getAllVideos } = VideoService()
@@ -132,11 +133,12 @@ const TableVideos = () => {
 
   const fetchTableData = useCallback(
     async (sortType: SortType, q: string, column: string) => {
-
+      setLoading(true)
       const allVids = await getAllVideos({data : { sort: 'created_at', sort_by: sortType, with: 'user' }})
 
       setRows(loadServerRows(page, allVids.data))
       setTotal(allVids.total)
+      setLoading(false)
       
       // await axios
       //   .get('/api/table/data', {
@@ -180,6 +182,7 @@ const TableVideos = () => {
     <Card>
       <CardHeader title='' />
       <DataGrid
+        loading={isLoading}
         getRowId={(row)=> row._id}
         autoHeight
         pagination
