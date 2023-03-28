@@ -39,10 +39,10 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
 
   const handleToggle = async (newValue: boolean) => {
     // Determine the new status
-    const newStatus = value === 'Applied' || value === 'Approved' ? 'hold' : 'approved'
+    const newStatus = value === 'Applied' || value === 'Approved' ? 'Hold' : 'Approved'
 
     // Update the status in the backend
-    await mutation.mutateAsync({ id, data: { status: newStatus } })
+    await mutation.mutateAsync({ id, data: { status: newStatus, _method: 'put' } })
   }
 
   return (
