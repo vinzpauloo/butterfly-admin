@@ -51,11 +51,11 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
 }
 
 const superAgentColumns = [
-  { field: 'username', headerName: 'Super Agent', width: 300 },
+  { field: 'username', headerName: 'Super Agent', width: 200 },
 
   // { field: 'SiteName', headerName: 'Site Name', width: 250 },
-  { field: 'mobile', headerName: 'Mobile Number', width: 300 },
-  { field: 'email', headerName: 'Email', width: 300 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
+  { field: 'email', headerName: 'Email', width: 250 },
   {
     field: 'created_at',
     headerName: 'Date Created',
@@ -77,7 +77,7 @@ const superAgentColumns = [
   {
     field: 'status',
     headerName: 'Action',
-    width: 200,
+    width: 150,
     renderCell: (params: any) => {
       return (
         <Box>
