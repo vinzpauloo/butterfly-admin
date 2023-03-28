@@ -30,6 +30,7 @@ import { useUsersTable } from '../../../services/api/useUsersTable'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
+import SupervisorDrawer from './drawer/SupervisorDrawer'
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -194,11 +195,14 @@ const UserTable = () => {
     handleRoleChange(activeTab)
   }, [activeTab])
 
+  const [addUserOpen, setAddUserOpen] = useState<boolean>(false)
+  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <Box sx={{ padding: '20px 25px 0 25px', ...styles.buttonContainer }}>
+          <Box sx={{ mx: 5, mt: 5, ...styles.buttonContainer }}>
             <TabContext value={activeTab}>
               <TabList
                 variant='scrollable'
@@ -268,7 +272,7 @@ const UserTable = () => {
               </Button>
             </Box> */}
 
-            <Link
+            {/* <Link
               style={styles.linkButton}
               href={{
                 pathname: 'list/CreateAccount',
@@ -276,7 +280,7 @@ const UserTable = () => {
               }}
             >
               <Button sx={styles.createAccount}>Create Account</Button>
-            </Link>
+            </Link> */}
           </Box>
 
           <DataGrid
@@ -296,6 +300,7 @@ const UserTable = () => {
             components={{ Toolbar: UserTableToolbar }}
             componentsProps={{
               toolbar: {
+                toggle: toggleAddUserDrawer,
                 role: role,
                 usernameValue: searchValue,
                 emailValue: emailSearchValue,
@@ -311,8 +316,9 @@ const UserTable = () => {
                 onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
               }
             }}
-            sx={{ padding: 5 }}
+            sx={{ padding: 0 }}
           />
+          <SupervisorDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
         </Card>
       </Grid>
     </Grid>
