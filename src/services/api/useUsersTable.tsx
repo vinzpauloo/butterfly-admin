@@ -22,5 +22,44 @@ export const useUsersTable = () => {
     })
   }
 
-  return { getUsers }
+  const getAllDataFromSupervisor = () => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1'
+      },
+      url: `/users?role=SUPERVISOR&paginate=500`
+    })
+  }
+
+  const getAllDataFromSuperAgent = () => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1'
+      },
+      url: `/users?role=SA&paginate=500`
+    })
+  }
+
+  const getAllDataFromCreator = () => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1'
+      },
+      url: `/users?role=CC&paginate=500`
+    })
+  }
+
+  const updateUser = (id: any, data: any) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|0',
+        'Content-Type': 'application/json'
+      },
+      url: `/users/${id}`,
+      method: 'PUT',
+      data: data
+    })
+  }
+
+  return { getUsers, getAllDataFromSupervisor, getAllDataFromSuperAgent, getAllDataFromCreator, updateUser }
 }

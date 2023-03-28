@@ -65,21 +65,19 @@ import 'src/iconify-bundle/icons-bundle-react'
 import '../../styles/globals.css'
 
 // ** TanStack Query
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // ** Axios Defaults
-import axios from 'axios';
+import axios from 'axios'
 
 // ** Set axios defaults
-// Local 
+axios.defaults.headers.common['Accept'] = 'application/json'
+
+// Local
 // axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL;
 
 // SIT
 // axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL_SIT;
-
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -120,16 +118,15 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
 
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {
-
   // Create a client
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        retry: false,
+        retry: false
       }
     }
-  });
+  })
 
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
@@ -151,10 +148,7 @@ const App = (props: ExtendedAppProps) => {
       <CacheProvider value={emotionCache}>
         <Head>
           <title>{`${themeConfig.templateName}`}</title>
-          <meta
-            name='description'
-            content={`${themeConfig.templateName}`}
-          />
+          <meta name='description' content={`${themeConfig.templateName}`} />
           {/* <meta name='keywords' content='' /> */}
           <meta name='viewport' content='initial-scale=1, width=device-width' />
         </Head>

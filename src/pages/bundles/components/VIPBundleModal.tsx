@@ -4,16 +4,20 @@ import Stack, { StackProps } from '@mui/material/Stack';
 import Grid, { GridProps } from '@mui/material/Grid';
 import { Icon, IconProps } from '@mui/material';
 import IconList from './IconList';
-import ToggleButton from '../../user/components/button/ToggleButton';
+import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import BundlesService from "../../../services/api/BudlesService"
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 type Props = {
 
 	// optional props to be passed if editing a bundle instead
 	isEditingVIPBundle?: boolean
+	bundleID?: string
 	bundleName?: string
-	bundlePrice?: string
+	bundlePrice?: number
 	bundleDescription?: string
 	isBundleOn?: boolean
 	isVideoIncluded?: boolean
@@ -37,6 +41,8 @@ const VIPBundleModal = (props: Props) => {
 
 	const [bundleDescription, setBundleDescription] = useState(props.bundleDescription ?? "")
 	const [bundleDescriptionError, setBundleDescriptionError] = useState(false)
+
+	const [isBundleActive, setIsBundleActive] = useState(props.isBundleOn ?? false)
 
 	const [isVideoIncluded, setIsVideoIsIncluded] = useState(props.isVideoIncluded ?? false)
 	const [isPhotosIncluded, setIsPhotosIncluded] = useState(props.isPhotosIncluded ?? false)
@@ -98,8 +104,6 @@ const VIPBundleModal = (props: Props) => {
 		},
 	]
 
-	const selectedFeatures: string[] = []
-
 	const validateInputs = () => {
 		if (bundleName === "") {
 			setBundleNameError(true) 
@@ -125,24 +129,90 @@ const VIPBundleModal = (props: Props) => {
 		return true
 	}
 
-	const addNewVIPBundle = () => {
-		if (validateInputs()) {
-			// POST TO BACK-END
-			console.log("Name:", bundleName)
-			console.log("Price:", bundlePrice)
-			console.log("Description:", bundleDescription)
+	// Get QueryClient from the context
+	const queryClient = useQueryClient();
+	const { addVIPBundle, editVIPBundle } = BundlesService();
 
-			featuresList.forEach(item => {if (item.isIncluded) selectedFeatures.push(item.featureName)})
-			console.log(selectedFeatures)
+	const { mutate: mutateAddNewVIPBundle, isLoading: addedLoading, isSuccess: addedSuccess } = useMutation(addVIPBundle, {
+		onSuccess: (data) => {
+			console.log(data);
+			queryClient.invalidateQueries({
+				queryKey: ["allVIPBundles"],
+			});
+		props.onClose()
+		},
+		onError: (error) => {
+			alert(error);
+		},
+	});
+
+	const { mutate: mutateEditVIPBundle, isLoading: editingLoading, isSuccess: editingSuccess } = useMutation(editVIPBundle, {
+		onSuccess: (data) => {
+			console.log(data);
+			queryClient.invalidateQueries({
+				queryKey: ["allVIPBundles"],
+			});
 			props.onClose()
+		},
+		onError: (error) => {
+			alert(error);
+		},
+	});
+
+	const confirmEditVIPBundle = () => {
+		if (validateInputs()) {
+			mutateEditVIPBundle({
+				data: {
+					bundle_id: props.bundleID,
+					name: bundleName,
+					price: Number(bundlePrice),
+					description: bundleDescription,
+					active: isBundleActive,
+					videos: featuresList[0].isIncluded,
+					photos: featuresList[1].isIncluded,
+					live_streaming: featuresList[2].isIncluded,
+					video_call: featuresList[3].isIncluded,
+					live_chat: featuresList[4].isIncluded,
+					forever_vip: featuresList[5].isIncluded,
+					download: featuresList[6].isIncluded,
+					watch_ticket: featuresList[7].isIncluded,
+					offline_benefit: featuresList[8].isIncluded,
+				},
+			});
 		}
 	}
+
+	const addNewVIPBundle = () => {
+		if (validateInputs()) {
+			mutateAddNewVIPBundle({
+				data: {
+					name: bundleName,
+					price: Number(bundlePrice),
+					description: bundleDescription,
+					active: isBundleActive,
+					videos: featuresList[0].isIncluded,
+					photos: featuresList[1].isIncluded,
+					live_streaming: featuresList[2].isIncluded,
+					video_call: featuresList[3].isIncluded,
+					live_chat: featuresList[4].isIncluded,
+					forever_vip: featuresList[5].isIncluded,
+					download: featuresList[6].isIncluded,
+					watch_ticket: featuresList[7].isIncluded,
+					offline_benefit: featuresList[8].isIncluded,
+				},
+			});
+		}
+	}
+
+	const isBeingAddedOrEdited = (addedLoading || addedSuccess) || (editingLoading || editingSuccess)
+	const loadingStyle = isBeingAddedOrEdited ? { opacity: 0.5, cursor: "not-allowed" } : null
 
 	return (
 		<Stack {...modalContainer}>
 			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingVIPBundle ? "EDIT" : "ADD"} VIP BUNDLE</Typography>
-			<Stack flexDirection="column" gap={2}>
-				<Stack gap={2} width={300}>
+			<Stack flexDirection="column" gap={2} sx={loadingStyle} width={300}>
+				{isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
+				<Stack gap={2}>
 					<Stack {...cardContainer}>
 						<Stack flexDirection="row" alignItems="center" justifyContent="space-between">
 							<TextField
@@ -151,9 +221,10 @@ const VIPBundleModal = (props: Props) => {
 								value={bundleName}
 								onChange={(event) => setBundleName(event.target.value)}
 								label="Bundle Name" />
-							<ToggleButton />
+							<Switch checked={isBundleActive} onChange={event => { setIsBundleActive(event.target.checked) }} />
 						</Stack>
 						<TextField
+							type="number"
 							error={bundlePrice !== "" ? false : undefined || bundlePriceError}
 							sx={textFieldStyle}
 							value={bundlePrice}
@@ -187,7 +258,7 @@ const VIPBundleModal = (props: Props) => {
 			</Stack>
 			<Stack flexDirection="row" gap={2} mt={4}>
 				<Button variant="contained" color="error" onClick={props.onClose} fullWidth>CANCEL</Button>
-				<Button variant="contained" color="success" onClick={addNewVIPBundle} fullWidth>SAVE</Button>
+				<Button variant="contained" color="success" onClick={props.isEditingVIPBundle? confirmEditVIPBundle : addNewVIPBundle} fullWidth>SAVE</Button>
 			</Stack>
 		</Stack>
 	)
@@ -241,4 +312,15 @@ const cardContainer: StackProps = {
 const textFieldStyle = {
 	backgroundColor: "white",
 	borderRadius: 1,
+}
+
+const loaderStyle =
+{
+	position: "absolute",
+	top: 0,
+	bottom: 0,
+	left: 0,
+	right: 0,
+	margin: "auto",
+	zIndex: 1,
 }

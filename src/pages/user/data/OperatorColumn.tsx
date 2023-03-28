@@ -9,6 +9,47 @@ import OperatorEditModal from '@/pages/user/components/modal/OperatorEditModal'
 // ** Utils Imports
 import formatDate from '@/utils/formatDate'
 
+// ** TanStack Imports
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// ** Hooks
+import { useUsersTable } from '@/services/api/useUsersTable'
+
+interface ToggleActionProps {
+  value: string
+  id: any
+}
+
+const ToggleAction = ({ value, id }: ToggleActionProps) => {
+  const queryClient = useQueryClient()
+  const { updateUser } = useUsersTable()
+  const mutation = useMutation(
+    async (data: { id: string; data: any }) => {
+      const response = await updateUser(data.id, data.data)
+      if (response.ok) {
+        await response.json()
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
+      }
+    }
+  )
+
+  const handleToggle = async (newValue: boolean) => {
+    // Determine the new status
+    const newStatus = value === 'Applied' || value === 'Approved' ? 'hold' : 'approved'
+
+    // Update the status in the backend
+    await mutation.mutateAsync({ id, data: { status: newStatus } })
+  }
+
+  return (
+    <ToggleButton checked={value === 'Approved' || value === 'Applied'} onToggle={newValue => handleToggle(newValue)} />
+  )
+}
+
 const operatorColumns = [
   { field: 'username', headerName: 'User Profile', width: 300 },
   { field: 'mobile', headerName: 'Mobile Number', width: 300 },
@@ -30,15 +71,17 @@ const operatorColumns = [
     }
   },
   {
-    field: 'action',
+    field: 'status',
     headerName: 'Action',
     width: 200,
-    renderCell: () => (
-      <Box>
-        <ToggleButton />
-        <EditBtn modal={OperatorEditModal} />
-      </Box>
-    )
+    renderCell: (params: any) => {
+      return (
+        <Box>
+          <ToggleAction id={params.row.id} value={params.value} />
+          <EditBtn modal={OperatorEditModal} userId={params.row.id} data={params.row} />
+        </Box>
+      )
+    }
   }
 ]
 

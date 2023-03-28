@@ -1,32 +1,34 @@
-import {styled} from "@mui/system";
-import {Switch} from "@mui/material";
-import React from "react";
+import { styled } from '@mui/system'
+import { Switch } from '@mui/material'
+import React from 'react'
 
 interface ToggleBtnProps {
-  onChange?: () => void;
-  width?: number;
-  height?: number;
-  padding?: number;
+  onChange?: () => void
+  width?: number
+  height?: number
+  padding?: number
+  checked?: boolean
+  onToggle?: (value: boolean) => void
 }
 
 const StyledSwitch = styled(Switch)(({ theme }) => ({
   width: '72px',
   height: '42px',
   '& .MuiSwitch-switchBase': {
-    margin: theme.spacing(3.50),
+    margin: theme.spacing(3.5),
     padding: 0,
     transform: 'translateX(-0.50px)',
     '&.Mui-checked': {
       color: '#fff',
       transform: 'translateX(28px)',
       '& .MuiSwitch-thumb:before': {
-        content: "'ON'",
+        content: "'ON'"
       },
       '& + .MuiSwitch-track': {
         opacity: 1,
         backgroundColor: '#60FF00'
-      },
-    },
+      }
+    }
   },
   '& .MuiSwitch-thumb': {
     backgroundColor: 'white',
@@ -43,25 +45,30 @@ const StyledSwitch = styled(Switch)(({ theme }) => ({
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
       color: 'black'
-    },
+    }
   },
   '& .MuiSwitch-track': {
     opacity: 1,
     backgroundColor: '#F03738',
-    borderRadius: 20 / 2,
-  },
-}));
+    borderRadius: 20 / 2
+  }
+}))
 
-const ToggleButton = ({ onChange, ...otherProps }: ToggleBtnProps) => {
-
+const ToggleButton = ({ onChange, checked, onToggle, ...otherProps }: ToggleBtnProps) => {
   return (
-    <StyledSwitch onChange={(event) => {
-      if (event.target.checked) {
-        console.log(`Test Toggle`);
-      }
-      onChange?.();
-    }} {...otherProps} />
-  );
-};
+    <StyledSwitch
+      checked={checked}
+      onChange={event => {
+        const isChecked = event.target.checked
+        if (isChecked) {
+          console.log(`Toggle Checked`)
+        }
+        onChange?.()
+        onToggle?.(isChecked)
+      }}
+      {...otherProps}
+    />
+  )
+}
 
 export default ToggleButton
