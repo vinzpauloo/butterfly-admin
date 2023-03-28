@@ -51,9 +51,9 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
 }
 
 const operatorColumns = [
-  { field: 'username', headerName: 'User Profile', width: 300 },
-  { field: 'mobile', headerName: 'Mobile Number', width: 300 },
-  { field: 'email', headerName: 'Email', width: 300 },
+  { field: 'username', headerName: 'User Profile', width: 200 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
+  { field: 'email', headerName: 'Email', width: 250 },
   {
     field: 'created_at',
     headerName: 'Date Created',
@@ -73,7 +73,7 @@ const operatorColumns = [
   {
     field: 'status',
     headerName: 'Action',
-    width: 200,
+    width: 150,
     renderCell: (params: any) => {
       return (
         <Box>

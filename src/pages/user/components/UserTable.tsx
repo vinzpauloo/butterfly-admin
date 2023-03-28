@@ -5,8 +5,14 @@ import React, { useState, useEffect, ChangeEvent } from 'react'
 import Link from 'next/link'
 
 // ** MUI Imports
-import { Box, Card, Grid, Button } from '@mui/material'
+import { Box, Card, Grid, Button, Tab } from '@mui/material'
 import { DataGrid, GridSortModel } from '@mui/x-data-grid'
+import MuiTabList, { TabListProps } from '@mui/lab/TabList'
+import TabContext from '@mui/lab/TabContext'
+import { styled } from '@mui/material/styles'
+
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 
 // ** Custom Table Components Imports
 import UserTableToolbar from './UserTableToolbar'
@@ -24,6 +30,26 @@ import { useUsersTable } from '../../../services/api/useUsersTable'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
+
+const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
+  '& .MuiTabs-indicator': {
+    display: 'none'
+  },
+  '& .Mui-selected': {
+    backgroundColor: theme.palette.primary.main,
+    color: `${theme.palette.common.white} !important`
+  },
+  '& .MuiTab-root': {
+    minWidth: 65,
+    minHeight: 40,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    [theme.breakpoints.up('md')]: {
+      minWidth: 130
+    }
+  }
+}))
 
 const useDebounce = (value: any, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -130,6 +156,7 @@ const UserTable = () => {
   useEffect(() => {
     setRole('SUPERVISOR')
     setColumnType('operators')
+    setActiveTab('SUPERVISOR')
   }, [])
 
   const handleSortModel = (newModel: GridSortModel) => {
@@ -157,12 +184,58 @@ const UserTable = () => {
     }
   }
 
+  const [activeTab, setActiveTab] = useState<any>()
+  const handleChange = (event: any, value: string) => {
+    setActiveTab(value)
+  }
+
+  useEffect(() => {
+    console.log(`ACTIVETABS###`, activeTab)
+    handleRoleChange(activeTab)
+  }, [activeTab])
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <Box sx={{ padding: 5, ...styles.buttonContainer }}>
-            <Box sx={styles.usersButtons}>
+          <Box sx={{ padding: '20px 25px 0 25px', ...styles.buttonContainer }}>
+            <TabContext value={activeTab}>
+              <TabList
+                variant='scrollable'
+                scrollButtons='auto'
+                onChange={handleChange}
+                aria-label='forced scroll tabs example'
+              >
+                <Tab
+                  value='SUPERVISOR'
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
+                      <Icon fontSize={20} icon='mdi:account-outline' />
+                      Operators
+                    </Box>
+                  }
+                />
+                <Tab
+                  value='SA'
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
+                      <Icon fontSize={20} icon='mdi:lock-outline' />
+                      Super Agent
+                    </Box>
+                  }
+                />
+                <Tab
+                  value='CC'
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
+                      <Icon fontSize={20} icon='mdi:bookmark-outline' />
+                      Content Creator
+                    </Box>
+                  }
+                />
+              </TabList>
+            </TabContext>
+            {/* <Box sx={styles.usersButtons}>
               <Button
                 onClick={() => handleRoleChange('SUPERVISOR')}
                 sx={{
@@ -193,7 +266,7 @@ const UserTable = () => {
               >
                 Content Creators
               </Button>
-            </Box>
+            </Box> */}
 
             <Link
               style={styles.linkButton}
@@ -208,6 +281,8 @@ const UserTable = () => {
 
           <DataGrid
             loading={isLoading}
+            checkboxSelection={false}
+            disableSelectionOnClick
             paginationMode='server'
             sortingMode='server'
             autoHeight
@@ -236,6 +311,7 @@ const UserTable = () => {
                 onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
               }
             }}
+            sx={{ padding: 5 }}
           />
         </Card>
       </Grid>
