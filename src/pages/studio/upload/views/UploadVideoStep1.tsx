@@ -40,7 +40,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery } from '@tanstack/react-query'
 
 //* Context Import
-import { StudioContext, DisplayPage, StudioContextType, GenericDataType } from '..'
+import { StudioContext, DisplayPage } from '..'
 
 
 // Styled components
@@ -98,8 +98,6 @@ const ThumbnailBox = styled(Box)(({ theme }) => ({
 
 // ** Data
 import { TaggingsDummy, GroupingsDummy } from '@/data/uploadVideoData'
-import { IItemType } from '@/shared-components/InfiniteLoaderWrapper'
-
 
 // ** Props and interfaces 
 type Props = {}
@@ -281,44 +279,137 @@ const UploadVideoStep1 = (props: Props) => {
         console.log('Upload finished:', upload.url)
       },
       onAfterResponse: (req, res) => {
-        if ( res.getHeader('works') != null ) {
 
-          let trial_upload_url = ''
-          if( res.getHeader('location') )   {
-            trial_upload_url = res.getHeader('location')
+        return new Promise<void>(resolve => {
+          if ( res.getHeader('works') != null ) {
+            resolve()
+          }
+        })
+          //upload trial video
+        .then(()=>{
+          return new Promise<boolean>(resolve => {
+            if ( studioContext?.hasTrial ) {
+              console.log('has trial')
+              resolve(true)
+            } else {
+              console.log('no trial')
+              resolve(false)
+            } 
+          })
+          
+        })
+        .then( (hasTrial) => {
+
+          let hasUploadedTrialVideo : boolean = false
+
+          if ( hasTrial ) {
+
+            hasUploadedTrialVideo = true
+
+            // call another TUS Upload
+            console.log('Call TUS Upload for Trial Video')
+
+            // call trial videos api
+            if (!trailerFile) {
+              console.log('trailerFile', trailerFile)
+              return;
+            }
+            
+            var tFile = trailerFile[0]
+
+
+            const trialHeaderData = JSON.stringify({
+              "username": contentCreator,
+              "file_name": title,
+              "video_type" : "trial_video",
+            })
+
+
+            const uploadTrial = new tus.Upload(file, {
+              endpoint: `${URL}`,
+              chunkSize: 5 * 1024 * 1024,
+              retryDelays: [0, 1000, 3000, 5000],
+              headers : {
+                data : trialHeaderData
+              },
+              metadata: {
+                filename: tFile.name,
+                filetype: tFile.type,
+              },
+              removeFingerprintOnSuccess : true, // fingerprint in the URL storage will be removed
+              onError: (error) => {
+                console.error('Failed because:', error);
+              },
+              onProgress: (bytesUploaded, bytesTotal) => {
+                const progress = Math.round((bytesUploaded / bytesTotal) * 100);
+                console.log('progress', progress)
+              },
+              onSuccess: () => {
+                console.log('Trial Upload finished:', uploadTrial.url)
+              },
+              onAfterResponse: (req, res) => {
+                console.log('response in TRIAL', res)
+              }
+            })
+
+            // Start the upload
+            uploadTrial.start()
+
+          } else {
+
+            //just continue form update
+            hasUploadedTrialVideo = false
+            console.log('isTrialUploaded', hasUploadedTrialVideo)
+
+            //form update
+            updateVideoByWorkId({ formData : handleFormData(res) })
+
           }
 
-          let data = JSON.parse(res.getHeader('works'))
-          console.log('data',data)
-          const { work_id } = data.data
-          
-          //update the table with the work_id -- Refactor this formData values 
-          console.log('getValues', getValues() )
 
-          const {title, description, startTime} = getValues()
+        })
 
-          const formData = new FormData()
-
-          formData.append('work_id', work_id) 
-          formData.append('title', title) 
-          formData.append('description', description) 
-          formData.append('orientation', 'landscape') 
-          formData.append('startTimeSeconds', startTime) 
-          
-          if( thumbnailFile?.length ) {
-            console.log('thumbnail', thumbnailFile)
-            formData.append('thumbnail',thumbnailFile[0])
-          }
-
-          //pass this as arrays LOOP?
-          formData.append('tags[]', 'sexy') 
-          formData.append('groups[]', '98acfaa9-6ced-4e51-b2e2-12ab56120bd8') 
-
-          updateVideoByWorkId({ formData : formData })
-
-        }
       }
     });
+
+    //handle form Update data
+    const handleFormData = (res : tus.HttpResponse) : FormData => {
+
+        let trial_upload_url = ''
+        if( res.getHeader('location') ) {
+          trial_upload_url = res.getHeader('location')
+        }
+
+        let data = JSON.parse(res.getHeader('works'))
+        console.log('data',data)
+        const { work_id } = data.data
+        
+        // ** Update the table with the work_id -- Refactor this formData values 
+        console.log( 'getValues', getValues() )
+
+        const {title, description, startTime} = getValues()
+        
+        const formData = new FormData()
+
+        formData.append('work_id', work_id) 
+        formData.append('title', title) 
+        formData.append('description', description) 
+        formData.append('orientation', 'landscape') // HardCoded
+        formData.append('startTimeSeconds', startTime) 
+        
+        if( thumbnailFile?.length ) {
+          console.log('thumbnail', thumbnailFile)
+          formData.append('thumbnail',thumbnailFile[0])
+        }
+
+        //pass this as arrays LOOP? // HardCoded
+        formData.append('tags[]', 'Couple')
+        formData.append('tags[]', 'Amazing')
+        formData.append('tags[]', '宇')
+        formData.append('groups[]', '98acfaa9-6ced-4e51-b2e2-12ab56120bd8') 
+
+        return formData
+    }
 
      // Check if there are any previous uploads to continue.
      upload.findPreviousUploads().then(function (previousUploads) {
@@ -328,7 +419,7 @@ const UploadVideoStep1 = (props: Props) => {
 
       // If an upload has been chosen to be resumed, instruct the upload object to do so.
       if(chosenUpload) {
-            upload.resumeFromPreviousUpload(chosenUpload)
+        upload.resumeFromPreviousUpload(chosenUpload)
       }
 
       // Start the upload

@@ -293,25 +293,34 @@ const VideoVisibility = () => {
                                     </Box>
 
                                 </Box>
-
-                                <Box>
-                                    <Box 
-                                        sx={{ 
-                                            borderRadius: '15px',
-                                            backgroundColor: '#C4C4C4',
-                                            display: 'flex', 
-                                            padding:'.5rem',
-                                            gap:'1rem',
-                                            justifyContent:'center',
-                                            textAlign:'center',
-                                            minHeight:'150px',
-                                            alignItems: 'center' }}>
-                                            <Typography>Trial</Typography>
-                                            <ProgressCircularWithLabel dummyInterval={100} />
+                                
+                                
+                                    <Box>
+                                        <Box 
+                                            sx={{ 
+                                                borderRadius: '15px',
+                                                backgroundColor: '#C4C4C4',
+                                                display: 'flex', 
+                                                padding:'.5rem',
+                                                gap:'1rem',
+                                                justifyContent:'center',
+                                                textAlign:'center',
+                                                minHeight:'150px',
+                                                alignItems: 'center' }}>
+                                                
+                                                {
+                                                    studioContext?.hasTrial ?
+                                                    <>
+                                                        <Typography>Trial</Typography>
+                                                        <ProgressCircularWithLabel dummyInterval={100} />
+                                                    </>
+                                                    
+                                                    : 'No Trial Video Uploaded'
+                                                }
+                                        </Box>
                                     </Box>
-
-
-                                </Box>
+                                
+                                
 
                             </UploadBox>
 

@@ -76,10 +76,6 @@ export type GenericDataType = {
   name : string
 }
 
-export type StudioFormDataType = {
-
-}
-
 export type StudioContextType = {
     displayPage : DisplayPage,
     setDisplayPage : React.Dispatch<React.SetStateAction<DisplayPage>>,

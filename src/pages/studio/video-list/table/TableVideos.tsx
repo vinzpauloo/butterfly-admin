@@ -72,7 +72,7 @@ const columns: GridColumns = [
     headerName: 'Category',
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.tags.join(", ")}
+        {params?.row?.tags?.join(", ")}
       </Typography>
     )
   },
