@@ -78,8 +78,8 @@ const schema = yup.object().shape({
 
 //remove default values if you want no initial values on render page
 const defaultValues: FormData = {
-  password: 'admin101^',
-  email: 'dexi@1bit.com.ph'
+  password: 'password',
+  email: 'kratos916'
 }
 
 interface FormData {
