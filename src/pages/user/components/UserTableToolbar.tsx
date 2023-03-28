@@ -5,6 +5,7 @@ import { ChangeEvent } from 'react'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
 import { CardHeader } from '@mui/material'
 
 // ** Icon Imports
@@ -19,6 +20,7 @@ interface Props {
   onUsernameChange: (e: ChangeEvent) => void
   onEmailChange: (e: ChangeEvent) => void
   onMobileChange: (e: ChangeEvent) => void
+  role: any
 }
 
 const UserTableToolbar = (props: Props) => {
@@ -29,29 +31,6 @@ const UserTableToolbar = (props: Props) => {
       }}
     >
       <Box>
-        <Box
-          sx={{
-            display: {
-              xs: '',
-              sm: 'flex',
-              md: 'flex'
-            },
-            justifyContent: {
-              xs: '',
-              sm: 'right',
-              md: 'right',
-              lg: 'right'
-            },
-            borderTop: {
-              xs: '',
-              sm: '',
-              md: '',
-              lg: '1px solid black'
-            }
-          }}
-        >
-          <ExportButton />
-        </Box>
         <CardHeader
           title='Search Filters'
           sx={{
@@ -158,6 +137,30 @@ const UserTableToolbar = (props: Props) => {
             }
           }}
         />
+      </Box>
+      <Box
+        sx={{
+          mt: 5,
+          borderTop: '1px solid #d3d3d3'
+        }}
+      >
+        <Box
+          sx={{
+            mt: 5,
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
+          <ExportButton
+            role={props.role}
+            emailValue={props.emailValue}
+            mobileValue={props.mobileValue}
+            usernameValue={props.usernameValue}
+          />
+          <Button sx={{}} variant='contained'>
+            Add User
+          </Button>
+        </Box>
       </Box>
     </Box>
   )

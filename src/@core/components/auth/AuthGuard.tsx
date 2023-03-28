@@ -7,6 +7,9 @@ import { useRouter } from 'next/router'
 // ** Hooks Import
 import { useAuth } from '@/services/useAuth'
 
+// ** Config
+import authConfig from 'src/configs/auth'
+
 interface AuthGuardProps {
   children: ReactNode
   fallback: ReactElement | null
@@ -16,6 +19,7 @@ const AuthGuard = (props: AuthGuardProps) => {
   const { children, fallback } = props
   const auth = useAuth()
   const router = useRouter()
+  const loginPath = '/loginv2'
 
   useEffect(
     () => {
@@ -23,14 +27,14 @@ const AuthGuard = (props: AuthGuardProps) => {
         return
       }
 
-      if (auth.user === null && !window.localStorage.getItem('userData')) {
+      if (auth.user === null && !window.localStorage.getItem(authConfig.userDataKeyname)) {
         if (router.asPath !== '/') {
           router.replace({
-            pathname: '/loginv2',
+            pathname: loginPath,
             query: { returnUrl: router.asPath }
           })
         } else {
-          router.replace('/loginv2')
+          router.replace(loginPath)
         }
       }
     },
