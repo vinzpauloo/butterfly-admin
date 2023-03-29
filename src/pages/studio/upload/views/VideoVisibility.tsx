@@ -1,6 +1,8 @@
 // ** React import
 import React from 'react'
 
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
@@ -19,7 +21,7 @@ import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
 
 //* Context Import
-import { StudioContext, DisplayPage, StudioContextType, GenericDataType } from '..'
+import { StudioContext, DisplayPage } from '..'
 
 // ** Third Party Imports
 import DatePicker from 'react-datepicker'
@@ -70,6 +72,7 @@ const CustomAccordion = styled(Accordion)(({ theme }) => ({
 }))
 
 const VideoVisibility = () => {
+  const router = useRouter()
   React.useEffect(() => {
     console.log('studioContext FINAL', studioContext)
   }, [])
@@ -111,8 +114,10 @@ const VideoVisibility = () => {
       workFormParams = { ...defaultWorkFormParams, publish: true }
     }
     console.log('workFormParams', workFormParams)
-
-    updateWork(workFormParams)
+    console.log('router', router)
+    updateWork(workFormParams).then(data => {
+      router.push('/studio/video-list')
+    })
   }
   const updateWork = (formDataParams: { [key: string]: any }) => {
     let formData = new FormData()
@@ -123,7 +128,7 @@ const VideoVisibility = () => {
     })
 
     // call api updat
-    updateVideoByWorkId({
+    return updateVideoByWorkId({
       formData: formData
     })
   }
