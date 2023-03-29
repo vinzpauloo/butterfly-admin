@@ -133,7 +133,7 @@ const superAgentColumns = [
       return (
         <Box>
           <ToggleAction id={params.row.id} value={params.value} />
-          <EditBtn modal={SuperAgentEditModal} userId={params.row.id} data={params.row} />
+          <EditBtn userId={params.row.id} roleId={params.row.role_id} data={params.row} />
         </Box>
       )
     }
@@ -255,7 +255,7 @@ const UserTable = () => {
           sort_by: sortName,
           search_by: search,
           search_value:
-            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
+            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile,
         }
       }),
     onSuccess: (data: any) => {

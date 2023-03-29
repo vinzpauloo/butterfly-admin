@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react'
 
 // ** MUI Imports
 import { Button } from '@mui/material'
-
-// ** Custom Imports
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 
+// ** Custom Imports
 import EditSupervisorDrawer from '../drawer/EditSupervisorDrawer'
+import EditSuperAgentDrawer from "@/pages/user/components/drawer/EditSuperAgentDrawer";
 import EditCreatorDrawer from '../drawer/EditCreatorDrawer'
 
 type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
@@ -66,6 +66,13 @@ const EditBtn = ({ roleId, userId, data }: any) => {
         roleId={roleId}
         open={openDrawer === 'SUPERVISOR'}
         toggle={() => handleDrawerToggle('SUPERVISOR')}
+      />
+      <EditSuperAgentDrawer
+        data={data}
+        userId={userId}
+        roleId={roleId}
+        open={openDrawer === 'SA'}
+        toggle={() => handleDrawerToggle('SA')}
       />
       <EditCreatorDrawer
         data={data}
