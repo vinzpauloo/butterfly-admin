@@ -105,7 +105,9 @@ import { TaggingsDummy, GroupingsDummy } from '@/data/uploadVideoData'
 type Props = {}
 
 // ** Constant variables
-const UploadURL: string = `${process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL}/videos/upload-url`
+const IS_SIT = process.env.NEXT_PUBLIC_APP_VARIANT === 'sit'
+const baseUrl = IS_SIT ? process.env.NEXT_PUBLIC_API_BASE_URL_SIT : process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL
+const UploadURL: string = `${baseUrl}/videos/upload-url`
 
 // ** Yup Schema
 const schema = yup.object().shape({

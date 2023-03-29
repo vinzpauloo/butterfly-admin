@@ -8,7 +8,6 @@ import Image from 'next/image'
 import { Box, Grid, Typography, ImageList, ImageListItem, Button } from '@mui/material'
 
 // ** Style Imports
-import { styles } from '../styles/advertisementStyles'
 import AdvertisementModal from '../components/modal/AdvertisementModal'
 
 type GridContent = {
@@ -55,7 +54,7 @@ const GridContent = (props: GridContent) => {
           {/* <Image src='/images/icons/butterfly-template-icon.png' width={50} height={50} alt='template icon' /> */}
           <img src={props.url} alt='template icon' />
         </ImageListItem>
-      }      
+      }
       <AdvertisementModal
         isOpen={openModal}
         onClose={handleClose}
@@ -101,6 +100,61 @@ const Advertisements = () => {
       </Grid>
     </Box>
   )
+}
+
+const styles = {
+  //Grid Content
+  gridContentWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 2,
+  },
+  titleWrapper: {
+    border: '1px solid #000',
+    width: 300,
+    p: 1
+  },
+  title: {
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    fontSize: 17
+  },
+  imgWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#D9D9D9',
+    border: '1px solid #000',
+    cursor:"pointer",
+    ":hover": {
+      backgroundColor: (theme: any) => theme.palette.primary.main,
+      opacity: 0.5,
+      scale: 0.5,
+      border: '1px solid',
+      borderColor: (theme: any) => theme.palette.primary.main,
+    }
+  },
+  uploadBtn: {
+    backgroundColor: '#9747FF',
+    width: 150,
+    color: '#FFF',
+    textTransform: 'uppercase',
+    fontSize: 12,
+    '&:hover': {
+      backgroundColor: '#7B0BB0'
+    }
+  },
+
+  //Main
+  ads: {
+    textAlign: 'center',
+    mb: 8,
+    textTransform: 'uppercase',
+    fontWeight: '600',
+    fontSize: 25
+  },
 }
 
 export default Advertisements

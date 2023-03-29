@@ -73,12 +73,6 @@ import axios from 'axios'
 // ** Set axios defaults
 axios.defaults.headers.common['Accept'] = 'application/json'
 
-// Local
-// axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL;
-
-// SIT
-// axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL_SIT;
-
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
   Component: NextPage
