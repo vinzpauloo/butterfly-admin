@@ -115,7 +115,7 @@ const SidebarAddUser = (props: SidebarAddUserType) => {
   })
 
   const onSubmit = (data: UserData) => {
-    dispatch(addUser({ ...data, role, currentPlan: plan }))
+    // dispatch(addUser({ ...data, role, currentPlan: plan }))
     toggle()
     reset()
   }

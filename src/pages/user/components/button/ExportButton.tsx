@@ -19,6 +19,7 @@ interface Props {
   emailValue: string
   mobileValue: string
   role: any
+  role_id: any
 }
 
 const ExportButton = (props: Props) => {
@@ -28,7 +29,7 @@ const ExportButton = (props: Props) => {
   const { getAllDataForCSV } = useUsersTable()
 
   const {} = useQuery({
-    queryKey: ['supervisors', props.role, props.usernameValue, props.emailValue, props.mobileValue],
+    queryKey: ['UsersTableCSV', props.role, props.usernameValue, props.emailValue, props.mobileValue, props.role_id],
     queryFn: () =>
       getAllDataForCSV({
         data: {

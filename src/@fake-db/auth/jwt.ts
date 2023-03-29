@@ -79,7 +79,7 @@ mock.onPost('/jwt/register').reply(request => {
       const { length } = users
       let lastIndex = 0
       if (length) {
-        lastIndex = users[length - 1].id
+        lastIndex = users[length - 1].id || 0
       }
       const userData = {
         id: lastIndex + 1,
