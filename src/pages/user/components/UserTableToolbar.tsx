@@ -21,7 +21,8 @@ interface Props {
   onEmailChange: (e: ChangeEvent) => void
   onMobileChange: (e: ChangeEvent) => void
   role: any
-  toggle: () => void
+  toggle: (role: string) => void
+  role_id: any
 }
 
 const UserTableToolbar = (props: Props) => {
@@ -157,8 +158,9 @@ const UserTableToolbar = (props: Props) => {
             emailValue={props.emailValue}
             mobileValue={props.mobileValue}
             usernameValue={props.usernameValue}
+            role_id={props.role_id}
           />
-          <Button onClick={props.toggle} variant='contained'>
+          <Button onClick={() => props.toggle(props.role)} variant='contained'>
             Add User
           </Button>
         </Box>

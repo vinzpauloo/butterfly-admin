@@ -1,11 +1,8 @@
 // ** React Imports
 import React, { useState, useEffect, ChangeEvent } from 'react'
 
-// ** Next Imports
-import Link from 'next/link'
-
 // ** MUI Imports
-import { Box, Card, Grid, Button, Tab } from '@mui/material'
+import { Box, Card, Grid, Tab } from '@mui/material'
 import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
@@ -24,13 +21,15 @@ import styles from '@/pages/user/list/styles'
 import operatorColumns from '@/pages/user/data/OperatorColumn'
 import superAgentColumns from '@/pages/user/data/SuperAgentColumn'
 import contentCreatorColumns from '@/pages/user/data/ContentCreatorColumn'
+import SupervisorDrawer from './drawer/SupervisorDrawer'
+import SADrawer from './drawer/SADrawer'
+import CCDrawer from './drawer/CCDrawer'
 
 // ** Hooks
 import { useUsersTable } from '../../../services/api/useUsersTable'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
-import SupervisorDrawer from './drawer/SupervisorDrawer'
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -75,6 +74,7 @@ const UserTable = () => {
   const [page, setPage] = useState<number>()
   const [pageSize, setPageSize] = useState<number>()
   const [role, setRole] = useState('SUPERVISOR')
+  const [roleId, setRoleId] = useState<any>()
   const [columnType, setColumnType] = useState('SUPERVISOR')
   const [rowCount, setRowCount] = useState<any>()
 
@@ -95,6 +95,7 @@ const UserTable = () => {
       'allUsers',
       page,
       role,
+      roleId,
       sort,
       sortName,
       search,
@@ -104,6 +105,7 @@ const UserTable = () => {
       getUsers({
         data: {
           role: role,
+          role_id: roleId,
           page: page,
           sort: sort,
           sort_by: sortName,
@@ -158,6 +160,7 @@ const UserTable = () => {
     setRole('SUPERVISOR')
     setColumnType('operators')
     setActiveTab('SUPERVISOR')
+    setRoleId('2')
   }, [])
 
   const handleSortModel = (newModel: GridSortModel) => {
@@ -191,12 +194,29 @@ const UserTable = () => {
   }
 
   useEffect(() => {
-    console.log(`ACTIVETABS###`, activeTab)
     handleRoleChange(activeTab)
   }, [activeTab])
 
-  const [addUserOpen, setAddUserOpen] = useState<boolean>(false)
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
+  type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
+  const [openDrawer, setOpenDrawer] = useState<DrawerType>(null)
+  const handleDrawerToggle = (role: string | null) => {
+    let drawerType: DrawerType
+
+    switch (role) {
+      case 'SUPERVISOR':
+        drawerType = 'SUPERVISOR'
+        break
+      case 'SA':
+        drawerType = 'SA'
+        break
+      case 'CC':
+        drawerType = 'CC'
+        break
+      default:
+        drawerType = null
+    }
+    setOpenDrawer(prevDrawer => (prevDrawer === drawerType ? null : drawerType))
+  }
 
   return (
     <Grid container spacing={6}>
@@ -239,48 +259,6 @@ const UserTable = () => {
                 />
               </TabList>
             </TabContext>
-            {/* <Box sx={styles.usersButtons}>
-              <Button
-                onClick={() => handleRoleChange('SUPERVISOR')}
-                sx={{
-                  ...styles.userButton,
-                  backgroundColor: role === 'SUPERVISOR' ? '#9747FF' : '#FFF',
-                  color: role === 'SUPERVISOR' ? '#FFF' : 'black'
-                }}
-              >
-                Operators
-              </Button>
-              <Button
-                onClick={() => handleRoleChange('SA')}
-                sx={{
-                  ...styles.userButton,
-                  backgroundColor: role === 'SA' ? '#9747FF' : '#FFF',
-                  color: role === 'SA' ? '#FFF' : 'black'
-                }}
-              >
-                Super Agent
-              </Button>
-              <Button
-                onClick={() => handleRoleChange('CC')}
-                sx={{
-                  ...styles.userButton,
-                  backgroundColor: role === 'CC' ? '#9747FF' : '#FFF',
-                  color: role === 'CC' ? '#FFF' : 'black'
-                }}
-              >
-                Content Creators
-              </Button>
-            </Box> */}
-
-            {/* <Link
-              style={styles.linkButton}
-              href={{
-                pathname: 'list/CreateAccount',
-                query: { role }
-              }}
-            >
-              <Button sx={styles.createAccount}>Create Account</Button>
-            </Link> */}
           </Box>
 
           <DataGrid
@@ -300,8 +278,9 @@ const UserTable = () => {
             components={{ Toolbar: UserTableToolbar }}
             componentsProps={{
               toolbar: {
-                toggle: toggleAddUserDrawer,
+                toggle: (role: any) => handleDrawerToggle(role),
                 role: role,
+                role_id: roleId,
                 usernameValue: searchValue,
                 emailValue: emailSearchValue,
                 mobileValue: mobileSearchValue,
@@ -318,7 +297,9 @@ const UserTable = () => {
             }}
             sx={{ padding: 0 }}
           />
-          <SupervisorDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
+          <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
+          <SADrawer open={openDrawer === 'SA'} toggle={() => handleDrawerToggle('SA')} />
+          <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
         </Card>
       </Grid>
     </Grid>

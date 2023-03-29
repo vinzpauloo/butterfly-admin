@@ -78,7 +78,7 @@ const operatorColumns = [
       return (
         <Box>
           <ToggleAction id={params.row.id} value={params.value} />
-          <EditBtn modal={OperatorEditModal} userId={params.row.id} data={params.row} />
+          <EditBtn userId={params.row.id} roleId={params.row.role_id} data={params.row} />
         </Box>
       )
     }
