@@ -30,6 +30,10 @@ type Props = {
   children: ReactNode
 }
 
+// ** Constant variables
+const IS_SIT = process.env.NEXT_PUBLIC_APP_VARIANT === 'sit'
+const baseUrl = IS_SIT ? process.env.NEXT_PUBLIC_API_BASE_URL_SIT : process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL
+
 const AuthProvider = ({ children }: Props) => {
   // ** States
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
@@ -55,7 +59,7 @@ const AuthProvider = ({ children }: Props) => {
     }
 
     axios
-      .post(`${process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL + authConfig.loginEndpoint}`, newParams, {
+      .post(`${baseUrl + authConfig.loginEndpoint}`, newParams, {
         headers: {
           'X-Authorization': 'postman|0'
         }
