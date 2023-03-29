@@ -42,13 +42,4 @@ export const styles = {
             backgroundColor: '#7B0BB0'
         }
     },
-
-    //Main
-    ads: {
-        textAlign: 'center',
-        mb: 8,
-        textTransform: 'uppercase',
-        fontWeight: '600',
-        fontSize: 25
-    },
 }
