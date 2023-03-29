@@ -12,6 +12,7 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import { styled } from '@mui/material/styles'
 import Radio from '@mui/material/Radio'
+import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -115,7 +116,9 @@ const VideoVisibility = () => {
     }
     console.log('workFormParams', workFormParams)
     console.log('router', router)
+    setIsLoading(true)
     updateWork(workFormParams).then(data => {
+      setIsLoading(false)
       router.push('/studio/video-list')
     })
   }
@@ -378,20 +381,27 @@ const VideoVisibility = () => {
                 }}
                 className='buttonContainer'
               >
-                <Box>
-                  <CustomButton onClick={handleCancelButton}>Back</CustomButton>
-                </Box>
-                <Box>
-                  <CustomButton
-                    onClick={dummyNavigate}
-                    sx={{
-                      bgcolor: 'primary.main',
-                      color: 'common.white'
-                    }}
-                  >
-                    Save
-                  </CustomButton>
-                </Box>
+                {isLoading ? (
+                  <CircularProgress color='success' />
+                ) : (
+                  <>
+                    <Box>
+                      <CustomButton onClick={handleCancelButton}>Back</CustomButton>
+                    </Box>
+
+                    <Box>
+                      <CustomButton
+                        onClick={dummyNavigate}
+                        sx={{
+                          bgcolor: 'primary.main',
+                          color: 'common.white'
+                        }}
+                      >
+                        Save
+                      </CustomButton>
+                    </Box>
+                  </>
+                )}
               </Box>
             </Grid>
           </Grid>
