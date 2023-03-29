@@ -15,53 +15,52 @@ import { useTheme } from '@mui/material/styles'
 declare module '@mui/system' {
   interface Theme {
     customBflyColors: {
-      darkBg: React.CSSProperties['color'],
-      grayInputBG?: React.CSSProperties['color'],
-      grayInputText?: React.CSSProperties['color'],
-      dateColorBG?: React.CSSProperties['color'],
-      borderBrown?: React.CSSProperties['color'],
-      menuBG? : React.CSSProperties['color'],
-      grayBG? : React.CSSProperties['color'],
-      menuItemsBG? : React.CSSProperties['color'],
-      sidebarHeaderBG? : React.CSSProperties['color'],
-      primary? : React.CSSProperties['color'],
-      primaryText? : React.CSSProperties['color'],
-      primaryTextContrast? : React.CSSProperties['color'],
-      alwaysPrimary? : React.CSSProperties['color'],
-      bodyText? : React.CSSProperties['color'],
-      sidebarLinkColor? : React.CSSProperties['color'],
-      green? : React.CSSProperties['color']
-    };
-    customTypography : {
-      fontFamilyPoppins : string
-    };
+      darkBg: React.CSSProperties['color']
+      grayInputBG?: React.CSSProperties['color']
+      grayInputText?: React.CSSProperties['color']
+      dateColorBG?: React.CSSProperties['color']
+      borderBrown?: React.CSSProperties['color']
+      menuBG?: React.CSSProperties['color']
+      grayBG?: React.CSSProperties['color']
+      menuItemsBG?: React.CSSProperties['color']
+      sidebarHeaderBG?: React.CSSProperties['color']
+      primary?: React.CSSProperties['color']
+      primaryText?: React.CSSProperties['color']
+      primaryTextContrast?: React.CSSProperties['color']
+      alwaysPrimary?: React.CSSProperties['color']
+      bodyText?: React.CSSProperties['color']
+      sidebarLinkColor?: React.CSSProperties['color']
+      green?: React.CSSProperties['color']
+    }
+    customTypography?: {
+      fontFamilyPoppins: string
+    }
   }
   // allow configuration using `createTheme`
   interface ThemeOptions {
     customBflyColors?: {
-      darkBg?: React.CSSProperties['color'],
-      grayInputBG?: React.CSSProperties['color'],
-      grayInputText?: React.CSSProperties['color'], 
-      dateColorBG?: React.CSSProperties['color'],
-      borderBrown?: React.CSSProperties['color'],
-      grayBG?: React.CSSProperties['color'],
-      menuBG? : React.CSSProperties['color'],
-      menuItemsBG? : React.CSSProperties['color'],
-      sidebarHeaderBG? : React.CSSProperties['color'],
-      primary? : React.CSSProperties['color'],
-      primaryText? : React.CSSProperties['color'],
-      primaryTextContrast? : React.CSSProperties['color'],
-      alwaysPrimary? : React.CSSProperties['color'],
-      bodyText? : React.CSSProperties['color'],
-      sidebarLinkColor? : React.CSSProperties['color'],
-      green? : React.CSSProperties['color']
-    };
-    customTypography : {
-      fontFamilyPoppins : string
-    };
+      darkBg?: React.CSSProperties['color']
+      grayInputBG?: React.CSSProperties['color']
+      grayInputText?: React.CSSProperties['color']
+      dateColorBG?: React.CSSProperties['color']
+      borderBrown?: React.CSSProperties['color']
+      grayBG?: React.CSSProperties['color']
+      menuBG?: React.CSSProperties['color']
+      menuItemsBG?: React.CSSProperties['color']
+      sidebarHeaderBG?: React.CSSProperties['color']
+      primary?: React.CSSProperties['color']
+      primaryText?: React.CSSProperties['color']
+      primaryTextContrast?: React.CSSProperties['color']
+      alwaysPrimary?: React.CSSProperties['color']
+      bodyText?: React.CSSProperties['color']
+      sidebarLinkColor?: React.CSSProperties['color']
+      green?: React.CSSProperties['color']
+    }
+    customTypography?: {
+      fontFamilyPoppins: string
+    }
   }
 }
-
 
 const UserThemeOptions = (): ThemeOptions => {
   // ** To use mode (light/dark/semi-dark), skin(default/bordered), direction(ltr/rtl), etc. for conditional styles, uncomment below line
@@ -80,27 +79,26 @@ const UserThemeOptions = (): ThemeOptions => {
       darkBg: mode === 'light' ? '#ededed' : '#020308',
       grayInputBG: '#F1F1F1',
       grayInputText: '#757575',
-      dateColorBG : '#3C4B64',
-      borderBrown : '#B59770',
-      grayBG: mode === 'light' ? '#ffffff' : (mode === 'dark') ? palette.background.default : '#d3d6df',
-      menuItemsBG : '#0e0e0e',
+      dateColorBG: '#3C4B64',
+      borderBrown: '#B59770',
+      grayBG: mode === 'light' ? '#ffffff' : mode === 'dark' ? palette.background.default : '#d3d6df',
+      menuItemsBG: '#0e0e0e',
       sidebarHeaderBG: '#1D1D1D',
-      primary : mode === 'light' ? '#EDEDED' : '#2A3446', 
-      primaryText : mode === 'light' ? '#000000' : (mode === 'dark') ? '#ffffff' : '#2A3446', 
-      primaryTextContrast : mode === 'light' ? '#2A3446' : (mode === 'dark') ? '#ffffff' : '#ffffff', 
-      alwaysPrimary : '#2A3446',
-      bodyText : '#D3D7DC',
-      sidebarLinkColor : mode === 'light' ? '#000000' : '#BFC6D0',
-      green : '#60FF00'
-
+      primary: mode === 'light' ? '#EDEDED' : '#2A3446',
+      primaryText: mode === 'light' ? '#000000' : mode === 'dark' ? '#ffffff' : '#2A3446',
+      primaryTextContrast: mode === 'light' ? '#2A3446' : mode === 'dark' ? '#ffffff' : '#ffffff',
+      alwaysPrimary: '#2A3446',
+      bodyText: '#D3D7DC',
+      sidebarLinkColor: mode === 'light' ? '#000000' : '#BFC6D0',
+      green: '#60FF00'
     },
-    palette:{
+    palette: {
       primary: {
         light: '#72D949',
         main: '#9747FF',
         dark: '#25A510',
         contrastText: '#FFF'
-      },
+      }
     },
     breakpoints: {
       values: {
@@ -175,8 +173,9 @@ const UserThemeOptions = (): ThemeOptions => {
             flex: '1 1 auto',
             flexDirection: 'column',
             minHeight: '100%',
-            width: '100%', 
-            backgroundColor : mode === 'light' ? palette.grey[100] : (mode === 'dark') ? palette.background.paper : palette.common.white
+            width: '100%',
+            backgroundColor:
+              mode === 'light' ? palette.grey[100] : mode === 'dark' ? palette.background.paper : palette.common.white
           },
           '#__next': {
             display: 'flex',
@@ -192,69 +191,71 @@ const UserThemeOptions = (): ThemeOptions => {
       borderRadius: 8
     },
     typography: {
-      fontFamily:
-        '"Rubik", sans-serif',
+      fontFamily: '"Rubik", sans-serif'
     },
     customTypography: {
       fontFamilyPoppins: '"Poppins", sans-serif'
     },
-    shadows: mode === 'light' ? [
-      'none',
-      '0px 2px 1px -1px rgba(58, 53, 65, 0.2), 0px 1px 1px 0px rgba(58, 53, 65, 0.14), 0px 1px 3px 0px rgba(58, 53, 65, 0.12)',
-      '0px 3px 1px -2px rgba(58, 53, 65, 0.2), 0px 2px 2px 0px rgba(58, 53, 65, 0.14), 0px 1px 5px 0px rgba(58, 53, 65, 0.12)',
-      '0px 4px 8px -4px rgba(58, 53, 65, 0.42)',
-      '0px 6px 18px -8px rgba(58, 53, 65, 0.56)',
-      '0px 3px 5px -1px rgba(58, 53, 65, 0.2), 0px 5px 8px 0px rgba(58, 53, 65, 0.14), 0px 1px 14px 0px rgba(58, 53, 65, 0.12)',
-      '0px 2px 10px 0px rgba(58, 53, 65, 0.1)',
-      '0px 4px 5px -2px rgba(58, 53, 65, 0.2), 0px 7px 10px 1px rgba(58, 53, 65, 0.14), 0px 2px 16px 1px rgba(58, 53, 65, 0.12)',
-      '0px 5px 5px -3px rgba(58, 53, 65, 0.2), 0px 8px 10px 1px rgba(58, 53, 65, 0.14), 0px 3px 14px 2px rgba(58, 53, 65, 0.12)',
-      '0px 5px 6px -3px rgba(58, 53, 65, 0.2), 0px 9px 12px 1px rgba(58, 53, 65, 0.14), 0px 3px 16px 2px rgba(58, 53, 65, 0.12)',
-      '0px 6px 6px -3px rgba(58, 53, 65, 0.2), 0px 10px 14px 1px rgba(58, 53, 65, 0.14), 0px 4px 18px 3px rgba(58, 53, 65, 0.12)',
-      '0px 6px 7px -4px rgba(58, 53, 65, 0.2), 0px 11px 15px 1px rgba(58, 53, 65, 0.14), 0px 4px 20px 3px rgba(58, 53, 65, 0.12)',
-      '0px 7px 8px -4px rgba(58, 53, 65, 0.2), 0px 12px 17px 2px rgba(58, 53, 65, 0.14), 0px 5px 22px 4px rgba(58, 53, 65, 0.12)',
-      '0px 7px 8px -4px rgba(58, 53, 65, 0.2), 0px 13px 19px 2px rgba(58, 53, 65, 0.14), 0px 5px 24px 4px rgba(58, 53, 65, 0.12)',
-      '0px 7px 9px -4px rgba(58, 53, 65, 0.2), 0px 14px 21px 2px rgba(58, 53, 65, 0.14), 0px 5px 26px 4px rgba(58, 53, 65, 0.12)',
-      '0px 8px 9px -5px rgba(58, 53, 65, 0.2), 0px 15px 22px 2px rgba(58, 53, 65, 0.14), 0px 6px 28px 5px rgba(58, 53, 65, 0.12)',
-      '0px 8px 10px -5px rgba(58, 53, 65, 0.2), 0px 16px 24px 2px rgba(58, 53, 65, 0.14), 0px 6px 30px 5px rgba(58, 53, 65, 0.12)',
-      '0px 8px 11px -5px rgba(58, 53, 65, 0.2), 0px 17px 26px 2px rgba(58, 53, 65, 0.14), 0px 6px 32px 5px rgba(58, 53, 65, 0.12)',
-      '0px 9px 11px -5px rgba(58, 53, 65, 0.2), 0px 18px 28px 2px rgba(58, 53, 65, 0.14), 0px 7px 34px 6px rgba(58, 53, 65, 0.12)',
-      '0px 9px 12px -6px rgba(58, 53, 65, 0.2), 0px 19px 29px 2px rgba(58, 53, 65, 0.14), 0px 7px 36px 6px rgba(58, 53, 65, 0.12)',
-      '0px 10px 13px -6px rgba(58, 53, 65, 0.2), 0px 20px 31px 3px rgba(58, 53, 65, 0.14), 0px 8px 38px 7px rgba(58, 53, 65, 0.12)',
-      '0px 10px 13px -6px rgba(58, 53, 65, 0.2), 0px 21px 33px 3px rgba(58, 53, 65, 0.14), 0px 8px 40px 7px rgba(58, 53, 65, 0.12)',
-      '0px 10px 14px -6px rgba(58, 53, 65, 0.2), 0px 22px 35px 3px rgba(58, 53, 65, 0.14), 0px 8px 42px 7px rgba(58, 53, 65, 0.12)',
-      '0px 11px 14px -7px rgba(58, 53, 65, 0.2), 0px 23px 36px 3px rgba(58, 53, 65, 0.14), 0px 9px 44px 8px rgba(58, 53, 65, 0.12)',
-      '0px 11px 15px -7px rgba(58, 53, 65, 0.2), 0px 24px 38px 3px rgba(58, 53, 65, 0.14), 0px 9px 46px 8px rgba(58, 53, 65, 0.12)'
-    ] : [
-      'none',
-      '0px 2px 1px -1px rgba(19, 17, 32, 0.2), 0px 1px 1px 0px rgba(19, 17, 32, 0.14), 0px 1px 3px 0px rgba(19, 17, 32, 0.12)',
-      '0px 3px 1px -2px rgba(19, 17, 32, 0.2), 0px 2px 2px 0px rgba(19, 17, 32, 0.14), 0px 1px 5px 0px rgba(19, 17, 32, 0.12)',
-      '0px 4px 8px -4px rgba(19, 17, 32, 0.42)',
-      '0px 6px 18px -8px rgba(19, 17, 32, 0.56)',
-      '0px 3px 5px -1px rgba(19, 17, 32, 0.2), 0px 5px 8px rgba(19, 17, 32, 0.14), 0px 1px 14px rgba(19, 17, 32, 0.12)',
-      '0px 2px 10px 0px rgba(19, 17, 32, 0.1)',
-      '0px 4px 5px -2px rgba(19, 17, 32, 0.2), 0px 7px 10px 1px rgba(19, 17, 32, 0.14), 0px 2px 16px 1px rgba(19, 17, 32, 0.12)',
-      '0px 5px 5px -3px rgba(19, 17, 32, 0.2), 0px 8px 10px 1px rgba(19, 17, 32, 0.14), 0px 3px 14px 2px rgba(19, 17, 32, 0.12)',
-      '0px 5px 6px -3px rgba(19, 17, 32, 0.2), 0px 9px 12px 1px rgba(19, 17, 32, 0.14), 0px 3px 16px 2px rgba(19, 17, 32, 0.12)',
-      '0px 6px 6px -3px rgba(19, 17, 32, 0.2), 0px 10px 14px 1px rgba(19, 17, 32, 0.14), 0px 4px 18px 3px rgba(19, 17, 32, 0.12)',
-      '0px 6px 7px -4px rgba(19, 17, 32, 0.2), 0px 11px 15px 1px rgba(19, 17, 32, 0.14), 0px 4px 20px 3px rgba(19, 17, 32, 0.12)',
-      '0px 7px 8px -4px rgba(19, 17, 32, 0.2), 0px 12px 17px 2px rgba(19, 17, 32, 0.14), 0px 5px 22px 4px rgba(19, 17, 32, 0.12)',
-      '0px 7px 8px -4px rgba(19, 17, 32, 0.2), 0px 13px 19px 2px rgba(19, 17, 32, 0.14), 0px 5px 24px 4px rgba(19, 17, 32, 0.12)',
-      '0px 7px 9px -4px rgba(19, 17, 32, 0.2), 0px 14px 21px 2px rgba(19, 17, 32, 0.14), 0px 5px 26px 4px rgba(19, 17, 32, 0.12)',
-      '0px 8px 9px -5px rgba(19, 17, 32, 0.2), 0px 15px 22px 2px rgba(19, 17, 32, 0.14), 0px 6px 28px 5px rgba(19, 17, 32, 0.12)',
-      '0px 8px 10px -5px rgba(19, 17, 32, 0.2), 0px 16px 24px 2px rgba(19, 17, 32, 0.14), 0px 6px 30px 5px rgba(19, 17, 32, 0.12)',
-      '0px 8px 11px -5px rgba(19, 17, 32, 0.2), 0px 17px 26px 2px rgba(19, 17, 32, 0.14), 0px 6px 32px 5px rgba(19, 17, 32, 0.12)',
-      '0px 9px 11px -5px rgba(19, 17, 32, 0.2), 0px 18px 28px 2px rgba(19, 17, 32, 0.14), 0px 7px 34px 6px rgba(19, 17, 32, 0.12)',
-      '0px 9px 12px -6px rgba(19, 17, 32, 0.2), 0px 19px 29px 2px rgba(19, 17, 32, 0.14), 0px 7px 36px 6px rgba(19, 17, 32, 0.12)',
-      '0px 10px 13px -6px rgba(19, 17, 32, 0.2), 0px 20px 31px 3px rgba(19, 17, 32, 0.14), 0px 8px 38px 7px rgba(19, 17, 32, 0.12)',
-      '0px 10px 13px -6px rgba(19, 17, 32, 0.2), 0px 21px 33px 3px rgba(19, 17, 32, 0.14), 0px 8px 40px 7px rgba(19, 17, 32, 0.12)',
-      '0px 10px 14px -6px rgba(19, 17, 32, 0.2), 0px 22px 35px 3px rgba(19, 17, 32, 0.14), 0px 8px 42px 7px rgba(19, 17, 32, 0.12)',
-      '0px 11px 14px -7px rgba(19, 17, 32, 0.2), 0px 23px 36px 3px rgba(19, 17, 32, 0.14), 0px 9px 44px 8px rgba(19, 17, 32, 0.12)',
-      '0px 11px 15px -7px rgba(19, 17, 32, 0.2), 0px 24px 38px 3px rgba(19, 17, 32, 0.14), 0px 9px 46px 8px rgba(19, 17, 32, 0.12)'
-    ],
+    shadows:
+      mode === 'light'
+        ? [
+            'none',
+            '0px 2px 1px -1px rgba(58, 53, 65, 0.2), 0px 1px 1px 0px rgba(58, 53, 65, 0.14), 0px 1px 3px 0px rgba(58, 53, 65, 0.12)',
+            '0px 3px 1px -2px rgba(58, 53, 65, 0.2), 0px 2px 2px 0px rgba(58, 53, 65, 0.14), 0px 1px 5px 0px rgba(58, 53, 65, 0.12)',
+            '0px 4px 8px -4px rgba(58, 53, 65, 0.42)',
+            '0px 6px 18px -8px rgba(58, 53, 65, 0.56)',
+            '0px 3px 5px -1px rgba(58, 53, 65, 0.2), 0px 5px 8px 0px rgba(58, 53, 65, 0.14), 0px 1px 14px 0px rgba(58, 53, 65, 0.12)',
+            '0px 2px 10px 0px rgba(58, 53, 65, 0.1)',
+            '0px 4px 5px -2px rgba(58, 53, 65, 0.2), 0px 7px 10px 1px rgba(58, 53, 65, 0.14), 0px 2px 16px 1px rgba(58, 53, 65, 0.12)',
+            '0px 5px 5px -3px rgba(58, 53, 65, 0.2), 0px 8px 10px 1px rgba(58, 53, 65, 0.14), 0px 3px 14px 2px rgba(58, 53, 65, 0.12)',
+            '0px 5px 6px -3px rgba(58, 53, 65, 0.2), 0px 9px 12px 1px rgba(58, 53, 65, 0.14), 0px 3px 16px 2px rgba(58, 53, 65, 0.12)',
+            '0px 6px 6px -3px rgba(58, 53, 65, 0.2), 0px 10px 14px 1px rgba(58, 53, 65, 0.14), 0px 4px 18px 3px rgba(58, 53, 65, 0.12)',
+            '0px 6px 7px -4px rgba(58, 53, 65, 0.2), 0px 11px 15px 1px rgba(58, 53, 65, 0.14), 0px 4px 20px 3px rgba(58, 53, 65, 0.12)',
+            '0px 7px 8px -4px rgba(58, 53, 65, 0.2), 0px 12px 17px 2px rgba(58, 53, 65, 0.14), 0px 5px 22px 4px rgba(58, 53, 65, 0.12)',
+            '0px 7px 8px -4px rgba(58, 53, 65, 0.2), 0px 13px 19px 2px rgba(58, 53, 65, 0.14), 0px 5px 24px 4px rgba(58, 53, 65, 0.12)',
+            '0px 7px 9px -4px rgba(58, 53, 65, 0.2), 0px 14px 21px 2px rgba(58, 53, 65, 0.14), 0px 5px 26px 4px rgba(58, 53, 65, 0.12)',
+            '0px 8px 9px -5px rgba(58, 53, 65, 0.2), 0px 15px 22px 2px rgba(58, 53, 65, 0.14), 0px 6px 28px 5px rgba(58, 53, 65, 0.12)',
+            '0px 8px 10px -5px rgba(58, 53, 65, 0.2), 0px 16px 24px 2px rgba(58, 53, 65, 0.14), 0px 6px 30px 5px rgba(58, 53, 65, 0.12)',
+            '0px 8px 11px -5px rgba(58, 53, 65, 0.2), 0px 17px 26px 2px rgba(58, 53, 65, 0.14), 0px 6px 32px 5px rgba(58, 53, 65, 0.12)',
+            '0px 9px 11px -5px rgba(58, 53, 65, 0.2), 0px 18px 28px 2px rgba(58, 53, 65, 0.14), 0px 7px 34px 6px rgba(58, 53, 65, 0.12)',
+            '0px 9px 12px -6px rgba(58, 53, 65, 0.2), 0px 19px 29px 2px rgba(58, 53, 65, 0.14), 0px 7px 36px 6px rgba(58, 53, 65, 0.12)',
+            '0px 10px 13px -6px rgba(58, 53, 65, 0.2), 0px 20px 31px 3px rgba(58, 53, 65, 0.14), 0px 8px 38px 7px rgba(58, 53, 65, 0.12)',
+            '0px 10px 13px -6px rgba(58, 53, 65, 0.2), 0px 21px 33px 3px rgba(58, 53, 65, 0.14), 0px 8px 40px 7px rgba(58, 53, 65, 0.12)',
+            '0px 10px 14px -6px rgba(58, 53, 65, 0.2), 0px 22px 35px 3px rgba(58, 53, 65, 0.14), 0px 8px 42px 7px rgba(58, 53, 65, 0.12)',
+            '0px 11px 14px -7px rgba(58, 53, 65, 0.2), 0px 23px 36px 3px rgba(58, 53, 65, 0.14), 0px 9px 44px 8px rgba(58, 53, 65, 0.12)',
+            '0px 11px 15px -7px rgba(58, 53, 65, 0.2), 0px 24px 38px 3px rgba(58, 53, 65, 0.14), 0px 9px 46px 8px rgba(58, 53, 65, 0.12)'
+          ]
+        : [
+            'none',
+            '0px 2px 1px -1px rgba(19, 17, 32, 0.2), 0px 1px 1px 0px rgba(19, 17, 32, 0.14), 0px 1px 3px 0px rgba(19, 17, 32, 0.12)',
+            '0px 3px 1px -2px rgba(19, 17, 32, 0.2), 0px 2px 2px 0px rgba(19, 17, 32, 0.14), 0px 1px 5px 0px rgba(19, 17, 32, 0.12)',
+            '0px 4px 8px -4px rgba(19, 17, 32, 0.42)',
+            '0px 6px 18px -8px rgba(19, 17, 32, 0.56)',
+            '0px 3px 5px -1px rgba(19, 17, 32, 0.2), 0px 5px 8px rgba(19, 17, 32, 0.14), 0px 1px 14px rgba(19, 17, 32, 0.12)',
+            '0px 2px 10px 0px rgba(19, 17, 32, 0.1)',
+            '0px 4px 5px -2px rgba(19, 17, 32, 0.2), 0px 7px 10px 1px rgba(19, 17, 32, 0.14), 0px 2px 16px 1px rgba(19, 17, 32, 0.12)',
+            '0px 5px 5px -3px rgba(19, 17, 32, 0.2), 0px 8px 10px 1px rgba(19, 17, 32, 0.14), 0px 3px 14px 2px rgba(19, 17, 32, 0.12)',
+            '0px 5px 6px -3px rgba(19, 17, 32, 0.2), 0px 9px 12px 1px rgba(19, 17, 32, 0.14), 0px 3px 16px 2px rgba(19, 17, 32, 0.12)',
+            '0px 6px 6px -3px rgba(19, 17, 32, 0.2), 0px 10px 14px 1px rgba(19, 17, 32, 0.14), 0px 4px 18px 3px rgba(19, 17, 32, 0.12)',
+            '0px 6px 7px -4px rgba(19, 17, 32, 0.2), 0px 11px 15px 1px rgba(19, 17, 32, 0.14), 0px 4px 20px 3px rgba(19, 17, 32, 0.12)',
+            '0px 7px 8px -4px rgba(19, 17, 32, 0.2), 0px 12px 17px 2px rgba(19, 17, 32, 0.14), 0px 5px 22px 4px rgba(19, 17, 32, 0.12)',
+            '0px 7px 8px -4px rgba(19, 17, 32, 0.2), 0px 13px 19px 2px rgba(19, 17, 32, 0.14), 0px 5px 24px 4px rgba(19, 17, 32, 0.12)',
+            '0px 7px 9px -4px rgba(19, 17, 32, 0.2), 0px 14px 21px 2px rgba(19, 17, 32, 0.14), 0px 5px 26px 4px rgba(19, 17, 32, 0.12)',
+            '0px 8px 9px -5px rgba(19, 17, 32, 0.2), 0px 15px 22px 2px rgba(19, 17, 32, 0.14), 0px 6px 28px 5px rgba(19, 17, 32, 0.12)',
+            '0px 8px 10px -5px rgba(19, 17, 32, 0.2), 0px 16px 24px 2px rgba(19, 17, 32, 0.14), 0px 6px 30px 5px rgba(19, 17, 32, 0.12)',
+            '0px 8px 11px -5px rgba(19, 17, 32, 0.2), 0px 17px 26px 2px rgba(19, 17, 32, 0.14), 0px 6px 32px 5px rgba(19, 17, 32, 0.12)',
+            '0px 9px 11px -5px rgba(19, 17, 32, 0.2), 0px 18px 28px 2px rgba(19, 17, 32, 0.14), 0px 7px 34px 6px rgba(19, 17, 32, 0.12)',
+            '0px 9px 12px -6px rgba(19, 17, 32, 0.2), 0px 19px 29px 2px rgba(19, 17, 32, 0.14), 0px 7px 36px 6px rgba(19, 17, 32, 0.12)',
+            '0px 10px 13px -6px rgba(19, 17, 32, 0.2), 0px 20px 31px 3px rgba(19, 17, 32, 0.14), 0px 8px 38px 7px rgba(19, 17, 32, 0.12)',
+            '0px 10px 13px -6px rgba(19, 17, 32, 0.2), 0px 21px 33px 3px rgba(19, 17, 32, 0.14), 0px 8px 40px 7px rgba(19, 17, 32, 0.12)',
+            '0px 10px 14px -6px rgba(19, 17, 32, 0.2), 0px 22px 35px 3px rgba(19, 17, 32, 0.14), 0px 8px 42px 7px rgba(19, 17, 32, 0.12)',
+            '0px 11px 14px -7px rgba(19, 17, 32, 0.2), 0px 23px 36px 3px rgba(19, 17, 32, 0.14), 0px 9px 44px 8px rgba(19, 17, 32, 0.12)',
+            '0px 11px 15px -7px rgba(19, 17, 32, 0.2), 0px 24px 38px 3px rgba(19, 17, 32, 0.14), 0px 9px 46px 8px rgba(19, 17, 32, 0.12)'
+          ],
     zIndex: {
       appBar: 1200,
       drawer: 1300
-    } 
+    }
   }
 }
 

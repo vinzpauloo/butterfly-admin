@@ -158,7 +158,7 @@ const CreateSuperAgent2 = () => {
     }
   }
 
-  const { data } = useQueries({
+  const {} = useQueries({
     queries: [
       {
         queryKey: ['Languages'],
