@@ -29,7 +29,7 @@ type SortType = 'asc' | 'desc' | null | undefined
 
 const columns: GridColumns = [
   {
-    flex: 0.06,
+    flex: 0.03,
     minWidth: 70,
     field: 'thumbnail_url',
     headerName: 'Video Thumbnail',
@@ -44,7 +44,7 @@ const columns: GridColumns = [
     }
   },
   {
-    flex: 0.09,
+    flex: 0.04,
     minWidth: 90,
     headerName: 'Content Creator',
     field: 'content_creator',
@@ -55,7 +55,7 @@ const columns: GridColumns = [
     )
   },
   {
-    flex: 0.09,
+    flex: 0.03,
     minWidth: 60,
     field: 'title',
     headerName: 'Title',
@@ -66,7 +66,7 @@ const columns: GridColumns = [
     )
   },
   {
-    flex: 0.100,
+    flex: 0.04,
     field: 'category',
     minWidth: 80,
     headerName: 'Category',
@@ -77,7 +77,7 @@ const columns: GridColumns = [
     )
   },
   {
-    flex: 0.1,
+    flex: 0.04,
     minWidth: 140,
     field: 'last_update',
     headerName: 'Last Update',
@@ -189,7 +189,6 @@ const TableVideos = () => {
         rows={rows}
         rowCount={total}
         columns={columns}
-        checkboxSelection
         pageSize={pageSize}
         sortingMode='server'
         paginationMode='server'

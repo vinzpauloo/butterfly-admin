@@ -95,7 +95,9 @@ export type StudioContextType = {
   workProgress: number
   setWorkProgress: React.Dispatch<React.SetStateAction<number>>
   trialProgress: number
-  setTrialProgress: React.Dispatch<React.SetStateAction<number>>
+  setTrialProgress: React.Dispatch<React.SetStateAction<number>>,
+  workId : number | null,
+  setWorkId : React.Dispatch<React.SetStateAction<number | null>>
 }
 
 //** DATA */
@@ -117,9 +119,14 @@ const UploadContent = () => {
   const [hasTrial, setHasTrial] = React.useState<boolean>(false)
   const [workProgress, setWorkProgress] = React.useState<number>(0)
   const [trialProgress, setTrialProgress] = React.useState<number>(0)
+  const [workId, setWorkId] = React.useState<number | null>(null)
 
   React.useEffect(() => {
     // console.log('call useEffect workProgress')
+
+    return () => {
+      console.log('Check if this unmounted WORK PROGRESS')
+    }
   }, [workProgress])
 
   React.useEffect(() => {
@@ -158,7 +165,9 @@ const UploadContent = () => {
         workProgress,
         setWorkProgress,
         trialProgress,
-        setTrialProgress
+        setTrialProgress,
+        workId,
+        setWorkId
       }}
     >
       <BoxBG>{PageDisplay()}</BoxBG>
