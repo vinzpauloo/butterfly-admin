@@ -27,7 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreateAccount } from '@/services/api/CreateAccount'
 
 interface FormValues {
-  role_id: '1' | '2' | ''
+  role_id: string
   username: string
   password: string
   password_confirmation: string
@@ -37,18 +37,17 @@ interface FormValues {
 }
 
 const schema = yup.object().shape({
-  role_id: yup.string().oneOf(['1', '2'], 'Role must be Operator or Supervisor').required('Role is required'),
   username: yup.string().min(7, 'Username must be at least 7 characters').required(),
   password: yup.string().min(7, 'Password must be at least 7 characters').required(),
   password_confirmation: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required(),
+    .required('Please confirm your password.'),
   mobile: yup
     .string()
     .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number')
     .required(),
-  email: yup.string().email().required()
+  email: yup.string().email().required('Email is required.')
 })
 interface SidebarAddUserType {
   open: boolean
@@ -63,7 +62,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundColor: theme.palette.background.default
 }))
 
-const SupervisorDrawer = (props: SidebarAddUserType) => {
+const CCDrawer = (props: SidebarAddUserType) => {
   const router = useRouter()
   const queryClient = useQueryClient()
 
@@ -73,7 +72,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
   const [formValue, setFormValue] = useState<FormValues>({
-    role_id: '',
+    role_id: '3',
     username: '',
     password: '',
     password_confirmation: '',
@@ -94,17 +93,10 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
   const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
 
-    if (name === 'role') {
-      setFormValue(prevState => ({
-        ...prevState,
-        role_id: value as '1' | '2' | ''
-      }))
-    } else {
-      setFormValue(prevState => ({
-        ...prevState,
-        [name]: value
-      }))
-    }
+    setFormValue(prevState => ({
+      ...prevState,
+      [name]: value
+    }))
   }
 
   const { createUser } = CreateAccount()
@@ -126,7 +118,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
         toggle()
         setSubmitted(false)
         setFormValue({
-          role_id: '',
+          role_id: '3',
           username: '',
           password: '',
           password_confirmation: '',
@@ -177,7 +169,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h6'>Add Operator/Supervisor</Typography>
+        <Typography variant='h6'>Add Content Creator</Typography>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
@@ -185,48 +177,10 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
+            <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
+              <Typography sx={styles.white}>Content Creator</Typography>
+            </Box>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
-              <Box sx={styles.header}>
-                <Controller
-                  name='role_id'
-                  control={control}
-                  defaultValue=''
-                  rules={{ required: 'Please select a role' }}
-                  render={({ field }) => (
-                    <RadioGroup
-                      {...field}
-                      onChange={e => {
-                        field.onChange(e)
-                        handleFormInputChange(e)
-                      }}
-                    >
-                      <Box sx={styles.radio}>
-                        <Typography sx={styles.white}>Operator</Typography>
-                        <Radio
-                          name='role_id'
-                          value='1'
-                          inputProps={{ 'aria-label': 'Operator' }}
-                          sx={styles.white}
-                          color='default'
-                        />
-                        <Typography sx={styles.white}>Supervisor</Typography>
-                        <Radio
-                          name='role_id'
-                          value='2'
-                          inputProps={{ 'aria-label': 'Supervisor' }}
-                          sx={styles.white}
-                          color='default'
-                        />
-                      </Box>
-                    </RadioGroup>
-                  )}
-                />
-              </Box>
-              {errors.role_id && (
-                <Typography variant='caption' color='error' sx={{ marginLeft: 4 }}>
-                  {errors.role_id.message}
-                </Typography>
-              )}
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
                   <TextField
@@ -416,4 +370,4 @@ const styles = {
   }
 }
 
-export default SupervisorDrawer
+export default CCDrawer

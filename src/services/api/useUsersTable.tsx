@@ -3,6 +3,7 @@ import request from '../../lib/request'
 interface UsersData {
   data: {
     role?: string
+    role_id?: any
     page?: number
     sort?: any
     sort_by?: string
@@ -55,7 +56,7 @@ export const useUsersTable = () => {
     return request({
       headers: {
         'X-Authorization': 'postman|1',
-        "ngrok-skip-browser-warning": "69420" // only for dev
+        'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: `/users?role=CC`
     })
