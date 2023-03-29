@@ -15,12 +15,8 @@ import Icon from 'src/@core/components/icon'
 import UserTableToolbar from './UserTableToolbar'
 
 // ** Style Imports
-import styles from '@/pages/user/list/styles'
 
 // ** Other Imports
-import operatorColumns from '@/pages/user/data/OperatorColumn'
-import superAgentColumns from '@/pages/user/data/SuperAgentColumn'
-import contentCreatorColumns from '@/pages/user/data/ContentCreatorColumn'
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
@@ -29,7 +25,155 @@ import CCDrawer from './drawer/CCDrawer'
 import { useUsersTable } from '../../../services/api/useUsersTable'
 
 // ** TanStack Query
-import { useQuery } from '@tanstack/react-query'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import ToggleButton from "@/pages/user/components/button/ToggleButton";
+import formatDate from "@/utils/formatDate";
+import EditBtn from "@/pages/user/components/button/EditButton";
+import SuperAgentEditModal from "@/pages/user/components/modal/SuperAgentEditModal";
+
+interface ToggleActionProps {
+  value: string
+  id: any
+}
+
+const ToggleAction = ({ value, id }: ToggleActionProps) => {
+  const queryClient = useQueryClient()
+  const { updateUser } = useUsersTable()
+  const mutation = useMutation(
+    async (data: { id: string; data: any }) => {
+      const response = await updateUser(data.id, data.data)
+      if (response.ok) {
+        await response.json()
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
+      }
+    }
+  )
+
+  const handleToggle = async (newValue: boolean) => {
+    // Determine the new status
+    const newStatus = value === 'Applied' || value === 'Approved' ? 'Hold' : 'Approved'
+
+    // Update the status in the backend
+    await mutation.mutateAsync({ id, data: { status: newStatus, _method: 'put' } })
+  }
+
+  return (
+    <ToggleButton checked={value === 'Approved' || value === 'Applied'} onToggle={newValue => handleToggle(newValue)} />
+  )
+}
+
+const operatorColumns = [
+  { field: 'username', headerName: 'User Profile', width: 200 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
+  { field: 'email', headerName: 'Email', width: 250 },
+  {
+    field: 'created_at',
+    headerName: 'Date Created',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+  {
+    field: 'updated_at',
+    headerName: 'Last Log In',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+  {
+    field: 'status',
+    headerName: 'Action',
+    width: 150,
+    renderCell: (params: any) => {
+      return (
+        <Box>
+          <ToggleAction id={params.row.id} value={params.value} />
+          <EditBtn userId={params.row.id} roleId={params.row.role_id} data={params.row} />
+        </Box>
+      )
+    }
+  }
+]
+
+const superAgentColumns = [
+  { field: 'username', headerName: 'Super Agent', width: 200 },
+
+  // { field: 'SiteName', headerName: 'Site Name', width: 250 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
+  { field: 'email', headerName: 'Email', width: 250 },
+  {
+    field: 'created_at',
+    headerName: 'Date Created',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+  {
+    field: 'updated_at',
+    headerName: 'Last Log In',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+
+  // { field: 'SecurityFunds', headerName: 'Security Funds', width: 250 },
+  {
+    field: 'status',
+    headerName: 'Action',
+    width: 150,
+    renderCell: (params: any) => {
+      return (
+        <Box>
+          <ToggleAction id={params.row.id} value={params.value} />
+          <EditBtn modal={SuperAgentEditModal} userId={params.row.id} data={params.row} />
+        </Box>
+      )
+    }
+  }
+]
+
+const contentCreatorColumns = [
+  { field: 'username', headerName: 'User Name', width: 200 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
+  { field: 'email', headerName: 'Email', width: 250 },
+  {
+    field: 'created_at',
+    headerName: 'Date Created',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+  {
+    field: 'updated_at',
+    headerName: 'Last Log In',
+    width: 250,
+    valueFormatter: (params: any) => {
+      return formatDate(params?.value)
+    }
+  },
+  {
+    field: 'status',
+    headerName: 'Action',
+    width: 150,
+    renderCell: (params: any) => {
+      return (
+        <Box>
+          <ToggleAction id={params.row.id} value={params.value} />
+          <EditBtn userId={params.row.id} roleId={params.row.role_id} data={params.row} />
+        </Box>
+      )
+    }
+  }
+]
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -304,6 +448,143 @@ const UserTable = () => {
       </Grid>
     </Grid>
   )
+}
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: 'auto',
+    overflow: 'hidden'
+  },
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      sm: 'column',
+      md: 'column',
+      lg: 'row'
+    },
+    justifyContent: {
+      xs: 'flex-start',
+      md: 'flex-start',
+      lg: 'space-between'
+    },
+    mb: 0
+  },
+  usersButtons: {
+    display: 'flex',
+    gap: 2,
+    flexWrap: 'wrap',
+    mb: {
+      xs: 5,
+      sm: 5,
+      md: 5,
+      lg: 0,
+      xl: 0
+    }
+  },
+  userButton: {
+    border: 1,
+    height: '56px',
+    minWidth: {
+      xs: '224px',
+      sm: 'auto',
+      md: 'auto',
+      lg: '224px'
+    },
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: 'black',
+    transition: 'background-color 0.1s',
+    '&:hover': {
+      backgroundColor: `#9747FF`,
+      color: 'white'
+    },
+    textTransform: 'uppercase'
+  },
+  linkButton: {
+    textDecoration: 'none'
+  },
+  createAccount: {
+    border: 1,
+    height: '56px',
+    minWidth: '224px',
+    width: {
+      xs: '100%',
+      md: '100%',
+      lg: '224px'
+    },
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    borderColor: 'black',
+    textTransform: 'uppercase',
+    color: 'black',
+    backgroundColor: '#FFF',
+    '&:hover': {
+      backgroundColor: `#9747FF`,
+      color: 'white'
+    }
+  },
+  tableContainer: {
+    minHeight: 540,
+    overflowX: 'auto'
+  },
+  paginationContainer: {
+    margin: '0 auto'
+  },
+  paginationContent: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  icon: {
+    fontSize: 12,
+    color: 'black'
+  },
+  text: {
+    color: 'black',
+    fontSize: 12
+  },
+  pageNumber: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 24,
+    height: 24,
+    borderRadius: 2,
+    marginLeft: 2,
+    marginRight: 2,
+    cursor: 'pointer'
+  },
+  searchContainer: {
+    padding: 5,
+    borderTop: '1px solid black'
+  },
+  cardHeader: {
+    margin: 0,
+    padding: 0
+  },
+  searchInput: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      md: 'column',
+      lg: 'row'
+    },
+    padding: 0,
+    gap: 5
+  },
+  fullWidth: {
+    width: '100%'
+  },
+  dataGrid: {
+    padding: 5
+  }
 }
 
 export default UserTable
