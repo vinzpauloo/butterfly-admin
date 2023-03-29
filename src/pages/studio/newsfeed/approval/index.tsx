@@ -18,7 +18,7 @@ import FeedDialog from '@/pages/studio/shared-component/FeedDialog'
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DataGridRowType } from '../../types/types'
+import { DataGridRowType } from '@/context/types'
 
 // ** Data Import
 import { rows } from '@/data/dummyNewsFeedData'
