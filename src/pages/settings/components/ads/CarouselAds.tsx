@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Box, Grid, Typography, ImageList, ImageListItem, Button, Switch, Stack, styled } from '@mui/material'
-import { styles } from '../../styles/advertisementStyles'
 
 type Props = {
   data: []
@@ -35,6 +34,27 @@ const CarouselAdItem = ({ openModal, photoURL }: any) => {
 }
 
 export default CarouselAds
+
+const styles = {
+  //Grid Content
+  gridContentWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 2,
+  },
+  titleWrapper: {
+    border: '1px solid #000',
+    width: 300,
+    p: 1
+  },
+  title: {
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    fontSize: 17
+  },
+}
 
 const Img = styled('img')({
   height: 75,
