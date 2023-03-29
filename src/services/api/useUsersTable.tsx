@@ -34,6 +34,7 @@ export const useUsersTable = () => {
         'X-Authorization': 'postman|1'
       },
       url: '/users',
+      method: 'GET',
       params: params.data
     })
   }
@@ -58,7 +59,8 @@ export const useUsersTable = () => {
         'X-Authorization': 'postman|1',
         'ngrok-skip-browser-warning': '69420' // only for dev
       },
-      url: `/users?role=CC`
+      url: `/users?role=CC`,
+      method: 'GET'
     })
   }
 
@@ -66,10 +68,10 @@ export const useUsersTable = () => {
     return request({
       headers: {
         'X-Authorization': 'postman|0',
-        'Content-Type': 'application/json'
+        'Content-Type': 'multipart/form-data'
       },
       url: `/users/${id}`,
-      method: 'PUT',
+      method: 'POST',
       data: data
     })
   }
