@@ -40,6 +40,9 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery } from '@tanstack/react-query'
 
+// ** Configs
+import authConfig from 'src/configs/auth'
+
 //* Context Import
 import { StudioContext, DisplayPage } from '..'
 
@@ -140,6 +143,8 @@ const UploadVideoStep1 = (props: Props) => {
   >([])
 
   const studioContext = React.useContext(StudioContext)
+
+  const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
   // ** UseForm
   const {
@@ -288,7 +293,8 @@ const UploadVideoStep1 = (props: Props) => {
       chunkSize: 5 * 1024 * 1024,
       retryDelays: [0, 1000, 3000, 5000],
       headers: {
-        data: headerData
+        data: headerData,
+        Authorization: `Bearer ${accessToken}`
       },
       metadata: {
         filename: file.name,
@@ -304,7 +310,7 @@ const UploadVideoStep1 = (props: Props) => {
         studioContext?.setWorkProgress(progress)
       },
       onSuccess: () => {
-        console.log('Upload finished:', upload.url)
+        console.log('Full Video Upload finished:', upload.url)
       },
       onAfterResponse: (req, res) => {
         let xmlhttpreq = req.getUnderlyingObject()
@@ -314,9 +320,12 @@ const UploadVideoStep1 = (props: Props) => {
         if (xmlhttpreq.getAllResponseHeaders().indexOf('work_id') != -1) {
           studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
 
+          let hasTrialCheck = false
+
           if (studioContext?.hasTrial) {
             //start upload another TUS trial video
             console.log('hasTrial')
+            hasTrialCheck = true
 
             // call trial videos api
             if (!trailerFile) {
@@ -325,11 +334,17 @@ const UploadVideoStep1 = (props: Props) => {
             }
 
             var tFile = trailerFile[0]
+            let data = JSON.parse(res.getHeader('works'))
+            console.log('data from trial video header', data)
+            const { work_id } = data.data
+            studioContext?.setWorkId(work_id)
+
             //get the traileHeaderData
             const trialHeaderData = JSON.stringify({
               user_id: contentCreator,
               file_name: title,
-              video_type: 'trial_video'
+              video_type: 'trial_video',
+              work_id: work_id
             })
 
             const uploadTrial = new tus.Upload(file, {
@@ -337,7 +352,8 @@ const UploadVideoStep1 = (props: Props) => {
               chunkSize: 5 * 1024 * 1024,
               retryDelays: [0, 1000, 3000, 5000],
               headers: {
-                data: trialHeaderData
+                data: trialHeaderData,
+                Authorization: `Bearer ${accessToken}`
               },
               metadata: {
                 filename: tFile.name,
@@ -364,17 +380,17 @@ const UploadVideoStep1 = (props: Props) => {
             uploadTrial.start()
           } else {
             console.log('no trial')
+            hasTrialCheck = false
           }
 
           //form update
-          updateVideoByWorkId({ formData : handleFormData(res) })
-
+          updateVideoByWorkId({ formData: handleFormData(res, hasTrialCheck) })
         } // End if check workID has been returned after uploading work video
       }
     })
 
     //handle form Update data
-    const handleFormData = (res: tus.HttpResponse): FormData => {
+    const handleFormData = (res: tus.HttpResponse, hasTrialCheck: boolean): FormData => {
       let trial_upload_url = ''
       if (res.getHeader('location')) {
         trial_upload_url = res.getHeader('location')
@@ -399,12 +415,11 @@ const UploadVideoStep1 = (props: Props) => {
       formData.append('_method', 'put')
 
       if (thumbnailFile?.length) {
-        console.log('thumbnail', thumbnailFile)
         formData.append('thumbnail', thumbnailFile[0])
       }
+      formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
 
       //pass this as arrays LOOP? // HardCoded
-      formData.append('tags[]', 'Couple')
       formData.append('tags[]', 'Amazing')
       formData.append('tags[]', '宇')
       formData.append('groups[]', '98acfaa9-6ced-4e51-b2e2-12ab56120bd8')
