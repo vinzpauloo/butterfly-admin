@@ -1,14 +1,12 @@
 // ** React Imports
-import { useRef, useState } from 'react'
-
-// ** Next Imports
-import Image from 'next/image'
+import { useRef, useState, useEffect } from 'react'
 
 // ** MUI Imports
-import { Drawer, Button, TextField, IconButton, Typography, MenuItem, InputAdornment, InputLabel } from '@mui/material'
-
-import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
+import { Drawer, Button, TextField, IconButton, Typography, MenuItem, InputAdornment } from '@mui/material'
+
+// ** Style Imports
+import { styled } from '@mui/material/styles'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -41,11 +39,9 @@ interface FormValues {
   partner_note: string
   currency_id: string
   language_id: string
-  site_name: string // Name of Site
+  site_name: string
   description: string
   logo: File | null
-
-  // amount: number
   note: string
 }
 
@@ -59,6 +55,19 @@ interface SidebarAddUserType {
   data: any
 }
 
+interface Partner {
+  name: string
+  code: string
+  note: string
+}
+
+interface SiteData {
+  logo: any
+  name: string
+  security_funds_balance: string
+  description: string
+}
+
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -69,6 +78,10 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
+
+  // ** Hooks
+  const { updateUser, getSpecificUser } = useUsersTable()
+  const { getLanguages, getCurrency } = CreateAccount()
 
   // ** Props
   const { open, toggle } = props
@@ -90,31 +103,107 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     site_name: '',
     description: '',
     logo: null,
-
-    // amount: 0,
     note: ''
   })
+  const [responseError, setResponseError] = useState<any>([])
 
+  const [fileName, setFileName] = useState('')
   const fileInputRef: any = useRef(null)
   const handleUploadBtnClick = () => {
     fileInputRef.current.click()
   }
-  const [fileName, setFileName] = useState('')
+
+  const [partner, setPartner] = useState<Partner | null>(null)
+  const [siteData, setSiteData] = useState<SiteData[]>([])
+
+  const SitesPartnerQuery = (userId: any) => {
+    return useQuery({
+      queryKey: ['specificUserPartner', props.userId],
+      queryFn: () =>
+        getSpecificUser({
+          data: {
+            id: props.userId,
+            with: 'partner,sites'
+          }
+        }),
+      onSuccess: (data: any) => {
+        setPartner(data.partner)
+        const site = data.sites.map((item: any) => {
+          return item
+        })
+        setSiteData(site)
+      }
+    })
+  }
+
+  if (props.roleId && props.roleId === 4) {
+    const {} = SitesPartnerQuery(props.userId)
+  }
+
+  const [languages, setLanguages] = useState([])
+  const [currencies, setCurrencies] = useState([])
+  const {} = useQueries({
+    queries: [
+      {
+        queryKey: ['Languages'],
+        queryFn: getLanguages,
+        onSuccess: (data: any) => {
+          setLanguages(data?.data)
+
+          if (data?.data && data?.data.length > 0 && !formValue.language_id) {
+            setFormValue(prevState => ({
+              ...prevState,
+              language_id: data?.data[0]?.id
+            }))
+          }
+        }
+      },
+      {
+        queryKey: ['Currencies'],
+        queryFn: getCurrency,
+        onSuccess: (data: any) => {
+          setCurrencies(data?.data)
+
+          if (data?.data && data?.data.length > 0 && !formValue.currency_id) {
+            setFormValue(prevState => ({
+              ...prevState,
+              currency_id: data?.data[0]?.id
+            }))
+          }
+        }
+      }
+    ]
+  })
 
   const {
     control,
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    setValue
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      partner_name: 'Sample'
+      username: props?.data.username,
+      mobile: props?.data.mobile,
+      email: props?.data.email,
+      note: props?.data.note
     }
   })
 
-  const { updateUser, getSpecificUser } = useUsersTable()
-  const { getLanguages, getCurrency } = CreateAccount()
+  // ** Handles the defaultValues of the TextFields
+  useEffect(() => {
+    if (partner) {
+      setValue('partner_name', `${partner.name}`)
+      setValue('partner_code', `${partner.code}`)
+      setValue('partner_note', `${partner.note}`)
+    }
+    if (siteData) {
+      setValue('site_name', `${siteData[0]?.name}`)
+      setValue('description', `${siteData[0]?.description}`)
+    }
+  }, [partner, siteData, setValue])
+
   const mutation = useMutation(async (data: { id: any; data: any }) => {
     const response = await updateUser(data.id, data.data)
     if (response.ok) {
@@ -122,11 +211,12 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     }
   })
 
-  const [responseError, setResponseError] = useState<any>([])
+  // ** Function for the photo/logo
   function isFile(value: any): value is File {
     return value instanceof File
   }
 
+  // ** Filters out the empty values, and returns a new object with only the non-empty values
   const filterEmptyValues = (obj: FormValues) => {
     return Object.fromEntries(Object.entries(obj).filter(([key, value]) => value !== '' && value !== null))
   }
@@ -175,8 +265,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
             site_name: '',
             description: '',
             logo: null,
-
-            // amount: 0,
             note: ''
           })
 
@@ -192,7 +280,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
           data: { error }
         } = e
         setResponseError(error)
-        console.log(error)
       }
     }
   }
@@ -221,85 +308,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     toggle()
   }
 
-  const {} = useQueries({
-    queries: [
-      {
-        queryKey: ['Languages'],
-        queryFn: getLanguages,
-        onSuccess: (data: any) => {
-          setLanguages(data?.data)
-
-          if (data?.data && data?.data.length > 0 && !formValue.language_id) {
-            setFormValue(prevState => ({
-              ...prevState,
-              language_id: data?.data[0]?.id
-            }))
-          }
-        }
-      },
-      {
-        queryKey: ['Currencies'],
-        queryFn: getCurrency,
-        onSuccess: (data: any) => {
-          setCurrencies(data?.data)
-          setCurrencyId(data?.data)
-
-          if (data?.data && data?.data.length > 0 && !formValue.currency_id) {
-            setFormValue(prevState => ({
-              ...prevState,
-              currency_id: data?.data[0]?.id
-            }))
-          }
-        }
-      }
-    ]
-  })
-
-  interface Partner {
-    name: string
-    code: string
-    note: string
-  }
-
-  interface SiteData {
-    logo: any
-    name: string
-    security_funds_balance: string
-    description: string
-  }
-
-  const [languages, setLanguages] = useState([])
-  const [currencies, setCurrencies] = useState([])
-  const [partner, setPartner] = useState<Partner | null>(null)
-  const [siteData, setSiteData] = useState<SiteData[]>([])
-
-  const [currencyId, setCurrencyId] = useState()
-  const [languageId, setLanguageId] = useState()
-
-  const SitesPartnerQuery = (userId: any) => {
-    return useQuery({
-      queryKey: ['specificUserPartner', props.userId],
-      queryFn: () =>
-        getSpecificUser({
-          data: {
-            id: props.userId,
-            with: 'partner,sites'
-          }
-        }),
-      onSuccess: (data: any) => {
-        setPartner(data.partner)
-        const site = data.sites.map((item: any) => {
-          return item
-        })
-        setSiteData(site)
-      }
-    })
-  }
-
-  if (props.roleId && props.roleId === 4) {
-    const {} = SitesPartnerQuery(props.userId)
-  }
-
   return (
     <Drawer
       open={open}
@@ -318,14 +326,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4, justifyContent: 'space-between' }}>
-              <Box>
-                <Typography sx={styles.white}>Super Agent: {props.userId} </Typography>
-              </Box>
-              <Box>
-                <Typography sx={styles.white}>{props.data.username}</Typography>
-              </Box>
-            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
@@ -336,7 +336,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('partner_name')}
                     error={!!errors.partner_name}
                     helperText={errors.partner_name?.message}
-                    // value={formValue.partner_name === '' ? partner?.name : formValue.partner_name}
                     onChange={handleFormInputChange}
                     name='partner_name'
                     InputLabelProps={{
@@ -352,7 +351,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('partner_code')}
                     error={!!errors.partner_code}
                     helperText={errors.partner_code?.message}
-                    value={formValue.partner_code === '' ? partner?.code : formValue.partner_code}
                     onChange={handleFormInputChange}
                     name='partner_code'
                     InputLabelProps={{
@@ -368,7 +366,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('username')}
                     error={!!errors.username}
                     helperText={errors.username?.message}
-                    value={formValue.username === '' ? props?.data.username : formValue.username}
                     onChange={handleFormInputChange}
                     name='username'
                     InputLabelProps={{
@@ -415,7 +412,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('mobile')}
                     error={!!errors.mobile}
                     helperText={errors.mobile?.message}
-                    value={formValue.mobile === '' ? props?.data.mobile : formValue.mobile}
                     onChange={handleFormInputChange}
                     name='mobile'
                     InputLabelProps={{
@@ -432,7 +428,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('email')}
                     error={!!errors.email}
                     helperText={errors.email?.message}
-                    value={formValue.email === '' ? props?.data.mobile : formValue.email}
                     onChange={handleFormInputChange}
                     name='email'
                     InputLabelProps={{
@@ -451,7 +446,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('partner_note')}
                     error={!!errors.partner_note}
                     helperText={errors.partner_note?.message}
-                    value={formValue.partner_note === '' ? partner?.note : formValue.partner_note}
                     onChange={handleFormInputChange}
                     name='email'
                     InputLabelProps={{
@@ -459,23 +453,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     }}
                   />
                 </Box>
-
-                {/* <Box
-                  sx={{
-                    display: 'flex',
-                    backgroundColor: '#A459D1',
-                    padding: 4,
-                    justifyContent: 'space-between',
-                    mt: 5
-                  }}
-                >
-                  <Box>
-                    <Typography sx={styles.white}>Step 2</Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={styles.white}>{props.data.site_name} </Typography>
-                  </Box>
-                </Box> */}
 
                 <Box sx={styles.fullWidth}>
                   <TextField
@@ -485,7 +462,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('site_name')}
                     error={!!errors.site_name}
                     helperText={errors.site_name?.message}
-                    value={formValue.site_name === '' ? siteData[0]?.name : formValue.site_name}
                     onChange={handleFormInputChange}
                     name='site_name'
                     InputLabelProps={{
@@ -614,7 +590,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('description')}
                     error={!!errors.description}
                     helperText={errors.description?.message}
-                    value={formValue.description === '' ? siteData[0]?.description : formValue.description}
                     onChange={handleFormInputChange}
                     name='description'
                     InputLabelProps={{
@@ -633,7 +608,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('note')}
                     error={!!errors.note}
                     helperText={errors.note?.message}
-                    value={formValue.note === '' ? props?.data.note : formValue.note}
                     onChange={handleFormInputChange}
                     name='note'
                     InputLabelProps={{
