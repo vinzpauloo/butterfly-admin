@@ -217,7 +217,7 @@ const UserViewLeft = () => {
               aria-describedby='user-view-edit-description'
             >
               <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
-                Edit User Information
+                Edit User Informations
               </DialogTitle>
               <DialogContent>
                 <DialogContentText variant='body2' id='user-view-edit-description' sx={{ textAlign: 'center', mb: 7 }}>

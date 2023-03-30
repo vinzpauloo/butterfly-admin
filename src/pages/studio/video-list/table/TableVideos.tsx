@@ -8,10 +8,10 @@ import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import { DataGrid, GridColumns, GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 
-
 // ** Custom Components
 import ServerSideToolbar from 'src/views/table/data-grid/ServerSideToolbar'
 import CustomAvatar from 'src/@core/components/mui/avatar'
+import DialogEdit from '../views/DialogEdit'
 
 // ** Types Imports
 import { VideoType } from '@/types/videoTypes'
@@ -27,6 +27,10 @@ import Icon from 'src/@core/components/icon'
 
 type SortType = 'asc' | 'desc' | null | undefined
 
+const handleModal = (open : boolean) => {
+  return open
+}
+
 const columns: GridColumns = [
   {
     flex: 0.02,
@@ -37,7 +41,10 @@ const columns: GridColumns = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <CustomAvatar src={params.row.thumbnail_url} sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }} />
+            <CustomAvatar
+              src={params.row.thumbnail_url}
+              sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
+            />
           </Box>
         </Box>
       )
@@ -72,7 +79,7 @@ const columns: GridColumns = [
     headerName: 'Category',
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params?.row?.tags?.join(", ")}
+        {params?.row?.tags?.join(', ')}
       </Typography>
     )
   },
@@ -83,7 +90,7 @@ const columns: GridColumns = [
     headerName: 'Last Update',
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
-         { formatDate(params.row.updated_at) }
+        {formatDate(params.row.updated_at)}
       </Typography>
     )
   },
@@ -94,11 +101,13 @@ const columns: GridColumns = [
     headerName: 'Action',
     renderCell: (params: GridRenderCellParams) => (
       <>
-        <Icon onClick={() => console.log('setShow')} icon='mdi:eye-outline' fontSize={20} cursor='pointer' />
+        <DialogEdit params={params.row} />
       </>
     )
   }
 ]
+
+
 
 const TableVideos = () => {
   // ** State
@@ -110,6 +119,7 @@ const TableVideos = () => {
   const [searchValue, setSearchValue] = useState<string>('')
   const [sortColumn, setSortColumn] = useState<string>('')
   const [isLoading, setLoading] = useState<boolean>(true)
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
 
   // ** Service API Calls
   const { getAllVideos } = VideoService()
@@ -125,21 +135,20 @@ const TableVideos = () => {
   //   }
   // })
 
-  
   function loadServerRows(currentPage: number, data: VideoType[]) {
-    console.log('data',data)
+    console.log('data', data)
     return data.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
   }
 
   const fetchTableData = useCallback(
     async (sortType: SortType, q: string, column: string) => {
       setLoading(true)
-      const allVids = await getAllVideos({data : { sort: 'created_at', sort_by: sortType, with: 'user' }})
+      const allVids = await getAllVideos({ data: { sort: 'created_at', sort_by: sortType, with: 'user' } })
 
       setRows(loadServerRows(page, allVids.data))
       setTotal(allVids.total)
       setLoading(false)
-      
+
       // await axios
       //   .get('/api/table/data', {
       //     params: {
@@ -173,42 +182,44 @@ const TableVideos = () => {
   }
 
   const handleSearch = (value: string) => {
-    console.log('value',value)
+    console.log('value', value)
     setSearchValue(value)
     fetchTableData(sortType, value, sortColumn)
   }
 
   return (
-    <Card>
-      <CardHeader title='' />
-      <DataGrid
-        loading={isLoading}
-        getRowId={(row)=> row._id}
-        autoHeight
-        pagination
-        rows={rows}
-        rowCount={total}
-        columns={columns}
-        pageSize={pageSize}
-        sortingMode='server'
-        paginationMode='server'
-        onSortModelChange={handleSortModel}
-        rowsPerPageOptions={[7, 10, 25, 50]}
-        onPageChange={newPage => setPage(newPage)}
-        components={{ Toolbar: ServerSideToolbar }}
-        onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-        componentsProps={{
-          baseButton: {
-            variant: 'outlined'
-          },
-          toolbar: {
-            value: searchValue,
-            clearSearch: () => handleSearch(''),
-            onChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-          }
-        }}
-      />
-    </Card>
+    <>
+      <Card>
+        <CardHeader title='' />
+        <DataGrid
+          loading={isLoading}
+          getRowId={row => row._id}
+          autoHeight
+          pagination
+          rows={rows}
+          rowCount={total}
+          columns={columns}
+          pageSize={pageSize}
+          sortingMode='server'
+          paginationMode='server'
+          onSortModelChange={handleSortModel}
+          rowsPerPageOptions={[7, 10, 25, 50]}
+          onPageChange={newPage => setPage(newPage)}
+          components={{ Toolbar: ServerSideToolbar }}
+          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+          componentsProps={{
+            baseButton: {
+              variant: 'outlined'
+            },
+            toolbar: {
+              value: searchValue,
+              clearSearch: () => handleSearch(''),
+              onChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
+            }
+          }}
+        />
+      </Card>
+    </>
   )
 }
 
