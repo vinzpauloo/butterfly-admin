@@ -62,6 +62,7 @@ interface Partner {
 }
 
 interface SiteData {
+  id: any
   logo: any
   name: string
   security_funds_balance: string
