@@ -1,37 +1,16 @@
 // ** React Imports
-import React, { useState } from 'react'
-
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-
-// ** MUI Imports
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Button,
-  TextField,
-  Typography,
-  CircularProgress,
-  Switch
-} from '@mui/material'
-
-// ** Custom Imports
+import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, CircularProgress, Switch } from '@mui/material'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import { DateType } from '@/types/forms/reactDatepickerTypes'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
-
-// ** Style Imports
+import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  adTitle?: string
-  width?: number
-  height?: number
-  photoURL?: string
-  adsLink?: string
 }
 
 const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
@@ -45,6 +24,14 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
   const [ImageInputError, setImageInputError] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  // WIP - REMOVE THE PREVIEW FILE AND OTHER STUFF TO WHEN POSTING TO BACK END
+  useEffect(() => {
+    return () => {
+      setSelectedFile(null)
+      setPreview("")
+    }
+  },[])
 
   const handleFileInputChange = (e: any) => {
     const file = e.target.files[0];
@@ -64,7 +51,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
   };
 
   const validateInput = () => {
-    if (props.photoURL === undefined || selectedFile === null) {
+    if (adsPhotoURL === undefined || selectedFile === null) {
       setImageInputError(true)
 
       return false
@@ -89,45 +76,61 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
     }
   }
 
-  console.log("asd",new Date("2023-01-01T00:00:00.000000Z"))
+  // subscribe to ads global store
+  const [
+    adsCategory,
+    adsWidth,
+    adsHeight,
+    adsPhotoURL,
+    adsLink,
+    adsStartDate,
+    adsEndDate,
+  ] = adsGlobalStore((state) => [
+    state.adsCategory,
+    state.adsWidth,
+    state.adsHeight,
+    state.adsPhotoURL,
+    state.adsLink,
+    state.adsStartDate,
+    state.adsEndDate,
+  ]);
 
   return (
     <DatePickerWrapper>
       <Dialog open={props.isOpen} onClose={props.onClose}>
         <DialogContent sx={styles.dialogContent}>
-          <DialogTitle sx={styles.title}>{props.adTitle} Advertisement</DialogTitle>
+          <DialogTitle sx={styles.title}>{adsCategory} Advertisement</DialogTitle>
             {isLoading ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
             <Box sx={styles.container} style={isLoading? {opacity:0.5, cursor:"not-allowed"} : undefined}>
               <Box sx={styles.left}>
-                {/* {props.adTitle === "Carousel" ? <Switch disabled={isLoading} /> : null} */}
+                {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={isLoading} /> : null} */}
                 <Box
                   sx={uploadContainer}
-                  width={{ sm: "100%", md: props.width }}
-                  height={props.height}
-                  border='1px solid'
+                  width={{ sm: "100%", md: adsWidth }}
+                  height={adsHeight}
                   borderColor={ImageInputError ? "red" : "black"}
                 >
                   <Box sx={styles.imgWrapper}>                      
-                    {props.photoURL && !preview ?
-                      <img src={props.photoURL} alt='template icon' style={{ objectFit: "cover", width: props.width, height: props.height }} /> :
+                    {adsPhotoURL && !preview ?
+                      <img src={adsPhotoURL} alt='template icon' style={{ objectFit: "cover", width: adsWidth, height: adsHeight }} /> :
                       <Image
                         src={preview ? preview : '/images/icons/butterfly-template-icon.png'}
-                        width={preview ? props.width : 50}
-                        height={preview ? props.height : 50}
+                        width={preview ? adsWidth : 50}
+                        height={preview ? adsHeight : 50}
                         alt='template icon'
                         style={{ objectFit: "fill" }}
                       />
                     }
                   </Box>
                 </Box>
-                <Button variant="contained" disabled={isLoading} component="label" sx={uploadBtn}>{preview || props.photoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
+                <Button variant="contained" disabled={isLoading} component="label" sx={uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
               </Box>
               <Box sx={styles.right}>
                 <Box>
                   <Typography>Duration: Start Date</Typography>
                   <DatePicker
                     disabled={isLoading}
-                    selected={startDate}
+                    selected={adsStartDate}
                     onChange={(date: Date) => setStartDate(date)}
                     placeholderText='Click to select a date'
                     customInput={<CustomInput customWidth='100%' />}
@@ -138,7 +141,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
                   <Typography>Duration: End Date</Typography>
                   <DatePicker
                     disabled={isLoading}
-                    selected={endDate}
+                    selected={adsEndDate}
                     onChange={(date: Date) => setEndDate(date)}
                     placeholderText='Click to select a date'
                     customInput={<CustomInput customWidth='100%' />}
@@ -147,7 +150,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
                 </Box>
                 <Box>
                   <Typography>URL Link:</Typography>
-                  <TextField fullWidth error={URLInputError} disabled={isLoading} defaultValue={props.adsLink} onChange={(event) => setnewURLLink(event.target.value)}/>
+                  <TextField fullWidth error={URLInputError} disabled={isLoading} value={adsLink} onChange={(event) => setnewURLLink(event.target.value)}/>
                 </Box>
                 <Box sx={styles.bottomBtnWrapper}>
                   <Button sx={styles.bottomBtns} disabled={isLoading} onClick={props.onClose}>Cancel</Button>
@@ -172,7 +175,7 @@ const styles = {
     margin: 0,
     textAlign: 'center',
     textTransform: 'uppercase',
-    mb: 5
+    mb: 6
   },
   container: {
     display: 'flex',
@@ -187,8 +190,7 @@ const styles = {
   left: {
     display: 'flex',
     flexDirection: ' column',
-    width: { xs: '100%', lg: '50%' },
-    gap: 3
+    gap: 4
   },
   adsTitle: {
     border: '1px solid #000',
@@ -236,10 +238,6 @@ const styles = {
     },
     display: 'flex',
     flexDirection: 'column',
-    mt: {
-      xs: 0,
-      lg: 10
-    },
     gap: 4
   },
   fullWidth: {

@@ -1,5 +1,6 @@
 import React from 'react'
-import { Box, Grid, Typography, ImageList, ImageListItem } from '@mui/material'
+import { Box, Grid, Typography, ImageList, ImageListItem, styled } from '@mui/material'
+import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 
 type Props = {
   data: any
@@ -7,14 +8,47 @@ type Props = {
 }
 
 const BannerAds = (props: Props) => {
+  const BannerAdsWidth = 300
+  const BannerAdsHeight = 75
+
+  // subscribe to ads global store
+  const [
+    setAdsCategory,
+    setAdsWidth,
+    setAdsHeight,
+    setAdsPhotoURL,
+    setAdsLink,
+    setAdsStartDate,
+    setAdsEndDate,
+  ] = adsGlobalStore((state) => [
+    state.setAdsCategory,
+    state.setAdsWidth,
+    state.setAdsHeight,
+    state.setAdsPhotoURL,
+    state.setAdsLink,
+    state.setAdsStartDate,
+    state.setAdsEndDate,
+  ]);
+
+  const openBannerAdsModal = () => {
+    setAdsCategory("Pop-Up")
+    setAdsWidth(BannerAdsWidth)
+    setAdsHeight(BannerAdsHeight)
+    setAdsPhotoURL(props.data?.photo_url)
+    setAdsLink(props.data?.url)
+    setAdsStartDate(new Date(props.data?.start_date))
+    setAdsEndDate(new Date(props.data?.end_date))
+    props.openModal()
+  }
+
   return (
     <Grid item xs={6} md={4} sx={styles.gridContentWrapper}>
       <Box sx={styles.titleWrapper}>
         <Typography sx={styles.title}>Banner</Typography>
       </Box>
       <ImageList cols={1}>
-        <ImageListItem onClick={props.openModal} sx={styles.imgWrapper} style={{ width: 300, height: 75 }}>
-          <img src={props.data?.photo_url} style={{ width: 300, height: 75, objectFit: "cover" }} alt='template icon' />					
+        <ImageListItem onClick={openBannerAdsModal} sx={styles.imgWrapper} style={{ width: BannerAdsWidth, height: BannerAdsHeight }}>
+          <Img src={props.data?.photo_url} style={{ width: BannerAdsWidth, height: BannerAdsHeight, objectFit: "cover" }} alt='template icon' />					
         </ImageListItem>
       </ImageList>
     </Grid>
@@ -22,6 +56,11 @@ const BannerAds = (props: Props) => {
 }
 
 export default BannerAds
+
+const Img = styled('img')({
+  objectFit: "cover",
+  "&:hover": { opacity: 0.5 }
+})
 
 const styles = {
   //Grid Content
@@ -46,15 +85,10 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#D9D9D9',
-    border: '1px solid #000',
     cursor: "pointer",
+    backgroundColor: '#D9D9D9',
     ":hover": {
       backgroundColor: (theme: any) => theme.palette.primary.main,
-      opacity: 0.5,
-      scale: 0.5,
-      border: '1px solid',
-      borderColor: (theme: any) => theme.palette.primary.main,
     }
   },
 }
