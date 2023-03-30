@@ -138,7 +138,7 @@ const Header = ({ setOpen, setHeader }: any) => {
   )
 }
 
-const Table = ({ data, isLoading, setPage, pageSize, rowCount, setOpen, setHeader }: any) => {
+const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setOpen, setHeader }: any) => {
   const columnData = [
     {
       field: 'title',
@@ -180,6 +180,10 @@ const Table = ({ data, isLoading, setPage, pageSize, rowCount, setOpen, setHeade
     setPage(newPage + 1)
   }
 
+  const handlePageSizeChange = (pageSize: number) => {
+    setPageSize(pageSize)
+  }
+
   return (
     <DataGrid
       rowCount={rowCount}
@@ -191,9 +195,11 @@ const Table = ({ data, isLoading, setPage, pageSize, rowCount, setOpen, setHeade
       autoHeight
       loading={isLoading}
       rows={data}
+      rowsPerPageOptions={[10, 25, 50]}
       columns={columnData}
       pagination
       onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
     />
   )
 }
@@ -207,9 +213,9 @@ function index() {
   const [open, setOpen] = useState(false)
   const [header, setHeader] = useState('')
 
-  const { isLoading } = useQuery({
-    queryKey: ['workgroup', page],
-    queryFn: () => getWorkgroup({ page: page }),
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: ['workgroup', page, pageSize],
+    queryFn: () => getWorkgroup({ page: page, paginate: pageSize }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -228,9 +234,10 @@ function index() {
         <Header setOpen={setOpen} setHeader={setHeader} />
         <Table
           data={data}
-          isLoading={isLoading}
+          isLoading={isLoading || isRefetching}
           setPage={setPage}
           pageSize={pageSize}
+          setPageSize={setPageSize}
           rowCount={rowCount}
           setOpen={setOpen}
           setHeader={setHeader}

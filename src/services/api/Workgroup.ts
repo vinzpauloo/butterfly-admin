@@ -3,6 +3,7 @@ import authConfig from 'src/configs/auth'
 
 interface IWorkgroup {
   page: number
+  paginate: number
 }
 
 const WorkgroupService = () => {
