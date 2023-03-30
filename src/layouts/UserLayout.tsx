@@ -72,19 +72,6 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
           // navItems: verticalMenuItems
         },
         appBar: {
-          componentProps: {
-            sx: {
-              boxShadow: theme => theme.shadows[9],
-              backgroundColor: theme => theme.palette.background.paper,
-              '& .navbar-content-container': {
-                minHeight: '50px !important'
-              },
-              '& .css-auttry': {
-                paddingBottom: 1.2,
-                gap: 0.5
-              }
-            }
-          },
           content: props => (
             <VerticalAppBarContent
               hidden={hidden}
