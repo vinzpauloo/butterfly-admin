@@ -149,7 +149,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     } else {
       // HAS NO VIDEO - continue upload Feed
 
-      uploadFeed({ formData: fd }).then(data => {
+      uploadFeed({ formData: formData }).then(data => {
         console.log('data', data)
         toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
         onClose()
