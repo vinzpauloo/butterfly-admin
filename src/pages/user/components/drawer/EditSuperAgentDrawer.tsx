@@ -107,7 +107,10 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     handleSubmit,
     formState: { errors }
   } = useForm<FormValues>({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
+    defaultValues: {
+      partner_name: 'Sample'
+    }
   })
 
   const { updateUser, getSpecificUser } = useUsersTable()
@@ -333,7 +336,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('partner_name')}
                     error={!!errors.partner_name}
                     helperText={errors.partner_name?.message}
-                    value={formValue.partner_name === '' ? partner?.name : formValue.partner_name}
+                    // value={formValue.partner_name === '' ? partner?.name : formValue.partner_name}
                     onChange={handleFormInputChange}
                     name='partner_name'
                     InputLabelProps={{
