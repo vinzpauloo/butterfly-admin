@@ -1,7 +1,7 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, CircularProgress, Switch } from '@mui/material'
+import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, CircularProgress } from '@mui/material'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import { DateType } from '@/types/forms/reactDatepickerTypes'
@@ -51,7 +51,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
   };
 
   const validateInput = () => {
-    if (adsPhotoURL === undefined || selectedFile === null) {
+    if (adsPhotoURL === "" || selectedFile === null) {
       setImageInputError(true)
 
       return false
@@ -105,7 +105,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
               <Box sx={styles.left}>
                 {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={isLoading} /> : null} */}
                 <Box
-                  sx={uploadContainer}
+                  sx={styles.uploadContainer}
                   width={{ sm: "100%", md: adsWidth }}
                   height={adsHeight}
                   borderColor={ImageInputError ? "red" : "black"}
@@ -122,8 +122,9 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
                       />
                     }
                   </Box>
-                </Box>
-                <Button variant="contained" disabled={isLoading} component="label" sx={uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
+              </Box>
+                <Typography textAlign="center">Recommended Size: {adsWidth}x{adsHeight}</Typography>
+                <Button variant="contained" disabled={isLoading} component="label" sx={styles.uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
               </Box>
               <Box sx={styles.right}>
                 <Box>
@@ -167,6 +168,25 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
 export default AdvertisementModal
 
 const styles = {
+  uploadContainer: {
+    backgroundColor: '#D9D9D9',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative'
+  },
+  uploadBtn: {
+    backgroundColor: '#9747FF',
+    width: 150,
+    color: '#FFF',
+    textTransform: 'uppercase',
+    fontSize: 12,
+    '&:hover': {
+      backgroundColor: '#7B0BB0'
+    },
+    marginLeft: "auto",
+    marginRight: "auto"
+  },
   dialogContent: {
     padding: 10,
   },
@@ -217,18 +237,6 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between'
   },
-  uploadBtn: {
-    backgroundColor: '#9747FF',
-    width: 150,
-    color: '#FFF',
-    textTransform: 'uppercase',
-    fontSize: 12,
-    '&:hover': {
-      backgroundColor: '#7B0BB0'
-    },
-    position: 'absolute',
-    bottom: 12
-  },
   right: {
     width: {
       xs: '100%',
@@ -270,25 +278,4 @@ const styles = {
       margin: "auto",
       zIndex: 1
     }
-}
-
-const uploadContainer = {
-  backgroundColor: '#D9D9D9',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'relative'
-}
-
-const uploadBtn = {
-  backgroundColor: '#9747FF',
-  width: 150,
-  color: '#FFF',
-  textTransform: 'uppercase',
-  fontSize: 12,
-  '&:hover': {
-    backgroundColor: '#7B0BB0'
-  },
-  marginLeft:"auto",
-  marginRight:"auto"
 }
