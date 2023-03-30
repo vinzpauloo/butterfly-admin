@@ -21,6 +21,7 @@ import { useDropzone } from 'react-dropzone'
 
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
+import TUSService from '@/services/api/TusService'
 
 interface ModalProps {
   isOpen: boolean
@@ -31,7 +32,8 @@ type Inputs = {
   title: string
   string_story: string
   tags: string
- 'photo[]'?: any
+  'images[]'?: any
+  video: any
 }
 
 //maximum Images that can be uploaded
@@ -40,12 +42,14 @@ const limitFiles = 9
 const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
+  const [feedVideo, setFeedVideo] = React.useState<File[]>([])
 
   // ** Hooks
   const {
     register,
     getValues,
     setValue,
+    reset,
     formState: { errors }
   } = useForm<Inputs>()
 
@@ -57,7 +61,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     onDrop: (acceptedFiles: File[]) => {
       let imageFiles = acceptedFiles.map((file: File) => Object.assign(file))
       setMultipleImages(acceptedFiles.map((file: File) => Object.assign(file)))
-      setValue('photo[]', imageFiles)
+      setValue('images[]', imageFiles)
     },
     onDropRejected: () => {
       toast.error(`You can only upload ${limitFiles} images`, {
@@ -66,6 +70,23 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
   })
 
+  //upload video
+  const { getRootProps: getVidRootProps, getInputProps: getVidInputProps } = useDropzone({
+    multiple: false,
+    accept: {
+      'video/*': ['.mp4', '.avi']
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      let videoFile = acceptedFiles.map((file: File) => Object.assign(file))
+      setFeedVideo(videoFile)
+      setValue('video', videoFile[0])
+    },
+    onDropRejected: () => {
+      toast.error(`You can only upload ${limitFiles} images`, {
+        duration: 2000
+      })
+    }
+  })
 
   //use api service
   const { uploadFeed } = FeedsService()
@@ -75,29 +96,88 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   }
 
   const handlePublish = () => {
+  
+    const formData = createFormData(getValues())
+    const { video } = getValues()
+
+    if ( video != undefined ) {
+      console.log('there is a video')
+
+      const feedHeaderData = {
+        user_id: 25,
+        file_name: video.name,
+        video_type: 'feed_video'
+      }
+
+      const customOnProgress = (str : string) => {
+        console.log('string', str)
+      }
+      const customOnAfterResponse = (req : any ,res : any) => {
+        console.log('response', res)
+        let xmlhttpreq = req.getUnderlyingObject()
+        console.log('xml', xmlhttpreq)
+        console.log('xmlhttpreq get all', xmlhttpreq.getAllResponseHeaders())
+
+        if (xmlhttpreq.getAllResponseHeaders().indexOf('feed_id') != -1) { 
+          // save to feed with video
+          console.log('SAVE HERE!!!!!!!!')
+
+          let data = JSON.parse(res.getHeader('works'))
+          console.log('data from feed header', data)
+          const { feed_id } = data.data
+
+          //Append to formData
+          formData.append('feed_id', feed_id)
+
+          // upload the Feed With Video
+          uploadFeed({ formData: formData }).then(data => {
+            console.log('data from with video', data)
+            toast.success('Successfully Upload Newsfeed WITH VIDEO!', { position: 'top-center' })
+            onClose()
+            setIsLoading(false)
+            reset()
+          }) //end uploadFeed
+
+        }
+
+      }
+
+      //Start TUS Uplaod
+      const { upload } = TUSService(video, { customOnProgress,customOnAfterResponse }, feedHeaderData)
+      upload.start()
+
+    } else {
+      // HAS NO VIDEO - continue upload Feed
+
+      uploadFeed({ formData: formData }).then(data => {
+        console.log('data', data)
+        toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
+        onClose()
+        setIsLoading(false)
+        reset()
+      })
+
+    }
+
     console.log(getValues())
 
-    const fd = createFormData(getValues())
     setIsLoading(true)
-    // uploadFeed({ formData: fd }).then(data => {
-    //   console.log('data', data)
-    //   toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
-    //   onClose()
-    //   setIsLoading(false)
-    // })
+    
   }
 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
     let formData = new FormData()
-
-    //content creator ID DUMMY FOR TESTING
-    formData.append('user_id', '25')
+    // ** DUMMY VALUES
+    formData.append('user_id', '25') // should be content creator ID
+    formData.append('is_Service', 'true')
 
     Object.keys(newsfeedFormData).forEach(key => {
-
       //check if data has photo
-
-
+      if (key == 'images') {
+        newsfeedFormData[key].map((img: any) => {
+          formData.append('images[]', img)
+        })
+      }
       if (key == 'tags') {
         formData.append('tags[]', newsfeedFormData[key])
       } else {
@@ -120,13 +200,12 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const filtered = uploadedFiles.filter((i: any) => i.name !== file.name)
     setMultipleImages([...filtered])
     let currentImages = [...filtered]
-    if( !currentImages.length ) {
+    if (!currentImages.length) {
       console.log('no images')
-      setValue('photo[]', null)
+      setValue('images[]', null)
     } else {
-      setValue('photo[]', [...filtered])
+      setValue('images[]', [...filtered])
     }
-    
   }
 
   const handleRemoveAllFiles = () => {
@@ -134,7 +213,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   }
 
   const fileList = multipleImages.map((file: any) => (
-    <ListItem key={file.name}>
+    <ListItem key={file.name} sx={{position: 'relative'}}>
       <Box className='file-details'>
         <div className='file-preview'>{renderFilePreview(file)}</div>
       </Box>
@@ -162,7 +241,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         ) : (
           <>
             <Box sx={styles.textContainer}>
-              <TextField label='Title' sx={styles.fullWidth} {...register('title')} />
+              <TextField label='Title' sx={styles.fullWidth} {...register("title", { required: true, minLength: 5 })}  />
               <TextField
                 label='Description'
                 minRows={10}
@@ -174,10 +253,15 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             </Box>
 
             <Box sx={styles.buttonContainer}>
-              <Box sx={styles.button}>
-                <Image src='/images/icons/upload-video.png' alt='upload video' width={100} height={100} />
-                <Button sx={styles.upload}>Upload Video</Button>
-              </Box>
+              
+              <div {...getVidRootProps({ className: 'dropzone' })}>
+              <input {...getVidInputProps()} />
+                <Box sx={styles.button}>
+                  <Image src='/images/icons/upload-video.png' alt='upload video' width={100} height={100} />
+                  <Button sx={styles.upload}>Upload Video</Button>
+                  { (feedVideo.length !=0) ? <p>Selected 1 video</p> : null }
+                </Box>
+              </div>
 
               <div {...getRootProps({ className: 'dropzone' })}>
                 <input {...getInputProps()} />

@@ -78,7 +78,7 @@ const navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'Advertisements',
-          path: '/settings/pages/advertisements'
+          path: '/settings/pages/ads'
         },
         {
           title: 'Announcements',

@@ -6,7 +6,7 @@ import { Box, Button, OutlinedInput, Tab } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 
-import TabListData from '@/pages/transactions/data/TabLists'
+import TabListData from '@/data/TabLists'
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {

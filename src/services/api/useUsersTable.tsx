@@ -31,7 +31,8 @@ export const useUsersTable = () => {
   const getUsers = (params: UsersData) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|0'
+        'X-Authorization': 'postman|0',
+        'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: '/users',
       method: 'GET',
@@ -43,7 +44,8 @@ export const useUsersTable = () => {
     return request(
       {
         headers: {
-          'X-Authorization': 'postman|0'
+          'X-Authorization': 'postman|0',
+          'ngrok-skip-browser-warning': '69420' // only for dev
         },
         url: `/users?export=true&role=${params.data.role}`,
         method: 'GET',
@@ -68,7 +70,8 @@ export const useUsersTable = () => {
     return request({
       headers: {
         'X-Authorization': 'postman|0',
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: `/users/${id}`,
       method: 'POST',
@@ -80,7 +83,8 @@ export const useUsersTable = () => {
     return request({
       headers: {
         'X-Authorization': 'postman|0',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: `/users/${params.data.id}`,
       method: 'GET',
