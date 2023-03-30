@@ -2,22 +2,22 @@ import Icon from 'src/@core/components/icon'
 
 const TabListData = [
   {
-    value: 'DONATIONS',
+    value: 'donations',
     icon: <Icon fontSize={20} icon='mdi:donation-outline' />,
     title: 'Donations'
   },
   {
-    value: 'COMMISSIONS',
+    value: 'commissions',
     icon: <Icon fontSize={20} icon='game-icons:pay-money' />,
     title: 'Commissions'
   },
   {
-    value: 'WITHDRAWAL',
+    value: 'withdrawal',
     icon: <Icon fontSize={20} icon='uil:money-withdrawal' />,
     title: 'Withdrawal'
   },
   {
-    value: 'SECURITY_FUNDS',
+    value: 'security-funds',
     icon: <Icon fontSize={20} icon='iconoir:card-security' />,
     title: 'Security Funds'
   }
