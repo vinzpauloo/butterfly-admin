@@ -32,14 +32,14 @@ const CreatedSuccessful = ({ update }: any) => {
           }}
         >
           {update ? (
-            <Typography sx={{ fontWeight: '600', fontSize: ['18px', '30px'] }}>UPDATED SUCCESSFULLY!</Typography>
+            <Typography sx={{ fontWeight: '600', fontSize: ['10px', '20px'] }}>UPDATED SUCCESSFULLY!</Typography>
           ) : (
-            <Typography sx={{ fontWeight: '600', fontSize: ['18px', '30px'] }}>CREATED SUCCESSFULLY!</Typography>
+            <Typography sx={{ fontWeight: '600', fontSize: ['10px', '20px'] }}>CREATED SUCCESSFULLY!</Typography>
           )}
           <Box sx={{ display: 'flex', gap: 10, mt: 5 }}>
-            <Box sx={{ backgroundColor: '#60FF00', height: ['18px', '25px'], width: ['40px', '90px'] }} />
-            <Box sx={{ backgroundColor: '#6DD230', height: ['18px', '25px'], width: ['40px', '90px'] }} />
-            <Box sx={{ backgroundColor: '#41A207', height: ['18px', '25px'], width: ['40px', '90px'] }} />
+            <Box sx={{ backgroundColor: '#60FF00', height: ['8px', '15px'], width: ['20px', '50px'] }} />
+            <Box sx={{ backgroundColor: '#6DD230', height: ['8px', '15px'], width: ['20px', '50px'] }} />
+            <Box sx={{ backgroundColor: '#41A207', height: ['8px', '15px'], width: ['20px', '50px'] }} />
           </Box>
         </Box>
       </Box>

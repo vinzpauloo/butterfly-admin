@@ -44,7 +44,8 @@ interface FormValues {
   site_name: string // Name of Site
   description: string
   logo: File | null
-  amount: number
+
+  // amount: number
   note: string
 }
 
@@ -89,7 +90,8 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     site_name: '',
     description: '',
     logo: null,
-    amount: 0,
+
+    // amount: 0,
     note: ''
   })
 
@@ -170,9 +172,12 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
             site_name: '',
             description: '',
             logo: null,
-            amount: 0,
+
+            // amount: 0,
             note: ''
           })
+
+          setResponseError(false)
 
           // Re-fetches UserTable and CSV exportation
           queryClient.invalidateQueries({ queryKey: ['allUsers'] })
@@ -184,6 +189,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
           data: { error }
         } = e
         setResponseError(error)
+        console.log(error)
       }
     }
   }
@@ -252,15 +258,22 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     note: string
   }
 
+  interface SiteData {
+    logo: any
+    name: string
+    security_funds_balance: string
+    description: string
+  }
+
   const [languages, setLanguages] = useState([])
   const [currencies, setCurrencies] = useState([])
   const [partner, setPartner] = useState<Partner | null>(null)
-  const [siteData, setSiteData] = useState([])
+  const [siteData, setSiteData] = useState<SiteData[]>([])
 
   const [currencyId, setCurrencyId] = useState()
   const [languageId, setLanguageId] = useState()
 
-  const SitesPartnerQuery = userId => {
+  const SitesPartnerQuery = (userId: any) => {
     return useQuery({
       queryKey: ['specificUserPartner', props.userId],
       queryFn: () =>
@@ -281,7 +294,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   }
 
   if (props.roleId && props.roleId === 4) {
-    const { data, isLoading, isError, error } = SitesPartnerQuery(props.userId)
+    const {} = SitesPartnerQuery(props.userId)
   }
 
   return (
@@ -542,18 +555,15 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Current Balance: ${siteData[0]?.security_funds_balance}`}
+                    label='Security Funds'
                     variant='outlined'
                     fullWidth
-                    {...register('amount')}
-                    error={!!errors.amount}
-                    helperText={errors.amount?.message}
-                    value={formValue.amount === '' ? siteData[0]?.security_funds_balance : formValue.amount}
-                    onChange={handleFormInputChange}
+                    value={siteData[0]?.security_funds_balance}
                     name='amount'
                     InputLabelProps={{
                       shrink: true
                     }}
+                    disabled
                   />
                 </Box>
 
@@ -629,7 +639,12 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                {responseError && <Typography color='red'>{responseError?.message}</Typography>}
+                {responseError &&
+                  Object.values(responseError).map((error: any, index) => (
+                    <Typography color='red' key={index}>
+                      {error}
+                    </Typography>
+                  ))}
                 <Box sx={styles.formButtonContainer}>
                   <Box>
                     <Button sx={styles.cancelButton}>
