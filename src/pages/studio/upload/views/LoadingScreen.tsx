@@ -3,7 +3,6 @@
 import React from 'react'
 
 // ** MUI Imports
-import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 

@@ -1,9 +1,6 @@
-import React from 'react'
-
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import { useTheme } from '@mui/material/styles'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -12,16 +9,14 @@ import Icon from 'src/@core/components/icon'
 import { Settings } from 'src/@core/context/settingsContext'
 
 // ** Components
-import CustomUserDropdown from 'src/layouts/components/shared-components/CustomUserDropdown'
-import LanguageFlagsDropdown from 'src/layouts/components/shared-components/LanguageFlagsDropdown'
-import AppBarDate from 'src/layouts/components/shared-components/AppBarDate'
-import CustomNotificationDropdown, {
+import Autocomplete from 'src/layouts/components/Autocomplete'
+import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
+import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
+import LanguageDropdown from 'src/@core/layouts/components/shared-components/LanguageDropdown'
+import NotificationDropdown, {
   NotificationsType
-} from 'src/layouts/components/shared-components/CustomNotificationDropdown'
-import { Grid, Typography } from '@mui/material'
-
-// ** Date
-import { toDate, format } from 'date-fns'
+} from 'src/@core/layouts/components/shared-components/NotificationDropdown'
+import ShortcutsDropdown, { ShortcutsType } from 'src/@core/layouts/components/shared-components/ShortcutsDropdown'
 
 interface Props {
   hidden: boolean
@@ -31,6 +26,27 @@ interface Props {
 }
 
 const notifications: NotificationsType[] = [
+  {
+    meta: 'Today',
+    avatarAlt: 'Flora',
+    title: 'Congratulation Flora! 🎉',
+    avatarImg: '/images/avatars/4.png',
+    subtitle: 'Won the monthly best seller badge'
+  },
+  {
+    meta: 'Yesterday',
+    avatarColor: 'primary',
+    subtitle: '5 hours ago',
+    avatarText: 'Robert Austin',
+    title: 'New user registered.'
+  },
+  {
+    meta: '11 Aug',
+    avatarAlt: 'message',
+    title: 'New message received 👋🏻',
+    avatarImg: '/images/avatars/5.png',
+    subtitle: 'You have 10 unread messages'
+  },
   {
     meta: '25 May',
     title: 'Paypal',
@@ -43,7 +59,7 @@ const notifications: NotificationsType[] = [
     avatarAlt: 'order',
     title: 'Received Order 📦',
     avatarImg: '/images/avatars/3.png',
-    subtitle: 'New VIP member'
+    subtitle: 'New order received from John'
   },
   {
     meta: '27 Dec',
@@ -54,15 +70,60 @@ const notifications: NotificationsType[] = [
   }
 ]
 
-const AppBarContent = (props: Props) => {
-  // ** Hook
-  const theme = useTheme()
+const shortcuts: ShortcutsType[] = [
+  {
+    title: 'Calendar',
+    url: '/apps/calendar',
+    subtitle: 'Appointments',
+    icon: 'mdi:calendar-month-outline'
+  },
+  {
+    title: 'Invoice App',
+    url: '/apps/invoice/list',
+    subtitle: 'Manage Accounts',
+    icon: 'mdi:receipt-text-outline'
+  },
+  {
+    title: 'Users',
+    url: '/apps/user/list',
+    subtitle: 'Manage Users',
+    icon: 'mdi:account-outline'
+  },
+  {
+    url: '/apps/roles',
+    title: 'Role Management',
+    subtitle: 'Permissions',
+    icon: 'mdi:shield-check-outline'
+  },
+  {
+    url: '/',
+    title: 'Dashboard',
+    icon: 'mdi:chart-pie',
+    subtitle: 'User Dashboard'
+  },
+  {
+    title: 'Settings',
+    icon: 'mdi:cog-outline',
+    subtitle: 'Account Settings',
+    url: '/pages/account-settings/account'
+  },
+  {
+    title: 'Help Center',
+    subtitle: 'FAQs & Articles',
+    icon: 'mdi:help-circle-outline',
+    url: '/pages/help-center'
+  },
+  {
+    title: 'Dialogs',
+    subtitle: 'Useful Dialogs',
+    icon: 'mdi:window-maximize',
+    url: '/pages/dialog-examples'
+  }
+]
 
+const AppBarContent = (props: Props) => {
   // ** Props
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
-
-  const currentDate = toDate(new Date())
-  const formattedDate = format(currentDate, 'MMMM d, yyyy')
 
   return (
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -72,38 +133,14 @@ const AppBarContent = (props: Props) => {
             <Icon icon='mdi:menu' />
           </IconButton>
         ) : null}
-        <Typography sx={{ display: ['none', 'flex'], color: '##111111', paddingLeft: '3rem' }}>HOME</Typography>
+        <Autocomplete hidden={hidden} settings={settings} />
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
-        <Box
-          gap={3}
-          className=''
-          sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBlock: '1rem' }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start' }} gap={2}>
-            <img width={28} src='/images/topbar/msg.png' />
-            <CustomNotificationDropdown settings={settings} notifications={notifications} />
-            <Box alignItems='flex-end' flexDirection='column' display='flex' justifyContent='flex-end'>
-              <Typography sx={{ display: ['none', 'none', null] }} lineHeight={1} variant='body2'>
-                Juan Pablo Dela Cruz
-              </Typography>
-              <Typography sx={{ display: ['none', 'flex'] }} variant='body2'>
-                Administrator
-              </Typography>
-            </Box>
-
-            <CustomUserDropdown settings={settings} />
-          </Box>
-
-          <Grid sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }} container spacing={2}>
-            <Grid padding={0} item>
-              <LanguageFlagsDropdown />
-            </Grid>
-            <Grid item>
-              <AppBarDate />
-            </Grid>
-          </Grid>
-        </Box>
+        <LanguageDropdown settings={settings} saveSettings={saveSettings} />
+        <ModeToggler settings={settings} saveSettings={saveSettings} />
+        <ShortcutsDropdown settings={settings} shortcuts={shortcuts} />
+        <NotificationDropdown settings={settings} notifications={notifications} />
+        <UserDropdown settings={settings} />
       </Box>
     </Box>
   )

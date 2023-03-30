@@ -29,7 +29,7 @@ type SortType = 'asc' | 'desc' | null | undefined
 
 const columns: GridColumns = [
   {
-    flex: 0.03,
+    flex: 0.02,
     minWidth: 70,
     field: 'thumbnail_url',
     headerName: 'Video Thumbnail',
@@ -44,7 +44,7 @@ const columns: GridColumns = [
     }
   },
   {
-    flex: 0.04,
+    flex: 0.02,
     minWidth: 90,
     headerName: 'Content Creator',
     field: 'content_creator',

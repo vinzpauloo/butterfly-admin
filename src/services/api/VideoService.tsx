@@ -23,7 +23,7 @@ const VideoService = () => {
       headers: {
         'X-Authorization': 'postman|1',
         'ngrok-skip-browser-warning': '69420', // only for dev
-		Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`
       },
       url: '/works/admin',
       method: 'GET',
@@ -35,7 +35,7 @@ const VideoService = () => {
     return request({
       headers: {
         'Content-Type': 'multipart/form-data',
-		Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`
       },
       url: '/videos',
       method: 'POST',

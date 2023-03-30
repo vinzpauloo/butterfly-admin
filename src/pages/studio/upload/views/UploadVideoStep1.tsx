@@ -323,6 +323,10 @@ const UploadVideoStep1 = (props: Props) => {
           studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
 
           let hasTrialCheck = false
+          let data = JSON.parse(res.getHeader('works'))
+          console.log('data from trial video header', data)
+          const { work_id } = data.data
+          studioContext?.setWorkId(work_id)
 
           if (studioContext?.hasTrial) {
             //start upload another TUS trial video
@@ -336,10 +340,7 @@ const UploadVideoStep1 = (props: Props) => {
             }
 
             var tFile = trailerFile[0]
-            let data = JSON.parse(res.getHeader('works'))
-            console.log('data from trial video header', data)
-            const { work_id } = data.data
-            studioContext?.setWorkId(work_id)
+            
 
             //get the traileHeaderData
             const trialHeaderData = JSON.stringify({
