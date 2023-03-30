@@ -112,8 +112,6 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
   const [responseError, setResponseError] = useState<any>()
 
   const handleFormSubmit = async () => {
-    console.log(formValue)
-
     const userData = {
       data: formValue
     }

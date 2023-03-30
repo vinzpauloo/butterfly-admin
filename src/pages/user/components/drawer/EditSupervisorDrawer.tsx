@@ -56,8 +56,6 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const EditSupervisorDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
 
-  console.log(props.data)
-
   // ** Props
   const { open, toggle } = props
 
@@ -118,10 +116,6 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
     }
   }
 
-  responseError.map(item => {
-    console.log(item)
-  })
-
   const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
 
@@ -153,9 +147,9 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
+            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
               <Typography sx={styles.white}>Supervisor: {props.data.id} </Typography>
-            </Box>
+            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>

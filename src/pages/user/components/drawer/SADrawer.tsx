@@ -149,8 +149,6 @@ const SADrawer = (props: SidebarAddUserType) => {
   }
 
   const handleFormSubmit = async () => {
-    console.log(formValue)
-
     const formData = new FormData()
     for (const key in formValue) {
       const value = formValue[key]
@@ -277,14 +275,14 @@ const SADrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4, justifyContent: 'space-between' }}>
+            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4, justifyContent: 'space-between' }}>
               <Box>
                 <Typography sx={styles.white}>Step 1</Typography>
               </Box>
               <Box>
                 <Typography sx={styles.white}>Create Super Agent</Typography>
               </Box>
-            </Box>
+            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
@@ -401,7 +399,7 @@ const SADrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                <Box
+                {/* <Box
                   sx={{
                     display: 'flex',
                     backgroundColor: '#A459D1',
@@ -416,7 +414,7 @@ const SADrawer = (props: SidebarAddUserType) => {
                   <Box>
                     <Typography sx={styles.white}>Create Site</Typography>
                   </Box>
-                </Box>
+                </Box> */}
 
                 <Box sx={styles.fullWidth}>
                   <TextField

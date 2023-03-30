@@ -31,7 +31,7 @@ export const useUsersTable = () => {
   const getUsers = (params: UsersData) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1'
+        'X-Authorization': 'postman|0'
       },
       url: '/users',
       method: 'GET',
@@ -56,7 +56,7 @@ export const useUsersTable = () => {
   const getAllDataFromCreator = () => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        'X-Authorization': 'postman|0',
         'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: `/users?role=CC`,

@@ -104,8 +104,6 @@ const CCDrawer = (props: SidebarAddUserType) => {
   const [responseError, setResponseError] = useState<any>()
 
   const handleFormSubmit = async () => {
-    console.log(formValue)
-
     const userData = {
       data: formValue
     }
@@ -177,9 +175,9 @@ const CCDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
+            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
               <Typography sx={styles.white}>Content Creator</Typography>
-            </Box>
+            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>

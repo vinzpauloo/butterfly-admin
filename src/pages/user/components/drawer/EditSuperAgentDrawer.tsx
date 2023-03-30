@@ -1,6 +1,9 @@
 // ** React Imports
 import { useRef, useState } from 'react'
 
+// ** Next Imports
+import Image from 'next/image'
+
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography, MenuItem, InputAdornment } from '@mui/material'
 
@@ -45,13 +48,7 @@ interface FormValues {
   note: string
 }
 
-const schema = yup.object().shape({
-  password: yup.string().required('Please enter your desired new password.'),
-  password_confirmation: yup
-    .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Please re-enter your new password to confirm.')
-})
+const schema = yup.object().shape({})
 
 interface SidebarAddUserType {
   open: boolean
@@ -71,8 +68,6 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
-
-  console.log(props.data)
 
   // ** Props
   const { open, toggle } = props
@@ -134,8 +129,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   const handleFormSubmit = async () => {
     const { password, password_confirmation } = formValue
 
-    console.log(`VALUE OF FORM`, formValue)
-
     const filteredFormValues = filterEmptyValues(formValue)
 
     const formData = new FormData()
@@ -194,8 +187,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     }
   }
 
-  console.log(responseError)
-
   const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = event.target
 
@@ -242,7 +233,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
         onSuccess: (data: any) => {
           setCurrencies(data?.data)
           setCurrencyId(data?.data)
-          console.log(`CURRENCIES`, data?.data)
 
           if (data?.data && data?.data.length > 0 && !formValue.currency_id) {
             setFormValue(prevState => ({
@@ -269,26 +259,29 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   const [currencyId, setCurrencyId] = useState()
   const [languageId, setLanguageId] = useState()
 
-  const {} = useQuery({
-    queryKey: ['specificUserPartner', props.userId],
-    queryFn: () =>
-      getSpecificUser({
-        data: {
-          id: props.userId,
-          with: 'partner,sites'
-        }
-      }),
-    onSuccess: (data: any) => {
-      setPartner(data.partner)
-      const site = data.sites.map((item: any) => {
-        return item
-      })
-      setSiteData(site)
-    }
-  })
+  const SitesPartnerQuery = userId => {
+    return useQuery({
+      queryKey: ['specificUserPartner', props.userId],
+      queryFn: () =>
+        getSpecificUser({
+          data: {
+            id: props.userId,
+            with: 'partner,sites'
+          }
+        }),
+      onSuccess: (data: any) => {
+        setPartner(data.partner)
+        const site = data.sites.map((item: any) => {
+          return item
+        })
+        setSiteData(site)
+      }
+    })
+  }
 
-  console.log(`PARTNER`, partner)
-  console.log(`SITE`, siteData[0])
+  if (props.roleId && props.roleId === 4) {
+    const { data, isLoading, isError, error } = SitesPartnerQuery(props.userId)
+  }
 
   return (
     <Drawer
@@ -308,19 +301,20 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4, justifyContent: 'space-between' }}>
+            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4, justifyContent: 'space-between' }}>
               <Box>
                 <Typography sx={styles.white}>Super Agent: {props.userId} </Typography>
               </Box>
               <Box>
                 <Typography sx={styles.white}>{props.data.username}</Typography>
               </Box>
-            </Box>
+            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={partner?.name}
+                    label={`Partner Name: ${partner?.name}`}
+                    defaultValue={partner?.name}
                     variant='outlined'
                     fullWidth
                     {...register('partner_name')}
@@ -333,7 +327,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                 </Box>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={partner?.code}
+                    label={`Partner Code: ${partner?.code}`}
                     variant='outlined'
                     fullWidth
                     {...register('partner_code')}
@@ -346,7 +340,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                 </Box>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={props?.data.username}
+                    label={`Username: ${props?.data.username}`}
                     variant='outlined'
                     fullWidth
                     {...register('username')}
@@ -360,7 +354,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label='Enter Password'
+                    label='Enter New Password'
                     variant='outlined'
                     fullWidth
                     type='password'
@@ -375,7 +369,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label='Re-enter Password'
+                    label='Re-enter New Password'
                     variant='outlined'
                     fullWidth
                     type='password'
@@ -390,7 +384,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={props?.data.mobile}
+                    label={`Mobile: ${props?.data.mobile}`}
                     variant='outlined'
                     fullWidth
                     {...register('mobile')}
@@ -404,7 +398,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={props?.data.email}
+                    label={`Email: ${props?.data.email}`}
                     variant='outlined'
                     fullWidth
                     {...register('email')}
@@ -418,7 +412,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={partner?.note}
+                    label={`Partner Note: ${partner?.note}`}
                     variant='outlined'
                     fullWidth
                     multiline
@@ -432,7 +426,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                <Box
+                {/* <Box
                   sx={{
                     display: 'flex',
                     backgroundColor: '#A459D1',
@@ -447,11 +441,11 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                   <Box>
                     <Typography sx={styles.white}>{props.data.site_name} </Typography>
                   </Box>
-                </Box>
+                </Box> */}
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={siteData[0]?.name}
+                    label={`Site Name: ${siteData[0]?.name}`}
                     variant='outlined'
                     fullWidth
                     {...register('site_name')}
@@ -540,6 +534,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                 </Box>
 
                 <Box sx={styles.fullWidth}>
+                  <img width={340} height={300} src={siteData[0]?.logo} alt='Super Agent Logo' />
                   <Box>
                     <input
                       type='file'
@@ -622,7 +617,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
             </form>
           </Box>
         ) : (
-          <CreatedSuccessful />
+          <CreatedSuccessful update />
         )}
       </Box>
     </Drawer>

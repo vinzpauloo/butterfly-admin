@@ -7,7 +7,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 
 // ** Custom Imports
 import EditSupervisorDrawer from '../drawer/EditSupervisorDrawer'
-import EditSuperAgentDrawer from "@/pages/user/components/drawer/EditSuperAgentDrawer";
+import EditSuperAgentDrawer from '@/pages/user/components/drawer/EditSuperAgentDrawer'
 import EditCreatorDrawer from '../drawer/EditCreatorDrawer'
 
 type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
@@ -60,27 +60,33 @@ const EditBtn = ({ roleId, userId, data }: any) => {
       <Button style={styles.button} onClick={() => handleDrawerToggle(newRole)}>
         <EditOutlinedIcon sx={styles.icon} />
       </Button>
-      <EditSupervisorDrawer
-        data={data}
-        userId={userId}
-        roleId={roleId}
-        open={openDrawer === 'SUPERVISOR'}
-        toggle={() => handleDrawerToggle('SUPERVISOR')}
-      />
-      <EditSuperAgentDrawer
-        data={data}
-        userId={userId}
-        roleId={roleId}
-        open={openDrawer === 'SA'}
-        toggle={() => handleDrawerToggle('SA')}
-      />
-      <EditCreatorDrawer
-        data={data}
-        userId={userId}
-        roleId={roleId}
-        open={openDrawer === 'CC'}
-        toggle={() => handleDrawerToggle('CC')}
-      />
+      {roleId === 2 && (
+        <EditSupervisorDrawer
+          data={data}
+          userId={userId}
+          roleId={roleId}
+          open={openDrawer === 'SUPERVISOR'}
+          toggle={() => handleDrawerToggle('SUPERVISOR')}
+        />
+      )}
+      {roleId === 4 && (
+        <EditSuperAgentDrawer
+          data={data}
+          userId={userId}
+          roleId={roleId}
+          open={openDrawer === 'SA'}
+          toggle={() => handleDrawerToggle('SA')}
+        />
+      )}
+      {roleId === 3 && (
+        <EditCreatorDrawer
+          data={data}
+          userId={userId}
+          roleId={roleId}
+          open={openDrawer === 'CC'}
+          toggle={() => handleDrawerToggle('CC')}
+        />
+      )}
     </>
   )
 }
