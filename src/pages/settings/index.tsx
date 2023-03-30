@@ -1,149 +1,255 @@
-// ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
+import * as yup from 'yup'
+import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
+import { DataGrid } from '@mui/x-data-grid'
+import { useQuery } from '@tanstack/react-query'
 
-// ** MUI Imports
-import { Box, Typography, Button } from '@mui/material'
+import Container from './components/Container'
+import WorkgroupService from '@/services/api/Workgroup'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
 
-// ** Style Imports
+const navData = [
+  {
+    value: 'selection',
+    text: 'selection'
+  },
+  {
+    value: 'latest',
+    text: 'latest'
+  },
+  {
+    value: 'original',
+    text: 'original'
+  },
+  {
+    value: 'homemade',
+    text: 'homemade'
+  },
+  {
+    value: 'hot',
+    text: 'hot'
+  },
+  {
+    value: 'local',
+    text: 'local'
+  },
+  {
+    value: 'pornstar',
+    text: 'pornstar'
+  },
+  {
+    value: 'loli',
+    text: 'loli'
+  },
+  {
+    value: 'av',
+    text: 'av'
+  },
+  {
+    value: 'animation',
+    text: 'animation'
+  }
+]
 
-const WorkGroupings = () => {
-  const router = useRouter()
+const templateData = [
+  {
+    value: 'videoslider',
+    text: 'videoSlider'
+  },
+  {
+    value: 'reelslider',
+    text: 'reelSlider'
+  },
+  {
+    value: 'singlevideo',
+    text: 'singleVideo'
+  },
+  {
+    value: 'singlevideowithgrid',
+    text: 'singleVideoWithGrid'
+  },
+  {
+    value: 'singlevideolist',
+    text: 'singleVideoList'
+  },
+  {
+    value: 'grid',
+    text: 'grid'
+  }
+]
+
+const Header = ({ setOpen, setHeader }: any) => {
+  const [navbar, setNavbar] = useState('')
+  const [template, setTemplate] = useState('')
 
   const handleClick = () => {
-    router.push('/settings/pages/workgroupings')
-  }
-
-  const [groupingTitles, setGroupingTitles] = useState([
-    'Grouping Title',
-    'Grouping Title',
-    'Grouping Title',
-    'Grouping Title',
-    'Grouping Title'
-  ])
-
-  const handleAddGroupingTitle = () => {
-    setGroupingTitles([...groupingTitles, 'New Grouping Title'])
+    setHeader('Add')
+    setOpen(true)
   }
 
   return (
-    <Box sx={styles.container}>
-      <Box sx={styles.gradient}>
-        <Box sx={styles.wrapper}>
-          <Typography sx={styles.title}>Work Grouping Titles</Typography>
-
-          <Box sx={styles.btnContainer}>
-            {groupingTitles.map((title, index) => (
-              <Button key={index} sx={styles.button} onClick={handleClick}>
-                {title}
-              </Button>
-            ))}
-          </Box>
-
-          <Box sx={styles.addContainer}>
-            <Button sx={styles.addBtn} onClick={handleAddGroupingTitle}>
-              Add More
-            </Button>
-          </Box>
+    <Box mb={2}>
+      <Typography variant='h4' component='h4' mb={5}>
+        Workgroup
+      </Typography>
+      <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
+          <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search' size='small' />
+          <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
+            <InputLabel id='demo-simple-select-label'>Navbar</InputLabel>
+            <Select
+              labelId='demo-simple-select-label'
+              id='demo-simple-select'
+              value={navbar}
+              label='Navbar'
+              onChange={e => setNavbar(e.target.value)}
+            >
+              {navData.map((item, index) => (
+                <MenuItem key={index} value={item.value}>
+                  {item.text}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size='small'>
+            <InputLabel id='demo-simple-select-label'>Template</InputLabel>
+            <Select
+              labelId='demo-simple-select-label'
+              id='demo-simple-select'
+              value={template}
+              label='Template'
+              onChange={e => setTemplate(e.target.value)}
+            >
+              {templateData.map((item, index) => (
+                <MenuItem key={index} value={item.value}>
+                  {item.text}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
+        <Button variant='contained' onClick={handleClick}>
+          Add Workgroup
+        </Button>
       </Box>
     </Box>
   )
 }
 
+const Table = ({ data, isLoading, setPage, pageSize, rowCount, setOpen, setHeader }: any) => {
+  const columnData = [
+    {
+      field: 'title',
+      headerName: 'Title',
+      width: 650
+    },
+    {
+      field: 'navbar',
+      headerName: 'Navbar',
+      width: 300
+    },
+    {
+      field: 'template_id',
+      headerName: 'Template ID',
+      width: 300
+    },
+    {
+      field: 'action',
+      headerName: 'Action',
+      width: 100,
+      renderCell: (params: any) => {
+        return (
+          <Box>
+            <Button
+              onClick={() => {
+                setHeader('Edit')
+                setOpen(true)
+              }}
+            >
+              <EditOutlinedIcon sx={styles.icon} />
+            </Button>
+          </Box>
+        )
+      }
+    }
+  ]
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage + 1)
+  }
+
+  return (
+    <DataGrid
+      rowCount={rowCount}
+      pageSize={pageSize}
+      paginationMode='server'
+      getRowId={row => row._id}
+      checkboxSelection={false}
+      disableSelectionOnClick
+      autoHeight
+      loading={isLoading}
+      rows={data}
+      columns={columnData}
+      pagination
+      onPageChange={handlePageChange}
+    />
+  )
+}
+
+function index() {
+  const { getWorkgroup } = WorkgroupService()
+  const [data, setData] = useState([])
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [rowCount, setRowCount] = useState(0)
+  const [open, setOpen] = useState(false)
+  const [header, setHeader] = useState('')
+
+  const { isLoading } = useQuery({
+    queryKey: ['workgroup', page],
+    queryFn: () => getWorkgroup({ page: page }),
+    onSuccess: data => {
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+      console.log('@@@', data)
+    },
+    onError: err => {
+      console.log('workgroup error: ', err)
+    }
+  })
+
+  return (
+    <>
+      <Container>
+        <Header setOpen={setOpen} setHeader={setHeader} />
+        <Table
+          data={data}
+          isLoading={isLoading}
+          setPage={setPage}
+          pageSize={pageSize}
+          rowCount={rowCount}
+          setOpen={setOpen}
+          setHeader={setHeader}
+        />
+      </Container>
+      <WorkGroupDrawer open={open} setOpen={setOpen} header={header} />
+    </>
+  )
+}
+
 const styles = {
-  container: {
-    margin: {
-      xs: '0 0 0 0',
-      md: '0 0 0 0',
-      lg: '2px 200px 2px 200px'
-    }
-  },
-  gradient: {
-    background:
-      'radial-gradient(circle at 49.81% 51.23%, #00BDD4, #00AABE 5%, #007D8C 18%, #005761 31%, #00373E 45%, #001F23 58%, #000E0F 72%, #000304 86%, #000000 100%, #E21C25 0%, #BE181F 8%, #8C1117 21%, #610C10 33%, #3E080A 46%, #FFD700 58%, #230406 60%, #0F0203 73%, #040001 86%, #FF4500 85%, #000000 100%, #FCEE21 3%, #DDD11D 10%, #A49A15 24%, #726B0F 38%, #49450A 51%, #292705 65%, #121102 77%, #050401 89%, #000000 100%)',
-    position: 'relative',
-    height: '80dvh'
-  },
-  wrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10
-  },
-  title: {
-    textTransform: 'uppercase',
-    marginTop: 10,
-    color: '#FFF',
-    textAlign: 'center',
-    fontWeight: '500',
-    fontSize: 20
-  },
-  btnContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 10,
-    overflowY: 'auto',
-    maxHeight: '50vh',
-    scrollbarWidth: 'thin',
-    '&::-webkit-scrollbar': {
-      width: '4px'
-    },
-    '&::-webkit-scrollbar-track': {
-      background: 'rgba(0,0,0,0.1)'
-    },
-    '&::-webkit-scrollbar-thumb': {
-      background: 'rgba(255,255,255,0.3)',
-      borderRadius: '20px'
-    }
-  },
   button: {
-    backgroundColor: '#FFF',
-    width: '50%',
-    height: {
-      xs: '40px',
-      md: '40px',
-      lg: '50px'
-    },
-    textTransform: 'uppercase',
-    fontSize: {
-      xs: 12,
-      sm: 15,
-      lg: 18
-    },
-    color: '#000',
-    '&:hover': {
-      color: '#FFF',
-      backgroundColor: '#9747FF'
-    }
+    background: 'transparent',
+    border: 'none'
   },
-  addContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: 5
-  },
-  addBtn: {
-    backgroundColor: '#FFF',
-    width: {
-      xs: '35%',
-      md: '35%',
-      lg: '25%'
-    },
-    borderRadius: '30px',
-    color: '#000',
-    textTransform: 'uppercase',
-    fontSize: {
-      xs: 12,
-      sm: 15,
-      lg: 18
-    },
-    '&:hover': {
-      color: '#FFF',
-      backgroundColor: '#9747FF'
-    }
+  icon: {
+    color: '#98A9BC',
+    fontSize: 30
   }
 }
 
-export default WorkGroupings
+export default index
