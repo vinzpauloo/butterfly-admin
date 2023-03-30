@@ -5,7 +5,7 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 
 // ** MUI Imports
-import { Drawer, Button, TextField, IconButton, Typography, MenuItem, InputAdornment } from '@mui/material'
+import { Drawer, Button, TextField, IconButton, Typography, MenuItem, InputAdornment, InputLabel } from '@mui/material'
 
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
@@ -177,6 +177,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
           // Re-fetches UserTable and CSV exportation
           queryClient.invalidateQueries({ queryKey: ['allUsers'] })
           queryClient.invalidateQueries({ queryKey: ['UsersTableCSV'] })
+          queryClient.invalidateQueries({ queryKey: ['specificUserPartner'] })
         }, 1500)
       } catch (e: any) {
         const {
@@ -313,42 +314,50 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Partner Name: ${partner?.name}`}
-                    defaultValue={partner?.name}
+                    label='Partner Name'
                     variant='outlined'
                     fullWidth
                     {...register('partner_name')}
                     error={!!errors.partner_name}
                     helperText={errors.partner_name?.message}
-                    value={formValue.partner_name}
+                    value={formValue.partner_name === '' ? partner?.name : formValue.partner_name}
                     onChange={handleFormInputChange}
                     name='partner_name'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Partner Code: ${partner?.code}`}
+                    label='Partner Code'
                     variant='outlined'
                     fullWidth
                     {...register('partner_code')}
                     error={!!errors.partner_code}
                     helperText={errors.partner_code?.message}
-                    value={formValue.partner_code}
+                    value={formValue.partner_code === '' ? partner?.code : formValue.partner_code}
                     onChange={handleFormInputChange}
                     name='partner_code'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Username: ${props?.data.username}`}
+                    label='Username'
                     variant='outlined'
                     fullWidth
                     {...register('username')}
                     error={!!errors.username}
                     helperText={errors.username?.message}
-                    value={formValue.username}
+                    value={formValue.username === '' ? props?.data.username : formValue.username}
                     onChange={handleFormInputChange}
                     name='username'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
@@ -384,35 +393,41 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Mobile: ${props?.data.mobile}`}
+                    label='mobile'
                     variant='outlined'
                     fullWidth
                     {...register('mobile')}
                     error={!!errors.mobile}
                     helperText={errors.mobile?.message}
-                    value={formValue.mobile}
+                    value={formValue.mobile === '' ? props?.data.mobile : formValue.mobile}
                     onChange={handleFormInputChange}
                     name='mobile'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Email: ${props?.data.email}`}
+                    label='email'
                     variant='outlined'
                     fullWidth
                     {...register('email')}
                     error={!!errors.email}
                     helperText={errors.email?.message}
-                    value={formValue.email}
+                    value={formValue.email === '' ? props?.data.mobile : formValue.email}
                     onChange={handleFormInputChange}
                     name='email'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Partner Note: ${partner?.note}`}
+                    label='Partner Note'
                     variant='outlined'
                     fullWidth
                     multiline
@@ -420,9 +435,12 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('partner_note')}
                     error={!!errors.partner_note}
                     helperText={errors.partner_note?.message}
-                    value={formValue.partner_note}
+                    value={formValue.partner_note === '' ? partner?.note : formValue.partner_note}
                     onChange={handleFormInputChange}
-                    name='partner_note'
+                    name='email'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
@@ -445,15 +463,18 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={`Site Name: ${siteData[0]?.name}`}
+                    label='Site Name'
                     variant='outlined'
                     fullWidth
                     {...register('site_name')}
                     error={!!errors.site_name}
                     helperText={errors.site_name?.message}
-                    value={formValue.site_name}
+                    value={formValue.site_name === '' ? siteData[0]?.name : formValue.site_name}
                     onChange={handleFormInputChange}
                     name='site_name'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
@@ -527,9 +548,12 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('amount')}
                     error={!!errors.amount}
                     helperText={errors.amount?.message}
-                    value={formValue.amount}
+                    value={formValue.amount === '' ? siteData[0]?.security_funds_balance : formValue.amount}
                     onChange={handleFormInputChange}
                     name='amount'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
@@ -569,7 +593,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={siteData[0]?.description}
+                    label='Description'
                     variant='outlined'
                     fullWidth
                     multiline
@@ -577,15 +601,18 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('description')}
                     error={!!errors.description}
                     helperText={errors.description?.message}
-                    value={formValue.description}
+                    value={formValue.description === '' ? siteData[0]?.description : formValue.description}
                     onChange={handleFormInputChange}
                     name='description'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={props?.data.note}
+                    label='Note'
                     variant='outlined'
                     fullWidth
                     multiline
@@ -593,9 +620,12 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('note')}
                     error={!!errors.note}
                     helperText={errors.note?.message}
-                    value={formValue.note}
+                    value={formValue.note === '' ? props?.data.note : formValue.note}
                     onChange={handleFormInputChange}
                     name='note'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
