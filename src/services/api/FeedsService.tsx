@@ -26,20 +26,20 @@ const FeedsService = () => {
     })
   }
 
-  const getFeaturedFeed = (params : IGetFeaturedFeedsParams) => {
+  const getFeeds = (params : IGetFeaturedFeedsParams) => {
     return request({
       headers: {
         'X-Authorization': 'postman|1',
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/feature/feeds',
+      url: '/feeds',
       method: 'GET',
       params: params
     })
   }
 
-  return { uploadFeed, getFeaturedFeed }
+  return { uploadFeed, getFeeds }
 }
 
 export default FeedsService

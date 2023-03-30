@@ -11,7 +11,6 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import IconButton from '@mui/material/IconButton'
 
-
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -32,8 +31,7 @@ type Inputs = {
   title: string
   string_story: string
   tags: string
-  location: string
-  photo?: File
+ 'photo[]'?: any
 }
 
 //maximum Images that can be uploaded
@@ -44,13 +42,22 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
 
   // ** Hooks
+  const {
+    register,
+    getValues,
+    setValue,
+    formState: { errors }
+  } = useForm<Inputs>()
+
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 9,
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg', '.gif']
     },
     onDrop: (acceptedFiles: File[]) => {
+      let imageFiles = acceptedFiles.map((file: File) => Object.assign(file))
       setMultipleImages(acceptedFiles.map((file: File) => Object.assign(file)))
+      setValue('photo[]', imageFiles)
     },
     onDropRejected: () => {
       toast.error(`You can only upload ${limitFiles} images`, {
@@ -59,14 +66,9 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
   })
 
+
   //use api service
   const { uploadFeed } = FeedsService()
-
-  const {
-    register,
-    getValues,
-    formState: { errors }
-  } = useForm<Inputs>()
 
   const handleCancel = () => {
     onClose()
@@ -77,12 +79,12 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
     const fd = createFormData(getValues())
     setIsLoading(true)
-    uploadFeed({ formData: fd }).then(data => {
-      console.log('data', data)
-      toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
-      onClose()
-      setIsLoading(false)
-    })
+    // uploadFeed({ formData: fd }).then(data => {
+    //   console.log('data', data)
+    //   toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
+    //   onClose()
+    //   setIsLoading(false)
+    // })
   }
 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
@@ -92,6 +94,10 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     formData.append('user_id', '25')
 
     Object.keys(newsfeedFormData).forEach(key => {
+
+      //check if data has photo
+
+
       if (key == 'tags') {
         formData.append('tags[]', newsfeedFormData[key])
       } else {
@@ -103,7 +109,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   const renderFilePreview = (file: any) => {
     if (file.type.startsWith('image')) {
-      return <img width={80} height={80} alt={file.name} src={URL.createObjectURL(file as any)} />
+      return <img width={80} height={85} alt={file.name} src={URL.createObjectURL(file as any)} />
     } else {
       return <Icon icon='mdi:file-document-outline' />
     }
@@ -113,6 +119,14 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const uploadedFiles = multipleImages
     const filtered = uploadedFiles.filter((i: any) => i.name !== file.name)
     setMultipleImages([...filtered])
+    let currentImages = [...filtered]
+    if( !currentImages.length ) {
+      console.log('no images')
+      setValue('photo[]', null)
+    } else {
+      setValue('photo[]', [...filtered])
+    }
+    
   }
 
   const handleRemoveAllFiles = () => {
@@ -124,7 +138,10 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       <Box className='file-details'>
         <div className='file-preview'>{renderFilePreview(file)}</div>
       </Box>
-      <IconButton onClick={() => handleRemoveFile(file)}>
+      <IconButton
+        onClick={() => handleRemoveFile(file)}
+        sx={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'rgba(231, 227, 252, 0.09)' }}
+      >
         <Icon icon='mdi:close' fontSize={20} />
       </IconButton>
     </ListItem>
@@ -153,7 +170,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 sx={styles.fullWidth}
                 {...register('string_story')}
               />
-              <TextField label='Location' sx={styles.fullWidth} {...register('location')} />
               <TextField label='Tagging' sx={styles.fullWidth} {...register('tags')} />
             </Box>
 
@@ -173,7 +189,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
               {multipleImages.length ? (
                 <>
-                  <List sx={{display:'grid', gridTemplateColumns: 'repeat(3,1fr)' , padding:0}}>{fileList}</List>
+                  <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', padding: 0 }}>{fileList}</List>
                   <div className='buttons'>
                     <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
                       Remove All
