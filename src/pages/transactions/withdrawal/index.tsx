@@ -1,16 +1,9 @@
 import React from 'react'
 
-import TabLists from '@/pages/transactions/components/TabLists'
-import Container from '@/pages/transactions//components/Container'
+import Transaction from '@/pages/transactions'
 
-type Props = {}
-
-function index({}: Props) {
-  return (
-    <Container>
-      <TabLists />
-    </Container>
-  )
+function index() {
+  return <Transaction />
 }
 
 export default index

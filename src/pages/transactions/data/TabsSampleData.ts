@@ -1,5 +1,5 @@
 const TabsSampleData = {
-  DONATIONS: {
+  donations: {
     rowData: [
       {
         id: 1,
@@ -112,7 +112,7 @@ const TabsSampleData = {
       { field: 'lastUpdate', headerName: 'Last Update', width: 193 }
     ]
   },
-  WITHDRAWAL: {
+  withdrawal: {
     rowData: [
       {
         id: 1,
@@ -236,7 +236,7 @@ const TabsSampleData = {
       { field: 'approvedBy', headerName: 'Approved By', width: 169 }
     ]
   },
-  COMMISSIONS: {
+  commissions: {
     rowData: [
       {
         id: 1,
@@ -349,7 +349,7 @@ const TabsSampleData = {
       { field: 'notes', headerName: 'Notes', width: 193 }
     ]
   },
-  SECURITY_FUNDS: {
+  'security-funds': {
     rowData: [
       {
         id: 1,

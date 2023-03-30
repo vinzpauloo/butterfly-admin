@@ -2,8 +2,9 @@ import React from 'react'
 
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
-import { Box, OutlinedInput, Tab } from '@mui/material'
+import { Box, Button, OutlinedInput, Tab } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import { useRouter } from 'next/router'
 
 import TabListData from '@/pages/transactions/data/TabLists'
 
@@ -28,12 +29,19 @@ const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
 }))
 
 function TabLists({ activeTab, setActiveTab }: any) {
+  const router = useRouter()
   const handleChange = (event: any, value: string) => {
     setActiveTab(value)
   }
 
+  const haveAddMore = activeTab === 'security-funds'
+
+  const handleClick = (value: string) => {
+    router.push(`/transactions/${value}`)
+  }
+
   return (
-    <Box display={'flex'} alignItems='flex-start' justifyContent={'space-between'}>
+    <Box display={'flex'} alignItems='flex-end' justifyContent={'space-between'}>
       <TabContext value={activeTab}>
         <TabList
           variant='scrollable'
@@ -43,6 +51,7 @@ function TabLists({ activeTab, setActiveTab }: any) {
         >
           {TabListData.map((item, index) => (
             <Tab
+              onClick={() => handleClick(item.value)}
               key={index}
               value={item.value}
               label={
@@ -55,7 +64,14 @@ function TabLists({ activeTab, setActiveTab }: any) {
           ))}
         </TabList>
       </TabContext>
-      <OutlinedInput placeholder='Search' size='small' />
+      <Box display={'flex'} flexDirection='column'>
+        <OutlinedInput style={{ marginBottom: '10px' }} placeholder='Search' size='small' />
+        {haveAddMore ? (
+          <Button style={{ marginBottom: '10px' }} size='small' variant='contained'>
+            Add More
+          </Button>
+        ) : null}
+      </Box>
     </Box>
   )
 }
