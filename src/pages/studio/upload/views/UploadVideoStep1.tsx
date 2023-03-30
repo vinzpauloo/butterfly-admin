@@ -340,7 +340,6 @@ const UploadVideoStep1 = (props: Props) => {
             }
 
             var tFile = trailerFile[0]
-            
 
             //get the traileHeaderData
             const trialHeaderData = JSON.stringify({

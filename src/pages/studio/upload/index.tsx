@@ -16,6 +16,7 @@ import LoadingScreen from './views/LoadingScreen'
 import VideoVisibility from './views/VideoVisibility'
 import UploadVideoPublish from './views/UploadVideoPublish'
 import VideosListTable from './views/VideosList'
+import UploadAlbum from './views/UploadAlbum'
 
 // ** Styled Components
 const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
@@ -40,6 +41,7 @@ const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
 export enum DisplayPage {
   MainPage,
   UploadVideoStep1,
+  UploadAlbum,
   UploadNewsfeedsStep1,
   LoadingScreen,
   VideoVisibility,
@@ -90,14 +92,14 @@ export type StudioContextType = {
   publishDate: PublishSchedule
   setPublishDate: React.Dispatch<React.SetStateAction<PublishSchedule>>
   hasTrial: boolean
-  setHasTrial: React.Dispatch<React.SetStateAction<boolean>>,
+  setHasTrial: React.Dispatch<React.SetStateAction<boolean>>
   //the loading indicators below could be moved to another context
   workProgress: number
   setWorkProgress: React.Dispatch<React.SetStateAction<number>>
   trialProgress: number
-  setTrialProgress: React.Dispatch<React.SetStateAction<number>>,
-  workId : number | null,
-  setWorkId : React.Dispatch<React.SetStateAction<number | null>>
+  setTrialProgress: React.Dispatch<React.SetStateAction<number>>
+  workId: number | null
+  setWorkId: React.Dispatch<React.SetStateAction<number | null>>
 }
 
 //** DATA */
@@ -136,6 +138,7 @@ const UploadContent = () => {
   const PageDisplay = () => {
     if (displayPage == DisplayPage.MainPage) return <UploadMenu />
     if (displayPage == DisplayPage.UploadVideoStep1) return <UploadVideoStep1 />
+    if (displayPage == DisplayPage.UploadAlbum) return <UploadAlbum />
     if (displayPage == DisplayPage.UploadNewsfeedsStep1) return <UploadNewsfeedsStep1 />
     if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
     if (displayPage == DisplayPage.VideoVisibility) return <VideoVisibility />
@@ -175,7 +178,7 @@ const UploadContent = () => {
   )
 }
 
-UploadContent.contentHeightFixed = true
+UploadContent.contentHeightFixed = false
 UploadContent.getLayout = (page: ReactNode) => (
   <UserLayoutNoPadding contentHeightFixed={UploadContent.contentHeightFixed}>{page}</UserLayoutNoPadding>
 )
