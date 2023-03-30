@@ -180,46 +180,32 @@ const FileUploaderSingle = () => {
     }
   })
 
-  const handleLinkClick = (event: SyntheticEvent) => {
-    event.preventDefault()
-  }
-
   const img = files.map((file: FileProp) => (
     <img
       key={file.name}
       alt={file.name}
       className='single-file-image'
       src={URL.createObjectURL(file as any)}
-      width={100}
-      height={100}
+      style={{ maxWidth: '500px', maxHeight: '60dvh' }}
     />
   ))
-  //sx={{ ...styles.albumContent  }}
 
   return (
     <Box {...getRootProps({ className: 'dropzone' })} sx={acceptedFiles.length ? { height: 450 } : {}}>
       <input {...getInputProps()} />
-      <Box sx={{ ...styles.albumContent }}>
-        <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
-        <Box sx={{ display: 'flex', flexDirection: 'column', textAlign: ['center', 'center', 'inherit'] }}>
-          <Typography sx={{ ...styles.title }} variant='h6'>
-            Album Cover
-          </Typography>
+      {files.length === 0 ? (
+        <Box sx={{ ...styles.albumContent }}>
+          <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
+          <Box sx={{ display: 'flex', flexDirection: 'column', textAlign: ['center', 'center', 'inherit'] }}>
+            <Typography sx={{ ...styles.title }} variant='h6'>
+              Album Cover
+            </Typography>
+          </Box>
         </Box>
-      </Box>
-      {files.length ? img : null}
+      ) : (
+        <Box sx={{ ...styles.uploadedImage }}>{img}</Box>
+      )}
     </Box>
-
-    //   <Box  sx={acceptedFiles.length ? { height: 450 } : {}}>
-    //         <Box sx={{ ...styles.albumImage }}>
-    //           <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
-    //         </Box>
-    //         <Box>
-    //           <Typography sx={{ ...styles.title }} variant='h6'>
-    //             Album Cover
-    //           </Typography>
-    //         </Box>
-    //       </Box>
   )
 }
 
