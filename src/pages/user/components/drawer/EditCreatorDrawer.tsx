@@ -2,10 +2,11 @@
 import { useState } from 'react'
 
 // ** MUI Imports
+import Box, { BoxProps } from '@mui/material/Box'
 import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
 
+// ** Style Imports
 import { styled } from '@mui/material/styles'
-import Box, { BoxProps } from '@mui/material/Box'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -71,7 +72,11 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
     handleSubmit,
     formState: { errors }
   } = useForm<FormValues>({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
+    defaultValues: {
+      password: '*******',
+      password_confirmation: '*******'
+    }
   })
 
   const { updateUser } = useUsersTable()
@@ -147,13 +152,20 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
-              <Typography sx={styles.white}>Supervisor: {props.data.id} </Typography>
-            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
-                  <TextField label={props?.data.username} variant='outlined' fullWidth name='username' disabled />
+                  <TextField
+                    label='Username'
+                    variant='outlined'
+                    fullWidth
+                    name='username'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    value={props?.data.username}
+                    disabled
+                  />
                 </Box>
                 <Box sx={styles.fullWidth}>
                   <TextField
@@ -164,9 +176,11 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                     {...register('password')}
                     error={!!errors.password}
                     helperText={errors.password?.message}
-                    value={formValue.password}
                     onChange={handleFormInputChange}
                     name='password'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
@@ -178,29 +192,55 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                     {...register('password_confirmation')}
                     error={!!errors.password_confirmation}
                     helperText={errors.password_confirmation?.message}
-                    value={formValue.password_confirmation}
                     onChange={handleFormInputChange}
                     name='password_confirmation'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField label={props?.data.mobile} variant='outlined' fullWidth name='mobile' disabled />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <TextField label={props?.data.email} variant='outlined' fullWidth name='email' disabled />
+                  <TextField
+                    label='Mobile'
+                    variant='outlined'
+                    fullWidth
+                    name='mobile'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    disabled
+                    value={props?.data.mobile}
+                  />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label={props?.data.note}
+                    label='Email'
+                    variant='outlined'
+                    fullWidth
+                    name='email'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    disabled
+                    value={props?.data.email}
+                  />
+                </Box>
+
+                <Box sx={styles.fullWidth}>
+                  <TextField
+                    label='Note'
                     variant='outlined'
                     fullWidth
                     multiline
                     rows={4}
                     name='note'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                     disabled
+                    value={props?.data.note}
                   />
                 </Box>
 

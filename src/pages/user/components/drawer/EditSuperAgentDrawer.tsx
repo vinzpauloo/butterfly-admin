@@ -188,7 +188,9 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
       username: props?.data.username,
       mobile: props?.data.mobile,
       email: props?.data.email,
-      note: props?.data.note
+      note: props?.data.note,
+      password: '*******',
+      password_confirmation: '*******'
     }
   })
 
@@ -331,7 +333,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label='Partner Name'
+                    label='Company Name'
                     variant='outlined'
                     fullWidth
                     {...register('partner_name')}
@@ -346,7 +348,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                 </Box>
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label='Partner Code'
+                    label='Company Code'
                     variant='outlined'
                     fullWidth
                     {...register('partner_code')}
@@ -384,9 +386,11 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('password')}
                     error={!!errors.password}
                     helperText={errors.password?.message}
-                    value={formValue.password}
                     onChange={handleFormInputChange}
                     name='password'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
@@ -399,15 +403,17 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     {...register('password_confirmation')}
                     error={!!errors.password_confirmation}
                     helperText={errors.password_confirmation?.message}
-                    value={formValue.password_confirmation}
                     onChange={handleFormInputChange}
                     name='password_confirmation'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label='mobile'
+                    label='Mobile'
                     variant='outlined'
                     fullWidth
                     {...register('mobile')}
@@ -423,7 +429,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label='email'
+                    label='Email'
                     variant='outlined'
                     fullWidth
                     {...register('email')}
