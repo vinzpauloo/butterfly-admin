@@ -16,7 +16,8 @@ export const CreateAccount = () => {
   const createUser = (params: UsersData) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1'
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: '/users',
       method: 'POST',
@@ -27,7 +28,8 @@ export const CreateAccount = () => {
   const getLanguages = () => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1'
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: '/languages',
       method: 'GET'
@@ -37,7 +39,8 @@ export const CreateAccount = () => {
   const getCurrency = () => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1'
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420' // only for dev
       },
       url: '/currencies',
       method: 'GET'

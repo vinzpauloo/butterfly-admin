@@ -7,8 +7,10 @@ interface IFeedsPostParams {
 }
 
 interface IGetFeaturedFeedsParams {
-  site_id : number
+  story_feeds_only : boolean,
+
 }
+
 
 const FeedsService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -20,7 +22,7 @@ const FeedsService = () => {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/feeds/upload',
+      url: '/feeds/admin/upload',
       method: 'POST',
       data: params.formData
     })
@@ -33,11 +35,12 @@ const FeedsService = () => {
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/feeds',
+      url: '/feeds/admin',
       method: 'GET',
       params: params
     })
   }
+  
 
   return { uploadFeed, getFeeds }
 }
