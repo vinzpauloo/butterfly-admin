@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import * as yup from 'yup'
 import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
@@ -80,9 +80,55 @@ const templateData = [
   }
 ]
 
-const Header = ({ setOpen, setHeader }: any) => {
+const useDebounce = (value: any, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
+const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, setHeader }: any) => {
+  const { getSearchWorkgroups } = WorkgroupService()
+  const [search_value, setTitle] = useState('')
   const [navbar, setNavbar] = useState('')
-  const [template, setTemplate] = useState('')
+  const [template_id, setTemplate] = useState('')
+
+  const debouncedTitle = useDebounce(search_value, 1000)
+
+  const filterParams = () => {
+    const title = !!search_value && { search_value }
+    const nav = !!navbar && { navbar }
+    const template = !!template_id && { template_id }
+
+    return { ...title, ...nav, ...template }
+  }
+
+  const {} = useQuery({
+    queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page],
+    queryFn: () =>
+      getSearchWorkgroups({
+        page: page,
+        search_by: 'title',
+        select: '_id,navbar,title,template_id',
+        ...filterParams()
+      }),
+    onSuccess: data => {
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+    },
+    enabled: !!debouncedTitle || !!template_id || !!navbar
+  })
 
   const handleClick = () => {
     setHeader('Add')
@@ -96,7 +142,14 @@ const Header = ({ setOpen, setHeader }: any) => {
       </Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
-          <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search' size='small' />
+          <OutlinedInput
+            fullWidth
+            style={{ marginRight: 10 }}
+            placeholder='Search'
+            size='small'
+            value={search_value}
+            onChange={e => setTitle(e.target.value)}
+          />
           <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
             <InputLabel id='demo-simple-select-label'>Navbar</InputLabel>
             <Select
@@ -118,7 +171,7 @@ const Header = ({ setOpen, setHeader }: any) => {
             <Select
               labelId='demo-simple-select-label'
               id='demo-simple-select'
-              value={template}
+              value={template_id}
               label='Template'
               onChange={e => setTemplate(e.target.value)}
             >
@@ -138,7 +191,7 @@ const Header = ({ setOpen, setHeader }: any) => {
   )
 }
 
-const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setOpen, setHeader }: any) => {
+const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setOpen, setHeader, setEditID }: any) => {
   const columnData = [
     {
       field: 'title',
@@ -166,6 +219,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
               onClick={() => {
                 setHeader('Edit')
                 setOpen(true)
+                setEditID(params.id)
               }}
             >
               <EditOutlinedIcon sx={styles.icon} />
@@ -212,6 +266,7 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const [open, setOpen] = useState(false)
   const [header, setHeader] = useState('')
+  const [editID, setEditID] = useState('')
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['workgroup', page, pageSize],
@@ -221,7 +276,6 @@ function index() {
       setRowCount(data.total)
       setPageSize(data.per_page)
       setPage(data.current_page)
-      console.log('@@@', data)
     },
     onError: err => {
       console.log('workgroup error: ', err)
@@ -231,7 +285,15 @@ function index() {
   return (
     <>
       <Container>
-        <Header setOpen={setOpen} setHeader={setHeader} />
+        <Header
+          setData={setData}
+          page={page}
+          setPage={setPage}
+          setPageSize={setPageSize}
+          setRowCount={setRowCount}
+          setOpen={setOpen}
+          setHeader={setHeader}
+        />
         <Table
           data={data}
           isLoading={isLoading || isRefetching}
@@ -241,9 +303,10 @@ function index() {
           rowCount={rowCount}
           setOpen={setOpen}
           setHeader={setHeader}
+          setEditID={setEditID}
         />
       </Container>
-      <WorkGroupDrawer open={open} setOpen={setOpen} header={header} />
+      <WorkGroupDrawer open={open} setOpen={setOpen} header={header} editID={editID} />
     </>
   )
 }

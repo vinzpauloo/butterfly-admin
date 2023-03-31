@@ -95,7 +95,7 @@ const Header = ({ setOpen, setHeader }: any) => {
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
           <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search Creator' size='small' />
           <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search Title' size='small' />
-          <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search Tag' size='small' />
+          <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search Category' size='small' />
         </Box>
       </Box>
     </Box>
@@ -146,9 +146,9 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
     },
     {
       flex: 0.04,
-      field: 'tag',
+      field: 'category',
       minWidth: 80,
-      headerName: 'Tag',
+      headerName: 'Category',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params?.row?.tags?.join(', ')}

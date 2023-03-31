@@ -28,6 +28,7 @@ import { useForm } from 'react-hook-form'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import ThumbnailUploader from './ThumbnailUploader'
+import { useQueryClient } from '@tanstack/react-query'
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -76,6 +77,9 @@ const DialogEdit = ({ params }: DialogEditProps) => {
   const [resultMessage, setResultMessage] = React.useState<string>('Success')
   const [thumb, setThumb] = React.useState<File[] | null>([])
 
+  // ** Queries
+  const queryClient = useQueryClient()
+
   const {
     register,
     getValues,
@@ -96,6 +100,7 @@ const DialogEdit = ({ params }: DialogEditProps) => {
       console.log('data', data)
       setIsLoading(false)
       setIsDialogOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['videosList'] })
     })
   }
 

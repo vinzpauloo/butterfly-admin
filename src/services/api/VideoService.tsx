@@ -7,6 +7,8 @@ interface IVideoParams {
     sort?: 'created_at'
     sort_by?: 'desc' | 'asc' | null | undefined
     with?: 'user'
+    page?: number
+    paginate?: number
   }
   token?: string
 }

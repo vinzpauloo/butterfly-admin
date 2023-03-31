@@ -2,14 +2,9 @@
 import React from 'react'
 
 import TableVideos from './table/TableVideos'
+// import TableVideos from './table/TableVideosOld'
 
 const VideosList = () => {
-
-  React.useEffect( ()=>{
-    //initial state load
-
-  },[])
-
   return (
     <>
       <TableVideos />
