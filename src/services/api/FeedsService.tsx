@@ -6,9 +6,9 @@ interface IFeedsPostParams {
   formData: FormData
 }
 
-interface IGetFeaturedFeedsParams {
-  story_feeds_only : boolean,
-
+interface IGetFeedsParams {
+  story_feeds_only? : boolean,
+  with? : string
 }
 
 
@@ -28,7 +28,7 @@ const FeedsService = () => {
     })
   }
 
-  const getFeeds = (params : IGetFeaturedFeedsParams) => {
+  const getFeeds = (params : IGetFeedsParams) => {
     return request({
       headers: {
         'X-Authorization': 'postman|1',

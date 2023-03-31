@@ -22,14 +22,7 @@ import VideoService from '@/services/api/VideoService'
 // ** Utils import
 import formatDate from '@/utils/formatDate'
 
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
 type SortType = 'asc' | 'desc' | null | undefined
-
-const handleModal = (open : boolean) => {
-  return open
-}
 
 const columns: GridColumns = [
   {

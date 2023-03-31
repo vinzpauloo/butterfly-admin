@@ -96,8 +96,8 @@ const NewsFeedList = (props: Props) => {
 
       <Box sx={{ borderRadius: '5px', maxWidth: '90%', marginInline: 'auto', padding: '1em' }}>
         <Box sx={{ display: 'flex', columnGap: '1rem', marginBottom: '1.5rem' }}>
-          <Button variant='contained' color='inherit'>SEARCH BY CONTENT CREATOR</Button>
-          <Button variant='contained' color='inherit'>SORT BY DATE</Button>
+          <Button variant='contained'>SEARCH BY CONTENT CREATOR</Button>
+          <Button variant='contained'>SORT BY DATE</Button>
         </Box>
         {renderContent()}
       </Box>
