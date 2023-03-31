@@ -29,7 +29,6 @@ interface ModalProps {
 }
 
 type Inputs = {
-  title: string
   string_story: string
   tags: string
   'images[]'?: any
@@ -241,7 +240,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         ) : (
           <>
             <Box sx={styles.textContainer}>
-              <TextField label='Title' sx={styles.fullWidth} {...register("title", { required: true, minLength: 5 })}  />
               <TextField
                 label='Description'
                 minRows={10}
