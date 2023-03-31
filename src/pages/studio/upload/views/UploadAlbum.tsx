@@ -1,14 +1,15 @@
 // ** React imports
-import React, { useState, SyntheticEvent } from 'react'
+import React, { Fragment, useEffect, useState, SyntheticEvent } from 'react'
 
 // ** Next Images
 import Image from 'next/image'
 
 // ** MUI Imports
-import { Box, Typography, TextField, Link, TypographyProps } from '@mui/material'
+import { Box, Button, Typography, TextField, Link, TypographyProps, List, ListItem, IconButton } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
-// ** Services Import
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
@@ -33,12 +34,26 @@ import {
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable'
 
-// @dnd-kit requires string 'id' on sortable elements
-interface SortablePhoto extends Photo {
-  id: string
-}
+//* Context Import
+import { StudioContext, DisplayPage } from '..'
 
-type SortablePhotoProps = RenderPhotoProps<SortablePhoto>
+// Styled components
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: '4px',
+  '& .MuiOutlinedInput-notchedOutline': {
+    display: 'none'
+  }
+}))
+
+interface FileProp {
+  name: string
+  type: string
+  size: number
+}
+interface SortablePhoto extends Photo {
+  id: string // @dnd-kit requires string 'id' on sortable elements
+}
 
 type PhotoFrameProps = SortablePhotoProps & {
   overlay?: boolean
@@ -47,6 +62,8 @@ type PhotoFrameProps = SortablePhotoProps & {
   attributes?: Partial<React.HTMLAttributes<HTMLDivElement>>
   listeners?: Partial<React.HTMLAttributes<HTMLDivElement>>
 }
+
+type SortablePhotoProps = RenderPhotoProps<SortablePhoto>
 
 const PhotoFrame = React.memo(
   React.forwardRef<HTMLDivElement, PhotoFrameProps>((props, ref) => {
@@ -110,18 +127,6 @@ function SortablePhotoFrame(props: SortablePhotoProps & { activeIndex?: number }
   )
 }
 
-//* Context Import
-import { StudioContext, DisplayPage } from '..'
-
-// Styled components
-const CustomTextField = styled(TextField)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: '4px',
-  '& .MuiOutlinedInput-notchedOutline': {
-    display: 'none'
-  }
-}))
-
 // ** Data
 const modelImages = [
   { src: '/images/misc/profilePhoto.jpg', width: 800, height: 600 },
@@ -132,38 +137,8 @@ const modelImages = [
   { src: '/images/misc/profilePhoto5.png', width: 800, height: 600 },
   { src: '/images/misc/grid/1.jpg', width: 800, height: 600 },
   { src: '/images/misc/grid/2.jpg', width: 800, height: 600 },
-  { src: '/images/misc/grid/3.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto3.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto4.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto5.png', width: 800, height: 600 }
+  { src: '/images/misc/grid/3.jpg', width: 800, height: 600 }
 ]
-
-interface FileProp {
-  name: string
-  type: string
-  size: number
-}
-
-// Styled component for the upload image inside the dropzone area
-const Img = styled('img')(({ theme }) => ({
-  [theme.breakpoints.up('md')]: {
-    marginRight: theme.spacing(15.75)
-  },
-  [theme.breakpoints.down('md')]: {
-    marginBottom: theme.spacing(4)
-  },
-  [theme.breakpoints.down('sm')]: {
-    width: 160
-  }
-}))
-
-// Styled component for the heading inside the dropzone area
-const HeadingTypography = styled(Typography)<TypographyProps>(({ theme }) => ({
-  marginBottom: theme.spacing(5),
-  [theme.breakpoints.down('sm')]: {
-    marginBottom: theme.spacing(4)
-  }
-}))
 
 const FileUploaderSingle = () => {
   // ** State
@@ -196,34 +171,161 @@ const FileUploaderSingle = () => {
       {files.length === 0 ? (
         <Box sx={{ ...styles.albumContent }}>
           <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
-          <Box sx={{ display: 'flex', flexDirection: 'column', textAlign: ['center', 'center', 'inherit'] }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              textAlign: ['center', 'center', 'inherit'],
+              alignItems: 'center'
+            }}
+          >
             <Typography sx={{ ...styles.title }} variant='h6'>
               Album Cover
             </Typography>
+            <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
           </Box>
         </Box>
       ) : (
-        <Box sx={{ ...styles.uploadedImage }}>{img}</Box>
+        <Box>{img}</Box>
       )}
     </Box>
+  )
+}
+
+// MULTIPLE FILE UPLOAD START...
+const FileUploaderMultiple = ({ onFilesChange }: any) => {
+  // ** State
+  const [files, setFiles] = useState<File[]>([])
+
+  useEffect(() => {
+    if (onFilesChange) {
+      onFilesChange(files)
+    }
+  }, [files, onFilesChange])
+
+  // ** Hooks
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: (acceptedFiles: File[]) => {
+      setFiles(prevFiles => [...prevFiles, ...acceptedFiles.map((file: File) => Object.assign(file))])
+    }
+  })
+
+  const renderFilePreview = (file: FileProp) => {
+    if (file.type.startsWith('image')) {
+      return <img width={100} height={100} alt={file.name} src={URL.createObjectURL(file as any)} />
+    } else {
+      return <Icon icon='mdi:file-document-outline' />
+    }
+  }
+
+  const handleRemoveFile = (file: FileProp) => {
+    const uploadedFiles = files
+    const filtered = uploadedFiles.filter((i: FileProp) => i.name !== file.name)
+    setFiles([...filtered])
+  }
+
+  const fileList = files.map((file: FileProp) => (
+    <ListItem key={file.name}>
+      <div className='file-details'>
+        <div className='file-preview'>{renderFilePreview(file)}</div>
+        <div>
+          <Typography className='file-name'>{file.name}</Typography>
+          <Typography className='file-size' variant='body2'>
+            {Math.round(file.size / 100) / 10 > 1000
+              ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
+              : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
+          </Typography>
+        </div>
+      </div>
+      <IconButton onClick={() => handleRemoveFile(file)}>
+        <Icon icon='mdi:close' fontSize={20} />
+      </IconButton>
+    </ListItem>
+  ))
+
+  const handleLinkClick = (event: SyntheticEvent) => {
+    event.preventDefault()
+  }
+
+  const handleRemoveAllFiles = () => {
+    setFiles([])
+  }
+
+  console.log(`FILE LIST`, fileList)
+
+  return (
+    <Fragment>
+      <div {...getRootProps({ className: 'dropzone' })}>
+        <input {...getInputProps()} />
+        <Box sx={{ ...styles.multiUpload }}>
+          <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
+          <Typography sx={{ ...styles.title }} variant='h6'>
+            Multiple Upload
+          </Typography>
+          <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
+        </Box>
+        {/* {!files.length && (
+          <Box sx={{ ...styles.multiUpload }}>
+            <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
+            <Typography sx={{ ...styles.title }} variant='h6'>
+              Multiple Upload
+            </Typography>
+          </Box>
+        )} */}
+      </div>
+      {/* {files.length ? (
+        <Fragment>
+          <List
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              overflow: 'auto',
+              maxWidth: '35dvw'
+            }}
+          >
+            {fileList}
+          </List>
+          <Box sx={{ display: 'flex', gap: 5 }}>
+            <Button variant='contained' onClick={handleRemoveAllFiles}>
+              Remove All
+            </Button>
+            <Button variant='contained'>Upload Files</Button>
+          </Box>
+        </Fragment>
+      ) : null} */}
+    </Fragment>
   )
 }
 
 const UploadAlbum = () => {
   /* States */
   const studioContext = React.useContext(StudioContext)
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+
+  const handleFilesChange = (fileList: File[]) => {
+    setUploadedFiles(fileList)
+  }
+
+  const [photos, setPhotos] = useState<SortablePhoto[]>([])
+
+  useEffect(() => {
+    setPhotos(
+      uploadedFiles.map((file: File) => ({
+        ...file,
+        id: file.name,
+        src: URL.createObjectURL(file as any),
+        width: 1,
+        height: 1
+      }))
+    )
+  }, [uploadedFiles])
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
 
-  const [photos, setPhotos] = React.useState(
-    (modelImages as Photo[]).map(photo => ({
-      ...photo,
-      id: photo.key || photo.src
-    }))
-  )
   const renderedPhotos = React.useRef<{ [key: string]: SortablePhotoProps }>({})
   const [activeId, setActiveId] = React.useState<UniqueIdentifier | null>(null)
   const activeIndex = activeId ? photos.findIndex(photo => photo.id === activeId) : undefined
@@ -274,32 +376,18 @@ const UploadAlbum = () => {
       <Box sx={{ ...styles.uploadWrapper }}>
         {/* ALBUM COVER CONTAINER */}
         <Box sx={{ ...styles.albumWrapper }}>
-          {/* <Box sx={{ ...styles.albumContent }}>
-            <Box sx={{ ...styles.albumImage }}>
-              <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
-            </Box>
-            <Box>
-              <Typography sx={{ ...styles.title }} variant='h6'>
-                Album Cover
-              </Typography>
-            </Box>
-          </Box> */}
           <FileUploaderSingle />
         </Box>
 
         {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
         <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
-          <Box sx={{ ...styles.multiUpload }}>
-            <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
-            <Typography sx={{ ...styles.title }} variant='h6'>
-              Multiple Upload
-            </Typography>
+          <Box sx={{ ...styles.multiUploadWrapper }}>
+            <FileUploaderMultiple onFilesChange={handleFilesChange} />
           </Box>
 
           {/* SCROLLABLE PHOTO ALBUM */}
           <Box sx={{ ...styles.photoAlbumWrapper }}>
             <Box sx={{ ...styles.scrollFunc }}>
-              {/* <PhotoAlbum layout='masonry' photos={photos} /> */}
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -308,7 +396,7 @@ const UploadAlbum = () => {
               >
                 <SortableContext items={photos}>
                   <div style={{ margin: 30 }}>
-                    <PhotoAlbum photos={photos} layout='rows' spacing={30} padding={20} renderPhoto={renderPhoto} />
+                    <PhotoAlbum photos={photos} layout='columns' spacing={10} padding={5} renderPhoto={renderPhoto} />
                   </div>
                 </SortableContext>
                 <DragOverlay>{activeId && <PhotoFrame overlay {...renderedPhotos.current[activeId]} />}</DragOverlay>
@@ -417,7 +505,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center'
   },
-  multiUpload: {
+  multiUploadWrapper: {
     width: '100%',
     height: '50%',
     display: 'flex',
@@ -426,6 +514,12 @@ const styles = {
     alignItems: 'center',
     borderBottom: '1px solid black',
     gap: 5
+  },
+  multiUpload: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column'
   },
   photoAlbumWrapper: {
     width: '100%',
