@@ -1,5 +1,5 @@
 // ** React imports
-import React, { Fragment, useState, SyntheticEvent } from 'react'
+import React, { Fragment, useEffect, useState, SyntheticEvent } from 'react'
 
 // ** Next Images
 import Image from 'next/image'
@@ -137,10 +137,7 @@ const modelImages = [
   { src: '/images/misc/profilePhoto5.png', width: 800, height: 600 },
   { src: '/images/misc/grid/1.jpg', width: 800, height: 600 },
   { src: '/images/misc/grid/2.jpg', width: 800, height: 600 },
-  { src: '/images/misc/grid/3.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto3.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto4.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto5.png', width: 800, height: 600 }
+  { src: '/images/misc/grid/3.jpg', width: 800, height: 600 }
 ]
 
 const FileUploaderSingle = () => {
@@ -174,10 +171,18 @@ const FileUploaderSingle = () => {
       {files.length === 0 ? (
         <Box sx={{ ...styles.albumContent }}>
           <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
-          <Box sx={{ display: 'flex', flexDirection: 'column', textAlign: ['center', 'center', 'inherit'] }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              textAlign: ['center', 'center', 'inherit'],
+              alignItems: 'center'
+            }}
+          >
             <Typography sx={{ ...styles.title }} variant='h6'>
               Album Cover
             </Typography>
+            <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
           </Box>
         </Box>
       ) : (
@@ -188,16 +193,17 @@ const FileUploaderSingle = () => {
 }
 
 // MULTIPLE FILE UPLOAD START...
-const FileUploaderMultiple = () => {
+const FileUploaderMultiple = ({ onFilesChange }: any) => {
   // ** State
   const [files, setFiles] = useState<File[]>([])
 
+  useEffect(() => {
+    if (onFilesChange) {
+      onFilesChange(files)
+    }
+  }, [files, onFilesChange])
+
   // ** Hooks
-  // const { getRootProps, getInputProps } = useDropzone({
-  //   onDrop: (acceptedFiles: File[]) => {
-  //     setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
-  //   }
-  // })
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
       setFiles(prevFiles => [...prevFiles, ...acceptedFiles.map((file: File) => Object.assign(file))])
@@ -245,42 +251,29 @@ const FileUploaderMultiple = () => {
     setFiles([])
   }
 
+  console.log(`FILE LIST`, fileList)
+
   return (
-    // <Fragment>
-    //   <div {...getRootProps({ className: 'dropzone' })}>
-    //     <input {...getInputProps()} />
-    //     <Box sx={{ ...styles.multiUpload }}>
-    //       <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
-    //       <Typography sx={{ ...styles.title }} variant='h6'>
-    //         Multiple Upload
-    //       </Typography>
-    //     </Box>
-    //   </div>
-    //   {files.length ? (
-    //     <Fragment>
-    //       <List>{fileList}</List>
-    //       <div className='buttons'>
-    //         <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
-    //           Remove All
-    //         </Button>
-    //         <Button variant='contained'>Upload Files</Button>
-    //       </div>
-    //     </Fragment>
-    //   ) : null}
-    // </Fragment>
     <Fragment>
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
-        {!files.length && (
+        <Box sx={{ ...styles.multiUpload }}>
+          <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
+          <Typography sx={{ ...styles.title }} variant='h6'>
+            Multiple Upload
+          </Typography>
+          <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
+        </Box>
+        {/* {!files.length && (
           <Box sx={{ ...styles.multiUpload }}>
             <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
             <Typography sx={{ ...styles.title }} variant='h6'>
               Multiple Upload
             </Typography>
           </Box>
-        )}
+        )} */}
       </div>
-      {files.length ? (
+      {/* {files.length ? (
         <Fragment>
           <List
             style={{
@@ -300,7 +293,7 @@ const FileUploaderMultiple = () => {
             <Button variant='contained'>Upload Files</Button>
           </Box>
         </Fragment>
-      ) : null}
+      ) : null} */}
     </Fragment>
   )
 }
@@ -308,18 +301,31 @@ const FileUploaderMultiple = () => {
 const UploadAlbum = () => {
   /* States */
   const studioContext = React.useContext(StudioContext)
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+
+  const handleFilesChange = (fileList: File[]) => {
+    setUploadedFiles(fileList)
+  }
+
+  const [photos, setPhotos] = useState<SortablePhoto[]>([])
+
+  useEffect(() => {
+    setPhotos(
+      uploadedFiles.map((file: File) => ({
+        ...file,
+        id: file.name,
+        src: URL.createObjectURL(file as any),
+        width: 1,
+        height: 1
+      }))
+    )
+  }, [uploadedFiles])
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
 
-  const [photos, setPhotos] = React.useState(
-    (modelImages as Photo[]).map(photo => ({
-      ...photo,
-      id: photo.key || photo.src
-    }))
-  )
   const renderedPhotos = React.useRef<{ [key: string]: SortablePhotoProps }>({})
   const [activeId, setActiveId] = React.useState<UniqueIdentifier | null>(null)
   const activeIndex = activeId ? photos.findIndex(photo => photo.id === activeId) : undefined
@@ -376,11 +382,7 @@ const UploadAlbum = () => {
         {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
         <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
           <Box sx={{ ...styles.multiUploadWrapper }}>
-            {/* <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
-            <Typography sx={{ ...styles.title }} variant='h6'>
-              Multiple Upload
-            </Typography> */}
-            <FileUploaderMultiple />
+            <FileUploaderMultiple onFilesChange={handleFilesChange} />
           </Box>
 
           {/* SCROLLABLE PHOTO ALBUM */}
