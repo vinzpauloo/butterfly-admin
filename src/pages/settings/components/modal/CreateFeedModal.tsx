@@ -95,11 +95,10 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   }
 
   const handlePublish = () => {
-  
     const formData = createFormData(getValues())
     const { video } = getValues()
 
-    if ( video != undefined ) {
+    if (video != undefined) {
       console.log('there is a video')
 
       const feedHeaderData = {
@@ -108,16 +107,16 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         video_type: 'feed_video'
       }
 
-      const customOnProgress = (str : string) => {
+      const customOnProgress = (str: string) => {
         console.log('string', str)
       }
-      const customOnAfterResponse = (req : any ,res : any) => {
+      const customOnAfterResponse = (req: any, res: any) => {
         console.log('response', res)
         let xmlhttpreq = req.getUnderlyingObject()
         console.log('xml', xmlhttpreq)
         console.log('xmlhttpreq get all', xmlhttpreq.getAllResponseHeaders())
 
-        if (xmlhttpreq.getAllResponseHeaders().indexOf('feed_id') != -1) { 
+        if (xmlhttpreq.getAllResponseHeaders().indexOf('feed_id') != -1) {
           // save to feed with video
           console.log('SAVE HERE!!!!!!!!')
 
@@ -136,15 +135,12 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             setIsLoading(false)
             reset()
           }) //end uploadFeed
-
         }
-
       }
 
       //Start TUS Uplaod
-      const { upload } = TUSService(video, { customOnProgress,customOnAfterResponse }, feedHeaderData)
+      const { upload } = TUSService(video, { customOnProgress, customOnAfterResponse }, feedHeaderData)
       upload.start()
-
     } else {
       // HAS NO VIDEO - continue upload Feed
 
@@ -155,13 +151,11 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         setIsLoading(false)
         reset()
       })
-
     }
 
     console.log(getValues())
 
     setIsLoading(true)
-    
   }
 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
@@ -212,7 +206,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   }
 
   const fileList = multipleImages.map((file: any) => (
-    <ListItem key={file.name} sx={{position: 'relative'}}>
+    <ListItem key={file.name} sx={{ position: 'relative' }}>
       <Box className='file-details'>
         <div className='file-preview'>{renderFilePreview(file)}</div>
       </Box>
@@ -226,7 +220,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   ))
 
   return (
-    <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'lg'}>
+    <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'sm'}>
       <DialogContent sx={{ ...styles.dialogContent, bgcolor: theme => theme.customBflyColors.primary }}>
         <Box>
           <DialogTitle color={theme => theme.customBflyColors.primaryTextContrast} sx={styles.title}>
@@ -241,7 +235,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           <>
             <Box sx={styles.textContainer}>
               <TextField
-                label='Description'
+                label='Story'
                 minRows={10}
                 multiline={true}
                 sx={styles.fullWidth}
@@ -251,34 +245,36 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             </Box>
 
             <Box sx={styles.buttonContainer}>
-              
               <div {...getVidRootProps({ className: 'dropzone' })}>
-              <input {...getVidInputProps()} />
+                <input {...getVidInputProps()} />
                 <Box sx={styles.button}>
-                  <Image src='/images/icons/upload-video.png' alt='upload video' width={100} height={100} />
+                  <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
                   <Button sx={styles.upload}>Upload Video</Button>
-                  { (feedVideo.length !=0) ? <p>Selected 1 video</p> : null }
+                  {feedVideo.length != 0 ? <p>Selected 1 video</p> : null}
                 </Box>
               </div>
 
               <div {...getRootProps({ className: 'dropzone' })}>
                 <input {...getInputProps()} />
                 <Box sx={styles.button}>
-                  <Image src='/images/icons/upload-photo.png' alt='upload video' width={100} height={100} />
+                  <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
                   <Button sx={styles.upload}>Upload Photo</Button>
                 </Box>
               </div>
 
-              {multipleImages.length ? (
-                <>
-                  <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', padding: 0 }}>{fileList}</List>
-                  <div className='buttons'>
-                    <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
-                      Remove All
-                    </Button>
-                  </div>
-                </>
-              ) : null}
+              <Box>
+                {multipleImages.length ? (
+                  <>
+                    <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
+                    <div className='buttons' style={{textAlign:'center'}}>
+                      <Button sx={{marginInline:'auto'}} color='error' variant='outlined' onClick={handleRemoveAllFiles}>
+                        Remove All
+                      </Button>
+                    </div>
+                  </>
+                ) : null}
+              </Box>
+
             </Box>
 
             <Box sx={styles.bottomBtnContainer}>
@@ -320,7 +316,7 @@ const styles = {
   textContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 2
+    gap: 10
   },
   fullWidth: {
     width: '100%'

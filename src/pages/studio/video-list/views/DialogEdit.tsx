@@ -15,8 +15,12 @@ import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import CircularProgress from '@mui/material/CircularProgress'
+import { styled } from '@mui/system'
 
 import VideoService from '@/services/api/VideoService'
+
+// ** Third party components
+import ReactPlayer from 'react-player'
 
 // ** React Hook Form
 import { useForm } from 'react-hook-form'
@@ -31,6 +35,21 @@ const Transition = forwardRef(function Transition(
 ) {
   return <Fade ref={ref} {...props} />
 })
+
+// ** Custom Layout Style Components
+const VideoBox = styled(Box)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 1fr)',
+  gap: '.5rem',
+  position: 'relative',
+  paddingTop: '56.25%' /* Player ratio: 100 / (1280 / 720) */,
+
+  '& .reactPlayer': {
+    position: 'absolute',
+    top: 0,
+    left: 0
+  }
+}))
 
 type DialogEditProps = {
   params: {
@@ -60,7 +79,6 @@ const DialogEdit = ({ params }: DialogEditProps) => {
   const {
     register,
     getValues,
-    watch,
     formState: { errors }
   } = useForm<FormInputs>()
 
@@ -74,12 +92,11 @@ const DialogEdit = ({ params }: DialogEditProps) => {
   }
 
   const callResultNotification = () => {
-    updateVideoByWorkId({ formData: getFormData() })
-        .then( data => {
-            console.log('data',data)
-            setIsLoading(false)
-            setIsDialogOpen(false)
-        })
+    updateVideoByWorkId({ formData: getFormData() }).then(data => {
+      console.log('data', data)
+      setIsLoading(false)
+      setIsDialogOpen(false)
+    })
   }
 
   const getFormData = () => {
@@ -144,11 +161,23 @@ const DialogEdit = ({ params }: DialogEditProps) => {
             <Grid item sm={4} xs={12}>
               <Grid container spacing={5}>
                 <Grid item xs={12}>
-                  <ThumbnailUploader thumb={params.thumbnail_url} />
+                  <ThumbnailUploader
+                    thumb={params.thumbnail_url.replace('http://localhost/', `http://192.168.50.9/`)}
+                  />
                 </Grid>
 
                 <Grid item xs={12}>
                   <Box>
+                    
+                    <VideoBox>
+                      <ReactPlayer 
+                        className='reactPlayer' 
+                        width='100%' 
+                        height='100%' 
+                        controls={true} 
+                        url='https://customer-rg8qf1aaic6bwg8l.cloudflarestream.com/93e450b81f8530acefacbd33133d28c0/manifest/video.m3u8' />
+                    </VideoBox>
+
                     <a style={{ textDecoration: 'none' }} target='_blank' href={params.trial_video_hls}>
                       Video Link
                     </a>

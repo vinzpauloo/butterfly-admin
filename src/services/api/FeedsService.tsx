@@ -8,7 +8,9 @@ interface IFeedsPostParams {
 
 interface IGetFeedsParams {
   story_feeds_only? : boolean,
-  with? : string
+  video_only? : boolean,
+  with? : string,
+  page? : number
 }
 
 
