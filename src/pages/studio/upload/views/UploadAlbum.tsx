@@ -5,7 +5,7 @@ import React, { Fragment, useEffect, useState, SyntheticEvent } from 'react'
 import Image from 'next/image'
 
 // ** MUI Imports
-import { Box, Button, Typography, TextField, Link, TypographyProps, List, ListItem, IconButton } from '@mui/material'
+import { Box, Typography, TextField, ListItem, IconButton } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
@@ -33,6 +33,7 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable'
+import { v4 as uuidv4 } from 'uuid'
 
 //* Context Import
 import { StudioContext, DisplayPage } from '..'
@@ -126,19 +127,6 @@ function SortablePhotoFrame(props: SortablePhotoProps & { activeIndex?: number }
     />
   )
 }
-
-// ** Data
-const modelImages = [
-  { src: '/images/misc/profilePhoto.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto1.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto2.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto3.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto4.jpg', width: 800, height: 600 },
-  { src: '/images/misc/profilePhoto5.png', width: 800, height: 600 },
-  { src: '/images/misc/grid/1.jpg', width: 800, height: 600 },
-  { src: '/images/misc/grid/2.jpg', width: 800, height: 600 },
-  { src: '/images/misc/grid/3.jpg', width: 800, height: 600 }
-]
 
 const FileUploaderSingle = () => {
   // ** State
@@ -251,11 +239,9 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
     setFiles([])
   }
 
-  console.log(`FILE LIST`, fileList)
-
   return (
     <Fragment>
-      <div {...getRootProps({ className: 'dropzone' })}>
+      <Box {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
         <Box sx={{ ...styles.multiUpload }}>
           <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
@@ -264,36 +250,7 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
           </Typography>
           <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
         </Box>
-        {/* {!files.length && (
-          <Box sx={{ ...styles.multiUpload }}>
-            <Image src='/images/studio/butterfly_file_upload.png' width={100} height={100} alt='Multiple Upload' />
-            <Typography sx={{ ...styles.title }} variant='h6'>
-              Multiple Upload
-            </Typography>
-          </Box>
-        )} */}
-      </div>
-      {/* {files.length ? (
-        <Fragment>
-          <List
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              overflow: 'auto',
-              maxWidth: '35dvw'
-            }}
-          >
-            {fileList}
-          </List>
-          <Box sx={{ display: 'flex', gap: 5 }}>
-            <Button variant='contained' onClick={handleRemoveAllFiles}>
-              Remove All
-            </Button>
-            <Button variant='contained'>Upload Files</Button>
-          </Box>
-        </Fragment>
-      ) : null} */}
+      </Box>
     </Fragment>
   )
 }
@@ -309,11 +266,14 @@ const UploadAlbum = () => {
 
   const [photos, setPhotos] = useState<SortablePhoto[]>([])
 
+  console.log(`UPLOADED FILES`, uploadedFiles)
+  console.log(`PHOTOS@@@`, photos)
+
   useEffect(() => {
     setPhotos(
       uploadedFiles.map((file: File) => ({
         ...file,
-        id: file.name,
+        id: uuidv4(),
         src: URL.createObjectURL(file as any),
         width: 1,
         height: 1
@@ -388,19 +348,37 @@ const UploadAlbum = () => {
           {/* SCROLLABLE PHOTO ALBUM */}
           <Box sx={{ ...styles.photoAlbumWrapper }}>
             <Box sx={{ ...styles.scrollFunc }}>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext items={photos}>
-                  <div style={{ margin: 30 }}>
-                    <PhotoAlbum photos={photos} layout='columns' spacing={10} padding={5} renderPhoto={renderPhoto} />
-                  </div>
-                </SortableContext>
-                <DragOverlay>{activeId && <PhotoFrame overlay {...renderedPhotos.current[activeId]} />}</DragOverlay>
-              </DndContext>
+              {photos.length === 0 ? (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    mt: 15
+                  }}
+                >
+                  <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
+                  <Typography sx={{ textTransform: 'uppercase' }} variant='h6'>
+                    Gallery
+                  </Typography>
+                  <Typography>No photos uploaded.</Typography>
+                </Box>
+              ) : (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={photos}>
+                    <div style={{ margin: 30 }}>
+                      <PhotoAlbum photos={photos} layout='rows' spacing={10} padding={5} renderPhoto={renderPhoto} />
+                    </div>
+                  </SortableContext>
+                  <DragOverlay>{activeId && <PhotoFrame overlay {...renderedPhotos.current[activeId]} />}</DragOverlay>
+                </DndContext>
+              )}
             </Box>
           </Box>
         </Box>
@@ -527,7 +505,7 @@ const styles = {
     padding: 2
   },
   scrollFunc: {
-    overflowY: 'scroll',
+    overflowY: 'auto',
     height: '100%',
     width: '100%',
     padding: 2
