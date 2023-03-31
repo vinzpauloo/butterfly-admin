@@ -149,34 +149,73 @@ const FileUploaderSingle = () => {
       alt={file.name}
       className='single-file-image'
       src={URL.createObjectURL(file as any)}
-      style={{ maxWidth: '500px', maxHeight: '60dvh' }}
+      style={{ objectFit: 'cover', width: '100%', height: '100%' }}
     />
   ))
 
   return (
-    <Box {...getRootProps({ className: 'dropzone' })} sx={acceptedFiles.length ? { height: 450 } : {}}>
-      <input {...getInputProps()} />
-      {files.length === 0 ? (
-        <Box sx={{ ...styles.albumContent }}>
-          <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
+    <>
+      <Box sx={{ ...styles.albumWrapper, position: 'relative' }}>
+        {files.length > 0 && (
           <Box
+            {...getRootProps({ className: 'dropzone' })}
             sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
               display: 'flex',
-              flexDirection: 'column',
-              textAlign: ['center', 'center', 'inherit'],
-              alignItems: 'center'
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              cursor: 'pointer',
+              zIndex: 1
             }}
           >
-            <Typography sx={{ ...styles.title }} variant='h6'>
-              Album Cover
-            </Typography>
-            <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
+            <input {...getInputProps()} />
+            <Typography sx={{ color: '#fff', fontSize: 14 }}>Click to change image</Typography>
           </Box>
-        </Box>
-      ) : (
-        <Box>{img}</Box>
-      )}
-    </Box>
+        )}
+        {files.length === 0 ? (
+          <Box {...getRootProps({ className: 'dropzone' })} sx={{ ...styles.albumContent }}>
+            <input {...getInputProps()} />
+
+            <Box
+              sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  textAlign: ['center', 'center', 'inherit'],
+                  alignItems: 'center'
+                }}
+              >
+                <Image src='/images/studio/butterfly_file_upload.png' alt='SINGLE FILE LOAD' width={100} height={100} />
+                <Typography sx={{ ...styles.title }} variant='h6'>
+                  Album Cover
+                </Typography>
+                <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
+              </Box>
+            </Box>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              ...styles.albumWrapper,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              height: '100%'
+            }}
+          >
+            {img}
+          </Box>
+        )}
+      </Box>
+    </>
   )
 }
 
@@ -331,9 +370,7 @@ const UploadAlbum = () => {
       {/* UPLOAD CONTAINER */}
       <Box sx={{ ...styles.uploadWrapper }}>
         {/* ALBUM COVER CONTAINER */}
-        <Box sx={{ ...styles.albumWrapper }}>
-          <FileUploaderSingle />
-        </Box>
+        <FileUploaderSingle />
 
         {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
         <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
