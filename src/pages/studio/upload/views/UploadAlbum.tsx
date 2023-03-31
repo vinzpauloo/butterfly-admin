@@ -231,13 +231,13 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
     </ListItem>
   ))
 
-  const handleLinkClick = (event: SyntheticEvent) => {
-    event.preventDefault()
-  }
+  // const handleLinkClick = (event: SyntheticEvent) => {
+  //   event.preventDefault()
+  // }
 
-  const handleRemoveAllFiles = () => {
-    setFiles([])
-  }
+  // const handleRemoveAllFiles = () => {
+  //   setFiles([])
+  // }
 
   return (
     <Fragment>
@@ -259,27 +259,11 @@ const UploadAlbum = () => {
   /* States */
   const studioContext = React.useContext(StudioContext)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [photos, setPhotos] = useState<SortablePhoto[]>([])
 
   const handleFilesChange = (fileList: File[]) => {
     setUploadedFiles(fileList)
   }
-
-  const [photos, setPhotos] = useState<SortablePhoto[]>([])
-
-  console.log(`UPLOADED FILES`, uploadedFiles)
-  console.log(`PHOTOS@@@`, photos)
-
-  useEffect(() => {
-    setPhotos(
-      uploadedFiles.map((file: File) => ({
-        ...file,
-        id: uuidv4(),
-        src: URL.createObjectURL(file as any),
-        width: 1,
-        height: 1
-      }))
-    )
-  }, [uploadedFiles])
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
@@ -321,6 +305,18 @@ const UploadAlbum = () => {
     [activeIndex]
   )
 
+  useEffect(() => {
+    setPhotos(
+      uploadedFiles.map((file: File) => ({
+        ...file,
+        id: uuidv4(),
+        src: URL.createObjectURL(file as any),
+        width: 1,
+        height: 1
+      }))
+    )
+  }, [uploadedFiles])
+
   return (
     <BasicCard sx={{ ...styles.container }}>
       <Box>
@@ -349,17 +345,9 @@ const UploadAlbum = () => {
           <Box sx={{ ...styles.photoAlbumWrapper }}>
             <Box sx={{ ...styles.scrollFunc }}>
               {photos.length === 0 ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    mt: 15
-                  }}
-                >
+                <Box sx={{ ...styles.placeholder }}>
                   <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
-                  <Typography sx={{ textTransform: 'uppercase' }} variant='h6'>
+                  <Typography textTransform='uppercase' variant='h6'>
                     Gallery
                   </Typography>
                   <Typography>No photos uploaded.</Typography>
@@ -509,6 +497,13 @@ const styles = {
     height: '100%',
     width: '100%',
     padding: 2
+  },
+  placeholder: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    mt: 15
   },
 
   // Button Container
