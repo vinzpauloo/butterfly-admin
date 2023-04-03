@@ -126,6 +126,7 @@ const NewsFeedList = (props: Props) => {
         <Box>
           <TextField
             sx={{
+              display : 'none', //search box
               '& input': {
                 padding: '.5em 1em'
               },

@@ -25,10 +25,6 @@ type AllVideoProps = {
   handleFeedParams?: any
 }
 
-const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden: boolean }) => {
-  return <PerfectScrollbar options={{ wheelPropagation: false }}>{children}</PerfectScrollbar>
-}
-
 const videoOnlyParams = { video_only: true, with: 'user' }
 
 const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
@@ -41,7 +37,6 @@ const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
   if (data) {
     return (
       <Box sx={{ display: 'flex' }}>
-        <ScrollWrapper hidden={true}>
           <Grid container spacing={10}>
             {data.data &&
               data.data?.map((story: IFeedStory) => (
@@ -72,7 +67,6 @@ const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
                 </Grid>
               ))}
           </Grid>
-        </ScrollWrapper>
       </Box>
     )
   }

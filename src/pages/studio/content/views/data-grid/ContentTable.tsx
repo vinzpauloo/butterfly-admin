@@ -38,13 +38,18 @@ const renderClient = (params: GridRenderCellParams) => {
   const color = states[stateNum]
 
   if (row.avatar.length) {
-    return <CustomAvatar src={`/images/avatars/cc/${row.avatar}`} sx={{ borderRadius:'10px', mr: 3, width: '5.875rem', height: '3rem' }} />
+    return (
+      <CustomAvatar
+        src={`/images/avatars/cc/${row.avatar}`}
+        sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
+      />
+    )
   } else {
     return (
       <CustomAvatar
         skin='light'
         color={color as ThemeColor}
-        sx={{ borderRadius:'10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
+        sx={{ borderRadius: '10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
       >
         {getInitials(row.full_name ? row.full_name : 'John Doe')}
       </CustomAvatar>
@@ -54,10 +59,15 @@ const renderClient = (params: GridRenderCellParams) => {
 
 const statusObj: StatusObj = {
   1: { title: 'pending', color: 'warning' },
-  2: { title: 'declined', color: 'error' },
+  2: { title: 'declined', color: 'error' }
 }
 
-const ContentTable = () => {
+interface IContentTable {
+  isLoading?: boolean
+  data?: any
+}
+
+const ContentTable = ({ isLoading, data }: IContentTable) => {
   // ** States
   const [pageSize, setPageSize] = useState<number>(7)
   const [hideNameColumn, setHideNameColumn] = useState(false)
@@ -68,15 +78,11 @@ const ContentTable = () => {
       minWidth: 150,
       field: 'video_thumbnail',
       headerName: 'Video Thumbnail',
-      align:'center',
-      headerAlign:'center',
+      align: 'center',
+      headerAlign: 'center',
       hide: hideNameColumn,
       renderCell: (params: GridRenderCellParams) => {
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {renderClient(params)}
-          </Box>
-        )
+        return <Box sx={{ display: 'flex', alignItems: 'center' }}>img</Box>
       }
     },
     {
@@ -92,7 +98,7 @@ const ContentTable = () => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {row.full_name}
+                full name
               </Typography>
             </Box>
           </Box>
@@ -106,7 +112,7 @@ const ContentTable = () => {
       field: 'title',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.title}
+          title
         </Typography>
       )
     },
@@ -117,7 +123,7 @@ const ContentTable = () => {
       headerName: 'Video URL',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.email}
+          url
         </Typography>
       )
     },
@@ -128,7 +134,7 @@ const ContentTable = () => {
       headerName: 'Category',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          Multiple Categories
+          category
         </Typography>
       )
     },
@@ -139,7 +145,7 @@ const ContentTable = () => {
       headerName: 'Last Update',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.last_update}
+          last update
         </Typography>
       )
     },
@@ -148,20 +154,12 @@ const ContentTable = () => {
       minWidth: 140,
       field: 'status',
       headerName: 'Status',
-      align:'center',
-      headerAlign:'center',
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
         const status = statusObj[params.row.status]
 
-        return (
-          <CustomChip
-            size='small'
-            skin='light'
-            color={status.color}
-            label={status.title}
-            sx={{  '&':{ padding: '1em 1em',borderRadius: '3px !important' },'& .MuiChip-label': { textTransform: 'capitalize' } }}
-          />
-        )
+        return <Typography>Status</Typography>
       }
     },
     {
@@ -169,31 +167,52 @@ const ContentTable = () => {
       minWidth: 50,
       field: 'actions',
       headerName: '',
-      align:'center',
+      align: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        return (
-          <ContentDialog param={params.row} />
-        )
+        // return <ContentDialog param={params.row} />
+        return 'icon'
       }
     }
   ]
 
-  return (
-    <Card>
-      <CardHeader
-        title='THE STUDIO PAGE - CONTENT APPROVAL'
-      />
-      <DataGrid
-        autoHeight
-        rows={rows}
-        columns={columns}
-        pageSize={pageSize}
-        disableSelectionOnClick
-        rowsPerPageOptions={[7, 10, 25, 50]}
-        onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-      />
-    </Card>
-  )
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader title='THE STUDIO PAGE - CONTENT APPROVAL' />
+        <DataGrid
+          loading={isLoading}
+          autoHeight
+          rows={{}}
+          columns={columns}
+          pageSize={pageSize}
+          disableSelectionOnClick
+          rowsPerPageOptions={[7, 10, 25, 50]}
+          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+        />
+      </Card>
+    )
+  }
+
+  if (data) {
+    return (
+      <Card>
+        <CardHeader title='THE STUDIO PAGE - CONTENT APPROVAL' />
+        {/* <DataGrid
+          getRowId={row => row._id}
+          autoHeight
+          rows={data.data}
+          columns={columns}
+          pageSize={pageSize}
+          disableSelectionOnClick
+          rowsPerPageOptions={[7, 10, 25, 50]}
+          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+        /> */}
+      </Card>
+    )
+  }
+
+  return (<></>)
+
 }
 
 export default ContentTable
