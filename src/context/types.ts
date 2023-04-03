@@ -60,3 +60,23 @@ export type DataVideosGridRowType = {
   experience: string;
   status: number;
 }
+export interface IFeedStory {
+  created_at: string
+  is_Service: boolean
+  location: string
+  site_id: number
+  string_story: string
+  tags: string[]
+  updated_at: string
+  user?: IUser
+  user_id: number
+  _id: string
+  videos : {
+    url : string
+  }
+}
+export interface IUser {
+  id: number
+  photo: string
+  username: string
+}

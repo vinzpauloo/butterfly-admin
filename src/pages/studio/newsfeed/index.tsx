@@ -4,6 +4,7 @@ import React from 'react'
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid'
 
 // ** Step Components
 import AllStory from './views/AllStory'
@@ -15,6 +16,13 @@ import InputAdornment from '@mui/material/InputAdornment'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+
+// ** API Imports
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import FeedsService from '@/services/api/FeedsService'
+
+// ** Utils
+import createSkeleton from '@/utils/createSkeleton'
 
 const steps = [
   {
@@ -38,6 +46,25 @@ const NewsFeedList = (props: Props) => {
   // ** States
   const [activeTab, setActiveTab] = React.useState<number>(0)
 
+
+  // ** QueryAPI
+  const { getFeeds } = FeedsService()
+  const queryClient = useQueryClient();
+  const { isLoading, isError, data, refetch } = useQuery({
+    queryKey: ['getFeeds'],
+    queryFn: () => getFeeds({ story_feeds_only: true, with: 'user' })
+  })
+
+  // ** Hooks
+  React.useEffect( ()=>{
+    console.log('changed tab so I will call refetch from react query')
+  },[activeTab])
+
+
+  const handleInvalidate = () => {
+    queryClient.invalidateQueries()
+  }
+
   // TURN THIS TO ENUM SO ITS READABLE
   const getActiveTabContent = (step: number) => {
     switch (step) {
@@ -54,6 +81,7 @@ const NewsFeedList = (props: Props) => {
     }
   }
 
+  
   const renderContent = () => {
     return getActiveTabContent(activeTab)
   }
@@ -96,10 +124,21 @@ const NewsFeedList = (props: Props) => {
 
       <Box sx={{ borderRadius: '5px', maxWidth: '90%', marginInline: 'auto', padding: '1em' }}>
         <Box sx={{ display: 'flex', columnGap: '1rem', marginBottom: '1.5rem' }}>
-          <Button variant='contained'>SEARCH BY CONTENT CREATOR</Button>
-          <Button variant='contained'>SORT BY DATE</Button>
+          {/* <Button onClick={handleInvalidate} variant='contained'>SEARCH BY CONTENT CREATOR</Button>
+          <Button variant='contained'>SORT BY DATE</Button> */}
         </Box>
-        {renderContent()}
+        {
+          isLoading && 
+          <Box sx={{ display: 'flex' }}>
+              <Grid container spacing={10}>
+                {createSkeleton(2)}
+              </Grid>
+          </Box>
+          
+        }
+        {
+          data && renderContent()
+        }
       </Box>
     </Box>
   )
