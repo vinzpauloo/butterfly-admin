@@ -27,7 +27,7 @@ const VideoService = () => {
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/works/admin',
+      url: 'admin/works',
       method: 'GET',
       params: params.data
     })
