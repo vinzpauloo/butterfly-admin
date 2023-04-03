@@ -47,7 +47,7 @@ const AllStory = ({data, handleFeedParams}: StoryProps) => {
 
     return (
       <Box sx={{ display: 'flex' }}>
-        <ScrollWrapper hidden={true}>
+
           <Grid container spacing={10}>
             {stories &&
               stories?.map((story: IFeedStory) => (
@@ -73,7 +73,7 @@ const AllStory = ({data, handleFeedParams}: StoryProps) => {
                 </Grid>
               ))}
           </Grid>
-        </ScrollWrapper>
+
       </Box>
     )
   }

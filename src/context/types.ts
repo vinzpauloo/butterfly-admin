@@ -66,6 +66,7 @@ export interface IFeedStory {
   location: string
   site_id: number
   string_story: string
+  images? : IImages[]
   tags: string[]
   updated_at: string
   user?: IUser
@@ -74,6 +75,12 @@ export interface IFeedStory {
   videos : {
     url : string
   }
+}
+
+export interface IImages {
+  url : string,
+  width: number,
+  _id : string
 }
 export interface IUser {
   id: number

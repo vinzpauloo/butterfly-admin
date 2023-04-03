@@ -26,10 +26,6 @@ type videoPhotosProps = {
 // ** Types
 import { IFeedStory } from '@/context/types'
 
-const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden: boolean }) => {
-  return <PerfectScrollbar options={{ wheelPropagation: false }}>{children}</PerfectScrollbar>
-}
-
 const videoWithPhotos = { video_images: true, with: 'user' }
 
 const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
@@ -42,7 +38,7 @@ const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
   if (data) {
     return (
       <Box sx={{ display: 'flex' }}>
-        <ScrollWrapper hidden={true}>
+
           <Grid container spacing={10}>
             {data.data &&
               data.data?.map((story: IFeedStory) => (
@@ -69,11 +65,24 @@ const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
                         <FeedVideoCard source={story.videos.url} />
                       </FeedAttachments>
                     )}
+                    <FeedAttachments>
+                      <PhotoGridCard>
+                        {story &&
+                          story?.images &&
+                          story?.images.map(image => {
+                            return (
+                              <img
+                                key={image._id}
+                                src={image.url.replace('http://localhost/', 'http://192.168.50.9/')}
+                              />
+                            )
+                          })}
+                      </PhotoGridCard>
+                    </FeedAttachments>
                   </FeedCard>
                 </Grid>
               ))}
           </Grid>
-        </ScrollWrapper>
       </Box>
     )
   }

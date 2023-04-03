@@ -25,10 +25,6 @@ type Props = {
   handleFeedParams?: any
 }
 
-const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden: boolean }) => {
-  return <PerfectScrollbar options={{ wheelPropagation: false }}>{children}</PerfectScrollbar>
-}
-
 const photoOnlyParams = { images_only: true, with: 'user' }
 
 const AllPhoto = ({ data, handleFeedParams }: Props) => {
@@ -41,7 +37,6 @@ const AllPhoto = ({ data, handleFeedParams }: Props) => {
   if (data) {
     return (
       <Box sx={{ display: 'flex' }}>
-        <ScrollWrapper hidden={true}>
           <Grid container spacing={10}>
             {data.data &&
               data.data?.map((story: IFeedStory) => (
@@ -66,19 +61,17 @@ const AllPhoto = ({ data, handleFeedParams }: Props) => {
 
                     <FeedAttachments>
                       <PhotoGridCard>
-                        <img src='/images/misc/grid/3.jpg' />
-                        <img src='/images/misc/grid/1.jpg' />
-                        <img src='/images/misc/grid/2.jpg' />
-                        <img src='/images/misc/grid/3.jpg' />
-                        <img src='/images/misc/grid/1.jpg' />
-                        <img src='/images/misc/grid/2.jpg' />
+                        {
+                          story && story?.images && story?.images.map( image =>  {
+                            return <img key={image._id} src={image.url.replace('http://localhost/', 'http://192.168.50.9/')} />// TBR
+                          })
+                        }
                       </PhotoGridCard>
                     </FeedAttachments>
                   </FeedCard>
                 </Grid>
               ))}
           </Grid>
-        </ScrollWrapper>
       </Box>
     )
   }
