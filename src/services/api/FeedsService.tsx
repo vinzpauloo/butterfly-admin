@@ -24,7 +24,7 @@ const FeedsService = () => {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/feeds/admin/upload',
+      url: '/admin/feeds/upload',
       method: 'POST',
       data: params.formData
     })
@@ -37,7 +37,7 @@ const FeedsService = () => {
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/feeds/admin',
+      url: '/admin/feeds',
       method: 'GET',
       params: params
     })
