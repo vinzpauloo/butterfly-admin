@@ -94,7 +94,6 @@ function WorkList({ modalOpen, setModalOpen, setSelectedInModal, setSelectedRows
       setRowCount(data.total)
       setPageSize(data.per_page)
       setPage(data.current_page)
-      console.log('$$$', data.data)
     }
   })
 

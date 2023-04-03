@@ -1,37 +1,88 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, CircularProgress } from '@mui/material'
+import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, CircularProgress, Checkbox, Stack, FormControlLabel, styled } from '@mui/material'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import { DateType } from '@/types/forms/reactDatepickerTypes'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
 import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import AdvertisementService from "../../../../services/api/AdvertisementService"
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
-const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
-  const [startDate, setStartDate] = React.useState<DateType>(new Date())
-  const [endDate, setEndDate] = React.useState<DateType>(new Date())
-  const [selectedFile, setSelectedFile] = useState(null); // object to be send to back-end?
-  const [preview, setPreview] = useState("");
+const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
+
+  // subscribe to ads global store
+  const [
+    adsCategory,
+    adsWidth,
+    adsHeight,
+    adsPhotoURL,
+    adsLink,
+    adsStartDate,
+    adsEndDate,
+    containerID,
+    adsID,
+    isCreatingNewAds,
+    setAdsPhotoURL
+  ] = adsGlobalStore((state) => [
+    state.adsCategory,
+    state.adsWidth,
+    state.adsHeight,
+    state.adsPhotoURL,
+    state.adsLink,
+    state.adsStartDate,
+    state.adsEndDate,
+    state.containerID,
+    state.adsID,
+    state.isCreatingNewAds,
+    state.setAdsPhotoURL
+  ]);
+
+  // if creating new ads used this value, if editing use global store
+  const [newAdsStartDate, setNewAdsStartDate] = useState<DateType>(new Date())
+  const [newAdsEndDate, setNewAdsEndDate] = useState<DateType>(new Date())
   const [newURLLink, setnewURLLink] = useState("");
 
+  const [selectedFile, setSelectedFile] = useState("");
+  const [preview, setPreview] = useState("");
+
+  // input errors for validation
   const [URLInputError, setURLInputError] = useState(false);
   const [ImageInputError, setImageInputError] = useState(false);
+  
+  const [isDurationForever, setIsDurationForever] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  // WIP - REMOVE THE PREVIEW FILE AND OTHER STUFF TO WHEN POSTING TO BACK END
   useEffect(() => {
-    return () => {
-      setSelectedFile(null)
+    if (isCreatingNewAds) {
+      setSelectedFile("")
       setPreview("")
+      setAdsPhotoURL("")
+      setnewURLLink("")
+      setIsDurationForever(false)
+      setURLInputError(false)
+      setImageInputError(false)
     }
-  },[])
+
+    // if editing existing ads
+    if (!isCreatingNewAds) {
+      setSelectedFile("")
+      setPreview("")
+      setIsDurationForever(false)
+      setURLInputError(false)
+      setImageInputError(false)
+      setNewAdsStartDate(adsStartDate)
+      setNewAdsEndDate(adsEndDate)
+      setnewURLLink(adsLink)
+    }
+
+    if (Number(adsEndDate) === 0) setIsDurationForever(true)
+  }, [isCreatingNewAds, setAdsPhotoURL, adsEndDate, adsStartDate, adsLink])
 
   const handleFileInputChange = (e: any) => {
     const file = e.target.files[0];
@@ -51,13 +102,22 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
   };
 
   const validateInput = () => {
-    if (adsPhotoURL === "" || selectedFile === null) {
+    if (selectedFile === "") {
       setImageInputError(true)
 
       return false
     }
 
-    if (newURLLink === "") {
+    const isValidUrl = (string: string) => {
+      try { 
+        new URL(string);
+
+        return true;
+      } catch (err) { return false; }
+    }
+
+
+    if (!isValidUrl(newURLLink)) {
       setURLInputError(true)
 
       return false
@@ -66,53 +126,98 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
     return true
   }
 
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+  const { createNewBannerAds, updateBannerAds } = AdvertisementService();
+
+  const { mutate: mutateCreateNewBannerAds, isLoading: addedLoading } = useMutation(createNewBannerAds, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["allAdvertisement"],
+      });
+      props.onClose()
+      setSelectedFile("")
+      setPreview("")
+      setAdsPhotoURL("")
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
+  const { mutate: mutateUpdateBannerAds, isLoading: updateLoading } = useMutation(updateBannerAds, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["allAdvertisement"],
+      });
+      props.onClose()
+      setSelectedFile("")
+      setPreview("")
+      setAdsPhotoURL("")
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
   const publishAdvertisement = () => {
     if (validateInput()) {
-      // POST DATA TO BACK END
-      console.log(startDate)
-      console.log(endDate)
-      console.log(newURLLink)
-      console.log(selectedFile)
+      // POST data to back-end
+      mutateCreateNewBannerAds({
+        data: {
+          photo: selectedFile,
+          url: newURLLink,
+          id: containerID,
+          start_date: newAdsStartDate?.toISOString().split('T')[0],
+          end_date: isDurationForever ? "" : newAdsEndDate?.toISOString().split('T')[0],
+          hidden: false
+        },
+      });
     }
   }
 
-  // subscribe to ads global store
-  const [
-    adsCategory,
-    adsWidth,
-    adsHeight,
-    adsPhotoURL,
-    adsLink,
-    adsStartDate,
-    adsEndDate,
-  ] = adsGlobalStore((state) => [
-    state.adsCategory,
-    state.adsWidth,
-    state.adsHeight,
-    state.adsPhotoURL,
-    state.adsLink,
-    state.adsStartDate,
-    state.adsEndDate,
-  ]);
+  const editAdvertisement = () => {
+    // PUT data to back-end
+    mutateUpdateBannerAds({
+      banner_id: adsID,
+      data: {
+        // if something is selected, if none selected dont send
+        photo: selectedFile === "" ? null : selectedFile,
+        url: newURLLink,
+        id: containerID,
+        start_date: newAdsStartDate?.toISOString().split('T')[0],
+        end_date: isDurationForever ? "" : newAdsEndDate?.toISOString().split('T')[0],
+        hidden: false
+      },
+    });    
+  }
+
+  const Img = styled('img')({
+    height: adsHeight,
+    width: adsWidth,
+    objectFit: "cover"
+  })
 
   return (
     <DatePickerWrapper>
       <Dialog open={props.isOpen} onClose={props.onClose}>
         <DialogContent sx={styles.dialogContent}>
           <DialogTitle sx={styles.title}>{adsCategory} Advertisement</DialogTitle>
-            {isLoading ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
-            <Box sx={styles.container} style={isLoading? {opacity:0.5, cursor:"not-allowed"} : undefined}>
+            {addedLoading || updateLoading ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
+            <Box sx={styles.container} style={addedLoading || updateLoading? {opacity:0.5, cursor:"not-allowed"} : undefined}>
               <Box sx={styles.left}>
-                {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={isLoading} /> : null} */}
+                {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={addedLoading || updateLoading} /> : null} */}
                 <Box
                   sx={styles.uploadContainer}
                   width={{ sm: "100%", md: adsWidth }}
                   height={adsHeight}
-                  borderColor={ImageInputError ? "red" : "black"}
+                  border={ImageInputError ? "1px solid red" : undefined}
                 >
                   <Box sx={styles.imgWrapper}>                      
                     {adsPhotoURL && !preview ?
-                      <img src={adsPhotoURL} alt='template icon' style={{ objectFit: "cover", width: adsWidth, height: adsHeight }} /> :
+                    <Img src={adsPhotoURL} alt='template icon'/> :
                       <Image
                         src={preview ? preview : '/images/icons/butterfly-template-icon.png'}
                         width={preview ? adsWidth : 50}
@@ -123,39 +228,44 @@ const AdvertisementModal: React.FC<ModalProps> = (props:ModalProps) => {
                     }
                   </Box>
               </Box>
-                <Typography textAlign="center">Recommended Size: {adsWidth}x{adsHeight}</Typography>
-                <Button variant="contained" disabled={isLoading} component="label" sx={styles.uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
+                <Typography textAlign="center">Recommended Size: {adsWidth * 1.25}x{adsHeight * 1.25}</Typography>
+                <Button variant="contained" disabled={addedLoading || updateLoading} component="label" sx={styles.uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
               </Box>
               <Box sx={styles.right}>
                 <Box>
                   <Typography>Duration: Start Date</Typography>
                   <DatePicker
-                    disabled={isLoading}
-                    selected={adsStartDate}
-                    onChange={(date: Date) => setStartDate(date)}
+                    dateFormat="dd/MM/yyyy"
+                    disabled={addedLoading || updateLoading}
+                  selected={newAdsStartDate}
+                    onChange={(date: Date) => setNewAdsStartDate(date)}
                     placeholderText='Click to select a date'
                     customInput={<CustomInput customWidth='100%' />}
                     minDate={new Date()}
                   />
                 </Box>
                 <Box>
-                  <Typography>Duration: End Date</Typography>
-                  <DatePicker
-                    disabled={isLoading}
-                    selected={adsEndDate}
-                    onChange={(date: Date) => setEndDate(date)}
+                  <Typography sx={isDurationForever? {color: "#999"} : null}>Duration: End Date</Typography>
+                   <DatePicker
+                    dateFormat="dd/MM/yyyy"
+                    disabled={addedLoading || updateLoading || isDurationForever}                    
+                  selected={newAdsEndDate}
+                    onChange={(date: Date) => setNewAdsEndDate(date)}
                     placeholderText='Click to select a date'
                     customInput={<CustomInput customWidth='100%' />}
                     minDate={new Date()}
                   />
+                <Stack>
+                  <FormControlLabel control={<Checkbox checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label="Duration: Forever" />
+                </Stack>
                 </Box>
                 <Box>
                   <Typography>URL Link:</Typography>
-                  <TextField fullWidth error={URLInputError} disabled={isLoading} value={adsLink} onChange={(event) => setnewURLLink(event.target.value)}/>
+                <TextField fullWidth error={URLInputError} disabled={addedLoading || updateLoading} value={newURLLink} onChange={(event) => { setnewURLLink(event.target.value);  setURLInputError(false)}}/>
                 </Box>
                 <Box sx={styles.bottomBtnWrapper}>
-                  <Button sx={styles.bottomBtns} disabled={isLoading} onClick={props.onClose}>Cancel</Button>
-                  <Button sx={styles.bottomBtns} disabled={isLoading} onClick={publishAdvertisement}>Publish</Button>
+                  <Button sx={styles.bottomBtns} disabled={addedLoading || updateLoading} onClick={props.onClose}>Cancel</Button>
+                  <Button sx={styles.bottomBtns} disabled={addedLoading || updateLoading} onClick={isCreatingNewAds? publishAdvertisement : editAdvertisement}>Publish</Button>
                 </Box>
               </Box>
             </Box>

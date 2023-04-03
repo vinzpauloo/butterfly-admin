@@ -8,6 +8,9 @@ interface IAdsStore {
 	adsLink: string
 	adsStartDate: Date
 	adsEndDate: Date
+	containerID: string
+	adsID: string
+	isCreatingNewAds: boolean
 
 	setAdsCategory: (newAdsCategory: string) => void
 	setAdsWidth: (newAdsWidth: number) => void
@@ -16,6 +19,9 @@ interface IAdsStore {
 	setAdsLink: (newAdsLink: string) => void
 	setAdsStartDate: (newAdsStartDate: Date) => void
 	setAdsEndDate: (newAdsEndDate: Date) => void
+	setContainerID: (newcontainerID: string) => void
+	setAdsID: (newAdsID: string) => void
+	setIsCreatingNewAds: (newIsCreatingNewAds: boolean) => void
 }
 
 export const adsGlobalStore = create<IAdsStore>((set) => ({
@@ -26,6 +32,9 @@ export const adsGlobalStore = create<IAdsStore>((set) => ({
 	adsLink: "",
 	adsStartDate: new Date(),
 	adsEndDate: new Date(),
+	containerID: "",
+	adsID: "",
+	isCreatingNewAds: false,
 
 	setAdsCategory: (newAdsCategory) => set(() => ({ adsCategory: newAdsCategory })),
 	setAdsWidth: (newAdsWidth) => set(() => ({ adsWidth: newAdsWidth })),
@@ -34,4 +43,7 @@ export const adsGlobalStore = create<IAdsStore>((set) => ({
 	setAdsLink: (newAdsLink) => set(() => ({ adsLink: newAdsLink })),
 	setAdsStartDate: (newAdsStartDate) => set(() => ({ adsStartDate: newAdsStartDate })),
 	setAdsEndDate: (newAdsEndDate) => set(() => ({ adsEndDate: newAdsEndDate })),
+	setContainerID: (newContainerID) => set(() => ({ containerID: newContainerID })),
+	setAdsID: (newAdsID) => set(() => ({ adsID: newAdsID })),
+	setIsCreatingNewAds: (newIsCreatingNewAds) => set(() => ({ isCreatingNewAds: newIsCreatingNewAds })),
 }))
