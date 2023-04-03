@@ -9,6 +9,7 @@ import { styled } from '@mui/material/styles'
 
 // ** Next Imports
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
@@ -18,6 +19,7 @@ import CreateFeedModal from '@/pages/settings/components/modal/CreateFeedModal'
 //* Context Import
 import { StudioContext } from '..'
 import { DisplayPage } from '..'
+import { Router } from 'next/router'
 
 // ** Styled Components
 const UploadBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
@@ -36,6 +38,7 @@ const TOSLink = styled(Link)(({ theme }) => ({
 type Props = {}
 
 const UploadMenu = (props: Props) => {
+  const router = useRouter()
   const [feedModal, setFeedModal] = React.useState(false)
 
   const studioContext = React.useContext(StudioContext)
@@ -45,7 +48,8 @@ const UploadMenu = (props: Props) => {
   }
 
   const handleUploadAlbumClick = () => {
-    studioContext?.setDisplayPage(DisplayPage.UploadAlbum)
+    // studioContext?.setDisplayPage(DisplayPage.UploadAlbum)
+    router.push(`/studio/album/upload`)
   }
 
   const handleNewsfeedsButtonClick = () => {

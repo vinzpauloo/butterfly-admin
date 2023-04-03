@@ -20,6 +20,7 @@ interface Props {
   mobileValue: string
   role: any
   role_id: any
+  titleValue?: string
 }
 
 const ExportButton = (props: Props) => {
@@ -50,6 +51,8 @@ const ExportButton = (props: Props) => {
     saveAs(blob, `${props.role}-Data.csv`)
   }
 
+  console.log('propstitle', props.titleValue)
+
   useEffect(() => {
     if (props.emailValue) {
       console.log(`TYPING IN EMAIL`)
@@ -60,8 +63,11 @@ const ExportButton = (props: Props) => {
     } else if (props.usernameValue) {
       console.log(`TYPING IN username`)
       setSearch('username')
+    } else if (props.titleValue) {
+      console.log(`TYPING IN ALBUM TITLE`)
+      setSearch('title')
     }
-  }, [props.emailValue, props.mobileValue, props.usernameValue])
+  }, [props.emailValue, props.mobileValue, props.usernameValue, props.titleValue])
 
   return (
     // <Box

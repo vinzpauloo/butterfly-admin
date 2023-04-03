@@ -173,14 +173,14 @@ const DialogEdit = ({ params }: DialogEditProps) => {
 
                 <Grid item xs={12}>
                   <Box>
-                    
                     <VideoBox>
-                      <ReactPlayer 
-                        className='reactPlayer' 
-                        width='100%' 
-                        height='100%' 
-                        controls={true} 
-                        url='https://customer-rg8qf1aaic6bwg8l.cloudflarestream.com/93e450b81f8530acefacbd33133d28c0/manifest/video.m3u8' />
+                      <ReactPlayer
+                        className='reactPlayer'
+                        width='100%'
+                        height='100%'
+                        controls={true}
+                        url='https://customer-rg8qf1aaic6bwg8l.cloudflarestream.com/93e450b81f8530acefacbd33133d28c0/manifest/video.m3u8'
+                      />
                     </VideoBox>
 
                     <a style={{ textDecoration: 'none' }} target='_blank' href={params.trial_video_hls}>

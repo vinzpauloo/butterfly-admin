@@ -37,7 +37,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } 
 import { v4 as uuidv4 } from 'uuid'
 
 //* Context Import
-import { StudioContext, DisplayPage } from '..'
+import { StudioContext, DisplayPage } from '../../upload'
 
 // Styled components
 const CustomTextField = styled(TextField)(({ theme }) => ({
@@ -297,6 +297,10 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
 
 const UploadAlbum = () => {
   const router = useRouter()
+  const { query }: any = router
+  const albumId = Object.keys(query)
+  console.log(albumId[0])
+
   /* States */
   const studioContext = React.useContext(StudioContext)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
@@ -308,11 +312,11 @@ const UploadAlbum = () => {
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
-    studioContext?.setDisplayPage(DisplayPage.MainPage)
+    router.back()
   }
 
   const handleContinueButton = () => {
-    router.push(`album-list`)
+    router.push(`/studio/album/album-list`)
   }
 
   const renderedPhotos = React.useRef<{ [key: string]: SortablePhotoProps }>({})
@@ -364,13 +368,23 @@ const UploadAlbum = () => {
 
   return (
     <BasicCard sx={{ ...styles.container }}>
-      <Typography
-        sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
-        variant='h5'
-        color={theme => theme.customBflyColors.primaryTextContrast}
-      >
-        Create New Album
-      </Typography>
+      {albumId[0] === undefined ? (
+        <Typography
+          sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
+          variant='h5'
+          color={theme => theme.customBflyColors.primaryTextContrast}
+        >
+          Create New Album
+        </Typography>
+      ) : (
+        <Typography
+          sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
+          variant='h5'
+          color={theme => theme.customBflyColors.primaryTextContrast}
+        >
+          Edit New Album
+        </Typography>
+      )}
       <Box sx={{ ...styles.albumTitleWrapper }}>
         <Typography sx={{ ...styles.title }} variant='h6' color={theme => theme.customBflyColors.primaryTextContrast}>
           Album Title
@@ -443,9 +457,9 @@ const styles = {
   container: {
     width: {
       xs: '100%',
-      sm: '85%',
-      md: '85%',
-      lg: '85%'
+      sm: '100%',
+      md: '100%',
+      lg: '100%'
     },
     paddingTop: '0',
     '& .MuiCardContent-root': {
