@@ -61,6 +61,10 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Video List',
           path: '/studio/video-list'
+        },
+        {
+          title: 'Album List',
+          path: '/studio/album/album-list'
         }
       ]
     },

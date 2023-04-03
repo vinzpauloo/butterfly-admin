@@ -166,7 +166,7 @@ const VideosListTable = () => {
   }
 
   return (
-    <Card sx={{ minWidth:'850px', maxWidth:'90%' }}>
+    <Card sx={{ minWidth: '850px', maxWidth: '90%' }}>
       <CardHeader title='Quick Filter' />
       <DataGrid
         autoHeight
