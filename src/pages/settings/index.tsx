@@ -112,7 +112,7 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
     return { ...title, ...nav, ...template }
   }
 
-  const {} = useQuery({
+  const { refetch } = useQuery({
     queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page],
     queryFn: () =>
       getSearchWorkgroups({
@@ -133,6 +133,13 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
   const handleClick = () => {
     setHeader('Add')
     setOpen(true)
+  }
+
+  const handleClear = () => {
+    refetch()
+    setTitle('')
+    setNavbar('')
+    setTemplate('')
   }
 
   return (
@@ -166,7 +173,7 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size='small'>
+          <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
             <InputLabel id='demo-simple-select-label'>Template</InputLabel>
             <Select
               labelId='demo-simple-select-label'
@@ -182,6 +189,9 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
               ))}
             </Select>
           </FormControl>
+          <Button variant='contained' color='error' onClick={handleClear}>
+            Clear
+          </Button>
         </Box>
         <Button variant='contained' onClick={handleClick}>
           Add Workgroup

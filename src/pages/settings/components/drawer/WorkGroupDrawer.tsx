@@ -328,7 +328,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
         variant='temporary'
         onClose={handleClose}
         ModalProps={{ keepMounted: true }}
-        sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
+        sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 600 } } }}
       >
         <Header>
           <Typography variant='h6'>{header} Workgroup</Typography>
@@ -406,7 +406,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 autoHeight
                 pagination
                 rows={selectedVideosInModal}
-                loading={isLoading}
+                loading={header === 'Edit' ? isLoading : false}
                 getRowId={row => row._id}
               />
             </Box>
