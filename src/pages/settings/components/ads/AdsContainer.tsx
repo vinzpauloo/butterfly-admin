@@ -1,34 +1,58 @@
-import React, { useState } from 'react'
-import { Box, Grid, Typography, ImageList, Button } from '@mui/material'
+import React from 'react'
+import { ImageList, Button, Stack } from '@mui/material'
 import AdsItem from './AdsItem'
+import { adsGlobalStore } from '../../../../zustand/adsGlobalStore'
 
 type Props = {
+  containerID: string
   data: []
   openModal: () => void
   type: string
 }
 
 const AdsContainer = (props: Props) => {
-  const [newTemplate, setNewTemplate] = useState([1])
+
+  // subscribe to ads global store
+  const [
+    setIsCreatingNewAds,
+    setAdsCategory,
+    setAdsWidth,
+    setAdsHeight,
+    setContainerID,
+  ] = adsGlobalStore((state) => [
+    state.setIsCreatingNewAds,
+    state.setAdsCategory,
+    state.setAdsWidth,
+    state.setAdsHeight,
+    state.setContainerID,
+  ]);
 
   let customWidht = 0
   let customHeight = 0
   let customName = ""
 
-  if (props.type === "fullscreen_banner") { customHeight = 400; customWidht = 300; customName = "Pre-Loading" }
-  else if (props.type === "popup_banner") { customHeight = 300; customWidht = 300; customName = "Pop-Up" }
-  else if (props.type === "carousel_banner") { customHeight = 75; customWidht = 300; customName = "Carousel" }
-  else if (props.type === "single_banner") { customHeight = 75; customWidht = 300; customName = "Banner" }
-  else if (props.type === "multiple_random_gif") { customHeight = 170; customWidht = 300; customName = "Video-Grid" }
+  if (props.type === "fullscreen_banner") { customHeight = 650; customWidht = 475; customName = "Pre-Loading" }
+  else if (props.type === "popup_banner") { customHeight = 475; customWidht = 475; customName = "Pop-Up" }
+  else if (props.type === "carousel_banner") { customHeight = 150; customWidht = 475; customName = "Carousel" }
+  else if (props.type === "single_banner") { customHeight = 150; customWidht = 475; customName = "Banner" }
+  else if (props.type === "multiple_random_gif") { customHeight = 250; customWidht = 475; customName = "Video-Grid" }
+
+  const openModalCreatingNewAds = () => {
+    setAdsCategory(customName)
+    setAdsWidth(customWidht / 1.25)
+    setAdsHeight(customHeight / 1.25)
+    setIsCreatingNewAds(true)
+    setContainerID(props.containerID)
+    props.openModal()
+  }
 
   return (
-    <Grid item xs={6} md={4} sx={styles.gridContentWrapper}>
-      <Box sx={styles.titleWrapper}>
-        <Typography sx={styles.title}>{customName}</Typography>
-      </Box>
-      <ImageList cols={1} rowHeight={customHeight} sx={{ maxHeight: 400 }}>
+    <Stack sx={styles.gridContentWrapper}>
+      <ImageList cols={1} rowHeight={customHeight} sx={{ maxHeight: 650}} >
         {props.data.map((item: any, index: any) =>
           <AdsItem
+            containerID={props.containerID}
+            adsID={item._id}
             key={index}
             photoURL={item.photo_url}
             openModal={props.openModal}
@@ -41,23 +65,9 @@ const AdsContainer = (props: Props) => {
             itemName={customName}
           />
         )}
-        {newTemplate.map((item: any, index: any) =>
-          <AdsItem
-            key={index}
-            photoURL={null}
-            adsURL={null}
-            openModal={props.openModal}
-            startDate={new Date()}
-            endDate={new Date()}
-            isHidden={false}
-            itemWidth={customWidht}
-            itemHeight={customHeight}
-            itemName={customName}
-          />
-        )}
-        <Button sx={{ mt: 4 }} variant="contained" onClick={() => setNewTemplate(prev => [...prev].concat([1]))}>ADD MORE</Button>
+        <Button sx={{ mt: 4 }} variant="contained" onClick={openModalCreatingNewAds}>ADD MORE</Button>
       </ImageList>
-    </Grid>
+    </Stack>
   )
 }
 

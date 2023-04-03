@@ -3,7 +3,7 @@ import { ImageListItem, Switch, Stack, styled } from '@mui/material'
 import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 import Image from 'next/image'
 
-const AdsItem = ({ openModal, photoURL, adsURL, startDate, endDate, isHidden, itemWidth, itemHeight, itemName }: any) => {
+const AdsItem = ({ containerID, adsID, openModal, photoURL, adsURL, startDate, endDate, isHidden, itemWidth, itemHeight, itemName }: any) => {
 	// change later to onClick instead and POST
 	const [isActive, setIsActive] = useState(!isHidden)
 
@@ -16,6 +16,9 @@ const AdsItem = ({ openModal, photoURL, adsURL, startDate, endDate, isHidden, it
 		setAdsLink,
 		setAdsStartDate,
 		setAdsEndDate,
+		setContainerID,
+		setAdsID,
+		setIsCreatingNewAds,
 	] = adsGlobalStore((state) => [
 		state.setAdsCategory,
 		state.setAdsWidth,
@@ -24,16 +27,22 @@ const AdsItem = ({ openModal, photoURL, adsURL, startDate, endDate, isHidden, it
 		state.setAdsLink,
 		state.setAdsStartDate,
 		state.setAdsEndDate,
+		state.setContainerID,
+		state.setAdsID,
+		state.setIsCreatingNewAds,
 	]);
 
-	const openAdsModal = () => {
+	const openModalEditingAds = () => {
 		setAdsCategory(itemName)
-		setAdsWidth(itemWidth)
-		setAdsHeight(itemHeight)
+		setAdsWidth(itemWidth / 1.25)
+		setAdsHeight(itemHeight / 1.25)
 		setAdsPhotoURL(photoURL)
 		setAdsLink(adsURL)
 		setAdsStartDate(new Date(startDate))
 		setAdsEndDate(new Date(endDate))
+		setContainerID(containerID)
+		setAdsID(adsID)
+		setIsCreatingNewAds(false)
 		openModal()
 	}
 
@@ -47,7 +56,7 @@ const AdsItem = ({ openModal, photoURL, adsURL, startDate, endDate, isHidden, it
 	return (
 		<Stack>
 			<Switch checked={isActive} sx={{ alignSelf: "flex-end" }} onChange={event => { setIsActive(event.target.checked) }} />
-			<ImageListItem onClick={openAdsModal} sx={imgWrapper} style={{ width: itemWidth, height: itemHeight, marginBottom: 12 }}>
+			<ImageListItem onClick={openModalEditingAds} sx={imgWrapper} style={{ width: itemWidth, height: itemHeight, marginBottom: 12 }}>
 				{photoURL === null ?
 					<Image
 						src={'/images/icons/butterfly-template-icon.png'}
