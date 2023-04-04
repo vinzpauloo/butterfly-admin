@@ -11,6 +11,14 @@ interface AlbumData {
     search_by?: string
     search_value?: string
     filter?: string
+    _id?: string
+  }
+}
+
+interface AlbumUpload {
+  data: {
+    title?: string
+    cover_photo?: File | null
   }
 }
 
@@ -38,5 +46,32 @@ export const AlbumService = () => {
     })
   }
 
-  return { getAlbums }
+  const getSpecificUserAlbum = (params: AlbumData) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|0',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/albums/${params.data._id}`,
+      method: 'GET',
+      params: params.data
+    })
+  }
+
+  const postAlbum = (params: AlbumUpload) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|0',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/albums`,
+      method: 'POST',
+      data: params.data
+    })
+  }
+
+  return { getAlbums, getSpecificUserAlbum, postAlbum }
 }
