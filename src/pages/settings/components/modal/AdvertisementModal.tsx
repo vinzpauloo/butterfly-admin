@@ -64,6 +64,8 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setPreview("")
       setAdsPhotoURL("")
       setnewURLLink("")
+      setNewAdsStartDate(new Date())
+      setNewAdsEndDate(new Date())
       setIsDurationForever(false)
       setURLInputError(false)
       setImageInputError(false)
@@ -77,7 +79,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setURLInputError(false)
       setImageInputError(false)
       setNewAdsStartDate(adsStartDate)
-      setNewAdsEndDate(adsEndDate)
+      setNewAdsEndDate(Number(adsEndDate) === 0 ? new Date() : adsEndDate)
       setnewURLLink(adsLink)
     }
 
@@ -128,9 +130,9 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
 
   // Get QueryClient from the context
   const queryClient = useQueryClient();
-  const { createNewBannerAds, updateBannerAds } = AdvertisementService();
+  const { createNewAds, updateAds, deleteAds } = AdvertisementService();
 
-  const { mutate: mutateCreateNewBannerAds, isLoading: addedLoading } = useMutation(createNewBannerAds, {
+  const { mutate: mutateCreateNewBannerAds, isLoading: addedLoading } = useMutation(createNewAds, {
     onSuccess: (data) => {
       console.log(data);
       queryClient.invalidateQueries({
@@ -146,7 +148,23 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     },
   });
 
-  const { mutate: mutateUpdateBannerAds, isLoading: updateLoading } = useMutation(updateBannerAds, {
+  const { mutate: mutateUpdateBannerAds, isLoading: updateLoading } = useMutation(updateAds, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["allAdvertisement"],
+      });
+      props.onClose()
+      setSelectedFile("")
+      setPreview("")
+      setAdsPhotoURL("")
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
+  const { mutate: mutateDeleteBannerAds, isLoading: deleteLoading } = useMutation(deleteAds, {
     onSuccess: (data) => {
       console.log(data);
       queryClient.invalidateQueries({
@@ -166,13 +184,14 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     if (validateInput()) {
       // POST data to back-end
       mutateCreateNewBannerAds({
+        id: containerID,
+        relation: adsCategory === "Video-Grid" ? "gif" : "banner",
         data: {
           photo: selectedFile,
           url: newURLLink,
-          id: containerID,
           start_date: newAdsStartDate?.toISOString().split('T')[0],
           end_date: isDurationForever ? "" : newAdsEndDate?.toISOString().split('T')[0],
-          hidden: false
+          active: 1
         },
       });
     }
@@ -181,17 +200,28 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
   const editAdvertisement = () => {
     // PUT data to back-end
     mutateUpdateBannerAds({
+      id: containerID,
       banner_id: adsID,
+      relation: adsCategory === "Video-Grid" ? "gif" : "banner",
       data: {
         // if something is selected, if none selected dont send
         photo: selectedFile === "" ? null : selectedFile,
         url: newURLLink,
-        id: containerID,
         start_date: newAdsStartDate?.toISOString().split('T')[0],
         end_date: isDurationForever ? "" : newAdsEndDate?.toISOString().split('T')[0],
-        hidden: false
+        active: 1,
+        _method: "put"
       },
-    });    
+    });
+  }
+
+  const deleteAdvertisement = () => {
+    // DELETE data in back-end
+    mutateDeleteBannerAds({
+      id: containerID,
+      banner_id: adsID,
+      relation: adsCategory === "Video-Grid" ? "gif" : "banner",
+    })
   }
 
   const Img = styled('img')({
@@ -200,15 +230,17 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     objectFit: "cover"
   })
 
+  const isBeingAddedUpdatedDelete = addedLoading || updateLoading || deleteLoading
+
   return (
     <DatePickerWrapper>
       <Dialog open={props.isOpen} onClose={props.onClose}>
         <DialogContent sx={styles.dialogContent}>
           <DialogTitle sx={styles.title}>{adsCategory} Advertisement</DialogTitle>
-            {addedLoading || updateLoading ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
-            <Box sx={styles.container} style={addedLoading || updateLoading? {opacity:0.5, cursor:"not-allowed"} : undefined}>
+            {isBeingAddedUpdatedDelete ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
+            <Box sx={styles.container} style={isBeingAddedUpdatedDelete? {opacity:0.5, cursor:"not-allowed"} : undefined}>
               <Box sx={styles.left}>
-                {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={addedLoading || updateLoading} /> : null} */}
+                {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={isBeingAddedUpdatedDelete} /> : null} */}
                 <Box
                   sx={styles.uploadContainer}
                   width={{ sm: "100%", md: adsWidth }}
@@ -227,16 +259,22 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                       />
                     }
                   </Box>
-              </Box>
+                </Box>
+                <Stack>
                 <Typography textAlign="center">Recommended Size: {adsWidth * 1.25}x{adsHeight * 1.25}</Typography>
-                <Button variant="contained" disabled={addedLoading || updateLoading} component="label" sx={styles.uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
+                  <Stack flexDirection="row" justifyContent="center" gap={{xs:4, md:12}} mt={4}>
+                    {!isCreatingNewAds ? 
+                    <Button variant="contained" color="error" disabled={isBeingAddedUpdatedDelete} sx={{ width: 150 }} onClick={deleteAdvertisement}>DELETE</Button> : null}
+                    <Button variant="contained" disabled={isBeingAddedUpdatedDelete} component="label" sx={styles.uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
+                  </Stack>
+                </Stack>
               </Box>
               <Box sx={styles.right}>
                 <Box>
                   <Typography>Duration: Start Date</Typography>
                   <DatePicker
                     dateFormat="dd/MM/yyyy"
-                    disabled={addedLoading || updateLoading}
+                    disabled={isBeingAddedUpdatedDelete}
                   selected={newAdsStartDate}
                     onChange={(date: Date) => setNewAdsStartDate(date)}
                     placeholderText='Click to select a date'
@@ -248,8 +286,8 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                   <Typography sx={isDurationForever? {color: "#999"} : null}>Duration: End Date</Typography>
                    <DatePicker
                     dateFormat="dd/MM/yyyy"
-                    disabled={addedLoading || updateLoading || isDurationForever}                    
-                  selected={newAdsEndDate}
+                    disabled={isBeingAddedUpdatedDelete || isDurationForever}                    
+                    selected={newAdsEndDate}
                     onChange={(date: Date) => setNewAdsEndDate(date)}
                     placeholderText='Click to select a date'
                     customInput={<CustomInput customWidth='100%' />}
@@ -261,11 +299,11 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                 </Box>
                 <Box>
                   <Typography>URL Link:</Typography>
-                <TextField fullWidth error={URLInputError} disabled={addedLoading || updateLoading} value={newURLLink} onChange={(event) => { setnewURLLink(event.target.value);  setURLInputError(false)}}/>
+                <TextField fullWidth error={URLInputError} disabled={isBeingAddedUpdatedDelete} value={newURLLink} onChange={(event) => { setnewURLLink(event.target.value);  setURLInputError(false)}}/>
                 </Box>
                 <Box sx={styles.bottomBtnWrapper}>
-                  <Button sx={styles.bottomBtns} disabled={addedLoading || updateLoading} onClick={props.onClose}>Cancel</Button>
-                  <Button sx={styles.bottomBtns} disabled={addedLoading || updateLoading} onClick={isCreatingNewAds? publishAdvertisement : editAdvertisement}>Publish</Button>
+                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={props.onClose}>Cancel</Button>
+                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={isCreatingNewAds? publishAdvertisement : editAdvertisement}>Publish</Button>
                 </Box>
               </Box>
             </Box>
@@ -294,8 +332,6 @@ const styles = {
     '&:hover': {
       backgroundColor: '#7B0BB0'
     },
-    marginLeft: "auto",
-    marginRight: "auto"
   },
   dialogContent: {
     padding: 10,
@@ -378,14 +414,13 @@ const styles = {
       color: '#FFF'
     }
   },
-  loaderStyle:
-    {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      margin: "auto",
-      zIndex: 1
-    }
+  loaderStyle: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    margin: "auto",
+    zIndex: 1
+  }
 }
