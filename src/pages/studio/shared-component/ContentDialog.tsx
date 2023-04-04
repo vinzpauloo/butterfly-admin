@@ -128,7 +128,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
   const onSubmitNote = (data : any) => {
     setLocalLoading(true)
     setTimeout( ()=>{ 
-      setLocalLoading(false) 
+      setLocalLoading(false)
       setShowNotes(false)
       setShow(false)
       reset()
