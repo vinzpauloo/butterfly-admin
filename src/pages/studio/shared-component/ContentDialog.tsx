@@ -15,6 +15,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import { styled } from '@mui/material/styles'
 import InputAdornment from '@mui/material/InputAdornment'
+import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -92,8 +93,16 @@ const VideoBox = styled(Box)(({ theme }) => ({
 const ContentDialog = ({ param }: ContentDialogType) => {
   // ** States
   const [show, setShow] = useState<boolean>(false)
-
+  const [localLoading , setLocalLoading] = React.useState<boolean>(false)
   const [showNotes, setShowNotes] = useState<boolean>(false)
+
+
+  const handleApproveContent = () => {
+    setLocalLoading(true)
+
+    setTimeout( ()=>{ setLocalLoading(false) }, 2000 )
+
+  }
 
   const handleDecline = () => {
     setShowNotes(true)
@@ -101,6 +110,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
 
   // ** React hook form
   const {
+    reset,
     register,
     handleSubmit,
     formState: { errors }
@@ -108,8 +118,13 @@ const ContentDialog = ({ param }: ContentDialogType) => {
     mode: 'onBlur',
   })
 
-  const onSubmit = (data : any) => {
-    console.log('data')
+  const onSubmitNote = (data : any) => {
+    setLocalLoading(true)
+    setTimeout( ()=>{ 
+      setLocalLoading(false) 
+      setShowNotes(false)
+      reset()
+    }, 2000 )
   } 
 
   return (
@@ -198,8 +213,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
           <Button variant='contained' color='error' sx={{ mr: 1 }} onClick={() => handleDecline()}>
             Decline
           </Button>
-          <Button variant='contained' color='primary' onClick={() => setShow(false)}>
-            Approve
+          <Button disabled={ localLoading ? true : false } variant='contained' color='primary' onClick={() => handleApproveContent()} >
+            { localLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Approve
           </Button>
         </DialogActions>
       </Dialog>
@@ -213,7 +228,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
         open={showNotes}
       >
         <DialogContent sx={{ pb: 8, px: { xs: 8, sm: 15 }, pt: { xs: 8, sm: 12.5 }, position: 'relative' }}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmitNote)}>
             <Grid container spacing={5}>
               <Grid item xs={12}>
                 { errors.notes && <span>Empty note</span>}
@@ -236,8 +251,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
               </Grid>
 
               <Grid display='flex' justifyContent='center' alignItems='center' item xs={12}>
-                <Button disabled={ errors.notes ? true : false } sx={{marginInline:'auto'}} type='submit' variant='contained' size='large'>
-                  Submit
+                <Button disabled={ (errors.notes || localLoading ) ? true : false } sx={{marginInline:'auto'}} type='submit' variant='contained' size='large'>
+                  { localLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Submit Note
                 </Button>
               </Grid>
             </Grid>
