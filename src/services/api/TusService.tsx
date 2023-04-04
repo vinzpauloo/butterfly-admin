@@ -20,7 +20,7 @@ type TUSServiceOptions = {
 }
 
 type headerdata = {
-  user_id: number
+  user_id: string
   file_name: string
   video_type: 'full_video' | 'feed_video' | 'trial' | string
 }
@@ -42,11 +42,9 @@ const TUSService = (file: File, { customOnProgress, customOnAfterResponse }: TUS
     // Attach additional meta data about the file for the server
     metadata: {
       filename: file.name,
-      filetype: file.type
-    },
-    headers: {
-      data: JSON.stringify(headerData),
-      Authorization: `Bearer ${accessToken}`
+      filetype: file.type,
+      ...headerData,
+      authorization: `${accessToken}`
     },
     // Callback for errors which cannot be fixed using retries
     onError: function (error) {

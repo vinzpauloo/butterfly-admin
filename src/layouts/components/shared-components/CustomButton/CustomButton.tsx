@@ -6,7 +6,8 @@ type Props = {
   borderType?: 'rounded-0' | 'rounded-pill' | 'rounded'
   children?: ReactElement<any, any> | string
   sx?: SxProps
-  onClick?: () => void
+  onClick?: () => void,
+  disabled? : boolean
 }
 
 const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({

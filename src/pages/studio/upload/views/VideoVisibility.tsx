@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 // ** MUI Imports
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -156,6 +157,8 @@ const VideoVisibility = () => {
   const setStudioPublishDate = (publish: PublishSchedule) => {
     studioContext?.setPublishDate(publish)
   }
+
+  console.log('workProgress', studioContext?.workProgress)
 
   return (
     <Box
@@ -386,19 +389,30 @@ const VideoVisibility = () => {
                 ) : (
                   <>
                     <Box>
-                      <CustomButton onClick={handleCancelButton}>Back</CustomButton>
+                      <CustomButton
+                        disabled={studioContext?.workProgress != 100 ? true : false}
+                        onClick={handleCancelButton}
+                      >
+                        Back
+                      </CustomButton>
                     </Box>
 
                     <Box>
-                      <CustomButton
+                      <Button
                         onClick={dummyNavigate}
                         sx={{
                           bgcolor: 'primary.main',
                           color: 'common.white'
                         }}
+                        color='primary'
+                        variant='contained'
+                        disabled={studioContext?.workProgress != 100 ? true : false}
                       >
+                        {studioContext?.workProgress != 100 ? (
+                          <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' />
+                        ) : null}{' '}
                         Save
-                      </CustomButton>
+                      </Button>
                     </Box>
                   </>
                 )}

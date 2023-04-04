@@ -16,7 +16,7 @@ import ContentDialog from '@/pages/studio/shared-component/ContentDialog'
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Apis
 import ContentService from '@/services/api/ContentService'
@@ -63,8 +63,12 @@ const ContentTable = (props: IContentTable) => {
   // desctruct the snack state
   const { vertical, horizontal, open } = snackState
 
+  // Access the client
+  const queryClient = useQueryClient()
+
   const { getContents } = ContentService()
 
+  //Queries
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['contents'],
     queryFn: () => getContents({ with: 'user' }),
@@ -77,6 +81,16 @@ const ContentTable = (props: IContentTable) => {
       console.log('@@@', data)
     }
   })
+
+  // Mutations
+  const mutation = useMutation({
+    mutationFn: () => { return new Promise(resolve => {}) },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['contents'] })
+    },
+  })
+
 
   const columns: GridColDef[] = [
     {
@@ -127,7 +141,7 @@ const ContentTable = (props: IContentTable) => {
       renderCell: (params: GridRenderCellParams) => (
         <>
           <Icon
-            onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls )}
+            onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls)}
             icon='mdi:text-box-outline'
             fontSize='1.4rem'
           />
@@ -179,7 +193,7 @@ const ContentTable = (props: IContentTable) => {
     }
   ]
 
-  const handleCopyToClipboard = (newState: SnackbarOrigin, trialUrl : string) => () => {
+  const handleCopyToClipboard = (newState: SnackbarOrigin, trialUrl: string) => () => {
     navigator.clipboard.writeText(trialUrl)
     setSnackState({ open: true, ...newState })
   }
