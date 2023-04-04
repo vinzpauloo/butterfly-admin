@@ -294,13 +294,13 @@ const UploadVideoStep1 = (props: Props) => {
       endpoint: `${UploadURL}`,
       chunkSize: 5 * 1024 * 1024,
       retryDelays: [0, 1000, 3000, 5000],
-      headers: {
-        data: headerData,
-        Authorization: `Bearer ${accessToken}`
-      },
       metadata: {
         filename: file.name,
-        filetype: file.type
+        filetype: file.type,
+        user_id: contentCreator,
+        file_name: title,
+        video_type: 'full_video',
+        authorization: `${accessToken}`
       },
       removeFingerprintOnSuccess: true, // fingerprint in the URL storage will be removed
       onError: error => {
@@ -316,8 +316,6 @@ const UploadVideoStep1 = (props: Props) => {
       },
       onAfterResponse: (req, res) => {
         let xmlhttpreq = req.getUnderlyingObject()
-        console.log('xml', xmlhttpreq)
-        console.log('xmlhttpreq get all', xmlhttpreq.getAllResponseHeaders())
 
         if (xmlhttpreq.getAllResponseHeaders().indexOf('work_id') != -1) {
           studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
@@ -353,13 +351,15 @@ const UploadVideoStep1 = (props: Props) => {
               endpoint: `${UploadURL}`,
               chunkSize: 5 * 1024 * 1024,
               retryDelays: [0, 1000, 3000, 5000],
-              headers: {
-                data: trialHeaderData,
-                Authorization: `Bearer ${accessToken}`
-              },
+
               metadata: {
                 filename: tFile.name,
-                filetype: tFile.type
+                filetype: tFile.type,
+                user_id: contentCreator,
+                file_name: title,
+                video_type: 'trial_video',
+                work_id: work_id,
+                authorization: `${accessToken}`
               },
               removeFingerprintOnSuccess: true, // fingerprint in the URL storage will be removed
               onError: error => {

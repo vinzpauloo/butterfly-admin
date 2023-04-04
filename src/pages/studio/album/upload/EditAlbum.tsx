@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import { Box, Typography, TextField, ListItem, IconButton } from '@mui/material'
+import { Box, Typography, TextField, ListItem, IconButton, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
@@ -14,7 +14,6 @@ import Icon from 'src/@core/components/icon'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
-import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
 
 // ** Third Party Components
 import { useDropzone } from 'react-dropzone'
@@ -37,7 +36,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } 
 import { v4 as uuidv4 } from 'uuid'
 
 //* Context Import
-import { StudioContext, DisplayPage } from '..'
+import { StudioContext, DisplayPage } from '../../upload'
 
 // Styled components
 const CustomTextField = styled(TextField)(({ theme }) => ({
@@ -134,7 +133,7 @@ const FileUploaderSingle = () => {
   const [files, setFiles] = useState<File[]>([])
 
   // ** Hook
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg', '.gif']
@@ -295,10 +294,10 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
   )
 }
 
-const UploadAlbum = () => {
+const EditAlbum = () => {
   const router = useRouter()
+
   /* States */
-  const studioContext = React.useContext(StudioContext)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [photos, setPhotos] = useState<SortablePhoto[]>([])
 
@@ -308,11 +307,11 @@ const UploadAlbum = () => {
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
-    studioContext?.setDisplayPage(DisplayPage.MainPage)
+    router.back()
   }
 
   const handleContinueButton = () => {
-    router.push(`album-list`)
+    router.push(`/studio/album/album-list`)
   }
 
   const renderedPhotos = React.useRef<{ [key: string]: SortablePhotoProps }>({})
@@ -362,79 +361,85 @@ const UploadAlbum = () => {
     )
   }, [uploadedFiles])
 
+  const handleSubmit = (event: React.SyntheticEvent) => {
+    event.preventDefault()
+  }
+
   return (
     <BasicCard sx={{ ...styles.container }}>
-      <Typography
-        sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
-        variant='h5'
-        color={theme => theme.customBflyColors.primaryTextContrast}
-      >
-        Create New Album
-      </Typography>
-      <Box sx={{ ...styles.albumTitleWrapper }}>
-        <Typography sx={{ ...styles.title }} variant='h6' color={theme => theme.customBflyColors.primaryTextContrast}>
-          Album Title
+      <form onSubmit={handleSubmit}>
+        <Typography
+          sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
+          variant='h5'
+          color={theme => theme.customBflyColors.primaryTextContrast}
+        >
+          Edit New Album
         </Typography>
-        <form>
+        <Box sx={{ ...styles.albumTitleWrapper }}>
+          <Typography sx={{ ...styles.title }} variant='h6' color={theme => theme.customBflyColors.primaryTextContrast}>
+            Album Title
+          </Typography>
           <CustomTextField sx={{ ...styles.titleInput }} id='title' placeholder='Title' type='text' />
-        </form>
-      </Box>
+        </Box>
 
-      {/* UPLOAD CONTAINER */}
-      <Box sx={{ ...styles.uploadWrapper }}>
-        {/* ALBUM COVER CONTAINER */}
-        <FileUploaderSingle />
+        {/* UPLOAD CONTAINER */}
+        <Box sx={{ ...styles.uploadWrapper }}>
+          {/* ALBUM COVER CONTAINER */}
+          <FileUploaderSingle />
 
-        {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
-        <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
-          <Box sx={{ ...styles.multiUploadWrapper }}>
-            <FileUploaderMultiple onFilesChange={handleFilesChange} />
-          </Box>
+          {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
+          <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
+            <Box sx={{ ...styles.multiUploadWrapper }}>
+              <FileUploaderMultiple onFilesChange={handleFilesChange} />
+            </Box>
 
-          {/* SCROLLABLE PHOTO ALBUM */}
-          <Box sx={{ ...styles.photoAlbumWrapper }}>
-            <Box sx={{ ...styles.scrollFunc }}>
-              {photos.length === 0 ? (
-                <Box sx={{ ...styles.placeholder }}>
-                  <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
-                  <Typography textTransform='uppercase' variant='h6'>
-                    Gallery
-                  </Typography>
-                  <Typography>No photos uploaded.</Typography>
-                </Box>
-              ) : (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext items={photos}>
-                    <div style={{ margin: 30 }}>
-                      <PhotoAlbum photos={photos} layout='rows' spacing={10} padding={5} renderPhoto={renderPhoto} />
-                    </div>
-                  </SortableContext>
-                  <DragOverlay>{activeId && <PhotoFrame overlay {...renderedPhotos.current[activeId]} />}</DragOverlay>
-                </DndContext>
-              )}
+            {/* SCROLLABLE PHOTO ALBUM */}
+            <Box sx={{ ...styles.photoAlbumWrapper }}>
+              <Box sx={{ ...styles.scrollFunc }}>
+                {photos.length === 0 ? (
+                  <Box sx={{ ...styles.placeholder }}>
+                    <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
+                    <Typography textTransform='uppercase' variant='h6'>
+                      Gallery
+                    </Typography>
+                    <Typography>No photos uploaded.</Typography>
+                  </Box>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext items={photos}>
+                      <div style={{ margin: 30 }}>
+                        <PhotoAlbum photos={photos} layout='rows' spacing={10} padding={5} renderPhoto={renderPhoto} />
+                      </div>
+                    </SortableContext>
+                    <DragOverlay>
+                      {activeId && <PhotoFrame overlay {...renderedPhotos.current[activeId]} />}
+                    </DragOverlay>
+                  </DndContext>
+                )}
+              </Box>
             </Box>
           </Box>
         </Box>
-      </Box>
 
-      {/* BUTTON CONTAINER */}
-      <Box sx={{ ...styles.btnWrapper }}>
-        <Box>
-          <CustomButton sx={{ ...styles.buttons }} onClick={handleCancelButton}>
-            Cancel
-          </CustomButton>
+        {/* BUTTON CONTAINER */}
+        <Box sx={{ ...styles.btnWrapper }}>
+          <Box>
+            <Button sx={{ ...styles.buttons }} type='button' onClick={handleCancelButton}>
+              Cancel
+            </Button>
+          </Box>
+          <Box>
+            <Button sx={{ ...styles.buttons }} type='submit'>
+              Continue
+            </Button>
+          </Box>
         </Box>
-        <Box>
-          <CustomButton sx={{ ...styles.buttons }} onClick={handleContinueButton}>
-            Continue
-          </CustomButton>
-        </Box>
-      </Box>
+      </form>
     </BasicCard>
   )
 }
@@ -443,9 +448,9 @@ const styles = {
   container: {
     width: {
       xs: '100%',
-      sm: '85%',
-      md: '85%',
-      lg: '85%'
+      sm: '100%',
+      md: '100%',
+      lg: '100%'
     },
     paddingTop: '0',
     '& .MuiCardContent-root': {
@@ -476,7 +481,7 @@ const styles = {
     width: {
       xs: '100%',
       sm: '100%',
-      lg: '235%'
+      lg: '50%'
     }
   },
 
@@ -587,8 +592,15 @@ const styles = {
     }
   },
   buttons: {
-    width: 150
+    color: (theme: any) => theme.customBflyColors.alwaysPrimary,
+    backgroundColor: (theme: any) => theme.palette.common.white,
+    width: 180,
+    fontWeight: 'normal',
+    '&:hover': {
+      backgroundColor: (theme: any) => theme.palette.primary.main,
+      color: (theme: any) => theme.palette.common.white
+    }
   }
 }
 
-export default UploadAlbum
+export default EditAlbum

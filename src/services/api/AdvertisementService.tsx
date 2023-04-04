@@ -1,19 +1,32 @@
 import request from "@/lib/request";
+import authConfig from 'src/configs/auth'
 
 interface IAdvertisementParams {
-	data: {
+	id?: string
+	banner_id?: string
+	relation?: "banner" | "gif"
+	data?: {
 		site_id?: number
+		photo?: any
+		url?: string
+		start_date?: string
+		end_date?: string | null
+		active?: number
+		_method?: string
 	},
 	token?: string
 }
 
 const AdvertisementService = () => {
+	const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
 	const getAllAdminAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
 				"X-Authorization": "postman|1",
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
 			url: "/advertisements/admin",
 			method: "GET",
@@ -21,8 +34,51 @@ const AdvertisementService = () => {
 		});
 	};
 
+	const createNewAds = (params: IAdvertisementParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				'Content-Type': 'multipart/form-data', // if POST is form-data
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
+			},
+			url: `/advertisements/admin/${params.id}/${params.relation}`,
+			method: "POST",
+			data: params.data, // if body is JSON
+		});
+	};
 
-	return { getAllAdminAds };
+	const updateAds = (params: IAdvertisementParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				'Content-Type': 'multipart/form-data', // if POST is form-data
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
+			},
+			url: `/advertisements/admin/${params.id}/${params.relation}/${params.banner_id}`,
+			method: "POST",
+			data: params.data, // if body is JSON
+		});
+	};
+
+	const deleteAds = (params: IAdvertisementParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
+			},
+			url: `/advertisements/admin/${params.id}/${params.relation}/${params.banner_id}`,
+			method: "DELETE",
+		});
+	};
+
+
+	return { getAllAdminAds, createNewAds, updateAds, deleteAds };
 };
 
 export default AdvertisementService;

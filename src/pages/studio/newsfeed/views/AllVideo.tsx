@@ -14,42 +14,32 @@ import FeedVideoCard from '../../shared-component/feed/FeedVideoCard'
 // ** Third Party Components
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
-// ** API
-import { useQueryClient, useQuery } from '@tanstack/react-query'
-import FeedsService from '@/services/api/FeedsService'
-
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
 // ** Types
 import { IFeedStory } from '@/context/types'
-import { IUser } from '@/context/types'
 
-type Props = {}
-
-const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden: boolean }) => {
-  return <PerfectScrollbar options={{ wheelPropagation: false }}>{children}</PerfectScrollbar>
+type AllVideoProps = {
+  data?: any
+  handleFeedParams?: any
 }
 
-const AllVideo = (props: Props) => {
+const videoOnlyParams = { video_only: true, with: 'user' }
 
-  // ** Feeds 
-  const { getFeeds } = FeedsService()
-  const queryClient = useQueryClient()
-  const { isLoading, isError, data, refetch } = useQuery({
-    queryKey: ['getFeeds'],
-    queryFn: () => getFeeds({ video_only: true, with: 'user',  })
-  })
+const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
+  React.useEffect(() => {
+    if (data) {
+      handleFeedParams(videoOnlyParams)
+    }
+  }, [data])
 
   if (data) {
-    const { data: stories } = data
-
     return (
       <Box sx={{ display: 'flex' }}>
-        <ScrollWrapper hidden={true}>
           <Grid container spacing={10}>
-            {stories &&
-              stories?.map((story: IFeedStory) => (
+            {data.data &&
+              data.data?.map((story: IFeedStory) => (
                 <Grid key={story._id} item sm={6}>
                   <FeedCard
                     datePublished={formatDate(story.created_at)}
@@ -77,12 +67,11 @@ const AllVideo = (props: Props) => {
                 </Grid>
               ))}
           </Grid>
-        </ScrollWrapper>
       </Box>
     )
   }
 
-  return <></>
+  return <>Loading</>
 }
 
-export default AllVideo
+export default React.memo(AllVideo)

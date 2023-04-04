@@ -1,12 +1,12 @@
 // ** React imports
-import React, { Fragment, useEffect, useState, SyntheticEvent } from 'react'
+import React, { Fragment, useEffect, useCallback, useState, SyntheticEvent } from 'react'
 
 // ** Next Images
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import { Box, Typography, TextField, ListItem, IconButton } from '@mui/material'
+import { Box, Typography, TextField, ListItem, IconButton, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
@@ -14,7 +14,6 @@ import Icon from 'src/@core/components/icon'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
-import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
 
 // ** Third Party Components
 import { useDropzone } from 'react-dropzone'
@@ -35,9 +34,12 @@ import {
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable'
 import { v4 as uuidv4 } from 'uuid'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm, Controller } from 'react-hook-form'
 
 //* Context Import
-import { StudioContext, DisplayPage } from '..'
+import { StudioContext, DisplayPage } from '../../upload'
 
 // Styled components
 const CustomTextField = styled(TextField)(({ theme }) => ({
@@ -47,6 +49,22 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     display: 'none'
   }
 }))
+
+// ** TanStack Query
+import { useMutation, useQueryClient, useQueries, QueryClient } from '@tanstack/react-query'
+import { AlbumService } from '@/services/api/AlbumService'
+
+interface FormValues {
+  title: string
+  cover_photo: File | null
+  photos: File[]
+}
+
+const schema = yup.object().shape({
+  title: yup.string().required()
+  // cover_photo: yup.mixed().required()
+  // photos: yup.array().of(yup.mixed().required())
+})
 
 interface FileProp {
   name: string
@@ -63,13 +81,16 @@ type PhotoFrameProps = SortablePhotoProps & {
   insertPosition?: 'before' | 'after'
   attributes?: Partial<React.HTMLAttributes<HTMLDivElement>>
   listeners?: Partial<React.HTMLAttributes<HTMLDivElement>>
+  onRemove?: (id: string) => void
 }
 
-type SortablePhotoProps = RenderPhotoProps<SortablePhoto>
+type SortablePhotoProps = RenderPhotoProps<SortablePhoto> & {
+  onRemove?: (id: string) => void
+}
 
 const PhotoFrame = React.memo(
   React.forwardRef<HTMLDivElement, PhotoFrameProps>((props, ref) => {
-    const { layoutOptions, imageProps, overlay, active, insertPosition, attributes, listeners } = props
+    const { layoutOptions, imageProps, photo, overlay, active, insertPosition, attributes, listeners, onRemove } = props
     const { alt, style, ...restImageProps } = imageProps
 
     return (
@@ -89,25 +110,53 @@ const PhotoFrame = React.memo(
         {...attributes}
         {...listeners}
       >
-        <img
-          alt={alt}
-          style={{
-            ...style,
-            width: '100%',
-            height: 'auto',
-            padding: 0,
-            marginBottom: 0
-          }}
-          {...restImageProps}
-        />
+        {onRemove && (
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box
+              sx={{
+                position: 'relative',
+                width: '100%',
+                height: 'auto'
+              }}
+            >
+              <button
+                onClick={() => onRemove(photo.id)}
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: '50%',
+                  border: 'none',
+                  cursor: 'pointer',
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  zIndex: 5
+                }}
+              >
+                X
+              </button>
+              <img
+                alt={alt}
+                style={{
+                  ...style,
+                  width: '100%',
+                  height: 'auto',
+                  padding: 0,
+                  marginBottom: 0
+                }}
+                {...restImageProps}
+              />
+            </Box>
+          </Box>
+        )}
       </div>
     )
   })
 )
+
 PhotoFrame.displayName = 'PhotoFrame'
 
 function SortablePhotoFrame(props: SortablePhotoProps & { activeIndex?: number }) {
-  const { photo, activeIndex } = props
+  const { photo, activeIndex, onRemove } = props
   const { attributes, listeners, isDragging, index, over, setNodeRef } = useSortable({ id: photo.id })
 
   return (
@@ -129,18 +178,21 @@ function SortablePhotoFrame(props: SortablePhotoProps & { activeIndex?: number }
   )
 }
 
-const FileUploaderSingle = () => {
+const FileUploaderSingle = ({ onFilesChange }: { onFilesChange?: (files: File[]) => void }) => {
   // ** State
   const [files, setFiles] = useState<File[]>([])
 
   // ** Hook
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg', '.gif']
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
+      if (onFilesChange) {
+        onFilesChange(acceptedFiles)
+      }
     }
   })
 
@@ -271,14 +323,6 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
     </ListItem>
   ))
 
-  // const handleLinkClick = (event: SyntheticEvent) => {
-  //   event.preventDefault()
-  // }
-
-  // const handleRemoveAllFiles = () => {
-  //   setFiles([])
-  // }
-
   return (
     <Fragment>
       <Box {...getRootProps({ className: 'dropzone' })}>
@@ -297,22 +341,25 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
 
 const UploadAlbum = () => {
   const router = useRouter()
+  const queryClient = useQueryClient()
+
   /* States */
-  const studioContext = React.useContext(StudioContext)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [photos, setPhotos] = useState<SortablePhoto[]>([])
 
-  const handleFilesChange = (fileList: File[]) => {
+  // const handleFilesChange = (fileList: File[]) => {
+  //   setUploadedFiles(fileList)
+  // }
+
+  const handleFilesChange = useCallback((fileList: File[]) => {
     setUploadedFiles(fileList)
-  }
+    console.log(uploadedFiles)
+    setFormValue(prevFormValue => ({ ...prevFormValue, photos: fileList }))
+  }, [])
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
-    studioContext?.setDisplayPage(DisplayPage.MainPage)
-  }
-
-  const handleContinueButton = () => {
-    router.push(`album-list`)
+    router.back()
   }
 
   const renderedPhotos = React.useRef<{ [key: string]: SortablePhotoProps }>({})
@@ -345,7 +392,15 @@ const UploadAlbum = () => {
       // capture rendered photos for future use in DragOverlay
       renderedPhotos.current[props.photo.id] = props
 
-      return <SortablePhotoFrame activeIndex={activeIndex} {...props} />
+      return (
+        <SortablePhotoFrame
+          activeIndex={activeIndex}
+          onRemove={id => {
+            setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== id))
+          }}
+          {...props}
+        />
+      )
     },
     [activeIndex]
   )
@@ -362,79 +417,177 @@ const UploadAlbum = () => {
     )
   }, [uploadedFiles])
 
+  const [fileName, setFileName] = useState('')
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<FormValues>({
+    resolver: yupResolver(schema)
+  })
+
+  const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = event.target
+
+    if (name === 'logo' && files) {
+      const file = files[0]
+      if (file) {
+        setFileName(file.name)
+        setFormValue(prevState => ({
+          ...prevState,
+          [name]: file
+        }))
+      }
+    } else {
+      setFormValue(prevState => ({
+        ...prevState,
+        [name]: value
+      }))
+    }
+  }
+
+  const handleCoverPhotoChange = (files: File[]) => {
+    setFormValue({ ...formValue, cover_photo: files[0] })
+    console.log(`handleCOVERCHANGE`, formValue)
+  }
+
+  const [formValue, setFormValue] = useState<FormValues>({
+    title: '',
+    cover_photo: null,
+    photos: []
+  })
+
+  const { postAlbum } = AlbumService()
+  const mutation = useMutation(postAlbum)
+
+  const handleFormSubmit = async () => {
+    console.log(formValue)
+
+    const albumMultiPhotos: any = {
+      data: formValue
+    }
+
+    try {
+      await mutation.mutateAsync(albumMultiPhotos)
+
+      setTimeout(() => {
+        router.push(`/studio/album/album-list`)
+      }, 1000)
+    } catch (error) {
+      console.log(error)
+      alert(error)
+    }
+
+    // router.push(`/studio/album/album-list`)
+  }
+
   return (
     <BasicCard sx={{ ...styles.container }}>
-      <Typography
-        sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
-        variant='h5'
-        color={theme => theme.customBflyColors.primaryTextContrast}
-      >
-        Create New Album
-      </Typography>
-      <Box sx={{ ...styles.albumTitleWrapper }}>
-        <Typography sx={{ ...styles.title }} variant='h6' color={theme => theme.customBflyColors.primaryTextContrast}>
-          Album Title
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
+        <Typography
+          sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
+          variant='h5'
+          color={theme => theme.customBflyColors.primaryTextContrast}
+        >
+          Create New Album
         </Typography>
-        <form>
-          <CustomTextField sx={{ ...styles.titleInput }} id='title' placeholder='Title' type='text' />
-        </form>
-      </Box>
+        <Box sx={{ ...styles.albumTitleWrapper }}>
+          <Typography sx={{ ...styles.title }} variant='h6' color={theme => theme.customBflyColors.primaryTextContrast}>
+            Album Title
+          </Typography>
+          <TextField
+            label='Title'
+            variant='outlined'
+            sx={{ ...styles.titleInput2 }}
+            {...register('title')}
+            error={!!errors.title}
+            helperText={errors.title?.message}
+            value={formValue.title}
+            onChange={handleFormInputChange}
+            name='title'
+          />
+        </Box>
 
-      {/* UPLOAD CONTAINER */}
-      <Box sx={{ ...styles.uploadWrapper }}>
-        {/* ALBUM COVER CONTAINER */}
-        <FileUploaderSingle />
+        {/* UPLOAD CONTAINER */}
+        <Box sx={{ ...styles.uploadWrapper }}>
+          {/* ALBUM COVER CONTAINER */}
+          <FileUploaderSingle onFilesChange={handleCoverPhotoChange} />
 
-        {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
-        <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
-          <Box sx={{ ...styles.multiUploadWrapper }}>
-            <FileUploaderMultiple onFilesChange={handleFilesChange} />
-          </Box>
+          {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
+          <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
+            <Box sx={{ ...styles.multiUploadWrapper }}>
+              <FileUploaderMultiple onFilesChange={handleFilesChange} />
+            </Box>
 
-          {/* SCROLLABLE PHOTO ALBUM */}
-          <Box sx={{ ...styles.photoAlbumWrapper }}>
-            <Box sx={{ ...styles.scrollFunc }}>
-              {photos.length === 0 ? (
-                <Box sx={{ ...styles.placeholder }}>
-                  <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
-                  <Typography textTransform='uppercase' variant='h6'>
-                    Gallery
-                  </Typography>
-                  <Typography>No photos uploaded.</Typography>
-                </Box>
-              ) : (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext items={photos}>
-                    <div style={{ margin: 30 }}>
-                      <PhotoAlbum photos={photos} layout='rows' spacing={10} padding={5} renderPhoto={renderPhoto} />
-                    </div>
-                  </SortableContext>
-                  <DragOverlay>{activeId && <PhotoFrame overlay {...renderedPhotos.current[activeId]} />}</DragOverlay>
-                </DndContext>
-              )}
+            {/* SCROLLABLE PHOTO ALBUM */}
+            <Box sx={{ ...styles.photoAlbumWrapper }}>
+              <Box sx={{ ...styles.scrollFunc }}>
+                {photos.length === 0 ? (
+                  <Box sx={{ ...styles.placeholder }}>
+                    <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
+                    <Typography textTransform='uppercase' variant='h6'>
+                      Gallery
+                    </Typography>
+                    <Typography>No photos uploaded.</Typography>
+                  </Box>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext items={photos}>
+                      <div style={{ margin: 30 }}>
+                        <PhotoAlbum
+                          photos={photos}
+                          layout='rows'
+                          spacing={10}
+                          padding={5}
+                          renderPhoto={photoProps =>
+                            renderPhoto({
+                              ...photoProps,
+                              onRemove: id => {
+                                setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== id))
+                              }
+                            })
+                          }
+                        />
+                      </div>
+                    </SortableContext>
+                    <DragOverlay>
+                      {activeId && (
+                        <PhotoFrame
+                          overlay
+                          {...renderedPhotos.current[activeId]}
+                          onRemove={id => {
+                            setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== id))
+                          }}
+                        />
+                      )}
+                    </DragOverlay>
+                  </DndContext>
+                )}
+              </Box>
             </Box>
           </Box>
         </Box>
-      </Box>
 
-      {/* BUTTON CONTAINER */}
-      <Box sx={{ ...styles.btnWrapper }}>
-        <Box>
-          <CustomButton sx={{ ...styles.buttons }} onClick={handleCancelButton}>
-            Cancel
-          </CustomButton>
+        {/* BUTTON CONTAINER */}
+        <Box sx={{ ...styles.btnWrapper }}>
+          <Box>
+            <Button sx={{ ...styles.buttons }} type='button' onClick={handleCancelButton}>
+              Cancel
+            </Button>
+          </Box>
+          <Box>
+            <Button sx={{ ...styles.buttons }} type='submit'>
+              Continue
+            </Button>
+          </Box>
         </Box>
-        <Box>
-          <CustomButton sx={{ ...styles.buttons }} onClick={handleContinueButton}>
-            Continue
-          </CustomButton>
-        </Box>
-      </Box>
+      </form>
     </BasicCard>
   )
 }
@@ -443,9 +596,9 @@ const styles = {
   container: {
     width: {
       xs: '100%',
-      sm: '85%',
-      md: '85%',
-      lg: '85%'
+      sm: '100%',
+      md: '100%',
+      lg: '100%'
     },
     paddingTop: '0',
     '& .MuiCardContent-root': {
@@ -476,8 +629,16 @@ const styles = {
     width: {
       xs: '100%',
       sm: '100%',
-      lg: '235%'
+      lg: '50%'
     }
+  },
+  titleInput2: {
+    backgroundColor: (theme: any) => theme.customBflyColors.primaryTextContrast,
+    borderRadius: '4px',
+    '& .MuiOutlinedInput-notchedOutline': {
+      display: 'none'
+    },
+    width: { xs: '100%', lg: '38%' }
   },
 
   // Upload Container
@@ -587,7 +748,14 @@ const styles = {
     }
   },
   buttons: {
-    width: 150
+    color: (theme: any) => theme.customBflyColors.alwaysPrimary,
+    backgroundColor: (theme: any) => theme.palette.common.white,
+    width: 180,
+    fontWeight: 'normal',
+    '&:hover': {
+      backgroundColor: (theme: any) => theme.palette.primary.main,
+      color: (theme: any) => theme.palette.common.white
+    }
   }
 }
 

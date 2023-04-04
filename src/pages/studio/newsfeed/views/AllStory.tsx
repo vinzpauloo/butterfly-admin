@@ -23,24 +23,31 @@ import formatDate from '@/utils/formatDate'
 import { IFeedStory } from '@/context/types'
 import { IUser } from '@/context/types'
 
-type Props = {}
-
-
+type StoryProps = {
+  data? : any,
+  handleFeedParams? : any
+}
 
 const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden: boolean }) => {
   return <PerfectScrollbar options={{ wheelPropagation: false }}>{children}</PerfectScrollbar>
 }
-const AllStory = (props: Props) => {
-  // const { isLoading, data } = useQuery({queryKey: ['getFeeds']})
-  const queryClient = useQueryClient()
-  const data : any = queryClient.getQueryData(['getFeeds'])
 
+const StoryOnlyParams = { story_feeds_only: true, with: 'user' }
+
+const AllStory = ({data, handleFeedParams}: StoryProps) => {
+  React.useEffect(() => {
+    if (data) {
+      handleFeedParams(StoryOnlyParams)
+    }
+  }, [data])
+  
   if (data) {
+    console.log('story data',data)
     const { data : stories } = data
 
     return (
       <Box sx={{ display: 'flex' }}>
-        <ScrollWrapper hidden={true}>
+
           <Grid container spacing={10}>
             {stories &&
               stories?.map((story: IFeedStory) => (
@@ -66,7 +73,7 @@ const AllStory = (props: Props) => {
                 </Grid>
               ))}
           </Grid>
-        </ScrollWrapper>
+
       </Box>
     )
   }

@@ -112,7 +112,7 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
     return { ...title, ...nav, ...template }
   }
 
-  const {} = useQuery({
+  const { refetch } = useQuery({
     queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page],
     queryFn: () =>
       getSearchWorkgroups({
@@ -133,6 +133,13 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
   const handleClick = () => {
     setHeader('Add')
     setOpen(true)
+  }
+
+  const handleClear = () => {
+    refetch()
+    setTitle('')
+    setNavbar('')
+    setTemplate('')
   }
 
   return (
@@ -166,7 +173,7 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size='small'>
+          <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
             <InputLabel id='demo-simple-select-label'>Template</InputLabel>
             <Select
               labelId='demo-simple-select-label'
@@ -182,6 +189,9 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
               ))}
             </Select>
           </FormControl>
+          <Button variant='contained' color='error' onClick={handleClear}>
+            Clear
+          </Button>
         </Box>
         <Button variant='contained' onClick={handleClick}>
           Add Workgroup
@@ -191,7 +201,18 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
   )
 }
 
-const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setOpen, setHeader, setEditID }: any) => {
+const Table = ({
+  data,
+  isLoading,
+  setPage,
+  pageSize,
+  setPageSize,
+  rowCount,
+  setOpen,
+  setHeader,
+  setSectionID,
+  setTitle
+}: any) => {
   const columnData = [
     {
       field: 'title',
@@ -213,15 +234,18 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       headerName: 'Action',
       width: 100,
       renderCell: (params: any) => {
+        const handleClick = () => {
+          console.log('~~~~', params)
+
+          setHeader('Edit')
+          setOpen(true)
+          setSectionID(params.id)
+          setTitle(params.row.title)
+        }
+
         return (
           <Box>
-            <Button
-              onClick={() => {
-                setHeader('Edit')
-                setOpen(true)
-                setEditID(params.id)
-              }}
-            >
+            <Button onClick={handleClick}>
               <EditOutlinedIcon sx={styles.icon} />
             </Button>
           </Box>
@@ -266,7 +290,8 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const [open, setOpen] = useState(false)
   const [header, setHeader] = useState('')
-  const [editID, setEditID] = useState('')
+  const [sectionID, setSectionID] = useState('')
+  const [title, setTitle] = useState('')
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['workgroup', page, pageSize],
@@ -303,10 +328,21 @@ function index() {
           rowCount={rowCount}
           setOpen={setOpen}
           setHeader={setHeader}
-          setEditID={setEditID}
+          setSectionID={setSectionID}
+          setTitle={setTitle}
         />
       </Container>
-      <WorkGroupDrawer open={open} setOpen={setOpen} header={header} editID={editID} />
+
+      {open ? (
+        <WorkGroupDrawer
+          open={open}
+          setOpen={setOpen}
+          header={header}
+          sectionID={sectionID}
+          title={title}
+          setTitle={setTitle}
+        />
+      ) : null}
     </>
   )
 }

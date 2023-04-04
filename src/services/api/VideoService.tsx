@@ -1,11 +1,12 @@
 import request from '@/lib/request'
+
 // ** Configs
 import authConfig from 'src/configs/auth'
 
 interface IVideoParams {
   data: {
-    sort?: 'created_at'
-    sort_by?: 'desc' | 'asc' | null | undefined
+    sort?: 'desc' | 'asc'
+    sort_by?: 'title' // sorted by table column name
     with?: 'user'
     page?: number
     paginate?: number
@@ -27,7 +28,7 @@ const VideoService = () => {
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/works/admin',
+      url: '/admin/works',
       method: 'GET',
       params: params.data
     })

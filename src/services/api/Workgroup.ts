@@ -5,6 +5,12 @@ interface IGetWorkgroup {
   page: number
   paginate: number
 }
+interface IGetSpecificWorkgroup {
+  id: string
+}
+interface IGetAllWorkgroup {
+  workgroup_id: string
+}
 interface IGetSearchWorkgroup {
   page: number
   search_by: string
@@ -21,6 +27,17 @@ interface IPostWorkgroup {
   single?: string
   multiple?: string[]
   all: string[]
+}
+interface IPutWorkgroup {
+  id: string
+  data: {
+    title: string
+    navbar: string
+    template_id: string
+    single?: string
+    multiple?: string[]
+    all: string[]
+  }
 }
 
 const WorkgroupService = () => {
@@ -52,6 +69,19 @@ const WorkgroupService = () => {
     })
   }
 
+  const putWorkgroup = (params: IPutWorkgroup) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/workgroups/${params.id}`,
+      method: 'PUT',
+      data: params.data
+    })
+  }
+
   const getSearchWorkgroups = (params: IGetSearchWorkgroup) => {
     return request({
       headers: {
@@ -65,7 +95,32 @@ const WorkgroupService = () => {
     })
   }
 
-  return { getWorkgroup, postWorkgroup, getSearchWorkgroups }
+  const getSpecificWorkgroup = (params: IGetSpecificWorkgroup) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/workgroups/${params.id}`,
+      method: 'GET'
+    })
+  }
+
+  const getAllWorkgroup = (params: IGetAllWorkgroup) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: 'admin/works',
+      method: 'GET',
+      params: params
+    })
+  }
+
+  return { getWorkgroup, postWorkgroup, getSearchWorkgroups, getSpecificWorkgroup, putWorkgroup, getAllWorkgroup }
 }
 
 export default WorkgroupService

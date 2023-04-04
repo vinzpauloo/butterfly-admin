@@ -1,34 +1,28 @@
 // ** React Imports
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 
 // ** Custom Components
-import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import ContentDialog from '@/pages/studio/shared-component/ContentDialog'
 
-// ** Types Imports
-import { ThemeColor } from 'src/@core/layouts/types'
+// ** Utils
+import formatDate from '@/utils/formatDate'
 
-// ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Data Import
-import { rows } from '@/data/dummyNewsFeedData'
+// ** Apis
+import ContentService from '@/services/api/ContentService'
 
-interface StatusObj {
-  [key: number]: {
-    title: string
-    color: ThemeColor
-  }
-}
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 
 // ** renders client column
 const renderClient = (params: GridRenderCellParams) => {
@@ -37,30 +31,66 @@ const renderClient = (params: GridRenderCellParams) => {
   const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
   const color = states[stateNum]
 
-  if (row.avatar.length) {
-    return <CustomAvatar src={`/images/avatars/cc/${row.avatar}`} sx={{ borderRadius:'10px', mr: 3, width: '5.875rem', height: '3rem' }} />
-  } else {
+  if (row.thumbnail_url.length) {
     return (
       <CustomAvatar
-        skin='light'
-        color={color as ThemeColor}
-        sx={{ borderRadius:'10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
-      >
-        {getInitials(row.full_name ? row.full_name : 'John Doe')}
-      </CustomAvatar>
+        src={`${row.thumbnail_url.replace('http://localhost/', 'http://192.168.50.9/')}`}
+        sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
+      />
     )
+  } else {
+    return <></>
   }
 }
 
-const statusObj: StatusObj = {
-  1: { title: 'pending', color: 'warning' },
-  2: { title: 'declined', color: 'error' },
+interface IContentTable {}
+
+interface SnackState extends SnackbarOrigin {
+  open: boolean
 }
 
-const ContentTable = () => {
+const ContentTable = (props: IContentTable) => {
   // ** States
-  const [pageSize, setPageSize] = useState<number>(7)
-  const [hideNameColumn, setHideNameColumn] = useState(false)
+  const [data, setData] = React.useState([])
+  const [rowCount, setRowCount] = React.useState([])
+  const [page, setPage] = React.useState<number>(1)
+  const [pageSize, setPageSize] = React.useState(10)
+  const [snackState, setSnackState] = React.useState<SnackState>({
+    open: false,
+    vertical: 'top',
+    horizontal: 'right'
+  })
+  // desctruct the snack state
+  const { vertical, horizontal, open } = snackState
+
+  // Access the client
+  const queryClient = useQueryClient()
+
+  const { getContents } = ContentService()
+
+  //Queries
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: ['contents'],
+    queryFn: () => getContents({ with: 'user' }),
+    onSuccess: data => {
+      console.log('data isss', data)
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+      console.log('@@@', data)
+    }
+  })
+
+  // Mutations
+  const mutation = useMutation({
+    mutationFn: () => { return new Promise(resolve => {}) },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['contents'] })
+    },
+  })
+
 
   const columns: GridColDef[] = [
     {
@@ -68,15 +98,10 @@ const ContentTable = () => {
       minWidth: 150,
       field: 'video_thumbnail',
       headerName: 'Video Thumbnail',
-      align:'center',
-      headerAlign:'center',
-      hide: hideNameColumn,
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {renderClient(params)}
-          </Box>
-        )
+        return <Box sx={{ display: 'flex', alignItems: 'center' }}>{renderClient(params)}</Box>
       }
     },
     {
@@ -84,15 +109,12 @@ const ContentTable = () => {
       minWidth: 150,
       field: 'full_name',
       headerName: 'Content Creator',
-      hide: hideNameColumn,
       renderCell: (params: GridRenderCellParams) => {
-        const { row } = params
-
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {row.full_name}
+                {params.row.user.username}
               </Typography>
             </Box>
           </Box>
@@ -114,21 +136,26 @@ const ContentTable = () => {
       flex: 0.15,
       minWidth: 110,
       field: 'video_url',
+      align: 'center',
       headerName: 'Video URL',
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.email}
-        </Typography>
+        <>
+          <Icon
+            onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls)}
+            icon='mdi:text-box-outline'
+            fontSize='1.4rem'
+          />
+        </>
       )
     },
     {
       flex: 0.13,
       minWidth: 140,
-      field: 'category',
-      headerName: 'Category',
+      field: 'tags',
+      headerName: 'Tags',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          Multiple Categories
+          {params.row.tags.join(', ')}
         </Typography>
       )
     },
@@ -139,7 +166,7 @@ const ContentTable = () => {
       headerName: 'Last Update',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.last_update}
+          {formatDate(params.row.updated_at)}
         </Typography>
       )
     },
@@ -148,20 +175,10 @@ const ContentTable = () => {
       minWidth: 140,
       field: 'status',
       headerName: 'Status',
-      align:'center',
-      headerAlign:'center',
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        const status = statusObj[params.row.status]
-
-        return (
-          <CustomChip
-            size='small'
-            skin='light'
-            color={status.color}
-            label={status.title}
-            sx={{  '&':{ padding: '1em 1em',borderRadius: '3px !important' },'& .MuiChip-label': { textTransform: 'capitalize' } }}
-          />
-        )
+        return <Typography>{params.row.approval}</Typography>
       }
     },
     {
@@ -169,30 +186,47 @@ const ContentTable = () => {
       minWidth: 50,
       field: 'actions',
       headerName: '',
-      align:'center',
+      align: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        return (
-          <ContentDialog param={params.row} />
-        )
+        return <ContentDialog param={params.row} />
       }
     }
   ]
 
+  const handleCopyToClipboard = (newState: SnackbarOrigin, trialUrl: string) => () => {
+    navigator.clipboard.writeText(trialUrl)
+    setSnackState({ open: true, ...newState })
+  }
+
   return (
-    <Card>
-      <CardHeader
-        title='THE STUDIO PAGE - CONTENT APPROVAL'
+    <>
+      <Card>
+        <CardHeader title='THE STUDIO PAGE - CONTENT APPROVAL' />
+        <DataGrid
+          loading={isLoading || isRefetching}
+          getRowId={row => row._id}
+          autoHeight
+          rows={data}
+          columns={columns}
+          pageSize={pageSize}
+          disableSelectionOnClick
+          rowsPerPageOptions={[7, 10, 25, 50]}
+          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+        />
+      </Card>
+
+      <Snackbar
+        color='black'
+        open={open}
+        onClose={() => {
+          setSnackState({ ...snackState, open: false })
+        }}
+        message='Copied to clipboard'
+        autoHideDuration={1500}
+        key={vertical + horizontal}
+        anchorOrigin={{ vertical, horizontal }}
       />
-      <DataGrid
-        autoHeight
-        rows={rows}
-        columns={columns}
-        pageSize={pageSize}
-        disableSelectionOnClick
-        rowsPerPageOptions={[7, 10, 25, 50]}
-        onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-      />
-    </Card>
+    </>
   )
 }
 

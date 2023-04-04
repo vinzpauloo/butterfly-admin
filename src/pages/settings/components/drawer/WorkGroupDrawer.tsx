@@ -29,7 +29,7 @@ import Icon from 'src/@core/components/icon'
 import WorkgroupService from '@/services/api/Workgroup'
 import WorkList from '../modal/WorkList'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 const navData = [
   {
@@ -109,7 +109,7 @@ const columns: GridColumns = [
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <CustomAvatar
               src={params.row.thumbnail_url}
-              sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
+              sx={{ borderRadius: '5px', mr: 3, width: '4.875rem', height: '3rem' }}
             />
           </Box>
         </Box>
@@ -144,10 +144,6 @@ const schema = yup.object().shape({
   title: yup.string().min(7, 'Title must be at least 7 characters').required()
 })
 
-const defaultValues = {
-  title: ''
-}
-
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -168,29 +164,66 @@ const RandomVideoPicker = (num: number, all: string[]) => {
   return choosenID
 }
 
-const WorkGroupDrawer = ({ open, setOpen, header, editID }: any) => {
+// ** THIS DRAWER IS FOR ADD AND EDIT WORKGROUP
+// ** open and setOpen -> use for triggering the show of drawer
+// ** header have two possible value -> Edit and Add
+// ** sectionID -> is section ID
+// ** title -> to set a default value for the edit
+// ** setTitle -> to reset the title
+const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: any) => {
   // ** State
-  const [navbar, setNavbar] = useState<string>('')
-  const [template, setTemplate] = useState<string>('')
+  const [navbar, setNavbar] = useState<string>('selection') // ** default value
+  const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedVideosInModal, setSelectedInModal] = useState([])
-  const [selectedRows, setSelectedRows] = useState([])
-  const { postWorkgroup } = WorkgroupService()
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [rowCount, setRowCount] = useState(0)
+  const [allId, setAllId] = useState([])
+  const [hasSave, setHasSave] = useState(true)
+  const { postWorkgroup, getSpecificWorkgroup, putWorkgroup, getAllWorkgroup } = WorkgroupService()
 
+  const { refetch: refetchSpecific } = useQuery({
+    queryKey: ['edit-workgroup', sectionID],
+    queryFn: () => getSpecificWorkgroup({ id: sectionID }),
+    onSuccess: data => {
+      setNavbar(data.navbar)
+      setTemplate(data.template_id)
+      setAllId(data.all)
+    },
+    enabled: header === 'Edit'
+  })
+
+  const { refetch: refetchAll, isLoading } = useQuery({
+    queryKey: ['edit-allworks', sectionID, page],
+    queryFn: () => getAllWorkgroup({ workgroup_id: sectionID }),
+    onSuccess: data => {
+      setSelectedInModal(data.data)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+      setRowCount(data.total)
+    },
+    enabled: header === 'Edit' && hasSave
+  })
+
+  // ** use to POST new workgroup
   const { mutate: mutateWorkgroup } = useMutation(postWorkgroup)
+
+  // ** use to PUT or update the workgroup
+  const { mutate: mutateEditWorkgroup } = useMutation(putWorkgroup)
 
   const layoutPattern = template => {
     switch (template) {
       case 'videoSlider':
-        return RandomVideoPicker(6, selectedRows)
+        return RandomVideoPicker(6, allId)
       case 'reelslider':
-        return RandomVideoPicker(6, selectedRows)
+        return RandomVideoPicker(6, allId)
       case 'singleVideoWithGrid':
-        return RandomVideoPicker(5, selectedRows)
+        return RandomVideoPicker(5, allId)
       case 'singleVideoList':
-        return RandomVideoPicker(10, selectedRows)
+        return RandomVideoPicker(10, allId)
       case 'grid':
-        return RandomVideoPicker(4, selectedRows)
+        return RandomVideoPicker(4, allId)
     }
   }
 
@@ -200,7 +233,9 @@ const WorkGroupDrawer = ({ open, setOpen, header, editID }: any) => {
     handleSubmit,
     formState: { errors }
   } = useForm({
-    defaultValues,
+    defaultValues: {
+      title
+    },
     mode: 'onChange',
     resolver: yupResolver(schema)
   })
@@ -208,23 +243,44 @@ const WorkGroupDrawer = ({ open, setOpen, header, editID }: any) => {
   const handleClose = () => {
     setOpen(false)
     reset()
+    setTemplate('videoSlider')
+    setNavbar('selection')
+    setAllId([])
+    setSelectedInModal([])
+    setOpen(false)
   }
 
   const handleOpenModal = () => {
     setModalOpen(true)
   }
 
+  const handlePageChange = (newPage: number) => {
+    console.log('@@@', newPage)
+
+    setPage(newPage + 1)
+    // if(!hasSave){
+    //   const first = (newPage + 1) * 10;
+    //   const last = (newPage + 2) * 10;
+
+    //   setSelectedInModal(prev => {
+    //     const nextPageData = prev.slice(first, last + 1)
+
+    //     return nextPageData
+    //   })
+    // }
+  }
+
   const onSubmit = (data: any) => {
+    const vid: string[] = layoutPattern(template)
     if (header === 'Add') {
-      const vid: string[] = layoutPattern(template)
-      if ('singleVideoList' === template) {
+      if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
         mutateWorkgroup({
           title: data.title,
           navbar: navbar,
           template_id: template,
           single: vid[0],
           multiple: vid?.slice(1),
-          all: selectedRows
+          all: allId
         })
       } else {
         mutateWorkgroup({
@@ -232,24 +288,58 @@ const WorkGroupDrawer = ({ open, setOpen, header, editID }: any) => {
           navbar: navbar,
           template_id: template,
           multiple: vid,
-          all: selectedRows
+          all: allId
         })
       }
       reset()
-      setTemplate('')
-      setNavbar('')
-      setSelectedRows([])
+      setTemplate('videoSlider')
+      setNavbar('selection')
+      setAllId([])
+      setSelectedInModal([])
+      setOpen(false)
+    } else {
+      if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
+        mutateEditWorkgroup({
+          id: sectionID,
+          data: {
+            title: data.title,
+            navbar: navbar,
+            template_id: template,
+            single: vid[0],
+            multiple: vid?.slice(1),
+            all: allId
+          }
+        })
+      } else {
+        mutateEditWorkgroup({
+          id: sectionID,
+          data: {
+            title: data.title,
+            navbar: navbar,
+            template_id: template,
+            single: vid[0],
+            multiple: vid?.slice(1),
+            all: allId
+          }
+        })
+      }
+      reset()
+      setTemplate('videoSlider')
+      setNavbar('selection')
+      setAllId([])
       setSelectedInModal([])
       setOpen(false)
     }
   }
 
   useEffect(() => {
-    const workgroupNavbar = header === 'Add' ? '' : 'selection' // if add its dont have default value
-    const workgroupTemplate = header === 'Add' ? '' : 'videoSlider' // if add its dont have default value
-    setNavbar(workgroupNavbar)
-    setTemplate(workgroupTemplate)
-  }, [header])
+    if (open && header === 'Edit') {
+      refetchSpecific()
+      refetchAll()
+    }
+
+    return () => setTitle('')
+  }, [open])
 
   return (
     <>
@@ -259,7 +349,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, editID }: any) => {
         variant='temporary'
         onClose={handleClose}
         ModalProps={{ keepMounted: true }}
-        sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
+        sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 600 } } }}
       >
         <Header>
           <Typography variant='h6'>{header} Workgroup</Typography>
@@ -327,8 +417,19 @@ const WorkGroupDrawer = ({ open, setOpen, header, editID }: any) => {
                 Select Content
               </Button>
             </Box>
-            <Box height={480} sx={{ mb: 6 }}>
-              <DataGrid columns={columns} rows={selectedVideosInModal} getRowId={row => row._id} />
+            <Box sx={{ mb: 6 }}>
+              <DataGrid
+                rowCount={rowCount}
+                columns={columns}
+                pageSize={10}
+                onPageChange={handlePageChange}
+                paginationMode='server'
+                autoHeight
+                pagination
+                rows={selectedVideosInModal}
+                loading={header === 'Edit' && hasSave ? isLoading : false}
+                getRowId={row => row._id}
+              />
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>
@@ -341,13 +442,19 @@ const WorkGroupDrawer = ({ open, setOpen, header, editID }: any) => {
           </form>
         </Box>
       </Drawer>
-      <WorkList
-        modalOpen={modalOpen}
-        setModalOpen={setModalOpen}
-        setSelectedInModal={setSelectedInModal}
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
-      />
+      {modalOpen ? (
+        <WorkList
+          allId={allId}
+          modalOpen={modalOpen}
+          setAllId={setAllId}
+          setHasSave={setHasSave}
+          setPage={setPage}
+          setPageSize={setPageSize}
+          setRowCount={setRowCount}
+          setModalOpen={setModalOpen}
+          setSelectedInModal={setSelectedInModal}
+        />
+      ) : null}
     </>
   )
 }

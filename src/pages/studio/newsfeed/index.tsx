@@ -26,40 +26,46 @@ import createSkeleton from '@/utils/createSkeleton'
 
 const steps = [
   {
-    title: 'All Story Feeds',
+    title: 'All Story Feeds'
   },
   {
-    title: 'All Photo Feeds',
+    title: 'All Photo Feeds'
   },
   {
-    title: 'All Video Feeds',
+    title: 'All Video Feeds'
   },
   {
-    title: 'Videos with Photos',
-  },
+    title: 'Videos with Photos'
+  }
 ]
 
 type Props = {}
 
-const NewsFeedList = (props: Props) => {
+// ** Feeds Params
+const defaultParams = { story_feeds_only: true, with: 'user' }
 
+const NewsFeedList = (props: Props) => {
   // ** States
   const [activeTab, setActiveTab] = React.useState<number>(0)
-
+  const [feedParams, setFeedParams] = React.useState<{}>(defaultParams)
 
   // ** QueryAPI
   const { getFeeds } = FeedsService()
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const { isLoading, isError, data, refetch } = useQuery({
-    queryKey: ['getFeeds'],
-    queryFn: () => getFeeds({ story_feeds_only: true, with: 'user' })
+    queryKey: ['getFeeds', feedParams],
+    queryFn: () => getFeeds(feedParams)
   })
 
   // ** Hooks
-  React.useEffect( ()=>{
+  React.useEffect(() => {
     console.log('changed tab so I will call refetch from react query')
-  },[activeTab])
+  }, [activeTab])
 
+  const handleFeedParams = (feedObj: {}) => {
+    const newFeed = feedObj
+    setFeedParams(newFeed)
+  }
 
   const handleInvalidate = () => {
     queryClient.invalidateQueries()
@@ -67,46 +73,66 @@ const NewsFeedList = (props: Props) => {
 
   // TURN THIS TO ENUM SO ITS READABLE
   const getActiveTabContent = (step: number) => {
-    switch (step) {
-      case 0:
-        return <AllStory />
-      case 1:
-        return <AllPhoto />
-      case 2:
-        return <AllVideo />
-      case 3:
-        return <VideosWithPhotos />
-      default:
-        return null
+    if (data) {
+      switch (step) {
+        case 0: {
+          return <AllStory data={data} handleFeedParams={handleFeedParams} />
+        }
+        case 1:
+          return <AllPhoto data={data} handleFeedParams={handleFeedParams} />
+        case 2: {
+          return <AllVideo data={data} handleFeedParams={handleFeedParams} />
+        }
+        case 3:
+          return <VideosWithPhotos data={data} handleFeedParams={handleFeedParams} />
+        default:
+          return null
+      }
     }
   }
 
-  
   const renderContent = () => {
     return getActiveTabContent(activeTab)
   }
 
   return (
     <Box sx={{ marginInline: 'auto', marginTop: '2rem', paddingBottom: '4rem', alignItems: 'center' }}>
-
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', gap: '2rem', marginBottom: '2rem' }}>
-
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexDirection: 'row',
+          gap: '2rem',
+          marginBottom: '2rem'
+        }}
+      >
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '2.5rem', marginBottom: '0rem' }}>
           {steps.map((step, index) => {
             return (
-              <Button sx={{ paddingBlock: '.5em', textTransform: 'uppercase' }} size='medium' onClick={() => { setActiveTab(index) }} variant={index == activeTab ? 'contained' : 'outlined'}>{step.title}</Button>
+              <Button
+                key={index}
+                sx={{ paddingBlock: '.5em', textTransform: 'uppercase' }}
+                size='medium'
+                onClick={() => {
+                  setActiveTab(index)
+                }}
+                variant={index == activeTab ? 'contained' : 'outlined'}
+              >
+                {step.title}
+              </Button>
             )
           })}
         </Box>
         <Box>
           <TextField
             sx={{
+              display : 'none', //search box
               '& input': {
-                padding: '.5em 1em',
+                padding: '.5em 1em'
               },
               '& fieldset': {
                 borderRadius: '0 !important',
-                padding: '.5em 1em',
+                padding: '.5em 1em'
               }
             }}
             variant='outlined'
@@ -117,9 +143,9 @@ const NewsFeedList = (props: Props) => {
                   <Icon icon='mdi:microphone' />
                 </InputAdornment>
               )
-            }} />
+            }}
+          />
         </Box>
-
       </Box>
 
       <Box sx={{ borderRadius: '5px', maxWidth: '90%', marginInline: 'auto', padding: '1em' }}>
@@ -127,20 +153,17 @@ const NewsFeedList = (props: Props) => {
           {/* <Button onClick={handleInvalidate} variant='contained'>SEARCH BY CONTENT CREATOR</Button>
           <Button variant='contained'>SORT BY DATE</Button> */}
         </Box>
-        {
-          isLoading && 
+        {isLoading && (
           <Box sx={{ display: 'flex' }}>
-              <Grid container spacing={10}>
-                {createSkeleton(2)}
-              </Grid>
+            <Grid container spacing={10}>
+              {createSkeleton(2)}
+            </Grid>
           </Box>
-          
-        }
-        {
-          data && renderContent()
-        }
+        )}
+        {data && renderContent()}
       </Box>
     </Box>
+
   )
 }
 
