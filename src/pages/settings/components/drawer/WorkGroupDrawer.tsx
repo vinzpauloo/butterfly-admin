@@ -176,10 +176,11 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedVideosInModal, setSelectedInModal] = useState([])
-  const [selectedRows, setSelectedRows] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
+  const [allId, setAllId] = useState([])
+  const [hasSave, setHasSave] = useState(true)
   const { postWorkgroup, getSpecificWorkgroup, putWorkgroup, getAllWorkgroup } = WorkgroupService()
 
   const { refetch: refetchSpecific } = useQuery({
@@ -188,6 +189,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     onSuccess: data => {
       setNavbar(data.navbar)
       setTemplate(data.template_id)
+      setAllId(data.all)
     },
     enabled: header === 'Edit'
   })
@@ -201,7 +203,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       setPage(data.current_page)
       setRowCount(data.total)
     },
-    enabled: header === 'Edit'
+    enabled: header === 'Edit' && hasSave
   })
 
   // ** use to POST new workgroup
@@ -213,15 +215,15 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   const layoutPattern = template => {
     switch (template) {
       case 'videoSlider':
-        return RandomVideoPicker(6, selectedRows)
+        return RandomVideoPicker(6, allId)
       case 'reelslider':
-        return RandomVideoPicker(6, selectedRows)
+        return RandomVideoPicker(6, allId)
       case 'singleVideoWithGrid':
-        return RandomVideoPicker(5, selectedRows)
+        return RandomVideoPicker(5, allId)
       case 'singleVideoList':
-        return RandomVideoPicker(10, selectedRows)
+        return RandomVideoPicker(10, allId)
       case 'grid':
-        return RandomVideoPicker(4, selectedRows)
+        return RandomVideoPicker(4, allId)
     }
   }
 
@@ -243,7 +245,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     reset()
     setTemplate('videoSlider')
     setNavbar('selection')
-    setSelectedRows([])
+    setAllId([])
     setSelectedInModal([])
     setOpen(false)
   }
@@ -253,7 +255,19 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   }
 
   const handlePageChange = (newPage: number) => {
+    console.log('@@@', newPage)
+
     setPage(newPage + 1)
+    // if(!hasSave){
+    //   const first = (newPage + 1) * 10;
+    //   const last = (newPage + 2) * 10;
+
+    //   setSelectedInModal(prev => {
+    //     const nextPageData = prev.slice(first, last + 1)
+
+    //     return nextPageData
+    //   })
+    // }
   }
 
   const onSubmit = (data: any) => {
@@ -266,7 +280,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
           template_id: template,
           single: vid[0],
           multiple: vid?.slice(1),
-          all: selectedRows
+          all: allId
         })
       } else {
         mutateWorkgroup({
@@ -274,38 +288,45 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
           navbar: navbar,
           template_id: template,
           multiple: vid,
-          all: selectedRows
+          all: allId
         })
       }
       reset()
       setTemplate('videoSlider')
       setNavbar('selection')
-      setSelectedRows([])
+      setAllId([])
       setSelectedInModal([])
       setOpen(false)
     } else {
       if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
-        mutateWorkgroup({
-          title: data.title,
-          navbar: navbar,
-          template_id: template,
-          single: vid[0],
-          multiple: vid?.slice(1),
-          all: selectedRows
+        mutateEditWorkgroup({
+          id: sectionID,
+          data: {
+            title: data.title,
+            navbar: navbar,
+            template_id: template,
+            single: vid[0],
+            multiple: vid?.slice(1),
+            all: allId
+          }
         })
       } else {
-        mutateWorkgroup({
-          title: data.title,
-          navbar: navbar,
-          template_id: template,
-          multiple: vid,
-          all: selectedRows
+        mutateEditWorkgroup({
+          id: sectionID,
+          data: {
+            title: data.title,
+            navbar: navbar,
+            template_id: template,
+            single: vid[0],
+            multiple: vid?.slice(1),
+            all: allId
+          }
         })
       }
       reset()
       setTemplate('videoSlider')
       setNavbar('selection')
-      setSelectedRows([])
+      setAllId([])
       setSelectedInModal([])
       setOpen(false)
     }
@@ -400,13 +421,13 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
               <DataGrid
                 rowCount={rowCount}
                 columns={columns}
-                pageSize={pageSize}
+                pageSize={10}
                 onPageChange={handlePageChange}
                 paginationMode='server'
                 autoHeight
                 pagination
                 rows={selectedVideosInModal}
-                loading={header === 'Edit' ? isLoading : false}
+                loading={header === 'Edit' && hasSave ? isLoading : false}
                 getRowId={row => row._id}
               />
             </Box>
@@ -421,13 +442,19 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
           </form>
         </Box>
       </Drawer>
-      <WorkList
-        modalOpen={modalOpen}
-        setModalOpen={setModalOpen}
-        setSelectedInModal={setSelectedInModal}
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
-      />
+      {modalOpen ? (
+        <WorkList
+          allId={allId}
+          modalOpen={modalOpen}
+          setAllId={setAllId}
+          setHasSave={setHasSave}
+          setPage={setPage}
+          setPageSize={setPageSize}
+          setRowCount={setRowCount}
+          setModalOpen={setModalOpen}
+          setSelectedInModal={setSelectedInModal}
+        />
+      ) : null}
     </>
   )
 }

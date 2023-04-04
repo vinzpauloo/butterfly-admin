@@ -235,6 +235,8 @@ const Table = ({
       width: 100,
       renderCell: (params: any) => {
         const handleClick = () => {
+          console.log('~~~~', params)
+
           setHeader('Edit')
           setOpen(true)
           setSectionID(params.id)

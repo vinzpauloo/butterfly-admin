@@ -76,9 +76,9 @@ const WorkgroupService = () => {
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
-      url: `/workgroups/${params.id}`,
+      url: `/admin/workgroups/${params.id}`,
       method: 'PUT',
-      params: params
+      data: params.data
     })
   }
 
@@ -102,7 +102,7 @@ const WorkgroupService = () => {
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
-      url: `/workgroups/${params.id}`,
+      url: `/admin/workgroups/${params.id}`,
       method: 'GET'
     })
   }

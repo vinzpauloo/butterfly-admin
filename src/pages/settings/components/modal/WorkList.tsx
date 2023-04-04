@@ -1,7 +1,7 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-import { Box, Button, Modal, Typography } from '@mui/material'
+import { Box, Button, Checkbox, Modal, Typography } from '@mui/material'
 import { DataGrid, GridColumns, GridRenderCellParams, useGridApiRef } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
 import VideoService from '@/services/api/VideoService'
@@ -10,90 +10,63 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 // ** Utils import
 import formatDate from '@/utils/formatDate'
 
-const columns: GridColumns = [
-  {
-    flex: 0.02,
-    minWidth: 70,
-    field: 'thumbnail_url',
-    headerName: 'Video Thumbnail',
-    renderCell: (params: GridRenderCellParams) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <CustomAvatar
-              src={params.row.thumbnail_url}
-              sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
-            />
-          </Box>
-        </Box>
-      )
-    }
-  },
-  {
-    flex: 0.02,
-    minWidth: 90,
-    headerName: 'Content Creator',
-    field: 'content_creator',
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.user.username}
-      </Typography>
-    )
-  },
-  {
-    flex: 0.03,
-    minWidth: 60,
-    field: 'title',
-    headerName: 'Title',
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.title}
-      </Typography>
-    )
-  },
-  {
-    flex: 0.04,
-    field: 'category',
-    minWidth: 80,
-    headerName: 'Category',
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params?.row?.tags?.join(', ')}
-      </Typography>
-    )
-  },
-  {
-    flex: 0.04,
-    minWidth: 140,
-    field: 'last_update',
-    headerName: 'Last Update',
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {formatDate(params.row.updated_at)}
-      </Typography>
-    )
-  }
-]
+const CheckboxContent = ({ allId, id, setAllId }: any) => {
+  const [isCheck, setIsCheck] = useState(allId.includes(id))
 
-function WorkList({ modalOpen, setModalOpen, setSelectedInModal, setSelectedRows }: any) {
-  const apiRef = useGridApiRef()
-  const [selectedVideos, setSelectedVideos] = useState([])
+  const handleCheck = () => {
+    if (isCheck) {
+      setAllId(prev => {
+        const removeId = prev.filter(item => item !== id)
+
+        return removeId
+      })
+      setIsCheck((prev: boolean) => !prev)
+    } else {
+      setAllId(prev => [...prev, id])
+      setIsCheck((prev: boolean) => !prev)
+    }
+  }
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Checkbox checked={isCheck} onClick={handleCheck} />
+    </Box>
+  )
+}
+
+function WorkList({
+  modalOpen,
+  setModalOpen,
+  setSelectedInModal,
+  allId,
+  setAllId,
+  setHasSave,
+  setPageSize,
+  setPage,
+  setRowCount
+}: any) {
   const [data, setData] = useState([])
-  const [page, setPage] = useState<number>(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [rowCount, setRowCount] = useState(0)
+  const [modalPage, setModalPage] = useState<number>(1)
+  const [modalPageSize, setModalPageSize] = useState(10)
+  const [modalRowCount, setModalRowCount] = useState(0)
+  const [saveData, setSaveData] = useState([])
+  const [prevPage, setPrevPage] = useState(0)
   const { getAllVideos } = VideoService()
-  const { isLoading } = useQuery({
-    queryKey: ['worklist', page],
-    queryFn: () => getAllVideos({ data: { sort: 'created_at', sort_by: 'desc', with: 'user' } }),
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['worklist', modalPage],
+    queryFn: () => getAllVideos({ data: { sort: 'desc', sort_by: 'title', with: 'user', page: modalPage } }),
     onError: err => {
       console.log('Modal', err)
     },
     onSuccess: data => {
       setData(data.data)
-      setRowCount(data.total)
-      setPageSize(data.per_page)
-      setPage(data.current_page)
+      setModalRowCount(data.total)
+      setModalPageSize(data.per_page)
+      setModalPage(data.current_page)
+      if (prevPage < modalPage) {
+        setSaveData(prev => prev.concat(data.data))
+        setPrevPage(prev => prev + 1)
+      }
     }
   })
 
@@ -102,21 +75,97 @@ function WorkList({ modalOpen, setModalOpen, setSelectedInModal, setSelectedRows
   }
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage + 1)
+    setModalPage(newPage + 1)
   }
 
   const handleSave = () => {
     if (data.length > 0) {
-      const selectedVid = data?.filter((item: any) => {
-        if (selectedVideos.includes(item?._id)) {
+      const selectedVid = saveData?.filter((item: any) => {
+        if (allId.includes(item?._id)) {
           return item
         }
       })
       setSelectedInModal(selectedVid)
-      setSelectedRows(selectedVideos)
+      setPageSize(10)
+      setPage(1)
+      setRowCount(selectedVid.length)
+      setHasSave(false)
       setModalOpen(false)
     }
   }
+
+  // ** table columns
+  const columns: GridColumns = [
+    {
+      flex: 0.01,
+      minWidth: 20,
+      field: 'action',
+      headerName: '',
+      renderCell: (params: GridRenderCellParams) => <CheckboxContent allId={allId} id={params.id} setAllId={setAllId} />
+    },
+    {
+      flex: 0.02,
+      minWidth: 70,
+      field: 'thumbnail_url',
+      headerName: 'Video Thumbnail',
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <CustomAvatar
+                src={params.row.thumbnail_url}
+                sx={{ borderRadius: '5px', mr: 3, width: '5.875rem', height: '3rem' }}
+              />
+            </Box>
+          </Box>
+        )
+      }
+    },
+    {
+      flex: 0.02,
+      minWidth: 90,
+      headerName: 'Content Creator',
+      field: 'content_creator',
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.user.username}
+        </Typography>
+      )
+    },
+    {
+      flex: 0.03,
+      minWidth: 60,
+      field: 'title',
+      headerName: 'Title',
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.title}
+        </Typography>
+      )
+    },
+    {
+      flex: 0.04,
+      field: 'category',
+      minWidth: 80,
+      headerName: 'Category',
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params?.row?.tags?.join(', ')}
+        </Typography>
+      )
+    },
+    {
+      flex: 0.04,
+      minWidth: 140,
+      field: 'last_update',
+      headerName: 'Last Update',
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {formatDate(params.row.updated_at)}
+        </Typography>
+      )
+    }
+  ]
 
   return (
     <Modal
@@ -126,19 +175,22 @@ function WorkList({ modalOpen, setModalOpen, setSelectedInModal, setSelectedRows
     >
       <Box width={1200} sx={{ background: 'white' }}>
         <DataGrid
-          rowCount={rowCount}
-          pageSize={pageSize}
+          rowCount={modalRowCount}
+          pageSize={modalPageSize}
           paginationMode='server'
           getRowId={row => row._id}
-          checkboxSelection={true}
           disableSelectionOnClick
           autoHeight
-          loading={isLoading}
+          loading={isLoading || isFetching}
           rows={data}
           columns={columns}
           pagination
           onPageChange={handlePageChange}
-          onStateChange={e => setSelectedVideos(e.selection)}
+          disableColumnMenu
+
+          // onStateChange={e => console.log('###', e)}
+          // onSelectionModelChange={selectionModel => setSelectedVideos(selectionModel)}
+          // keepNonExistentRowsSelected={true}
         />
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} mb={5}>
           <Button size='large' variant='contained' sx={{ mr: 3 }} onClick={handleSave}>
