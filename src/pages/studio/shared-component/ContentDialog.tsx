@@ -130,6 +130,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
     setTimeout( ()=>{ 
       setLocalLoading(false) 
       setShowNotes(false)
+      setShow(false)
       reset()
     }, 2000 )
   } 
