@@ -1,4 +1,5 @@
 import request from "@/lib/request";
+import authConfig from 'src/configs/auth'
 
 interface IAdvertisementParams {
 	id?: string
@@ -17,12 +18,15 @@ interface IAdvertisementParams {
 }
 
 const AdvertisementService = () => {
+	const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
 	const getAllAdminAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
 				"X-Authorization": "postman|1",
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
 			url: "/advertisements/admin",
 			method: "GET",
@@ -36,7 +40,8 @@ const AdvertisementService = () => {
 				"X-Authorization": "postman|1",
 				'Content-Type': 'multipart/form-data', // if POST is form-data
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
 			url: `/advertisements/admin/${params.id}/${params.relation}`,
 			method: "POST",
@@ -50,7 +55,8 @@ const AdvertisementService = () => {
 				"X-Authorization": "postman|1",
 				'Content-Type': 'multipart/form-data', // if POST is form-data
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
 			url: `/advertisements/admin/${params.id}/${params.relation}/${params.banner_id}`,
 			method: "POST",
@@ -63,7 +69,8 @@ const AdvertisementService = () => {
 			headers: {
 				"X-Authorization": "postman|1",
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
 			url: `/advertisements/admin/${params.id}/${params.relation}/${params.banner_id}`,
 			method: "DELETE",
