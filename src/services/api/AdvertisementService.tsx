@@ -1,15 +1,17 @@
 import request from "@/lib/request";
 
 interface IAdvertisementParams {
+	id?: string
 	banner_id?: string
-	data: {
-		id?: string
+	relation?: "banner" | "gif"
+	data?: {
 		site_id?: number
 		photo?: any
 		url?: string
 		start_date?: string
 		end_date?: string | null
-		hidden?: boolean
+		active?: number
+		_method?: string
 	},
 	token?: string
 }
@@ -28,7 +30,7 @@ const AdvertisementService = () => {
 		});
 	};
 
-	const createNewBannerAds = (params: IAdvertisementParams) => {
+	const createNewAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
 				"X-Authorization": "postman|1",
@@ -36,13 +38,13 @@ const AdvertisementService = () => {
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
-			url: `/advertisements/admin/${params.data.id}/banner`,
+			url: `/advertisements/admin/${params.id}/${params.relation}`,
 			method: "POST",
 			data: params.data, // if body is JSON
 		});
 	};
 
-	const updateBannerAds = (params: IAdvertisementParams) => {
+	const updateAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
 				"X-Authorization": "postman|1",
@@ -50,14 +52,26 @@ const AdvertisementService = () => {
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
-			url: `/advertisements/admin/${params.data.id}/banner/${params.banner_id}`,
-			method: "PUT",
+			url: `/advertisements/admin/${params.id}/${params.relation}/${params.banner_id}`,
+			method: "POST",
 			data: params.data, // if body is JSON
 		});
 	};
 
+	const deleteAds = (params: IAdvertisementParams) => {
+		return request({
+			headers: {
+				"X-Authorization": "postman|1",
+				"ngrok-skip-browser-warning": "69420", // only for dev
+				"Accept": "application/json"
+			},
+			url: `/advertisements/admin/${params.id}/${params.relation}/${params.banner_id}`,
+			method: "DELETE",
+		});
+	};
 
-	return { getAllAdminAds, createNewBannerAds, updateBannerAds };
+
+	return { getAllAdminAds, createNewAds, updateAds, deleteAds };
 };
 
 export default AdvertisementService;

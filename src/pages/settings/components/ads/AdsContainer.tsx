@@ -59,7 +59,7 @@ const AdsContainer = (props: Props) => {
             adsURL={item.url}
             startDate={item.start_date}
             endDate={item.end_date}
-            isHidden={item.hidden}
+            isActive={item.active}
             itemWidth={customWidht}
             itemHeight={customHeight}
             itemName={customName}
