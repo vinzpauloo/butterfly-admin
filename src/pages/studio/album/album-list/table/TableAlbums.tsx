@@ -5,22 +5,17 @@ import React, { useState, useEffect, ChangeEvent } from 'react'
 import { Box, Card, Grid, Typography } from '@mui/material'
 import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
 // ** Custom Table Components Imports
 import AlbumTableToolbar from '../components/AlbumTableToolbar'
 
-// ** Style Imports
-
 // ** Other Imports
+import { AlbumColumns } from '@/data/AlbumColumns'
 
 // ** Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
-import { AlbumColumns } from '@/data/AlbumColumns'
 
 const useDebounce = (value: any, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -44,25 +39,15 @@ const TableAlbums = () => {
   const { getAlbums } = AlbumService()
   const [page, setPage] = useState<number>()
   const [pageSize, setPageSize] = useState<number>()
-  const [role, setRole] = useState('SUPERVISOR')
-  const [roleId, setRoleId] = useState<any>()
-  const [columnType, setColumnType] = useState('SUPERVISOR')
   const [rowCount, setRowCount] = useState<any>()
 
   const [sort, setSort] = useState<SortType>('desc')
   const [sortName, setSortName] = useState<string>('created_at')
 
   const [search, setSearch] = useState<string>()
-  const [emailSearchValue, setEmailSearchValue] = useState<string>('')
-  const [mobileSearchValue, setMobileSearchValue] = useState<string>('')
-  const [searchValue, setSearchValue] = useState<string>('')
   const [titleSearchValue, setTitleSearchValue] = useState<string>('')
 
-  const debouncedUsername = useDebounce(searchValue, 1000)
-  const debouncedEmail = useDebounce(emailSearchValue, 1000)
-  const debouncedMobile = useDebounce(mobileSearchValue, 1000)
   const debouncedTitle = useDebounce(titleSearchValue, 1000)
-  const [columns, setColumns] = useState<any[]>([])
 
   interface AlbumData {
     id: string
@@ -72,28 +57,31 @@ const TableAlbums = () => {
   }
 
   const [albumData, setAlbumData] = useState<AlbumData[] | undefined>()
-  const [dataGridKey, setDataGridKey] = useState<number>(0)
-  const [filter, setFilter] = useState<string>('')
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['allAlbums', page, sort, sortName, search, search === 'title' ? debouncedTitle : undefined, filter],
-    queryFn: () =>
-      getAlbums({
-        data: {
-          page: page,
-          sort: sort,
-          sort_by: sortName,
-          search_by: search,
-          search_value: search === 'title' && debouncedTitle,
-          filter: filter
-        }
-      }),
+    queryKey: ['allAlbums', page, sort, sortName, search, search === 'title' ? debouncedTitle : undefined],
+    queryFn: () => {
+      const requestData: any = {
+        page: page,
+        sort: sort,
+        sort_by: sortName
+      }
+
+      if (search && search !== '') {
+        requestData.search_by = search
+      }
+
+      if (search === 'title' && debouncedTitle) {
+        requestData.search_value = search === 'title' && debouncedTitle
+      }
+
+      return getAlbums({ data: requestData })
+    },
     onSuccess: (response: any) => {
       setAlbumData(response?.data)
       setRowCount(response?.total)
       setPageSize(response?.per_page)
       setPage(response?.current_page)
-      setDataGridKey(prevKey => prevKey + 1)
     },
     enabled: true
   })
@@ -115,23 +103,11 @@ const TableAlbums = () => {
   const handleSearch = (value: string, type: string) => {
     setSearch(type)
     switch (type) {
-      case 'username':
-        setSearchValue(value)
-        break
-      case 'email':
-        setEmailSearchValue(value)
-        break
-      case 'mobile':
-        setMobileSearchValue(value)
-        break
       case 'title':
         setTitleSearchValue(value)
+        break
     }
   }
-
-  useEffect(() => {
-    setFilter('')
-  }, [])
 
   return (
     <Grid container spacing={6}>
@@ -144,7 +120,6 @@ const TableAlbums = () => {
           </Box>
 
           <DataGrid
-            key={dataGridKey}
             rowsPerPageOptions={[]}
             loading={isLoading || isRefetching}
             checkboxSelection={false}
@@ -163,11 +138,6 @@ const TableAlbums = () => {
             components={{ Toolbar: AlbumTableToolbar }}
             componentsProps={{
               toolbar: {
-                role: role,
-                role_id: roleId,
-                usernameValue: searchValue,
-                emailValue: emailSearchValue,
-                mobileValue: mobileSearchValue,
                 titleValue: titleSearchValue,
                 clearSearch: () => {
                   handleSearch('', 'title')
