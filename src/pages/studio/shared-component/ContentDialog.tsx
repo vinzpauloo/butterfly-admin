@@ -100,7 +100,10 @@ const ContentDialog = ({ param }: ContentDialogType) => {
   const handleApproveContent = () => {
     setLocalLoading(true)
 
-    setTimeout( ()=>{ setLocalLoading(false) }, 2000 )
+    setTimeout( ()=>{ 
+      setLocalLoading(false) 
+      setShow(false)
+    }, 2000 )
 
   }
 
@@ -116,6 +119,10 @@ const ContentDialog = ({ param }: ContentDialogType) => {
     formState: { errors }
   } = useForm({
     mode: 'onBlur',
+  })
+
+  const mainContentForm = useForm({
+    mode : 'onBlur'
   })
 
   const onSubmitNote = (data : any) => {
@@ -190,21 +197,28 @@ const ContentDialog = ({ param }: ContentDialogType) => {
             </Grid>
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '2rem' }}>
-                <TextField label='Video Title' fullWidth placeholder='Title' value={param.title} />
+                <TextField 
+                  label='Video Title' 
+                  fullWidth placeholder='Title' 
+                  defaultValue={param.title} 
+                  { ...mainContentForm.register('videoTitle') }
+                  
+                  />
                 <TextField
                   label='Description'
                   multiline
                   rows={3}
                   fullWidth
                   placeholder='Description or Caption'
-                  value={param.description}
+                  defaultValue={param.description}
+                  { ...mainContentForm.register('videoDescription') }
                 />
               </FormControl>
             </Grid>
 
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '.5rem' }}>
-                <TextField multiline rows={2} fullWidth value={param.tags.join(', ')} />
+                <TextField multiline rows={2} fullWidth defaultValue={param.tags.join(', ')} />
               </FormControl>
             </Grid>
           </Grid>
