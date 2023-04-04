@@ -1,34 +1,28 @@
 // ** React Imports
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 
 // ** Custom Components
-import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import ContentDialog from '@/pages/studio/shared-component/ContentDialog'
 
-// ** Types Imports
-import { ThemeColor } from 'src/@core/layouts/types'
+// ** Utils
+import formatDate from '@/utils/formatDate'
 
-// ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
+import { useQuery } from '@tanstack/react-query'
 
-// ** Data Import
-import { rows } from '@/data/dummyNewsFeedData'
+// ** Apis
+import ContentService from '@/services/api/ContentService'
 
-interface StatusObj {
-  [key: number]: {
-    title: string
-    color: ThemeColor
-  }
-}
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 
 // ** renders client column
 const renderClient = (params: GridRenderCellParams) => {
@@ -37,40 +31,52 @@ const renderClient = (params: GridRenderCellParams) => {
   const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
   const color = states[stateNum]
 
-  if (row.avatar.length) {
+  if (row.thumbnail_url.length) {
     return (
       <CustomAvatar
-        src={`/images/avatars/cc/${row.avatar}`}
+        src={`${row.thumbnail_url.replace('http://localhost/', 'http://192.168.50.9/')}`}
         sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
       />
     )
   } else {
-    return (
-      <CustomAvatar
-        skin='light'
-        color={color as ThemeColor}
-        sx={{ borderRadius: '10px', mr: 3, fontSize: '.8rem', width: '5.875rem', height: '3rem' }}
-      >
-        {getInitials(row.full_name ? row.full_name : 'John Doe')}
-      </CustomAvatar>
-    )
+    return <></>
   }
 }
 
-const statusObj: StatusObj = {
-  1: { title: 'pending', color: 'warning' },
-  2: { title: 'declined', color: 'error' }
+interface IContentTable {}
+
+interface SnackState extends SnackbarOrigin {
+  open: boolean
 }
 
-interface IContentTable {
-  isLoading?: boolean
-  data?: any
-}
-
-const ContentTable = ({ isLoading, data }: IContentTable) => {
+const ContentTable = (props: IContentTable) => {
   // ** States
-  const [pageSize, setPageSize] = useState<number>(7)
-  const [hideNameColumn, setHideNameColumn] = useState(false)
+  const [data, setData] = React.useState([])
+  const [rowCount, setRowCount] = React.useState([])
+  const [page, setPage] = React.useState<number>(1)
+  const [pageSize, setPageSize] = React.useState(10)
+  const [snackState, setSnackState] = React.useState<SnackState>({
+    open: false,
+    vertical: 'top',
+    horizontal: 'right'
+  })
+  // desctruct the snack state
+  const { vertical, horizontal, open } = snackState
+
+  const { getContents } = ContentService()
+
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: ['contents'],
+    queryFn: () => getContents({ with: 'user' }),
+    onSuccess: data => {
+      console.log('data isss', data)
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+      console.log('@@@', data)
+    }
+  })
 
   const columns: GridColDef[] = [
     {
@@ -80,9 +86,8 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
       headerName: 'Video Thumbnail',
       align: 'center',
       headerAlign: 'center',
-      hide: hideNameColumn,
       renderCell: (params: GridRenderCellParams) => {
-        return <Box sx={{ display: 'flex', alignItems: 'center' }}>img</Box>
+        return <Box sx={{ display: 'flex', alignItems: 'center' }}>{renderClient(params)}</Box>
       }
     },
     {
@@ -90,15 +95,12 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
       minWidth: 150,
       field: 'full_name',
       headerName: 'Content Creator',
-      hide: hideNameColumn,
       renderCell: (params: GridRenderCellParams) => {
-        const { row } = params
-
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                full name
+                {params.row.user.username}
               </Typography>
             </Box>
           </Box>
@@ -112,7 +114,7 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
       field: 'title',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          title
+          {params.row.title}
         </Typography>
       )
     },
@@ -120,21 +122,26 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
       flex: 0.15,
       minWidth: 110,
       field: 'video_url',
+      align: 'center',
       headerName: 'Video URL',
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          url
-        </Typography>
+        <>
+          <Icon
+            onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls )}
+            icon='mdi:text-box-outline'
+            fontSize='1.4rem'
+          />
+        </>
       )
     },
     {
       flex: 0.13,
       minWidth: 140,
-      field: 'category',
-      headerName: 'Category',
+      field: 'tags',
+      headerName: 'Tags',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          category
+          {params.row.tags.join(', ')}
         </Typography>
       )
     },
@@ -145,7 +152,7 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
       headerName: 'Last Update',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          last update
+          {formatDate(params.row.updated_at)}
         </Typography>
       )
     },
@@ -157,9 +164,7 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        const status = statusObj[params.row.status]
-
-        return <Typography>Status</Typography>
+        return <Typography>{params.row.approval}</Typography>
       }
     },
     {
@@ -169,20 +174,25 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
       headerName: '',
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        // return <ContentDialog param={params.row} />
-        return 'icon'
+        return <ContentDialog param={params.row} />
       }
     }
   ]
 
-  if (isLoading) {
-    return (
+  const handleCopyToClipboard = (newState: SnackbarOrigin, trialUrl : string) => () => {
+    navigator.clipboard.writeText(trialUrl)
+    setSnackState({ open: true, ...newState })
+  }
+
+  return (
+    <>
       <Card>
         <CardHeader title='THE STUDIO PAGE - CONTENT APPROVAL' />
         <DataGrid
-          loading={isLoading}
+          loading={isLoading || isRefetching}
+          getRowId={row => row._id}
           autoHeight
-          rows={{}}
+          rows={data}
           columns={columns}
           pageSize={pageSize}
           disableSelectionOnClick
@@ -190,29 +200,20 @@ const ContentTable = ({ isLoading, data }: IContentTable) => {
           onPageSizeChange={newPageSize => setPageSize(newPageSize)}
         />
       </Card>
-    )
-  }
 
-  if (data) {
-    return (
-      <Card>
-        <CardHeader title='THE STUDIO PAGE - CONTENT APPROVAL' />
-        {/* <DataGrid
-          getRowId={row => row._id}
-          autoHeight
-          rows={data.data}
-          columns={columns}
-          pageSize={pageSize}
-          disableSelectionOnClick
-          rowsPerPageOptions={[7, 10, 25, 50]}
-          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-        /> */}
-      </Card>
-    )
-  }
-
-  return (<></>)
-
+      <Snackbar
+        color='black'
+        open={open}
+        onClose={() => {
+          setSnackState({ ...snackState, open: false })
+        }}
+        message='Copied to clipboard'
+        autoHideDuration={1500}
+        key={vertical + horizontal}
+        anchorOrigin={{ vertical, horizontal }}
+      />
+    </>
+  )
 }
 
 export default ContentTable
