@@ -18,7 +18,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Icon from 'src/@core/components/icon'
 
 // ** API Imports
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import FeedsService from '@/services/api/FeedsService'
 
 // ** Utils
@@ -42,7 +42,7 @@ const steps = [
 type Props = {}
 
 // ** Feeds Params
-const defaultParams = { story_feeds_only: true, with: 'user' }
+const defaultParams = { story_feeds_only: true, with: 'user', page: 1 }
 
 const NewsFeedList = (props: Props) => {
   // ** States
@@ -52,9 +52,25 @@ const NewsFeedList = (props: Props) => {
   // ** QueryAPI
   const { getFeeds } = FeedsService()
   const queryClient = useQueryClient()
-  const { isLoading, isError, data, refetch } = useQuery({
+  const { isLoading, data, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } = useInfiniteQuery({
     queryKey: ['getFeeds', feedParams],
-    queryFn: () => getFeeds(feedParams)
+    getNextPageParam: (prevData: any) => {
+      // TBR any
+      let nextData = prevData.next_page_url
+      if (nextData == undefined) {
+        return undefined
+      }
+      let searchParams = new URLSearchParams(nextData.split('?')[1]) // extracts the query string and creates a URLSearchParams object
+      let page = searchParams.get('page') // retrieves the value of the 'page' parameter
+      let myObj = feedParams
+      let nextParams = { ...myObj, page: page }
+
+      return nextParams
+    },
+    queryFn: ({ pageParam = { ...feedParams } }) => {
+      console.log('pageparam', pageParam)
+      return getFeeds(pageParam)
+    }
   })
 
   // ** Hooks
@@ -67,24 +83,25 @@ const NewsFeedList = (props: Props) => {
     setFeedParams(newFeed)
   }
 
-  const handleInvalidate = () => {
-    queryClient.invalidateQueries()
-  }
-
   // TURN THIS TO ENUM SO ITS READABLE
   const getActiveTabContent = (step: number) => {
+
     if (data) {
+
+      let flatMapDataArray = data.pages.flatMap(data => [data.data])
+      let flatMap = flatMapDataArray.flatMap( data => [...data] )
+
       switch (step) {
         case 0: {
-          return <AllStory data={data} handleFeedParams={handleFeedParams} />
+          return <AllStory data={flatMap} handleFeedParams={handleFeedParams} />
         }
         case 1:
-          return <AllPhoto data={data} handleFeedParams={handleFeedParams} />
+          return <AllPhoto data={flatMap} handleFeedParams={handleFeedParams} />
         case 2: {
-          return <AllVideo data={data} handleFeedParams={handleFeedParams} />
+          return <AllVideo data={flatMap} handleFeedParams={handleFeedParams} />
         }
         case 3:
-          return <VideosWithPhotos data={data} handleFeedParams={handleFeedParams} />
+          return <VideosWithPhotos data={flatMap} handleFeedParams={handleFeedParams} />
         default:
           return null
       }
@@ -126,7 +143,7 @@ const NewsFeedList = (props: Props) => {
         <Box>
           <TextField
             sx={{
-              display : 'none', //search box
+              display: 'none', //search box
               '& input': {
                 padding: '.5em 1em'
               },
@@ -161,9 +178,27 @@ const NewsFeedList = (props: Props) => {
           </Box>
         )}
         {data && renderContent()}
+
+        {hasNextPage && (
+          <Box>
+            <Grid container spacing={10}>
+              <Grid mt={15} display='flex' justifyContent='center' alignItems='center' textAlign='center' item xs={12}>
+
+                <Button
+                  variant='contained'
+                  onClick={() => {
+                    fetchNextPage()
+                  }}
+                >
+                  {isFetchingNextPage ? 'Loading...' : 'Load More Stories'}
+                </Button>
+
+              </Grid>
+            </Grid>
+          </Box>
+        )}
       </Box>
     </Box>
-
   )
 }
 

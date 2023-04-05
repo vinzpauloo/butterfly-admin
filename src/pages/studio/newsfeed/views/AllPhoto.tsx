@@ -25,7 +25,7 @@ type Props = {
   handleFeedParams?: any
 }
 
-const photoOnlyParams = { images_only: true, with: 'user' }
+const photoOnlyParams = { images_only: true, with: 'user', page : 1 }
 
 const AllPhoto = ({ data, handleFeedParams }: Props) => {
   React.useEffect(() => {
@@ -38,8 +38,8 @@ const AllPhoto = ({ data, handleFeedParams }: Props) => {
     return (
       <Box sx={{ display: 'flex' }}>
           <Grid container spacing={10}>
-            {data.data &&
-              data.data?.map((story: IFeedStory) => (
+            {data &&
+              data?.map((story: IFeedStory) => (
                 <Grid key={story._id} item sm={6}>
                   <FeedCard
                     datePublished={formatDate(story.created_at)}
