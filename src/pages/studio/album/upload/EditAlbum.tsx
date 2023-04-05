@@ -330,10 +330,12 @@ const EditAlbum = () => {
 
   useEffect(() => {
     if (albumData) {
+      // @ts-ignore
       setValue(`title`, `${albumData?.title}`)
       setFormValue(prevState => ({
         ...prevState,
-        title: albumData.title
+        // @ts-ignore
+        title: albumData?.title
       }))
     }
   }, [albumData])
