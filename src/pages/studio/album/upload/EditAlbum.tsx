@@ -74,8 +74,6 @@ const FileUploaderSingle: React.FC<FileUploaderSingleProps> = ({ onFilesChange, 
     />
   ))
 
-  console.log(`singleupload`, albumData?.cover.cover_photo)
-
   return (
     <>
       <Box sx={{ ...styles.albumWrapper, position: 'relative' }}>
@@ -135,8 +133,6 @@ const FileUploaderSingle: React.FC<FileUploaderSingleProps> = ({ onFilesChange, 
               height: '100%'
             }}
           >
-            {/* {img}
-            <img src={albumData?.cover.cover_photo} width='100%' height='100%' alt='test' /> */}
             {files.length > 0 ? img : <img src={albumData?.cover.cover_photo} width='100%' height='100%' alt='test' />}
           </Box>
         )}
@@ -222,14 +218,32 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
     setResponseMultiple(albumData?.album.map((item: any) => item?.photo))
   }, [albumData])
 
-  console.log(`response`, responseMultiple)
+  // const handlePhotoDelete = (deleteIndex: number) => {
+  //   const deletedPhotoId = albumData.album[deleteIndex].photo_id // Assuming the albumData has an _id field for each photo
+  //   setDeletedPhotoIds([deletedPhotoId])
+  //   console.log(`DELETED@@@###`, deletedPhotoId)
+
+  //   const updatedResponseMultiple = responseMultiple.filter((_: any, index: number) => index !== deleteIndex)
+  //   setResponseMultiple(updatedResponseMultiple)
+  //   console.log(`RESPONSE@@@####`, responseMultiple)
+  // }
 
   const handlePhotoDelete = (deleteIndex: number) => {
     const deletedPhotoId = albumData.album[deleteIndex].photo_id // Assuming the albumData has an _id field for each photo
-    setDeletedPhotoIds([deletedPhotoId])
+
+    setDeletedPhotoIds(prevDeletedPhotoIds => {
+      if (!prevDeletedPhotoIds.includes(deletedPhotoId)) {
+        return [...prevDeletedPhotoIds, deletedPhotoId]
+      }
+
+      return prevDeletedPhotoIds
+    })
+
+    console.log(`DELETED@@@###`, deletedPhotoId)
 
     const updatedResponseMultiple = responseMultiple.filter((_: any, index: number) => index !== deleteIndex)
     setResponseMultiple(updatedResponseMultiple)
+    console.log(`RESPONSE@@@####`, responseMultiple)
   }
 
   useEffect(() => {
@@ -311,7 +325,6 @@ const EditAlbum = () => {
         }
       }),
     onSuccess: (data: any) => {
-      console.log(`SUCCESS`, data)
       setAlbumData(data)
     }
   })
