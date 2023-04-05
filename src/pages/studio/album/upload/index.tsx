@@ -29,7 +29,7 @@ import { AlbumService } from '@/services/api/AlbumService'
 interface FormValues {
   title: string
   cover_photo: File | null
-  photos: File[]
+  photo: File[]
 }
 
 const schema = yup.object().shape({
@@ -276,14 +276,14 @@ const UploadAlbum = () => {
   }
 
   const handleMultiplePhotoChange = (files: File[]) => {
-    setFormValue({ ...formValue, photos: files })
+    setFormValue({ ...formValue, photo: files })
     console.log(`handleMultiplePhoto`, formValue)
   }
 
   const [formValue, setFormValue] = useState<FormValues>({
     title: '',
     cover_photo: null,
-    photos: []
+    photo: []
   })
 
   const { postAlbum } = AlbumService()
@@ -311,7 +311,7 @@ const UploadAlbum = () => {
   useEffect(() => {
     setFormValue(prevFormValue => ({
       ...prevFormValue,
-      photos: uploadedFiles
+      photo: uploadedFiles
     }))
   }, [uploadedFiles])
 

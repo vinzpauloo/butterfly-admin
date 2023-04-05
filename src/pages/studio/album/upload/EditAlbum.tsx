@@ -1,12 +1,12 @@
 // ** React imports
-import React, { Fragment, useEffect, useState, SyntheticEvent } from 'react'
+import React, { Fragment, useEffect, useCallback, useState, SyntheticEvent } from 'react'
 
 // ** Next Images
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import { Box, Typography, TextField, ListItem, IconButton, Button } from '@mui/material'
+import { Box, Typography, TextField, Button, List, ListItem, IconButton } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
@@ -17,118 +17,36 @@ import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 
 // ** Third Party Components
 import { useDropzone } from 'react-dropzone'
-import { PhotoAlbum, Photo, RenderPhotoProps } from 'react-photo-album'
-import clsx from 'clsx'
-import {
-  closestCenter,
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  UniqueIdentifier,
-  useSensor,
-  useSensors
-} from '@dnd-kit/core'
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable'
 import { v4 as uuidv4 } from 'uuid'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm, Controller } from 'react-hook-form'
 
-//* Context Import
-import { StudioContext, DisplayPage } from '../../upload'
+// ** TanStack Query
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { AlbumService } from '@/services/api/AlbumService'
 
-// Styled components
-const CustomTextField = styled(TextField)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: '4px',
-  '& .MuiOutlinedInput-notchedOutline': {
-    display: 'none'
-  }
-}))
+interface FormValues {
+  title: string
+  cover_photo: File | null
+  photo: File[]
+  delete_id: File[]
+}
+
+const schema = yup.object().shape({})
 
 interface FileProp {
   name: string
   type: string
   size: number
 }
-interface SortablePhoto extends Photo {
-  id: string // @dnd-kit requires string 'id' on sortable elements
+
+interface FileUploaderSingleProps {
+  onFilesChange?: (files: File[]) => void
+  albumData: any
 }
 
-type PhotoFrameProps = SortablePhotoProps & {
-  overlay?: boolean
-  active?: boolean
-  insertPosition?: 'before' | 'after'
-  attributes?: Partial<React.HTMLAttributes<HTMLDivElement>>
-  listeners?: Partial<React.HTMLAttributes<HTMLDivElement>>
-}
-
-type SortablePhotoProps = RenderPhotoProps<SortablePhoto>
-
-const PhotoFrame = React.memo(
-  React.forwardRef<HTMLDivElement, PhotoFrameProps>((props, ref) => {
-    const { layoutOptions, imageProps, overlay, active, insertPosition, attributes, listeners } = props
-    const { alt, style, ...restImageProps } = imageProps
-
-    return (
-      <div
-        ref={ref}
-        style={{
-          width: overlay ? `calc(100% - ${2 * layoutOptions.padding}px)` : style.width,
-          padding: style.padding,
-          marginBottom: style.marginBottom
-        }}
-        className={clsx('photo-frame', {
-          overlay: overlay,
-          active: active,
-          insertBefore: insertPosition === 'before',
-          insertAfter: insertPosition === 'after'
-        })}
-        {...attributes}
-        {...listeners}
-      >
-        <img
-          alt={alt}
-          style={{
-            ...style,
-            width: '100%',
-            height: 'auto',
-            padding: 0,
-            marginBottom: 0
-          }}
-          {...restImageProps}
-        />
-      </div>
-    )
-  })
-)
-PhotoFrame.displayName = 'PhotoFrame'
-
-function SortablePhotoFrame(props: SortablePhotoProps & { activeIndex?: number }) {
-  const { photo, activeIndex } = props
-  const { attributes, listeners, isDragging, index, over, setNodeRef } = useSortable({ id: photo.id })
-
-  return (
-    <PhotoFrame
-      ref={setNodeRef}
-      active={isDragging}
-      insertPosition={
-        activeIndex !== undefined && over?.id === photo.id && !isDragging
-          ? index > activeIndex
-            ? 'after'
-            : 'before'
-          : undefined
-      }
-      aria-label='sortable image'
-      attributes={attributes}
-      listeners={listeners}
-      {...props}
-    />
-  )
-}
-
-const FileUploaderSingle = () => {
+const FileUploaderSingle: React.FC<FileUploaderSingleProps> = ({ onFilesChange, albumData }) => {
   // ** State
   const [files, setFiles] = useState<File[]>([])
 
@@ -140,6 +58,9 @@ const FileUploaderSingle = () => {
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
+      if (onFilesChange) {
+        onFilesChange(acceptedFiles)
+      }
     }
   })
 
@@ -153,31 +74,34 @@ const FileUploaderSingle = () => {
     />
   ))
 
+  console.log(`singleupload`, albumData?.cover.cover_photo)
+
   return (
     <>
       <Box sx={{ ...styles.albumWrapper, position: 'relative' }}>
-        {files.length > 0 && (
-          <Box
-            {...getRootProps({ className: 'dropzone' })}
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              cursor: 'pointer',
-              zIndex: 1
-            }}
-          >
-            <input {...getInputProps()} />
-            <Typography sx={{ color: '#fff', fontSize: 14 }}>Click to change image</Typography>
-          </Box>
-        )}
-        {files.length === 0 ? (
+        {files.length > 0 ||
+          (albumData?.cover.cover_photo && (
+            <Box
+              {...getRootProps({ className: 'dropzone' })}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                cursor: 'pointer',
+                zIndex: 1
+              }}
+            >
+              <input {...getInputProps()} />
+              <Typography sx={{ color: '#fff', fontSize: 14 }}>Click to change image</Typography>
+            </Box>
+          ))}
+        {files.length === 0 && !albumData?.cover.cover_photo ? (
           <Box {...getRootProps({ className: 'dropzone' })} sx={{ ...styles.albumContent }}>
             <input {...getInputProps()} />
 
@@ -211,7 +135,9 @@ const FileUploaderSingle = () => {
               height: '100%'
             }}
           >
-            {img}
+            {/* {img}
+            <img src={albumData?.cover.cover_photo} width='100%' height='100%' alt='test' /> */}
+            {files.length > 0 ? img : <img src={albumData?.cover.cover_photo} width='100%' height='100%' alt='test' />}
           </Box>
         )}
       </Box>
@@ -219,39 +145,50 @@ const FileUploaderSingle = () => {
   )
 }
 
-// MULTIPLE FILE UPLOAD START...
-const FileUploaderMultiple = ({ onFilesChange }: any) => {
-  // ** State
-  const [files, setFiles] = useState<File[]>([])
+interface FileUploaderMultipleProps {
+  onFilesChange?: (files: File[]) => void
+  files: File[]
+  albumData: any
+  onDeletedPhotos: (deletedPhotos: any[]) => void
+}
 
-  useEffect(() => {
-    if (onFilesChange) {
-      onFilesChange(files)
-    }
-  }, [files, onFilesChange])
+// MULTIPLE FILE UPLOAD START...
+const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
+  onFilesChange,
+  files,
+  albumData,
+  onDeletedPhotos
+}) => {
+  // ** State
+  const [localFiles, setLocalFiles] = useState<File[]>(files)
 
   // ** Hooks
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
-      setFiles(prevFiles => [...prevFiles, ...acceptedFiles.map((file: File) => Object.assign(file))])
+      setLocalFiles(acceptedFiles.map((file: File) => Object.assign(file)))
+      if (onFilesChange) {
+        onFilesChange(acceptedFiles)
+      }
     }
   })
 
   const renderFilePreview = (file: FileProp) => {
     if (file.type.startsWith('image')) {
-      return <img width={100} height={100} alt={file.name} src={URL.createObjectURL(file as any)} />
+      return <img width={200} height={200} alt={file.name} src={URL.createObjectURL(file as any)} />
     } else {
       return <Icon icon='mdi:file-document-outline' />
     }
   }
 
   const handleRemoveFile = (file: FileProp) => {
-    const uploadedFiles = files
-    const filtered = uploadedFiles.filter((i: FileProp) => i.name !== file.name)
-    setFiles([...filtered])
+    const filtered = localFiles.filter((i: FileProp) => i.name !== file.name)
+    setLocalFiles([...filtered])
+    if (onFilesChange) {
+      onFilesChange(filtered)
+    }
   }
 
-  const fileList = files.map((file: FileProp) => (
+  const fileList = localFiles.map((file: FileProp) => (
     <ListItem key={file.name}>
       <div className='file-details'>
         <div className='file-preview'>{renderFilePreview(file)}</div>
@@ -270,13 +207,34 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
     </ListItem>
   ))
 
-  // const handleLinkClick = (event: SyntheticEvent) => {
-  //   event.preventDefault()
-  // }
+  const handleRemoveAllFiles = () => {
+    setLocalFiles([])
+  }
 
-  // const handleRemoveAllFiles = () => {
-  //   setFiles([])
-  // }
+  const responseAlbumData = albumData?.album.map((item: any) => {
+    return item?.photo
+  })
+
+  const [responseMultiple, setResponseMultiple] = useState<any[]>([])
+  const [deletedPhotoIds, setDeletedPhotoIds] = useState<any[]>([])
+
+  useEffect(() => {
+    setResponseMultiple(albumData?.album.map((item: any) => item?.photo))
+  }, [albumData])
+
+  console.log(`response`, responseMultiple)
+
+  const handlePhotoDelete = (deleteIndex: number) => {
+    const deletedPhotoId = albumData.album[deleteIndex].photo_id // Assuming the albumData has an _id field for each photo
+    setDeletedPhotoIds([deletedPhotoId])
+
+    const updatedResponseMultiple = responseMultiple.filter((_: any, index: number) => index !== deleteIndex)
+    setResponseMultiple(updatedResponseMultiple)
+  }
+
+  useEffect(() => {
+    onDeletedPhotos(deletedPhotoIds)
+  }, [deletedPhotoIds])
 
   return (
     <Fragment>
@@ -290,84 +248,219 @@ const FileUploaderMultiple = ({ onFilesChange }: any) => {
           <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
         </Box>
       </Box>
+      <Box sx={{ ...styles.photoAlbumWrapper }}>
+        <Box sx={{ ...styles.scrollFunc }}>
+          {localFiles.length ? (
+            <Fragment>
+              <List>{fileList}</List>
+              <div className='buttons'>
+                <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
+                  Remove All
+                </Button>
+              </div>
+            </Fragment>
+          ) : null}
+          {responseAlbumData && (
+            <Box sx={{ mt: 5 }}>
+              <Typography variant='h6'>Existing Photos:</Typography>
+            </Box>
+          )}
+          {/* {responseAlbumData &&
+            responseAlbumData.map((item: any, index: any) => {
+              return (
+                <Box key={index} sx={{ display: 'flex' }}>
+                  <img src={item} alt='test2' width='250' height='250' />
+                  <IconButton>
+                    <Icon icon='mdi:close' fontSize={20} />
+                  </IconButton>
+                </Box>
+              )
+            })} */}
+          {responseMultiple &&
+            responseMultiple.map((item: any, index: any) => {
+              return (
+                <Box key={index} sx={{ display: 'flex' }}>
+                  <img src={item} alt='test2' width='250' height='250' />
+                  <IconButton onClick={() => handlePhotoDelete(index)}>
+                    <Icon icon='mdi:close' fontSize={20} />
+                  </IconButton>
+                </Box>
+              )
+            })}
+        </Box>
+      </Box>
     </Fragment>
   )
 }
 
 const EditAlbum = () => {
   const router = useRouter()
+  const { query } = router
+  const albumId = Object.keys(query)
+
+  // Use albumId[0] to get the specific id
+
+  const queryClient = useQueryClient()
+
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: ['specificAlbum', albumId[0]],
+    queryFn: () =>
+      getSpecificUserAlbum({
+        data: {
+          _id: albumId[0]
+        }
+      }),
+    onSuccess: (data: any) => {
+      console.log(`SUCCESS`, data)
+      setAlbumData(data)
+    }
+  })
 
   /* States */
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
-  const [photos, setPhotos] = useState<SortablePhoto[]>([])
-
-  const handleFilesChange = (fileList: File[]) => {
-    setUploadedFiles(fileList)
-  }
+  const [albumData, setAlbumData] = useState(null)
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
     router.back()
   }
 
-  const handleContinueButton = () => {
-    router.push(`/studio/album/album-list`)
-  }
+  const [fileName, setFileName] = useState('')
 
-  const renderedPhotos = React.useRef<{ [key: string]: SortablePhotoProps }>({})
-  const [activeId, setActiveId] = React.useState<UniqueIdentifier | null>(null)
-  const activeIndex = activeId ? photos.findIndex(photo => photo.id === activeId) : undefined
-
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 50, tolerance: 10 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  )
-
-  const handleDragStart = React.useCallback(({ active }: DragStartEvent) => setActiveId(active.id), [])
-
-  const handleDragEnd = React.useCallback((event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      setPhotos(items => {
-        const oldIndex = items.findIndex(item => item.id === active.id)
-        const newIndex = items.findIndex(item => item.id === over.id)
-
-        return arrayMove(items, oldIndex, newIndex)
-      })
-    }
-  }, [])
-
-  const renderPhoto = React.useCallback(
-    (props: SortablePhotoProps) => {
-      // capture rendered photos for future use in DragOverlay
-      renderedPhotos.current[props.photo.id] = props
-
-      return <SortablePhotoFrame activeIndex={activeIndex} {...props} />
-    },
-    [activeIndex]
-  )
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue
+  } = useForm<FormValues>({
+    resolver: yupResolver(schema)
+  })
 
   useEffect(() => {
-    setPhotos(
-      uploadedFiles.map((file: File) => ({
-        ...file,
-        id: uuidv4(),
-        src: URL.createObjectURL(file as any),
-        width: 1,
-        height: 1
+    if (albumData) {
+      setValue(`title`, `${albumData?.title}`)
+      setFormValue(prevState => ({
+        ...prevState,
+        title: albumData.title
       }))
-    )
-  }, [uploadedFiles])
+    }
+  }, [albumData])
 
-  const handleSubmit = (event: React.SyntheticEvent) => {
-    event.preventDefault()
+  const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = event.target
+
+    if (name === 'logo' && files) {
+      const file = files[0]
+      if (file) {
+        setFileName(file.name)
+        setFormValue(prevState => ({
+          ...prevState,
+          [name]: file
+        }))
+      }
+    } else {
+      setFormValue(prevState => ({
+        ...prevState,
+        [name]: value
+      }))
+    }
   }
+
+  const handleCoverPhotoChange = (files: File[]) => {
+    const maxFileSize = 2 * 1024 * 1024 // 2MB in bytes
+
+    if (files[0].size > maxFileSize) {
+      alert('Error: Cover photo size exceeds the 2MB limit.')
+
+      return
+    }
+
+    setFormValue({ ...formValue, cover_photo: files[0] })
+    console.log(`handleCOVERCHANGE`, formValue)
+  }
+
+  const handleMultiplePhotoChange = (files: File[]) => {
+    setFormValue({ ...formValue, photo: files })
+    console.log(`handleMultiplePhoto`, formValue)
+  }
+
+  const handleDeletedPhotos = (deletedIds: any[]) => {
+    setFormValue({ ...formValue, delete_id: deletedIds })
+  }
+
+  const [formValue, setFormValue] = useState<FormValues>({
+    title: '',
+    cover_photo: null,
+    photo: [],
+    delete_id: []
+  })
+
+  const { editAlbum, getSpecificUserAlbum } = AlbumService()
+  const mutation = useMutation(async (data: { _id: any; data: any }) => {
+    const response = await editAlbum(data._id, data.data)
+    if (response.ok) {
+      await response.json()
+    }
+  })
+
+  console.log(`NEWFORMVALUEUPDATED`, formValue)
+
+  const handleFormSubmit = async () => {
+    console.log(formValue)
+
+    try {
+      await mutation.mutateAsync({
+        _id: albumId[0],
+        data: { ...formValue, _method: 'put' }
+      })
+
+      setTimeout(() => {
+        router.push(`/studio/album/album-list`)
+      }, 1000)
+    } catch (error) {
+      console.log(error)
+      alert(error)
+    }
+  }
+
+  // const handleFormSubmit = async () => {
+
+  //   const payload = {
+  //     ...formValue,
+  //     _method: 'put'
+  //   }
+
+  //   if (!payload.title) {
+  //     delete payload.title
+  //   }
+
+  //   console.log(payload)
+
+  //   try {
+  //     await mutation.mutateAsync({
+  //       _id: albumId[0],
+  //       data: payload
+  //     })
+
+  //     setTimeout(() => {
+  //       router.push(`/studio/album/album-list`)
+  //     }, 1000)
+  //   } catch (error) {
+  //     console.log(error)
+  //     alert(error)
+  //   }
+  // }
+
+  useEffect(() => {
+    setFormValue(prevFormValue => ({
+      ...prevFormValue,
+      photo: uploadedFiles
+    }))
+  }, [uploadedFiles])
 
   return (
     <BasicCard sx={{ ...styles.container }}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Typography
           sx={{ ...styles.title, mb: 5, textAlign: 'center' }}
           variant='h5'
@@ -379,50 +472,35 @@ const EditAlbum = () => {
           <Typography sx={{ ...styles.title }} variant='h6' color={theme => theme.customBflyColors.primaryTextContrast}>
             Album Title
           </Typography>
-          <CustomTextField sx={{ ...styles.titleInput }} id='title' placeholder='Title' type='text' />
+          <TextField
+            label='Title'
+            variant='outlined'
+            sx={{ ...styles.titleInput2 }}
+            {...register('title')}
+            error={!!errors.title}
+            helperText={errors.title?.message}
+            // value={formValue.title}
+            onChange={handleFormInputChange}
+            name='title'
+            InputLabelProps={{
+              shrink: true
+            }}
+          />
         </Box>
 
         {/* UPLOAD CONTAINER */}
         <Box sx={{ ...styles.uploadWrapper }}>
           {/* ALBUM COVER CONTAINER */}
-          <FileUploaderSingle />
+          <FileUploaderSingle onFilesChange={handleCoverPhotoChange} albumData={albumData} />
 
-          {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
+          {/* MULTIPLE UPLOAD CONTAINER */}
           <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
-            <Box sx={{ ...styles.multiUploadWrapper }}>
-              <FileUploaderMultiple onFilesChange={handleFilesChange} />
-            </Box>
-
-            {/* SCROLLABLE PHOTO ALBUM */}
-            <Box sx={{ ...styles.photoAlbumWrapper }}>
-              <Box sx={{ ...styles.scrollFunc }}>
-                {photos.length === 0 ? (
-                  <Box sx={{ ...styles.placeholder }}>
-                    <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
-                    <Typography textTransform='uppercase' variant='h6'>
-                      Gallery
-                    </Typography>
-                    <Typography>No photos uploaded.</Typography>
-                  </Box>
-                ) : (
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext items={photos}>
-                      <div style={{ margin: 30 }}>
-                        <PhotoAlbum photos={photos} layout='rows' spacing={10} padding={5} renderPhoto={renderPhoto} />
-                      </div>
-                    </SortableContext>
-                    <DragOverlay>
-                      {activeId && <PhotoFrame overlay {...renderedPhotos.current[activeId]} />}
-                    </DragOverlay>
-                  </DndContext>
-                )}
-              </Box>
-            </Box>
+            <FileUploaderMultiple
+              onFilesChange={handleMultiplePhotoChange}
+              files={uploadedFiles}
+              albumData={albumData}
+              onDeletedPhotos={handleDeletedPhotos}
+            />
           </Box>
         </Box>
 
@@ -483,6 +561,14 @@ const styles = {
       sm: '100%',
       lg: '50%'
     }
+  },
+  titleInput2: {
+    backgroundColor: (theme: any) => theme.customBflyColors.primaryTextContrast,
+    borderRadius: '4px',
+    '& .MuiOutlinedInput-notchedOutline': {
+      display: 'none'
+    },
+    width: { xs: '100%', lg: '38%' }
   },
 
   // Upload Container
