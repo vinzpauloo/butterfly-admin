@@ -196,7 +196,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                     '& svg': { mr: 2 }
                   }}
                 >
-                  <Typography variant='body2'>Content Creator : {param.user.username}</Typography>
+                  <Typography variant='body1'>Content Creator : {param.user.username}</Typography>
                   <Typography variant='body2'>Date Uploaded: {formatDate(param.updated_at)}</Typography>
                 </Box>
               </Box>
@@ -218,6 +218,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '2rem' }}>
                 <TextField 
+                  disabled
                   label='Video Title' 
                   fullWidth placeholder='Title' 
                   defaultValue={param.title} 
@@ -225,6 +226,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                   
                   />
                 <TextField
+                  disabled
                   label='Description'
                   multiline
                   rows={3}
@@ -238,7 +240,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
 
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '.5rem' }}>
-                <TextField multiline rows={2} fullWidth defaultValue={param.tags.join(', ')} />
+                <TextField disabled multiline rows={2} fullWidth defaultValue={param.tags.join(', ')} />
               </FormControl>
             </Grid>
           </Grid>
