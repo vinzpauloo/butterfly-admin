@@ -19,6 +19,7 @@ interface AlbumUpload {
   data: {
     title?: string
     cover_photo?: File | null
+    _id?: string
   }
 }
 
@@ -73,5 +74,19 @@ export const AlbumService = () => {
     })
   }
 
-  return { getAlbums, getSpecificUserAlbum, postAlbum }
+  const editAlbum = (_id: any, data: any) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|0',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/albums/${_id}`,
+      method: 'POST',
+      data: data
+    })
+  }
+
+  return { getAlbums, getSpecificUserAlbum, postAlbum, editAlbum }
 }

@@ -25,7 +25,7 @@ type AllVideoProps = {
   handleFeedParams?: any
 }
 
-const videoOnlyParams = { video_only: true, with: 'user' }
+const videoOnlyParams = { video_only: true, with: 'user', page : 1 }
 
 const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
   React.useEffect(() => {
@@ -38,8 +38,8 @@ const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
     return (
       <Box sx={{ display: 'flex' }}>
           <Grid container spacing={10}>
-            {data.data &&
-              data.data?.map((story: IFeedStory) => (
+            {data &&
+              data?.map((story: IFeedStory) => (
                 <Grid key={story._id} item sm={6}>
                   <FeedCard
                     datePublished={formatDate(story.created_at)}

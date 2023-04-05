@@ -12,7 +12,7 @@ const createSkeletons = (numberOfElements: number) => {
   var elements = []
   for (let i = 0; i < numberOfElements; i++) {
     elements.push(
-      <Grid item sm={6}>
+      <Grid key={i} item sm={6}>
         <Card sx={{ m: 2 }}>
           <CardHeader
             avatar={<Skeleton animation='wave' variant='circular' width={40} height={40} />}
