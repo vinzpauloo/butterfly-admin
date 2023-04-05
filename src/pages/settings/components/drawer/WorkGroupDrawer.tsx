@@ -218,6 +218,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   // ** use to PUT or update the workgroup
   const { mutate: mutateEditWorkgroup } = useMutation(putWorkgroup)
 
+  // @ts-ignore
   const layoutPattern = template => {
     switch (template) {
       case 'videoSlider':
@@ -277,6 +278,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   }
 
   const onSubmit = (data: any) => {
+    // @ts-ignore
     const vid: string[] = layoutPattern(template)
     if (header === 'Add') {
       if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
@@ -380,7 +382,11 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                   />
                 )}
               />
-              {errors.title && <FormHelperText sx={{ color: 'error.main' }}>{errors.title.message}</FormHelperText>}
+              {errors.title && (
+                <FormHelperText sx={{ color: 'error.main' }}>
+                  <>{errors.title.message}</>
+                </FormHelperText>
+              )}
             </FormControl>
             <FormControl fullWidth sx={{ mb: 6 }}>
               <InputLabel id='role-select'>Navbar</InputLabel>

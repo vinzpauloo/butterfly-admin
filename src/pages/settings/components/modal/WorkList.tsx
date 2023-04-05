@@ -15,14 +15,14 @@ const CheckboxContent = ({ allId, id, setAllId }: any) => {
 
   const handleCheck = () => {
     if (isCheck) {
-      setAllId(prev => {
-        const removeId = prev.filter(item => item !== id)
+      setAllId((prev: any) => {
+        const removeId = prev.filter((item: any) => item !== id)
 
         return removeId
       })
       setIsCheck((prev: boolean) => !prev)
     } else {
-      setAllId(prev => [...prev, id])
+      setAllId((prev: any) => [...prev, id])
       setIsCheck((prev: boolean) => !prev)
     }
   }
