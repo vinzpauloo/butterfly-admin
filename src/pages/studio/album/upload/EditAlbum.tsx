@@ -146,6 +146,7 @@ interface FileUploaderMultipleProps {
   files: File[]
   albumData: any
   onDeletedPhotos: (deletedPhotos: any[]) => void
+  setFormValue: any
 }
 
 // MULTIPLE FILE UPLOAD START...
@@ -153,7 +154,8 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
   onFilesChange,
   files,
   albumData,
-  onDeletedPhotos
+  onDeletedPhotos,
+  setFormValue
 }) => {
   // ** State
   const [localFiles, setLocalFiles] = useState<File[]>(files)
@@ -220,8 +222,16 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
 
   // const handlePhotoDelete = (deleteIndex: number) => {
   //   const deletedPhotoId = albumData.album[deleteIndex].photo_id // Assuming the albumData has an _id field for each photo
-  //   setDeletedPhotoIds([deletedPhotoId])
-  //   console.log(`DELETED@@@###`, deletedPhotoId)
+
+  //   setDeletedPhotoIds(prevDeletedPhotoIds => {
+  //     if (!prevDeletedPhotoIds.includes(deletedPhotoId)) {
+  //       return [...prevDeletedPhotoIds, deletedPhotoId]
+  //     }
+
+  //     return prevDeletedPhotoIds
+  //   })
+
+  //   console.log(`DELETED@@@###`, deletedPhotoIds)
 
   //   const updatedResponseMultiple = responseMultiple.filter((_: any, index: number) => index !== deleteIndex)
   //   setResponseMultiple(updatedResponseMultiple)
@@ -229,21 +239,26 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
   // }
 
   const handlePhotoDelete = (deleteIndex: number) => {
-    const deletedPhotoId = albumData.album[deleteIndex].photo_id // Assuming the albumData has an _id field for each photo
+    const deletedPhotoId = albumData.album[deleteIndex].photo_id
 
     setDeletedPhotoIds(prevDeletedPhotoIds => {
       if (!prevDeletedPhotoIds.includes(deletedPhotoId)) {
-        return [...prevDeletedPhotoIds, deletedPhotoId]
+        const updatedDeletedPhotoIds = [...prevDeletedPhotoIds, deletedPhotoId]
+
+        // Call the setFormValue function from here with the updatedDeletedPhotoIds
+        setFormValue((prevState: any) => ({
+          ...prevState,
+          delete_id: updatedDeletedPhotoIds
+        }))
+
+        return updatedDeletedPhotoIds
       }
 
       return prevDeletedPhotoIds
     })
 
-    console.log(`DELETED@@@###`, deletedPhotoId)
-
     const updatedResponseMultiple = responseMultiple.filter((_: any, index: number) => index !== deleteIndex)
     setResponseMultiple(updatedResponseMultiple)
-    console.log(`RESPONSE@@@####`, responseMultiple)
   }
 
   useEffect(() => {
@@ -279,17 +294,6 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
               <Typography variant='h6'>Existing Photos:</Typography>
             </Box>
           )}
-          {/* {responseAlbumData &&
-            responseAlbumData.map((item: any, index: any) => {
-              return (
-                <Box key={index} sx={{ display: 'flex' }}>
-                  <img src={item} alt='test2' width='250' height='250' />
-                  <IconButton>
-                    <Icon icon='mdi:close' fontSize={20} />
-                  </IconButton>
-                </Box>
-              )
-            })} */}
           {responseMultiple &&
             responseMultiple.map((item: any, index: any) => {
               return (
@@ -436,34 +440,6 @@ const EditAlbum = () => {
     }
   }
 
-  // const handleFormSubmit = async () => {
-
-  //   const payload = {
-  //     ...formValue,
-  //     _method: 'put'
-  //   }
-
-  //   if (!payload.title) {
-  //     delete payload.title
-  //   }
-
-  //   console.log(payload)
-
-  //   try {
-  //     await mutation.mutateAsync({
-  //       _id: albumId[0],
-  //       data: payload
-  //     })
-
-  //     setTimeout(() => {
-  //       router.push(`/studio/album/album-list`)
-  //     }, 1000)
-  //   } catch (error) {
-  //     console.log(error)
-  //     alert(error)
-  //   }
-  // }
-
   useEffect(() => {
     setFormValue(prevFormValue => ({
       ...prevFormValue,
@@ -492,7 +468,6 @@ const EditAlbum = () => {
             {...register('title')}
             error={!!errors.title}
             helperText={errors.title?.message}
-            // value={formValue.title}
             onChange={handleFormInputChange}
             name='title'
             InputLabelProps={{
@@ -513,6 +488,7 @@ const EditAlbum = () => {
               files={uploadedFiles}
               albumData={albumData}
               onDeletedPhotos={handleDeletedPhotos}
+              setFormValue={setFormValue}
             />
           </Box>
         </Box>
