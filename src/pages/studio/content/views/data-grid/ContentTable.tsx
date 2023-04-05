@@ -71,12 +71,11 @@ const ContentTable = (props: IContentTable) => {
   //Queries
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['contents', page, pageSize],
-    queryFn: () => getContents({ data: { with: 'user', page: page } }),
+    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize } }),
     onSuccess: data => {
       console.log('data isss', data)
       setData(data.data)
       setRowCount(data.total)
-      setPageSize(data.per_page)
       setPage(data.current_page)
       console.log('@@@', data)
     }

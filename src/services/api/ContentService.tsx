@@ -13,6 +13,7 @@ interface IGetContentsParams {
     action?: "Approved" | "Declined"
     note?: string
     _method?: string
+    paginate?: number
   }
   token?: string
 }
