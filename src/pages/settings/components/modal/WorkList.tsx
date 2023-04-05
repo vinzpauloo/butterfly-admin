@@ -10,8 +10,9 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 // ** Utils import
 import formatDate from '@/utils/formatDate'
 import WorkgroupService from '@/services/api/Workgroup'
+import { log } from 'console'
 
-const CheckboxContent = ({ allId, setAllId, id, sectionID }: any) => {
+const CheckboxContent = ({ data, header, allId, setAllId, id, sectionID, setSelectedData }: any) => {
   const [isCheck, setIsCheck] = useState(allId.includes(id))
   const { deleteCheckWorkgroup, postCheckWorkgroup } = WorkgroupService()
 
@@ -25,17 +26,35 @@ const CheckboxContent = ({ allId, setAllId, id, sectionID }: any) => {
 
         return removeId
       })
-      uncheckMutate({
-        id: sectionID,
-        data: { work: id }
+
+      setSelectedData((prev: any) => {
+        const removeId = prev.filter((item: any) => item !== id)
+        const newData = data.filter((item: any) => removeId.includes(item._id))
+
+        return newData
       })
+
+      if (header === 'Edit') {
+        uncheckMutate({
+          id: sectionID,
+          data: { work: id }
+        })
+      }
       setIsCheck((prev: boolean) => !prev)
     } else {
       setAllId((prev: any) => [...prev, id])
-      checkMutate({
-        id: sectionID,
-        data: { work: id }
+      setSelectedData((prev: any) => {
+        const newData = data.filter((item: any) => item._id === id)
+
+        return [...prev, ...newData]
       })
+
+      if (header === 'Edit') {
+        checkMutate({
+          id: sectionID,
+          data: { work: id }
+        })
+      }
       setIsCheck((prev: boolean) => !prev)
     }
   }
@@ -47,12 +66,13 @@ const CheckboxContent = ({ allId, setAllId, id, sectionID }: any) => {
   )
 }
 
-function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAllId }: any) {
+function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAll, setAllId, setModalData }: any) {
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [modalRowCount, setModalRowCount] = useState(0)
   const { getAllVideos } = VideoService()
+  const [selectedData, setSelectedData] = useState([])
   const { isLoading, isFetching } = useQuery({
     queryKey: ['worklist', page],
     queryFn: () => getAllVideos({ data: { sort: 'desc', sort_by: 'title', with: 'user', page: page } }),
@@ -76,8 +96,11 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
   }
 
   const handleSave = () => {
+    setModalData(selectedData)
     setModalOpen(false)
-    refetchAll()
+    if (header === 'Edit') {
+      refetchAll()
+    }
   }
 
   // ** table columns
@@ -89,7 +112,16 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
       headerName: '',
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <CheckboxContent allId={allId} id={params.id} sectionID={sectionID} setAllId={setAllId} />
+        <CheckboxContent
+          allId={allId}
+          id={params.id}
+          sectionID={sectionID}
+          setAllId={setAllId}
+          setModalData={setModalData}
+          data={data}
+          header={header}
+          setSelectedData={setSelectedData}
+        />
       )
     },
     {

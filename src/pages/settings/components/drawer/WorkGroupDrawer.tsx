@@ -185,11 +185,12 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   const [navbar, setNavbar] = useState<string>('selection') // ** default value
   const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
-  const [data, setData] = useState([])
+  // const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
   const [allId, setAllId] = useState([])
+  const [modalData, setModalData] = useState([])
   const { postWorkgroup, getSpecificWorkgroup, putWorkgroup, getAllWorkgroup } = WorkgroupService()
 
   const { refetch: refetchSpecific } = useQuery({
@@ -207,7 +208,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     queryKey: ['edit-allworks', sectionID, page],
     queryFn: () => getAllWorkgroup({ workgroup_id: sectionID }),
     onSuccess: data => {
-      setData(data.data)
+      setModalData(data.data)
       setPageSize(data.per_page)
       setPage(data.current_page)
       setRowCount(data.total)
@@ -260,7 +261,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     setTemplate('videoSlider')
     setNavbar('selection')
     setAllId([])
-    setData([])
+    setModalData([])
     setOpen(false)
   }
 
@@ -298,7 +299,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       setTemplate('videoSlider')
       setNavbar('selection')
       setAllId([])
-      setData([])
+      setModalData([])
       setOpen(false)
     } else {
       if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
@@ -327,7 +328,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       reset()
       setTemplate('videoSlider')
       setNavbar('selection')
-      setData([])
+      setModalData([])
       setOpen(false)
     }
   }
@@ -433,7 +434,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 paginationMode='server'
                 autoHeight
                 pagination
-                rows={data}
+                rows={modalData}
                 loading={header === 'Edit' ? isLoading : false}
                 getRowId={row => row._id}
                 disableColumnMenu
@@ -458,6 +459,8 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
           setModalOpen={setModalOpen}
           sectionID={sectionID}
           refetchAll={refetchAll}
+          setModalData={setModalData}
+          header={header}
         />
       ) : null}
     </>
