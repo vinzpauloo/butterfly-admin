@@ -426,7 +426,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 autoHeight
                 pagination
                 rows={data}
-                loading={isLoading}
+                loading={header === 'Edit' ? isLoading : false}
                 getRowId={row => row._id}
                 disableColumnMenu
               />
