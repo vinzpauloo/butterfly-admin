@@ -51,7 +51,6 @@ const NewsFeedList = (props: Props) => {
 
   // ** QueryAPI
   const { getFeeds } = FeedsService()
-  const queryClient = useQueryClient()
   const { isLoading, data, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } = useInfiniteQuery({
     queryKey: ['getFeeds', feedParams],
     getNextPageParam: (prevData: any) => {
@@ -64,11 +63,9 @@ const NewsFeedList = (props: Props) => {
       let page = searchParams.get('page') // retrieves the value of the 'page' parameter
       let myObj = feedParams
       let nextParams = { ...myObj, page: page }
-
       return nextParams
     },
     queryFn: ({ pageParam = { ...feedParams } }) => {
-      console.log('pageparam', pageParam)
       return getFeeds(pageParam)
     }
   })
