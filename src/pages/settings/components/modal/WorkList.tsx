@@ -87,6 +87,7 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
       minWidth: 20,
       field: 'action',
       headerName: '',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <CheckboxContent allId={allId} id={params.id} sectionID={sectionID} setAllId={setAllId} />
       )
@@ -96,6 +97,7 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
       minWidth: 70,
       field: 'thumbnail_url',
       headerName: 'Video Thumbnail',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -114,6 +116,7 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
       minWidth: 90,
       headerName: 'Content Creator',
       field: 'content_creator',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.user.username}
@@ -125,6 +128,7 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
       minWidth: 60,
       field: 'title',
       headerName: 'Title',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.title}
@@ -136,6 +140,7 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
       field: 'category',
       minWidth: 80,
       headerName: 'Category',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params?.row?.tags?.join(', ')}
@@ -147,6 +152,7 @@ function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAl
       minWidth: 140,
       field: 'last_update',
       headerName: 'Last Update',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {formatDate(params.row.updated_at)}

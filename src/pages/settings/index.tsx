@@ -222,17 +222,20 @@ const Table = ({
     {
       field: 'title',
       headerName: 'Title',
-      width: 650
+      width: 650,
+      sortable: false
     },
     {
       field: 'navbar',
       headerName: 'Navbar',
-      width: 300
+      width: 300,
+      sortable: false
     },
     {
       field: 'template_id',
       headerName: 'Template ID',
       width: 300,
+      sortable: false,
       renderCell: (params: any) => {
         return (
           <Box display='flex' alignItems='center'>
@@ -252,6 +255,7 @@ const Table = ({
       field: 'action',
       headerName: 'Action',
       width: 100,
+      sortable: false,
       renderCell: (params: any) => {
         const handleClick = () => {
           setHeader('Edit')

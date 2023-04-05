@@ -29,7 +29,7 @@ import Icon from 'src/@core/components/icon'
 import WorkgroupService from '@/services/api/Workgroup'
 import WorkList from '../modal/WorkList'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
 
 const navData = [
@@ -109,6 +109,7 @@ const columns: GridColumns = [
     minWidth: 70,
     field: 'thumbnail_url',
     headerName: 'Video Thumbnail',
+    sortable: false,
     renderCell: (params: GridRenderCellParams) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -127,6 +128,7 @@ const columns: GridColumns = [
     minWidth: 90,
     headerName: 'Content Creator',
     field: 'content_creator',
+    sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
         {params.row?.user?.username}
@@ -138,6 +140,7 @@ const columns: GridColumns = [
     minWidth: 60,
     field: 'title',
     headerName: 'Title',
+    sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
         {params.row.title}
@@ -178,6 +181,7 @@ const RandomVideoPicker = (num: number, all: string[]) => {
 // ** setTitle -> to reset the title
 const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: any) => {
   // ** State
+  const queryClient = useQueryClient()
   const [navbar, setNavbar] = useState<string>('selection') // ** default value
   const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
@@ -212,10 +216,14 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   })
 
   // ** use to POST new workgroup
-  const { mutate: mutateWorkgroup } = useMutation(postWorkgroup)
+  const { mutate: mutateWorkgroup } = useMutation(postWorkgroup, {
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workgroup'] })
+  })
 
   // ** use to PUT or update the workgroup
-  const { mutate: mutateEditWorkgroup } = useMutation(putWorkgroup)
+  const { mutate: mutateEditWorkgroup } = useMutation(putWorkgroup, {
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workgroup'] })
+  })
 
   // @ts-ignore
   const layoutPattern = template => {
