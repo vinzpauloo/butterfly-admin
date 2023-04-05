@@ -26,6 +26,8 @@ import formatDate from '@/utils/formatDate'
 // ** Third Party Components
 import ReactPlayer from 'react-player'
 import { useForm, Controller } from 'react-hook-form'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import ContentService from '../../../services/api/ContentService'
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -36,7 +38,7 @@ const Transition = forwardRef(function Transition(
 
 type ContentDialogType = {
   param: {
-    id: number
+    _id: string
     avatar: string
     title: string
     description: string
@@ -93,23 +95,38 @@ const VideoBox = styled(Box)(({ theme }) => ({
 const ContentDialog = ({ param }: ContentDialogType) => {
   // ** States
   const [show, setShow] = useState<boolean>(false)
-  const [localLoading , setLocalLoading] = React.useState<boolean>(false)
   const [showNotes, setShowNotes] = useState<boolean>(false)
+  const [noteValue, setNoteValue] = useState<string>("")
 
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+  const { approveContent } = ContentService();
+
+  const { mutate, isLoading } = useMutation(approveContent, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ['contents'],
+      });
+      setShowNotes(false)
+      setShow(false)
+      setNoteValue("")
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
 
   const handleApproveContent = () => {
-    setLocalLoading(true)
-
-    setTimeout( ()=>{ 
-      setLocalLoading(false) 
-      setShow(false)
-    }, 2000 )
-
+    mutate({
+      data: {
+        foreign_id: param._id,
+        action: "Approved",
+        _method: "put"
+      },
+    })
   }
 
-  const handleDecline = () => {
-    setShowNotes(true)
-  }
 
   // ** React hook form
   const {
@@ -125,14 +142,16 @@ const ContentDialog = ({ param }: ContentDialogType) => {
     mode : 'onBlur'
   })
 
-  const onSubmitNote = (data : any) => {
-    setLocalLoading(true)
-    setTimeout( ()=>{ 
-      setLocalLoading(false)
-      setShowNotes(false)
-      setShow(false)
-      reset()
-    }, 2000 )
+  const onSubmitNote = () => {
+    // TO CONFIRM DECLINE OF WORK
+    mutate({
+      data: {
+        foreign_id: param._id,
+        action: "Declined",
+        note: noteValue,
+        _method: "put"
+      },
+    })
   } 
 
   return (
@@ -225,11 +244,11 @@ const ContentDialog = ({ param }: ContentDialogType) => {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'center' }}>
-          <Button variant='contained' color='error' sx={{ mr: 1 }} onClick={() => handleDecline()}>
+          <Button variant='contained' color='error' sx={{ mr: 1 }} onClick={() => setShowNotes(true)}>
             Decline
           </Button>
-          <Button disabled={ localLoading ? true : false } variant='contained' color='primary' onClick={() => handleApproveContent()} >
-            { localLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Approve
+          <Button disabled={ isLoading ? true : false } variant='contained' color='primary' onClick={() => handleApproveContent()} >
+            { isLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Approve
           </Button>
         </DialogActions>
       </Dialog>
@@ -249,6 +268,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                 { errors.notes && <span>Empty note</span>}
                 <TextField
                   {...register('notes', { required: true})}
+                  value={noteValue} //should be a state
+                  onChange={(event) => setNoteValue(event.target.value )}
                   fullWidth
                   multiline
                   minRows={3}
@@ -266,8 +287,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
               </Grid>
 
               <Grid display='flex' justifyContent='center' alignItems='center' item xs={12}>
-                <Button disabled={ (errors.notes || localLoading ) ? true : false } sx={{marginInline:'auto'}} type='submit' variant='contained' size='large'>
-                  { localLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Submit Note
+                <Button disabled={ (errors.notes || isLoading ) ? true : false } sx={{marginInline:'auto'}} type='submit' variant='contained' size='large'>
+                  { isLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Submit Note
                 </Button>
               </Grid>
             </Grid>
