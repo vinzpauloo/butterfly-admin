@@ -154,8 +154,7 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
   onFilesChange,
   files,
   albumData,
-  onDeletedPhotos,
-  setFormValue
+  onDeletedPhotos
 }) => {
   // ** State
   const [localFiles, setLocalFiles] = useState<File[]>(files)
@@ -217,39 +216,15 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
   const [deletedPhotoIds, setDeletedPhotoIds] = useState<any[]>([])
 
   useEffect(() => {
-    setResponseMultiple(albumData?.album.map((item: any) => item?.photo))
+    setResponseMultiple(albumData?.album)
   }, [albumData])
 
-  // const handlePhotoDelete = (deleteIndex: number) => {
-  //   const deletedPhotoId = albumData.album[deleteIndex].photo_id // Assuming the albumData has an _id field for each photo
-
-  //   setDeletedPhotoIds(prevDeletedPhotoIds => {
-  //     if (!prevDeletedPhotoIds.includes(deletedPhotoId)) {
-  //       return [...prevDeletedPhotoIds, deletedPhotoId]
-  //     }
-
-  //     return prevDeletedPhotoIds
-  //   })
-
-  //   console.log(`DELETED@@@###`, deletedPhotoIds)
-
-  //   const updatedResponseMultiple = responseMultiple.filter((_: any, index: number) => index !== deleteIndex)
-  //   setResponseMultiple(updatedResponseMultiple)
-  //   console.log(`RESPONSE@@@####`, responseMultiple)
-  // }
-
-  const handlePhotoDelete = (deleteIndex: number) => {
-    const deletedPhotoId = albumData.album[deleteIndex].photo_id
-
+  const handlePhotoDelete = (photoIdToDelete: string) => {
     setDeletedPhotoIds(prevDeletedPhotoIds => {
-      if (!prevDeletedPhotoIds.includes(deletedPhotoId)) {
-        const updatedDeletedPhotoIds = [...prevDeletedPhotoIds, deletedPhotoId]
+      if (!prevDeletedPhotoIds.includes(photoIdToDelete)) {
+        const updatedDeletedPhotoIds = [...prevDeletedPhotoIds, photoIdToDelete]
 
-        // Call the setFormValue function from here with the updatedDeletedPhotoIds
-        setFormValue((prevState: any) => ({
-          ...prevState,
-          delete_id: updatedDeletedPhotoIds
-        }))
+        onDeletedPhotos(updatedDeletedPhotoIds)
 
         return updatedDeletedPhotoIds
       }
@@ -257,7 +232,7 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
       return prevDeletedPhotoIds
     })
 
-    const updatedResponseMultiple = responseMultiple.filter((_: any, index: number) => index !== deleteIndex)
+    const updatedResponseMultiple = responseMultiple.filter((photo: any) => photo.photo_id !== photoIdToDelete)
     setResponseMultiple(updatedResponseMultiple)
   }
 
@@ -298,8 +273,8 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
             responseMultiple.map((item: any, index: any) => {
               return (
                 <Box key={index} sx={{ display: 'flex' }}>
-                  <img src={item} alt='test2' width='250' height='250' />
-                  <IconButton onClick={() => handlePhotoDelete(index)}>
+                  <img src={item.photo} alt='test2' width='250' height='250' />
+                  <IconButton onClick={() => handlePhotoDelete(item.photo_id)}>
                     <Icon icon='mdi:close' fontSize={20} />
                   </IconButton>
                 </Box>
@@ -401,8 +376,8 @@ const EditAlbum = () => {
     console.log(`handleMultiplePhoto`, formValue)
   }
 
-  const handleDeletedPhotos = (deletedIds: any[]) => {
-    setFormValue({ ...formValue, delete_id: deletedIds })
+  const handleDeletedPhotos = (deletedPhotoIds: any[]) => {
+    setFormValue({ ...formValue, delete_id: deletedPhotoIds })
   }
 
   const [formValue, setFormValue] = useState<FormValues>({
@@ -419,8 +394,6 @@ const EditAlbum = () => {
       await response.json()
     }
   })
-
-  console.log(`NEWFORMVALUEUPDATED`, formValue)
 
   const handleFormSubmit = async () => {
     console.log(formValue)
