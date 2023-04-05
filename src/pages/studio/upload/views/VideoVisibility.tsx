@@ -389,12 +389,12 @@ const VideoVisibility = () => {
                 ) : (
                   <>
                     <Box>
-                      <CustomButton
+                      <Button
                         disabled={studioContext?.workProgress != 100 ? true : false}
                         onClick={handleCancelButton}
                       >
                         Back
-                      </CustomButton>
+                      </Button>
                     </Box>
 
                     <Box>
