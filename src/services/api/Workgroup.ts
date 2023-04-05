@@ -36,7 +36,13 @@ interface IPutWorkgroup {
     template_id: string
     single?: string
     multiple?: string[]
-    all: string[]
+  }
+}
+
+interface ICheckWorkgroup {
+  id: string
+  data: {
+    work: string
   }
 }
 
@@ -120,7 +126,42 @@ const WorkgroupService = () => {
     })
   }
 
-  return { getWorkgroup, postWorkgroup, getSearchWorkgroups, getSpecificWorkgroup, putWorkgroup, getAllWorkgroup }
+  const deleteCheckWorkgroup = (params: ICheckWorkgroup) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/workgroups/${params.id}/all`,
+      method: 'DELETE',
+      params: params.data
+    })
+  }
+
+  const postCheckWorkgroup = (params: ICheckWorkgroup) => {
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/workgroups/${params.id}/all`,
+      method: 'POST',
+      params: params.data
+    })
+  }
+
+  return {
+    getWorkgroup,
+    postWorkgroup,
+    getSearchWorkgroups,
+    getSpecificWorkgroup,
+    putWorkgroup,
+    getAllWorkgroup,
+    deleteCheckWorkgroup,
+    postCheckWorkgroup
+  }
 }
 
 export default WorkgroupService

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import * as yup from 'yup'
 import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
@@ -255,8 +254,6 @@ const Table = ({
       width: 100,
       renderCell: (params: any) => {
         const handleClick = () => {
-          console.log('~~~~', params)
-
           setHeader('Edit')
           setOpen(true)
           setSectionID(params.id)
