@@ -178,14 +178,14 @@ const ContentTable = (props: IContentTable) => {
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        return <Typography>{params.row.approval}</Typography>
+        return <Typography color={params.row.approval === "Declined" ? "red" : undefined}>{params.row.approval}</Typography>
       }
     },
     {
       flex: 0.06,
       minWidth: 50,
       field: 'actions',
-      headerName: '',
+      headerName: 'View',
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
         return <ContentDialog param={params.row} />
