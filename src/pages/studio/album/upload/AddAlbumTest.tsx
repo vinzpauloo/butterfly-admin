@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import { Box, Typography, TextField, Button, List, ListItem, IconButton } from '@mui/material'
+import { Box, Typography, TextField, ListItem, IconButton, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
@@ -17,14 +17,44 @@ import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 
 // ** Third Party Components
 import { useDropzone } from 'react-dropzone'
+import { PhotoAlbum, Photo, RenderPhotoProps } from 'react-photo-album'
+import clsx from 'clsx'
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  UniqueIdentifier,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable'
 import { v4 as uuidv4 } from 'uuid'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 
+//* Context Import
+import { StudioContext, DisplayPage } from '../../upload'
+
+// Styled components
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: '4px',
+  '& .MuiOutlinedInput-notchedOutline': {
+    display: 'none'
+  }
+}))
+
 // ** TanStack Query
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQueries, QueryClient } from '@tanstack/react-query'
 import { AlbumService } from '@/services/api/AlbumService'
+
+import { useDebouncedCallback } from 'use-debounce'
 
 interface FormValues {
   title: string
@@ -34,12 +64,121 @@ interface FormValues {
 
 const schema = yup.object().shape({
   title: yup.string().required()
+  // cover_photo: yup.mixed().required()
+  // photos: yup.array().of(yup.mixed().required())
 })
 
 interface FileProp {
   name: string
   type: string
   size: number
+}
+interface SortablePhoto extends Photo {
+  id: string // @dnd-kit requires string 'id' on sortable elements
+}
+
+type PhotoFrameProps = SortablePhotoProps & {
+  overlay?: boolean
+  active?: boolean
+  insertPosition?: 'before' | 'after'
+  attributes?: Partial<React.HTMLAttributes<HTMLDivElement>>
+  listeners?: Partial<React.HTMLAttributes<HTMLDivElement>>
+  onRemove?: (id: string) => void
+}
+
+type SortablePhotoProps = RenderPhotoProps<SortablePhoto> & {
+  onRemove?: (id: string) => void
+}
+
+const PhotoFrame = React.memo(
+  React.forwardRef<HTMLDivElement, PhotoFrameProps>((props, ref) => {
+    const { layoutOptions, imageProps, photo, overlay, active, insertPosition, attributes, listeners, onRemove } = props
+    const { alt, style, ...restImageProps } = imageProps
+
+    return (
+      <div
+        ref={ref}
+        style={{
+          width: overlay ? `calc(100% - ${2 * layoutOptions.padding}px)` : style.width,
+          padding: style.padding,
+          marginBottom: style.marginBottom
+        }}
+        className={clsx('photo-frame', {
+          overlay: overlay,
+          active: active,
+          insertBefore: insertPosition === 'before',
+          insertAfter: insertPosition === 'after'
+        })}
+        {...attributes}
+        {...listeners}
+      >
+        {onRemove && (
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box
+              sx={{
+                position: 'relative',
+                width: '100%',
+                height: 'auto'
+              }}
+            >
+              <button
+                onClick={() => onRemove && onRemove(photo.id)}
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: '50%',
+                  border: 'none',
+                  cursor: 'pointer',
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  zIndex: 5
+                }}
+              >
+                X
+              </button>
+              <img
+                alt={alt}
+                style={{
+                  ...style,
+                  width: '100%',
+                  height: 'auto',
+                  padding: 0,
+                  marginBottom: 0
+                }}
+                {...restImageProps}
+              />
+            </Box>
+          </Box>
+        )}
+      </div>
+    )
+  })
+)
+
+PhotoFrame.displayName = 'PhotoFrame'
+
+function SortablePhotoFrame(props: SortablePhotoProps & { activeIndex?: number }) {
+  const { photo, activeIndex, onRemove } = props
+  const { attributes, listeners, isDragging, index, over, setNodeRef } = useSortable({ id: photo.id })
+
+  return (
+    <PhotoFrame
+      ref={setNodeRef}
+      active={isDragging}
+      insertPosition={
+        activeIndex !== undefined && over?.id === photo.id && !isDragging
+          ? index > activeIndex
+            ? 'after'
+            : 'before'
+          : undefined
+      }
+      aria-label='sortable image'
+      attributes={attributes}
+      listeners={listeners}
+      onRemove={onRemove}
+      {...props}
+    />
+  )
 }
 
 const FileUploaderSingle = ({ onFilesChange }: { onFilesChange?: (files: File[]) => void }) => {
@@ -137,58 +276,22 @@ const FileUploaderSingle = ({ onFilesChange }: { onFilesChange?: (files: File[])
 }
 
 // MULTIPLE FILE UPLOAD START...
-const FileUploaderMultiple = ({ onFilesChange, files }: { onFilesChange?: (files: File[]) => void; files: File[] }) => {
+const FileUploaderMultiple = ({ onFilesChange }: any) => {
   // ** State
-  const [localFiles, setLocalFiles] = useState<File[]>(files)
+  const [files, setFiles] = useState<File[]>([])
+
+  useEffect(() => {
+    if (onFilesChange) {
+      onFilesChange(files)
+    }
+  }, [files, onFilesChange])
 
   // ** Hooks
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
-      setLocalFiles(acceptedFiles.map((file: File) => Object.assign(file)))
-      if (onFilesChange) {
-        onFilesChange(acceptedFiles)
-      }
+      setFiles(prevFiles => [...prevFiles, ...acceptedFiles.map((file: File) => Object.assign(file))])
     }
   })
-
-  const renderFilePreview = (file: FileProp) => {
-    if (file.type.startsWith('image')) {
-      return <img width={200} height={200} alt={file.name} src={URL.createObjectURL(file as any)} />
-    } else {
-      return <Icon icon='mdi:file-document-outline' />
-    }
-  }
-
-  const handleRemoveFile = (file: FileProp) => {
-    const filtered = localFiles.filter((i: FileProp) => i.name !== file.name)
-    setLocalFiles([...filtered])
-    if (onFilesChange) {
-      onFilesChange(filtered)
-    }
-  }
-
-  const fileList = localFiles.map((file: FileProp) => (
-    <ListItem key={file.name}>
-      <div className='file-details'>
-        <div className='file-preview'>{renderFilePreview(file)}</div>
-        <div>
-          <Typography className='file-name'>{file.name}</Typography>
-          <Typography className='file-size' variant='body2'>
-            {Math.round(file.size / 100) / 10 > 1000
-              ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
-              : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
-          </Typography>
-        </div>
-      </div>
-      <IconButton onClick={() => handleRemoveFile(file)}>
-        <Icon icon='mdi:close' fontSize={20} />
-      </IconButton>
-    </ListItem>
-  ))
-
-  const handleRemoveAllFiles = () => {
-    setLocalFiles([])
-  }
 
   return (
     <Fragment>
@@ -202,35 +305,77 @@ const FileUploaderMultiple = ({ onFilesChange, files }: { onFilesChange?: (files
           <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
         </Box>
       </Box>
-      <Box sx={{ ...styles.photoAlbumWrapper }}>
-        <Box sx={{ ...styles.scrollFunc }}>
-          {localFiles.length ? (
-            <Fragment>
-              <List>{fileList}</List>
-              <div className='buttons'>
-                <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
-                  Remove All
-                </Button>
-              </div>
-            </Fragment>
-          ) : null}
-        </Box>
-      </Box>
     </Fragment>
   )
 }
 
-const UploadAlbum = () => {
+const AddAlbumTest = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
 
   /* States */
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [photos, setPhotos] = useState<SortablePhoto[]>([])
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
     router.back()
   }
+
+  const renderedPhotos = React.useRef<{ [key: string]: SortablePhotoProps }>({})
+  const [activeId, setActiveId] = React.useState<UniqueIdentifier | null>(null)
+  const activeIndex = activeId ? photos.findIndex(photo => photo.id === activeId) : undefined
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 50, tolerance: 10 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  const handleDragStart = React.useCallback(({ active }: DragStartEvent) => setActiveId(active.id), [])
+
+  const handleDragEnd = React.useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      setPhotos(items => {
+        const oldIndex = items.findIndex(item => item.id === active.id)
+        const newIndex = items.findIndex(item => item.id === over.id)
+
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }, [])
+
+  const renderPhoto = React.useCallback(
+    (props: SortablePhotoProps) => {
+      // capture rendered photos for future use in DragOverlay
+      renderedPhotos.current[props.photo.id] = props
+
+      return (
+        <SortablePhotoFrame
+          activeIndex={activeIndex}
+          onRemove={id => {
+            setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== id))
+          }}
+          {...props}
+        />
+      )
+    },
+    [activeIndex]
+  )
+
+  useEffect(() => {
+    setPhotos(
+      uploadedFiles.map((file: File) => ({
+        ...file,
+        id: uuidv4(),
+        src: URL.createObjectURL(file as any),
+        width: 1,
+        height: 1
+      }))
+    )
+  }, [uploadedFiles])
 
   const [fileName, setFileName] = useState('')
 
@@ -275,10 +420,11 @@ const UploadAlbum = () => {
     console.log(`handleCOVERCHANGE`, formValue)
   }
 
-  const handleMultiplePhotoChange = (files: File[]) => {
-    setFormValue({ ...formValue, photos: files })
-    console.log(`handleMultiplePhoto`, formValue)
-  }
+  const handleFilesChange = useCallback((fileList: File[]) => {
+    setUploadedFiles(fileList)
+    console.log(uploadedFiles)
+    setFormValue(prevFormValue => ({ ...prevFormValue, photos: fileList }))
+  }, [])
 
   const [formValue, setFormValue] = useState<FormValues>({
     title: '',
@@ -307,13 +453,6 @@ const UploadAlbum = () => {
       alert(error)
     }
   }
-
-  useEffect(() => {
-    setFormValue(prevFormValue => ({
-      ...prevFormValue,
-      photos: uploadedFiles
-    }))
-  }, [uploadedFiles])
 
   return (
     <BasicCard sx={{ ...styles.container }}>
@@ -347,9 +486,63 @@ const UploadAlbum = () => {
           {/* ALBUM COVER CONTAINER */}
           <FileUploaderSingle onFilesChange={handleCoverPhotoChange} />
 
-          {/* MULTIPLE UPLOAD CONTAINER */}
+          {/* MULTIPLE UPLOAD and Drag & Drop CONTAINER */}
           <Box sx={{ ...styles.multiUploadDragAndDropWrapper }}>
-            <FileUploaderMultiple onFilesChange={handleMultiplePhotoChange} files={uploadedFiles} />
+            <Box sx={{ ...styles.multiUploadWrapper }}>
+              <FileUploaderMultiple onFilesChange={handleFilesChange} />
+            </Box>
+
+            {/* SCROLLABLE PHOTO ALBUM */}
+            <Box sx={{ ...styles.photoAlbumWrapper }}>
+              <Box sx={{ ...styles.scrollFunc }}>
+                {photos.length === 0 ? (
+                  <Box sx={{ ...styles.placeholder }}>
+                    <Image src='/images/studio/thumbnail.png' width={100} height={100} alt='' />
+                    <Typography textTransform='uppercase' variant='h6'>
+                      Gallery
+                    </Typography>
+                    <Typography>No photos uploaded.</Typography>
+                  </Box>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext items={photos}>
+                      <div style={{ margin: 30 }}>
+                        <PhotoAlbum
+                          photos={photos}
+                          layout='rows'
+                          spacing={10}
+                          padding={5}
+                          renderPhoto={photoProps =>
+                            renderPhoto({
+                              ...photoProps,
+                              onRemove: id => {
+                                setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== id))
+                              }
+                            })
+                          }
+                        />
+                      </div>
+                    </SortableContext>
+                    <DragOverlay>
+                      {activeId && (
+                        <PhotoFrame
+                          overlay
+                          {...renderedPhotos.current[activeId]}
+                          onRemove={id => {
+                            setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== id))
+                          }}
+                        />
+                      )}
+                    </DragOverlay>
+                  </DndContext>
+                )}
+              </Box>
+            </Box>
           </Box>
         </Box>
 
@@ -538,4 +731,4 @@ const styles = {
   }
 }
 
-export default UploadAlbum
+export default AddAlbumTest
