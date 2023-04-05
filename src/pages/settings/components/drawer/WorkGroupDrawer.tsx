@@ -129,7 +129,7 @@ const columns: GridColumns = [
     field: 'content_creator',
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.user.username}
+        {params.row?.user?.username}
       </Typography>
     )
   },
@@ -181,12 +181,11 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   const [navbar, setNavbar] = useState<string>('selection') // ** default value
   const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
-  const [selectedVideosInModal, setSelectedInModal] = useState([])
+  const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
   const [allId, setAllId] = useState([])
-  const [hasSave, setHasSave] = useState(true)
   const { postWorkgroup, getSpecificWorkgroup, putWorkgroup, getAllWorkgroup } = WorkgroupService()
 
   const { refetch: refetchSpecific } = useQuery({
@@ -204,12 +203,12 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     queryKey: ['edit-allworks', sectionID, page],
     queryFn: () => getAllWorkgroup({ workgroup_id: sectionID }),
     onSuccess: data => {
-      setSelectedInModal(data.data)
+      setData(data.data)
       setPageSize(data.per_page)
       setPage(data.current_page)
       setRowCount(data.total)
     },
-    enabled: header === 'Edit' && hasSave
+    enabled: header === 'Edit'
   })
 
   // ** use to POST new workgroup
@@ -253,7 +252,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     setTemplate('videoSlider')
     setNavbar('selection')
     setAllId([])
-    setSelectedInModal([])
+    setData([])
     setOpen(false)
   }
 
@@ -262,19 +261,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   }
 
   const handlePageChange = (newPage: number) => {
-    console.log('@@@', newPage)
-
     setPage(newPage + 1)
-    // if(!hasSave){
-    //   const first = (newPage + 1) * 10;
-    //   const last = (newPage + 2) * 10;
-
-    //   setSelectedInModal(prev => {
-    //     const nextPageData = prev.slice(first, last + 1)
-
-    //     return nextPageData
-    //   })
-    // }
   }
 
   const onSubmit = (data: any) => {
@@ -303,7 +290,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       setTemplate('videoSlider')
       setNavbar('selection')
       setAllId([])
-      setSelectedInModal([])
+      setData([])
       setOpen(false)
     } else {
       if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
@@ -314,8 +301,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
             navbar: navbar,
             template_id: template,
             single: vid[0],
-            multiple: vid?.slice(1),
-            all: allId
+            multiple: vid?.slice(1)
           }
         })
       } else {
@@ -326,16 +312,14 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
             navbar: navbar,
             template_id: template,
             single: vid[0],
-            multiple: vid?.slice(1),
-            all: allId
+            multiple: vid?.slice(1)
           }
         })
       }
       reset()
       setTemplate('videoSlider')
       setNavbar('selection')
-      setAllId([])
-      setSelectedInModal([])
+      setData([])
       setOpen(false)
     }
   }
@@ -436,13 +420,13 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
               <DataGrid
                 rowCount={rowCount}
                 columns={columns}
-                pageSize={10}
+                pageSize={pageSize}
                 onPageChange={handlePageChange}
                 paginationMode='server'
                 autoHeight
                 pagination
-                rows={selectedVideosInModal}
-                loading={header === 'Edit' && hasSave ? isLoading : false}
+                rows={data}
+                loading={isLoading}
                 getRowId={row => row._id}
                 disableColumnMenu
               />
@@ -463,12 +447,9 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
           allId={allId}
           modalOpen={modalOpen}
           setAllId={setAllId}
-          setHasSave={setHasSave}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          setRowCount={setRowCount}
           setModalOpen={setModalOpen}
-          setSelectedInModal={setSelectedInModal}
+          sectionID={sectionID}
+          refetchAll={refetchAll}
         />
       ) : null}
     </>

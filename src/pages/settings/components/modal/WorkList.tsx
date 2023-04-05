@@ -3,15 +3,20 @@ import React, { useState } from 'react'
 
 import { Box, Button, Checkbox, Modal, Typography } from '@mui/material'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import VideoService from '@/services/api/VideoService'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Utils import
 import formatDate from '@/utils/formatDate'
+import WorkgroupService from '@/services/api/Workgroup'
 
-const CheckboxContent = ({ allId, id, setAllId }: any) => {
+const CheckboxContent = ({ allId, setAllId, id, sectionID }: any) => {
   const [isCheck, setIsCheck] = useState(allId.includes(id))
+  const { deleteCheckWorkgroup, postCheckWorkgroup } = WorkgroupService()
+
+  const { mutate: checkMutate } = useMutation(postCheckWorkgroup)
+  const { mutate: uncheckMutate } = useMutation(deleteCheckWorkgroup)
 
   const handleCheck = () => {
     if (isCheck) {
@@ -20,9 +25,17 @@ const CheckboxContent = ({ allId, id, setAllId }: any) => {
 
         return removeId
       })
+      uncheckMutate({
+        id: sectionID,
+        data: { work: id }
+      })
       setIsCheck((prev: boolean) => !prev)
     } else {
       setAllId((prev: any) => [...prev, id])
+      checkMutate({
+        id: sectionID,
+        data: { work: id }
+      })
       setIsCheck((prev: boolean) => !prev)
     }
   }
@@ -34,39 +47,23 @@ const CheckboxContent = ({ allId, id, setAllId }: any) => {
   )
 }
 
-function WorkList({
-  modalOpen,
-  setModalOpen,
-  setSelectedInModal,
-  allId,
-  setAllId,
-  setHasSave,
-  setPageSize,
-  setPage,
-  setRowCount
-}: any) {
+function WorkList({ allId, modalOpen, setModalOpen, sectionID, refetchAll, setAllId }: any) {
   const [data, setData] = useState([])
-  const [modalPage, setModalPage] = useState<number>(1)
-  const [modalPageSize, setModalPageSize] = useState(10)
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
   const [modalRowCount, setModalRowCount] = useState(0)
-  const [saveData, setSaveData] = useState([])
-  const [prevPage, setPrevPage] = useState(0)
   const { getAllVideos } = VideoService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['worklist', modalPage],
-    queryFn: () => getAllVideos({ data: { sort: 'desc', sort_by: 'title', with: 'user', page: modalPage } }),
+    queryKey: ['worklist', page],
+    queryFn: () => getAllVideos({ data: { sort: 'desc', sort_by: 'title', with: 'user', page: page } }),
     onError: err => {
       console.log('Modal', err)
     },
     onSuccess: data => {
       setData(data.data)
       setModalRowCount(data.total)
-      setModalPageSize(data.per_page)
-      setModalPage(data.current_page)
-      if (prevPage < modalPage) {
-        setSaveData(prev => prev.concat(data.data))
-        setPrevPage(prev => prev + 1)
-      }
+      setPageSize(data.per_page)
+      setPage(data.current_page)
     }
   })
 
@@ -75,23 +72,12 @@ function WorkList({
   }
 
   const handlePageChange = (newPage: number) => {
-    setModalPage(newPage + 1)
+    setPage(newPage + 1)
   }
 
   const handleSave = () => {
-    if (data.length > 0) {
-      const selectedVid = saveData?.filter((item: any) => {
-        if (allId.includes(item?._id)) {
-          return item
-        }
-      })
-      setSelectedInModal(selectedVid)
-      setPageSize(10)
-      setPage(1)
-      setRowCount(selectedVid.length)
-      setHasSave(false)
-      setModalOpen(false)
-    }
+    setModalOpen(false)
+    refetchAll()
   }
 
   // ** table columns
@@ -101,7 +87,9 @@ function WorkList({
       minWidth: 20,
       field: 'action',
       headerName: '',
-      renderCell: (params: GridRenderCellParams) => <CheckboxContent allId={allId} id={params.id} setAllId={setAllId} />
+      renderCell: (params: GridRenderCellParams) => (
+        <CheckboxContent allId={allId} id={params.id} sectionID={sectionID} setAllId={setAllId} />
+      )
     },
     {
       flex: 0.02,
@@ -176,7 +164,7 @@ function WorkList({
       <Box width={1200} sx={{ background: 'white' }}>
         <DataGrid
           rowCount={modalRowCount}
-          pageSize={modalPageSize}
+          pageSize={pageSize}
           paginationMode='server'
           getRowId={row => row._id}
           disableSelectionOnClick
