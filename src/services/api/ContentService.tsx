@@ -3,6 +3,15 @@ import request from '@/lib/request'
 import authConfig from 'src/configs/auth'
 
 interface IGetContentsParams {
+  data: {
+    search_by?: string
+    search_value?: string
+    order_by?: string
+    order_type?: string
+    with?: string
+    page?: number
+  }
+  token?: string
 }
 
 
@@ -18,7 +27,7 @@ const ContentService = () => {
       },
       url: '/admin/works',
       method: 'GET',
-      params: params
+      params: params.data
     })
   }
   
