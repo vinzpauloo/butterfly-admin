@@ -9,6 +9,7 @@ import Container from './components/Container'
 import WorkgroupService from '@/services/api/Workgroup'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
+import Image from 'next/image'
 
 const navData = [
   {
@@ -55,28 +56,29 @@ const navData = [
 
 const templateData = [
   {
-    value: 'videoslider',
-    text: 'videoSlider'
+    value: 'videoSlider',
+    text: 'videoSlider',
+    image: '/images/template/videoSlider.png'
   },
   {
     value: 'reelslider',
-    text: 'reelSlider'
+    text: 'reelSlider',
+    image: '/images/template/reelSlider.png'
   },
   {
-    value: 'singlevideo',
-    text: 'singleVideo'
+    value: 'singleVideoWithGrid',
+    text: 'singleVideoWithGrid',
+    image: '/images/template/singleVideoWithGrid.png'
   },
   {
-    value: 'singlevideowithgrid',
-    text: 'singleVideoWithGrid'
-  },
-  {
-    value: 'singlevideolist',
-    text: 'singleVideoList'
+    value: 'singleVideoList',
+    text: 'singleVideoList',
+    image: '/images/template/singleVideoList.png'
   },
   {
     value: 'grid',
-    text: 'grid'
+    text: 'grid',
+    image: '/images/template/grid.png'
   }
 ]
 
@@ -176,6 +178,7 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
           <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
             <InputLabel id='demo-simple-select-label'>Template</InputLabel>
             <Select
+              style={{ display: 'flex', alignItems: 'center' }}
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={template_id}
@@ -183,8 +186,11 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
               onChange={e => setTemplate(e.target.value)}
             >
               {templateData.map((item, index) => (
-                <MenuItem key={index} value={item.value}>
-                  {item.text}
+                <MenuItem key={index} value={item.value} style={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <Box display='flex' alignItems='center'>
+                    <Image src={item.image} alt='dfs' width='24' height='24' style={{ marginRight: 10 }} />
+                    {item.text}
+                  </Box>
                 </MenuItem>
               ))}
             </Select>
@@ -227,7 +233,21 @@ const Table = ({
     {
       field: 'template_id',
       headerName: 'Template ID',
-      width: 300
+      width: 300,
+      renderCell: (params: any) => {
+        return (
+          <Box display='flex' alignItems='center'>
+            <Image
+              src={`/images/template/${params.value}.png`}
+              alt='dfs'
+              width='24'
+              height='24'
+              style={{ marginRight: 10 }}
+            />
+            {params.value}
+          </Box>
+        )
+      }
     },
     {
       field: 'action',
@@ -270,6 +290,7 @@ const Table = ({
       getRowId={row => row._id}
       checkboxSelection={false}
       disableSelectionOnClick
+      disableColumnMenu
       autoHeight
       loading={isLoading}
       rows={data}

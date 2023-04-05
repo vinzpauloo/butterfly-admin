@@ -30,6 +30,7 @@ import WorkgroupService from '@/services/api/Workgroup'
 import WorkList from '../modal/WorkList'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
 
 const navData = [
   {
@@ -77,23 +78,28 @@ const navData = [
 const templateData = [
   {
     value: 'videoSlider',
-    text: 'videoSlider'
+    text: 'videoSlider',
+    image: '/images/template/videoSlider.png'
   },
   {
     value: 'reelslider',
-    text: 'reelSlider'
+    text: 'reelSlider',
+    image: '/images/template/reelSlider.png'
   },
   {
     value: 'singleVideoWithGrid',
-    text: 'singleVideoWithGrid'
+    text: 'singleVideoWithGrid',
+    image: '/images/template/singleVideoWithGrid.png'
   },
   {
     value: 'singleVideoList',
-    text: 'singleVideoList'
+    text: 'singleVideoList',
+    image: '/images/template/singleVideoList.png'
   },
   {
     value: 'grid',
-    text: 'grid'
+    text: 'grid',
+    image: '/images/template/grid.png'
   }
 ]
 
@@ -407,7 +413,10 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
               >
                 {templateData.map((item, index) => (
                   <MenuItem key={index} value={item.value}>
-                    {item.text}
+                    <Box display='flex' alignItems='center'>
+                      <Image src={item.image} alt='dfs' width='24' height='24' style={{ marginRight: 10 }} />
+                      {item.text}
+                    </Box>
                   </MenuItem>
                 ))}
               </Select>
@@ -429,6 +438,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 rows={selectedVideosInModal}
                 loading={header === 'Edit' && hasSave ? isLoading : false}
                 getRowId={row => row._id}
+                disableColumnMenu
               />
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 import { Box, Button, Checkbox, Modal, Typography } from '@mui/material'
-import { DataGrid, GridColumns, GridRenderCellParams, useGridApiRef } from '@mui/x-data-grid'
+import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
 import VideoService from '@/services/api/VideoService'
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -187,10 +187,6 @@ function WorkList({
           pagination
           onPageChange={handlePageChange}
           disableColumnMenu
-
-          // onStateChange={e => console.log('###', e)}
-          // onSelectionModelChange={selectionModel => setSelectedVideos(selectionModel)}
-          // keepNonExistentRowsSelected={true}
         />
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} mb={5}>
           <Button size='large' variant='contained' sx={{ mr: 3 }} onClick={handleSave}>
