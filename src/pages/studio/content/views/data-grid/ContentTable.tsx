@@ -52,7 +52,7 @@ interface SnackState extends SnackbarOrigin {
 const ContentTable = (props: IContentTable) => {
   // ** States
   const [data, setData] = React.useState([])
-  const [rowCount, setRowCount] = React.useState([])
+  const [rowCount, setRowCount] = React.useState(0)
   const [page, setPage] = React.useState<number>(1)
   const [pageSize, setPageSize] = React.useState(10)
   const [snackState, setSnackState] = React.useState<SnackState>({
@@ -70,13 +70,12 @@ const ContentTable = (props: IContentTable) => {
 
   //Queries
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['contents'],
-    queryFn: () => getContents({ with: 'user' }),
+    queryKey: ['contents', page, pageSize],
+    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize } }),
     onSuccess: data => {
       console.log('data isss', data)
       setData(data.data)
       setRowCount(data.total)
-      setPageSize(data.per_page)
       setPage(data.current_page)
       console.log('@@@', data)
     }
@@ -178,14 +177,14 @@ const ContentTable = (props: IContentTable) => {
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
-        return <Typography>{params.row.approval}</Typography>
+        return <Typography color={params.row.approval === "Declined" ? "red" : undefined}>{params.row.approval}</Typography>
       }
     },
     {
       flex: 0.06,
       minWidth: 50,
       field: 'actions',
-      headerName: '',
+      headerName: 'View',
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
         return <ContentDialog param={params.row} />
@@ -210,8 +209,13 @@ const ContentTable = (props: IContentTable) => {
           columns={columns}
           pageSize={pageSize}
           disableSelectionOnClick
-          rowsPerPageOptions={[7, 10, 25, 50]}
+          rowsPerPageOptions={[10, 25, 50]}
+          onPageChange={newPage => setPage(newPage + 1)}
           onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+          rowCount={rowCount}
+          paginationMode='server'
+          checkboxSelection={false}
+          pagination
         />
       </Card>
 

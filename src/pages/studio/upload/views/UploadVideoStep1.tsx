@@ -71,7 +71,7 @@ const CustomSelect = styled(Select)(({ theme }) => ({
 }))
 
 const CustomStack = styled(Stack)(({ theme }) => ({
-  backgroundColor: theme.palette.common.white,
+  backgroundColor: theme.palette.background.paper,
   borderRadius: '5px',
   padding: '1em',
   marginTop: '1rem',
@@ -119,7 +119,8 @@ const defaultValues = {
   title: '',
   description: '',
   contentCreator: '',
-  startTime: ''
+  startTime: '',
+  multiTags : ''
 }
 
 const UploadVideoStep1 = (props: Props) => {
@@ -128,8 +129,8 @@ const UploadVideoStep1 = (props: Props) => {
   const [files, setFiles] = React.useState<File[] | null>([])
   const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
   const [thumbnailFile, setThumbnailFile] = React.useState<File[]>([])
-  const [tags, setTags] = React.useState<[] | null>([])
-  const [groupings, setGroupings] = React.useState<[] | null>([])
+  const [tags, setTags] = React.useState<string[]>([])
+  const [groupings, setGroupings] = React.useState<[]>([])
   const [groupingsOptions, setGroupingsOptions] = React.useState<[{ title: string; _id: string }] | []>([])
   const [ccOptions, setCCOptions] = React.useState<
     | [
@@ -150,10 +151,13 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** UseForm
   const {
+    reset,
+    resetField,
     control,
     watch,
     getValues,
     setValue,
+    register,
     formState: { errors }
   } = useForm({
     defaultValues,
@@ -184,7 +188,6 @@ const UploadVideoStep1 = (props: Props) => {
       return getAllDataFromCreator()
     },
     onSuccess: (data: any) => {
-      console.log('ccData', data.data)
       setCCOptions(data.data)
     }
   })
@@ -235,12 +238,6 @@ const UploadVideoStep1 = (props: Props) => {
       'image/*': ['.jpeg', '.png', '.jpg']
     },
     onDrop: (acceptedFiles: File[]) => {
-      const uploadedThumb = acceptedFiles.map((file: File) => Object.assign(file))
-
-      console.log(
-        'thumbs',
-        acceptedFiles.map((file: File) => Object.assign(file))
-      )
       setThumbnailFile(acceptedFiles.map((file: File) => Object.assign(file)))
     },
     onDropRejected: () => {
@@ -252,9 +249,35 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Component Functions
   const handleCancelButton = () => {
-    //navigate back
+
+    //clear values 
+    reset()
+
+    //go Next page
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
+
+  const handleTagPressEnter = (e : React.KeyboardEvent<HTMLDivElement>) => {
+    if ( e.code == 'Enter' ) {
+
+      // handle add to Chip
+        let tagWord = (e.target as HTMLInputElement).value as string
+
+        let hasDuplicate = tags?.includes(tagWord)
+        if ( hasDuplicate ) {
+          toast.error('The tag you entered already exists')
+          return
+        }
+        let insertTagArray = [tagWord]
+        let newTagsArray = [ ...tags as [], ...insertTagArray ]
+        setTags( newTagsArray as [] )
+
+        //reset multiTags
+        resetField('multiTags')
+
+    }
+  }
+
   const askToResumeUpload = (previousUploads: tus.PreviousUpload[]) => {
     if (previousUploads.length === 0) return null
 
@@ -271,8 +294,7 @@ const UploadVideoStep1 = (props: Props) => {
     }
   }
   const handleUpload = () => {
-    //check required fields
-
+ 
     // call videos api
     if (!files) {
       return
@@ -282,13 +304,7 @@ const UploadVideoStep1 = (props: Props) => {
 
     //get fields from react hook form
     const { title, contentCreator } = getValues()
-    console.log('values', getValues())
-
-    const headerData = JSON.stringify({
-      user_id: contentCreator,
-      file_name: title,
-      video_type: 'full_video'
-    })
+    console.log('groupings',groupings)
 
     const upload = new tus.Upload(file, {
       endpoint: `${UploadURL}`,
@@ -338,14 +354,6 @@ const UploadVideoStep1 = (props: Props) => {
             }
 
             var tFile = trailerFile[0]
-
-            //get the traileHeaderData
-            const trialHeaderData = JSON.stringify({
-              user_id: contentCreator,
-              file_name: title,
-              video_type: 'trial_video',
-              work_id: work_id
-            })
 
             const uploadTrial = new tus.Upload(file, {
               endpoint: `${UploadURL}`,
@@ -421,10 +429,12 @@ const UploadVideoStep1 = (props: Props) => {
       }
       formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
 
-      //pass this as arrays LOOP? // HardCoded
-      formData.append('tags[]', 'Amazing')
-      formData.append('tags[]', '宇')
-      formData.append('groups[]', '98acfaa9-6ced-4e51-b2e2-12ab56120bd8')
+      if(tags.length) {
+        tags.map( tag => formData.append('tags[]', tag))
+      }
+      if(groupings.length) {
+        groupings.map( group => formData.append('groups[]', group))
+      }
 
       return formData
     }
@@ -457,10 +467,6 @@ const UploadVideoStep1 = (props: Props) => {
     }
 
     setValue('startTime', target.value)
-  }
-
-  const handleTaggingsChange = (event: React.ChangeEvent, child: { props: { children: string; value: number } }) => {
-    setTags((event.target as HTMLInputElement).value as any)
   }
   const handleTaggingsDelete = (tag: string) => {
     let filteredTags = tags?.filter(e => e !== tag)
@@ -649,24 +655,10 @@ const UploadVideoStep1 = (props: Props) => {
 
                   <Grid container justifyContent='space-between' spacing={4}>
                     <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel id='multiple-taggings-label'>Select Taggings</InputLabel>
-                        <CustomSelect
-                          multiple
-                          label='Chip'
-                          value={tags}
-                          id='multiple-taggings'
-                          onChange={(event, child) => {
-                            handleTaggingsChange(event as React.ChangeEvent, child as any)
-                          }}
-                          labelId='multiple-taggings-label'
-                        >
-                          {TaggingsDummy.map(tag => (
-                            <MenuItem key={tag.id} value={tag.name}>
-                              {tag.name}
-                            </MenuItem>
-                          ))}
-                        </CustomSelect>
+                      <FormControl 
+                        fullWidth>
+                        
+                        <TextField label='Type your tag then press enter' {...register('multiTags') } onKeyDown={ (e) => { handleTagPressEnter(e) } } />
 
                         {tags?.length != 0 ? (
                           <CustomStack>
@@ -693,7 +685,7 @@ const UploadVideoStep1 = (props: Props) => {
                             labelId='multiple-taggings-label'
                           >
                             {groupingsOptions.map(tag => (
-                              <MenuItem key={tag._id} value={tag.title}>
+                              <MenuItem key={tag._id} value={tag._id}>
                                 {tag.title}
                               </MenuItem>
                             ))}

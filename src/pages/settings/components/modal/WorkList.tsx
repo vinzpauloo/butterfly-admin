@@ -2,27 +2,59 @@
 import React, { useState } from 'react'
 
 import { Box, Button, Checkbox, Modal, Typography } from '@mui/material'
-import { DataGrid, GridColumns, GridRenderCellParams, useGridApiRef } from '@mui/x-data-grid'
-import { useQuery } from '@tanstack/react-query'
+import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import VideoService from '@/services/api/VideoService'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Utils import
 import formatDate from '@/utils/formatDate'
+import WorkgroupService from '@/services/api/Workgroup'
+import { log } from 'console'
 
-const CheckboxContent = ({ allId, id, setAllId }: any) => {
+const CheckboxContent = ({ data, header, allId, setAllId, id, sectionID, setSelectedData }: any) => {
   const [isCheck, setIsCheck] = useState(allId.includes(id))
+  const { deleteCheckWorkgroup, postCheckWorkgroup } = WorkgroupService()
+
+  const { mutate: checkMutate } = useMutation(postCheckWorkgroup)
+  const { mutate: uncheckMutate } = useMutation(deleteCheckWorkgroup)
 
   const handleCheck = () => {
     if (isCheck) {
-      setAllId(prev => {
-        const removeId = prev.filter(item => item !== id)
+      setAllId((prev: any) => {
+        const removeId = prev.filter((item: any) => item !== id)
 
         return removeId
       })
+
+      setSelectedData((prev: any) => {
+        const removeId = prev.filter((item: any) => item !== id)
+        const newData = data.filter((item: any) => removeId.includes(item._id))
+
+        return newData
+      })
+
+      if (header === 'Edit') {
+        uncheckMutate({
+          id: sectionID,
+          data: { work: id }
+        })
+      }
       setIsCheck((prev: boolean) => !prev)
     } else {
-      setAllId(prev => [...prev, id])
+      setAllId((prev: any) => [...prev, id])
+      setSelectedData((prev: any) => {
+        const newData = data.filter((item: any) => item._id === id)
+
+        return [...prev, ...newData]
+      })
+
+      if (header === 'Edit') {
+        checkMutate({
+          id: sectionID,
+          data: { work: id }
+        })
+      }
       setIsCheck((prev: boolean) => !prev)
     }
   }
@@ -34,39 +66,24 @@ const CheckboxContent = ({ allId, id, setAllId }: any) => {
   )
 }
 
-function WorkList({
-  modalOpen,
-  setModalOpen,
-  setSelectedInModal,
-  allId,
-  setAllId,
-  setHasSave,
-  setPageSize,
-  setPage,
-  setRowCount
-}: any) {
+function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAll, setAllId, setModalData }: any) {
   const [data, setData] = useState([])
-  const [modalPage, setModalPage] = useState<number>(1)
-  const [modalPageSize, setModalPageSize] = useState(10)
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
   const [modalRowCount, setModalRowCount] = useState(0)
-  const [saveData, setSaveData] = useState([])
-  const [prevPage, setPrevPage] = useState(0)
   const { getAllVideos } = VideoService()
+  const [selectedData, setSelectedData] = useState([])
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['worklist', modalPage],
-    queryFn: () => getAllVideos({ data: { sort: 'desc', sort_by: 'title', with: 'user', page: modalPage } }),
+    queryKey: ['worklist', page],
+    queryFn: () => getAllVideos({ data: { sort: 'desc', sort_by: 'title', with: 'user', page: page } }),
     onError: err => {
       console.log('Modal', err)
     },
     onSuccess: data => {
       setData(data.data)
       setModalRowCount(data.total)
-      setModalPageSize(data.per_page)
-      setModalPage(data.current_page)
-      if (prevPage < modalPage) {
-        setSaveData(prev => prev.concat(data.data))
-        setPrevPage(prev => prev + 1)
-      }
+      setPageSize(data.per_page)
+      setPage(data.current_page)
     }
   })
 
@@ -75,22 +92,14 @@ function WorkList({
   }
 
   const handlePageChange = (newPage: number) => {
-    setModalPage(newPage + 1)
+    setPage(newPage + 1)
   }
 
   const handleSave = () => {
-    if (data.length > 0) {
-      const selectedVid = saveData?.filter((item: any) => {
-        if (allId.includes(item?._id)) {
-          return item
-        }
-      })
-      setSelectedInModal(selectedVid)
-      setPageSize(10)
-      setPage(1)
-      setRowCount(selectedVid.length)
-      setHasSave(false)
-      setModalOpen(false)
+    setModalData(selectedData)
+    setModalOpen(false)
+    if (header === 'Edit') {
+      refetchAll()
     }
   }
 
@@ -101,13 +110,26 @@ function WorkList({
       minWidth: 20,
       field: 'action',
       headerName: '',
-      renderCell: (params: GridRenderCellParams) => <CheckboxContent allId={allId} id={params.id} setAllId={setAllId} />
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <CheckboxContent
+          allId={allId}
+          id={params.id}
+          sectionID={sectionID}
+          setAllId={setAllId}
+          setModalData={setModalData}
+          data={data}
+          header={header}
+          setSelectedData={setSelectedData}
+        />
+      )
     },
     {
       flex: 0.02,
       minWidth: 70,
       field: 'thumbnail_url',
       headerName: 'Video Thumbnail',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -126,6 +148,7 @@ function WorkList({
       minWidth: 90,
       headerName: 'Content Creator',
       field: 'content_creator',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.user.username}
@@ -137,6 +160,7 @@ function WorkList({
       minWidth: 60,
       field: 'title',
       headerName: 'Title',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.title}
@@ -148,6 +172,7 @@ function WorkList({
       field: 'category',
       minWidth: 80,
       headerName: 'Category',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params?.row?.tags?.join(', ')}
@@ -159,6 +184,7 @@ function WorkList({
       minWidth: 140,
       field: 'last_update',
       headerName: 'Last Update',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {formatDate(params.row.updated_at)}
@@ -176,7 +202,7 @@ function WorkList({
       <Box width={1200} sx={{ background: 'white' }}>
         <DataGrid
           rowCount={modalRowCount}
-          pageSize={modalPageSize}
+          pageSize={pageSize}
           paginationMode='server'
           getRowId={row => row._id}
           disableSelectionOnClick
@@ -187,10 +213,6 @@ function WorkList({
           pagination
           onPageChange={handlePageChange}
           disableColumnMenu
-
-          // onStateChange={e => console.log('###', e)}
-          // onSelectionModelChange={selectionModel => setSelectedVideos(selectionModel)}
-          // keepNonExistentRowsSelected={true}
         />
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} mb={5}>
           <Button size='large' variant='contained' sx={{ mr: 3 }} onClick={handleSave}>

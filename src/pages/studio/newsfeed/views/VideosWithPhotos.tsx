@@ -26,7 +26,7 @@ type videoPhotosProps = {
 // ** Types
 import { IFeedStory } from '@/context/types'
 
-const videoWithPhotos = { video_images: true, with: 'user' }
+const videoWithPhotos = { video_images: true, with: 'user', page : 1 }
 
 const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
   React.useEffect(() => {
@@ -40,8 +40,8 @@ const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
       <Box sx={{ display: 'flex' }}>
 
           <Grid container spacing={10}>
-            {data.data &&
-              data.data?.map((story: IFeedStory) => (
+            {data &&
+              data?.map((story: IFeedStory) => (
                 <Grid key={story._id} item sm={6}>
                   <FeedCard
                     datePublished={formatDate(story.created_at)}

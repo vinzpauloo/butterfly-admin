@@ -28,11 +28,7 @@ type StoryProps = {
   handleFeedParams? : any
 }
 
-const ScrollWrapper = ({ children, hidden }: { children: React.ReactNode; hidden: boolean }) => {
-  return <PerfectScrollbar options={{ wheelPropagation: false }}>{children}</PerfectScrollbar>
-}
-
-const StoryOnlyParams = { story_feeds_only: true, with: 'user' }
+const StoryOnlyParams = { story_feeds_only: true, with: 'user', page : 1 }
 
 const AllStory = ({data, handleFeedParams}: StoryProps) => {
   React.useEffect(() => {
@@ -42,8 +38,8 @@ const AllStory = ({data, handleFeedParams}: StoryProps) => {
   }, [data])
   
   if (data) {
-    console.log('story data',data)
-    const { data : stories } = data
+
+    const stories = data
 
     return (
       <Box sx={{ display: 'flex' }}>

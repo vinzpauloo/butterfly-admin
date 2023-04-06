@@ -109,6 +109,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       minWidth: 70,
       field: 'thumbnail_url',
       headerName: 'Video Thumbnail',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -126,6 +127,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       flex: 0.02,
       minWidth: 90,
       headerName: 'Content Creator',
+      sortable: false,
       field: 'content_creator',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -138,6 +140,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       minWidth: 60,
       field: 'title',
       headerName: 'Title',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.title}
@@ -149,6 +152,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       field: 'tag',
       minWidth: 80,
       headerName: 'Tag',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params?.row?.tags?.join(', ')}
@@ -160,6 +164,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       minWidth: 140,
       field: 'last_update',
       headerName: 'Last Update',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {formatDate(params.row.updated_at)}
@@ -190,6 +195,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       minWidth: 60,
       field: 'action',
       headerName: 'Action',
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <>
           <DialogEdit params={params.row} />
@@ -214,6 +220,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
       getRowId={row => row._id}
       checkboxSelection={false}
       disableSelectionOnClick
+      disableColumnMenu
       autoHeight
       loading={isLoading}
       rows={data}
