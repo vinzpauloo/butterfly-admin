@@ -63,11 +63,12 @@ const UploadMenu = (props: Props) => {
         variant='h6'
         sx={{
           marginInline: 'auto',
+          mt : ['1rem',0],
           mb: 7,
           lineHeight: 1,
           fontWeight: 600,
           textTransform: 'uppercase',
-          fontSize: '1.5rem !important',
+          fontSize: [ '1rem' ,'1.5rem !important'],
           textAlign: 'center'
         }}
         color={theme => theme.customBflyColors.primaryText}
@@ -90,7 +91,8 @@ const UploadMenu = (props: Props) => {
               sx={{
                 mb: 2,
                 textAlign: 'center',
-                fontWeight: 400
+                fontWeight: 400,
+                fontSize: ['.875rem', '1rem']
               }}
             >
               Please Select content to upload
@@ -114,7 +116,7 @@ const UploadMenu = (props: Props) => {
           </Grid>
           <Grid xs={12} item>
             <Typography
-              fontSize='0.8125rem'
+              fontSize={['.72rem','0.8125rem']}
               textAlign='center'
               sx={{ fontWeight: 'normal' }}
               color={theme => theme.customBflyColors.primaryTextContrast}

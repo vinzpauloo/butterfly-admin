@@ -88,13 +88,16 @@ const ThumbnailBox = styled(Box)(({ theme }) => ({
   padding: '0',
   marginBottom: 18,
   maxWidth: '180px',
-  marginLeft: 'auto',
+  marginInline: 'auto',
   height: '100%',
   flexDirection: 'column',
   display: 'flex',
   alignItems: 'center',
   gap: '1rem',
-  paddingBlock: '.5rem'
+  paddingBlock: '.5rem',
+  [theme.breakpoints.down('sm')]: {
+    marginInline : 'auto'
+  },
 }))
 
 // ** Data
@@ -530,7 +533,7 @@ const UploadVideoStep1 = (props: Props) => {
     <>
       <BasicCard
         sx={{
-          maxWidth: '85%',
+          maxWidth: ['100%','85%'],
           paddingTop: '0',
           '& .MuiCardContent-root': {
             paddingTop: '1rem'
@@ -629,7 +632,7 @@ const UploadVideoStep1 = (props: Props) => {
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container justifyContent='space-between' spacing={4} sx={{ marginBottom: 5 }}>
-                    <Grid justifySelf='flex-end' item xs={6}>
+                    <Grid justifySelf='flex-end' item xs={12} sm={6}>
                       <div {...thumbnailFileRootProps({ className: 'dropzone' })}>
                         <input {...thumbnailFileInputProps()} />
                         <ThumbnailBox>
@@ -641,11 +644,11 @@ const UploadVideoStep1 = (props: Props) => {
                         </ThumbnailBox>
                       </div>
                     </Grid>
-                    <Grid item xs={6}>
-                      <Typography maxWidth='23ch' color={theme => theme.customBflyColors.primaryTextContrast}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography textAlign={['center','left']} maxWidth='23ch' color={theme => theme.customBflyColors.primaryTextContrast}>
                         THUMBNAIL <br />
                       </Typography>
-                      <Typography fontSize={13} color={ theme => theme.customBflyColors.primaryTextContrast }>
+                      <Typography textAlign={['center','left']} fontSize={['.7rem',13]} color={ theme => theme.customBflyColors.primaryTextContrast }>
                         Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and
                         draws viewers attention.
                       </Typography>
@@ -653,7 +656,7 @@ const UploadVideoStep1 = (props: Props) => {
                   </Grid>
 
                   <Grid container justifyContent='space-between' spacing={4}>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl fullWidth>
                         <TextField
                           sx={{
@@ -678,7 +681,7 @@ const UploadVideoStep1 = (props: Props) => {
                         ) : null}
                       </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12} sm={6}>
                       {isGrpLoading ? (
                         <LinearProgress color='success' />
                       ) : (
@@ -728,7 +731,7 @@ const UploadVideoStep1 = (props: Props) => {
               </Grid>
             </form>
           </Grid>
-          <Grid item sm={4}>
+          <Grid pt={['0rem !important','2.5rem']} item xs={12} sm={4}>
             <Box className='uploadBoxes'>
               <Box className='uploadWorkVidBox'>
                 <div {...mainFileRootProps({ className: 'dropzone' })}>
@@ -762,7 +765,7 @@ const UploadVideoStep1 = (props: Props) => {
                       bgcolor: 'primary.main',
                       color: 'common.white',
                       mt: 5,
-                      maxWidth: '16rem',
+                      maxWidth: ['16rem'],
                       marginInline: 'auto',
                       display: 'block'
                     }}
@@ -824,11 +827,12 @@ const UploadVideoStep1 = (props: Props) => {
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
-                gap: '2rem'
+                gap: '2rem',
+                flexDirection : ['column','row']
               }}
               className='buttonContainer'
             >
-              <Box>
+              <Box sx={{ mt : ['1rem',0] }}>
                 <CustomButton onClick={handleCancelButton}>Cancel</CustomButton>
               </Box>
               <Box>
