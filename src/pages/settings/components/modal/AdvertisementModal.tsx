@@ -275,7 +275,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                   <DatePicker
                     dateFormat="dd/MM/yyyy"
                     disabled={isBeingAddedUpdatedDelete}
-                  selected={newAdsStartDate}
+                    selected={newAdsStartDate}
                     onChange={(date: Date) => setNewAdsStartDate(date)}
                     placeholderText='Click to select a date'
                     customInput={<CustomInput customWidth='100%' />}

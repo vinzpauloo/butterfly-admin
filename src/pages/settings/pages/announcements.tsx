@@ -1,105 +1,101 @@
-// ** React Imports
 import React, { useState } from 'react'
-
-// ** Next Imports
-import Link from 'next/link'
-
-// ** MUI Imports
-import { Box, Card, Grid, Divider, Typography, Button } from '@mui/material'
+import { Box, Card, Grid, Divider, Typography, Button, Switch } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-
-// ** Third Party Components
-import axios from 'axios'
-
-// ** Other Imports
 import AnnouncementModal from '../components/modal/AnnouncementModal'
-
-// ** Style Imports
-
-import ToggleButton from '@/pages/user/components/button/ToggleButton'
-import EditBtn from '@/pages/user/components/button/EditButton'
-
-const columns = [
-  { field: 'title', headerName: 'Title', width: 400 },
-  { field: 'dateCreated', headerName: 'Date Created', width: 350 },
-  { field: 'lastLogIn', headerName: 'Last Log In', width: 350 },
-  {
-    field: 'action',
-    headerName: 'Action',
-    width: 100,
-    renderCell: () => (
-      <Box>
-        <ToggleButton />
-      </Box>
-    )
-  },
-  {
-    field: 'status',
-    headerName: 'Status',
-    width: 100,
-    renderCell: () => (
-      <Box>
-        <EditBtn modal={AnnouncementModal} />
-      </Box>
-    )
-  }
-]
-
-interface announcementData {
-  id: any
-  title: string
-  dateCreated: any
-  lastLogIn: any
-}
-
-function createAnnouncementData(id: any, title: string, dateCreated: number, lastLogIn: number): announcementData {
-  const date = new Date(dateCreated)
-  const lastLog = new Date(lastLogIn)
-  const hours = date.getHours()
-  const formattedHours = (hours % 12 || 12).toString().padStart(2, '0')
-  const formattedDateCreated = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date
-    .getDate()
-    .toString()
-    .padStart(2, '0')} ${formattedHours}:${date.getMinutes().toString().padStart(2, '0')}:${date
-    .getSeconds()
-    .toString()
-    .padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`
-  const formattedLastLog = `${lastLog.getFullYear()}-${(lastLog.getMonth() + 1).toString().padStart(2, '0')}-${lastLog
-    .getDate()
-    .toString()
-    .padStart(2, '0')} ${formattedHours}:${lastLog.getMinutes().toString().padStart(2, '0')}:${lastLog
-    .getSeconds()
-    .toString()
-    .padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`
-
-  return {
-    id,
-    title,
-    dateCreated: formattedDateCreated,
-    lastLogIn: formattedLastLog
-  }
-}
-
-const announcementRows = [
-  { ...createAnnouncementData(1, 'Title 1', 1641812403000, 1643620222000) },
-  { ...createAnnouncementData(2, 'Title 2', 1641812403000, 1643620222000) },
-  { ...createAnnouncementData(3, 'Title 3', 1661640621000, 1643620222000) },
-  { ...createAnnouncementData(4, 'Title 4', 1645137632000, 1643620222000) },
-  { ...createAnnouncementData(5, 'Title 5', 1648314258000, 1643620222000) }
-]
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import { GridRenderCellParams } from '@mui/x-data-grid'
 
 const Announcements = () => {
-  const [pageSize, setPageSize] = useState<number>(10)
-
+  const [pageSize, setPageSize] = useState<number>(5)
   const [openModal, setOpenModal] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [data, setData] = useState([])
+
+  const openEditModal = () => {
+    setIsEditing(true)
+    setOpenModal(true)
+  }
 
   const handleOpen = () => {
+    setIsEditing(false)
     setOpenModal(true)
   }
 
   const handleClose = () => {
     setOpenModal(false)
   }
+
+  const columns = [
+    { field: 'title', headerName: 'Title', minWidth: 100, flex: 0.03, },
+    { field: 'description', headerName: 'Description', minWidth: 200, flex: 0.15, },
+    { field: 'start_date', headerName: 'Start Date', minWidth: 120, flex: 0.03, },
+    { field: 'end_date', headerName: 'End Date', minWidth: 120, flex: 0.03, },
+    {
+      field: 'active',
+      headerName: 'Active',
+      minWidth: 85,
+      flex: 0.02,
+      renderCell: (params: GridRenderCellParams) => <Switch checked={params.value} />
+    },
+    {
+      field: 'action',
+      headerName: 'Action',
+      minWidth: 85,
+      flex: 0.02,
+      renderCell: () => (
+        <Box>
+          <Button onClick={openEditModal}>
+            <EditOutlinedIcon sx={styles.icon} />
+          </Button>
+        </Box>
+      )
+    },
+  ]
+
+  // FAKE DATA
+  const announcementRows = [
+    {
+      id: 1,
+      title: 'Title 1',
+      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
+      start_date: "2023-04-05",
+      end_date: "2023-04-07",
+      active: true
+
+    },
+    {
+      id: 2,
+      title: 'Title 2',
+      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
+      start_date: "2023-04-05",
+      end_date: "2023-04-07",
+      active: false
+    },
+    {
+      id: 3,
+      title: 'Title 3',
+      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
+      start_date: "2023-04-05",
+      end_date: "2023-04-07",
+      active: false
+    },
+    {
+      id: 4,
+      title: 'Title 4',
+      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
+      start_date: "2023-04-05",
+      end_date: "2023-04-07",
+      active: false
+    },
+    {
+      id: 5,
+      title: 'Title 5',
+      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
+      start_date: "2023-04-05",
+      end_date: "2023-04-07",
+      active: true
+    },
+  ]
 
   return (
     <Grid container spacing={6}>
@@ -109,25 +105,22 @@ const Announcements = () => {
             <Box sx={styles.announcements}>
               <Typography sx={styles.announceText}>Announcements</Typography>
             </Box>
-
-            <Button sx={styles.createAccount} onClick={handleOpen}>
-              +Add New Announcements
-            </Button>
+            <Button variant="contained" onClick={handleOpen}>+ Add New Announcements</Button>
           </Box>
           <Divider />
-
           <DataGrid
             autoHeight
             rows={announcementRows}
             columns={columns}
             pageSize={pageSize}
+            rowsPerPageOptions={[5, 10, 15]}
             disableSelectionOnClick
             checkboxSelection={false}
             sx={styles.dataGrid}
           />
         </Card>
       </Grid>
-      <AnnouncementModal isOpen={openModal} onClose={handleClose} />
+      <AnnouncementModal isEditing={isEditing} isOpen={openModal} onClose={handleClose} />
     </Grid>
   )
 }
@@ -143,13 +136,13 @@ const styles = {
     display: 'flex',
     flexDirection: {
       xs: 'column',
-      sm: 'column',
+      sm: 'row',
       md: 'row',
       lg: 'row'
     },
     justifyContent: {
       xs: 'flex-start',
-      sm: 'flex-start',
+      sm: 'space-between',
       md: 'space-between',
       lg: 'space-between'
     },
@@ -193,6 +186,10 @@ const styles = {
   },
   dataGrid: {
     padding: 5
+  },
+  icon: {
+    color: '#98A9BC',
+    fontSize: 30
   }
 }
 
