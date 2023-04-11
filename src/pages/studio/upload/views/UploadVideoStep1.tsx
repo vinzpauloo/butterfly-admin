@@ -66,7 +66,6 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   borderRadius: '5px',
   '& .MuiSelect-select': {
-    paddingBlock: '.5em'
   }
 }))
 
@@ -120,7 +119,7 @@ const defaultValues = {
   description: '',
   contentCreator: '',
   startTime: '',
-  multiTags : ''
+  multiTags: ''
 }
 
 const UploadVideoStep1 = (props: Props) => {
@@ -249,32 +248,33 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Component Functions
   const handleCancelButton = () => {
-
-    //clear values 
+    //clear values
     reset()
 
     //go Next page
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
 
-  const handleTagPressEnter = (e : React.KeyboardEvent<HTMLDivElement>) => {
-    if ( e.code == 'Enter' ) {
-
+  const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.code == 'Enter') {
       // handle add to Chip
-        let tagWord = (e.target as HTMLInputElement).value as string
+      let tagWord = (e.target as HTMLInputElement).value as string
 
-        let hasDuplicate = tags?.includes(tagWord)
-        if ( hasDuplicate ) {
-          toast.error('The tag you entered already exists')
-          return
-        }
-        let insertTagArray = [tagWord]
-        let newTagsArray = [ ...tags as [], ...insertTagArray ]
-        setTags( newTagsArray as [] )
+      if ( tagWord == '' ) {
+        return
+      }
 
-        //reset multiTags
-        resetField('multiTags')
+      let hasDuplicate = tags?.includes(tagWord)
+      if (hasDuplicate) {
+        toast.error('The tag you entered already exists')
+        return
+      }
+      let insertTagArray = [tagWord]
+      let newTagsArray = [...(tags as []), ...insertTagArray]
+      setTags(newTagsArray as [])
 
+      //reset multiTags
+      resetField('multiTags')
     }
   }
 
@@ -294,7 +294,6 @@ const UploadVideoStep1 = (props: Props) => {
     }
   }
   const handleUpload = () => {
- 
     // call videos api
     if (!files) {
       return
@@ -304,7 +303,7 @@ const UploadVideoStep1 = (props: Props) => {
 
     //get fields from react hook form
     const { title, contentCreator } = getValues()
-    console.log('groupings',groupings)
+    console.log('groupings', groupings)
 
     const upload = new tus.Upload(file, {
       endpoint: `${UploadURL}`,
@@ -429,11 +428,11 @@ const UploadVideoStep1 = (props: Props) => {
       }
       formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
 
-      if(tags.length) {
-        tags.map( tag => formData.append('tags[]', tag))
+      if (tags.length) {
+        tags.map(tag => formData.append('tags[]', tag))
       }
-      if(groupings.length) {
-        groupings.map( group => formData.append('groups[]', group))
+      if (groupings.length) {
+        groupings.map(group => formData.append('groups[]', group))
       }
 
       return formData
@@ -643,10 +642,10 @@ const UploadVideoStep1 = (props: Props) => {
                       </div>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography maxWidth='23ch' color={theme => theme.palette.common.white}>
+                      <Typography maxWidth='23ch' color={theme => theme.customBflyColors.primaryTextContrast}>
                         THUMBNAIL <br />
                       </Typography>
-                      <Typography fontSize={13} color={theme => theme.palette.common.white}>
+                      <Typography fontSize={13} color={ theme => theme.customBflyColors.primaryTextContrast }>
                         Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and
                         draws viewers attention.
                       </Typography>
@@ -655,10 +654,21 @@ const UploadVideoStep1 = (props: Props) => {
 
                   <Grid container justifyContent='space-between' spacing={4}>
                     <Grid item xs={6}>
-                      <FormControl 
-                        fullWidth>
-                        
-                        <TextField label='Type your tag then press enter' {...register('multiTags') } onKeyDown={ (e) => { handleTagPressEnter(e) } } />
+                      <FormControl fullWidth>
+                        <TextField
+                          sx={{
+                            backgroundColor: theme => theme.palette.background.paper,
+                            borderRadius: '4px',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              display: 'none',
+                            }
+                          }}
+                          placeholder='Type your tag then press enter'
+                          {...register('multiTags')}
+                          onKeyDown={e => {
+                            handleTagPressEnter(e)
+                          }}
+                        />
 
                         {tags?.length != 0 ? (
                           <CustomStack>
@@ -679,13 +689,13 @@ const UploadVideoStep1 = (props: Props) => {
                             label='Chip'
                             value={groupings}
                             id='multiple-taggings'
-                            onChange={event => {
+                            onChange={(event, val : any) => {
                               handleGroupingsChange(event as any)
                             }}
                             labelId='multiple-taggings-label'
                           >
                             {groupingsOptions.map(tag => (
-                              <MenuItem key={tag._id} value={tag._id}>
+                              <MenuItem key={tag._id} value={tag.title}>
                                 {tag.title}
                               </MenuItem>
                             ))}
