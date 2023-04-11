@@ -114,13 +114,18 @@ const NewsFeedList = (props: Props) => {
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          gap: '2rem',
+          justifyContent: ['center','space-between'],
+          flexDirection: ['row'],
+          alignItems : ['center','initial'],
+          gap: ['0rem','2rem'],
           marginBottom: '2rem'
         }}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '2.5rem', marginBottom: '0rem' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: ['column','row'],
+          gap: ['1rem','2.5rem'],
+          marginBottom: '0rem' }}>
           {steps.map((step, index) => {
             return (
               <Button
