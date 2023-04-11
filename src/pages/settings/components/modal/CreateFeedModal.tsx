@@ -238,10 +238,10 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 label='Story'
                 minRows={10}
                 multiline={true}
-                sx={styles.fullWidth}
+                sx={{...styles.fullWidth, backgroundColor: theme => theme.palette.background.paper, borderRadius:'8px'}}
                 {...register('string_story')}
               />
-              <TextField label='Tagging' sx={styles.fullWidth} {...register('tags')} />
+              <TextField label='Tagging' sx={{...styles.fullWidth, backgroundColor: theme => theme.palette.background.paper, borderRadius:'8px'}} {...register('tags')} />
             </Box>
 
             <Box sx={styles.buttonContainer}>
