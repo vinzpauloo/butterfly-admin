@@ -100,8 +100,6 @@ const ThumbnailBox = styled(Box)(({ theme }) => ({
   },
 }))
 
-// ** Data
-import { TaggingsDummy, GroupingsDummy } from '@/data/uploadVideoData'
 
 // ** Props and interfaces
 type Props = {}

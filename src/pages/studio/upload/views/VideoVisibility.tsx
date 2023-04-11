@@ -139,7 +139,8 @@ const VideoVisibility = () => {
   const dimOnTrue = (flag: boolean) => {
     return {
       opacity: flag ? 0.3 : 1,
-      backgroundColor: 'black'
+      backgroundColor: 'black',
+      padding:'.3rem'
     }
   }
 
@@ -176,8 +177,9 @@ const VideoVisibility = () => {
             lineHeight: 1,
             fontWeight: 600,
             textTransform: 'uppercase',
-            fontSize: '1.5rem !important',
-            textAlign: 'left'
+            fontSize: ['1rem', '1.5rem !important'],
+            textAlign: 'left',
+            mt : ['1.5rem', '0']
           }}
           color={theme => theme.customBflyColors.primaryText}
         >
@@ -193,7 +195,7 @@ const VideoVisibility = () => {
           }}
         >
           <Grid container spacing={5}>
-            <Grid item sm={8}>
+            <Grid item xs={12} sm={8}>
               <CustomAccordion expanded>
                 <AccordionSummary id='panel-header-1' aria-controls='panel-content-1'>
                   <HeaderBox>
@@ -324,7 +326,7 @@ const VideoVisibility = () => {
               </CustomAccordion>
             </Grid>
 
-            <Grid item sm={4}>
+            <Grid item xs={12} sm={4}>
               <UploadBox>
                 <Box>
                   <Box
