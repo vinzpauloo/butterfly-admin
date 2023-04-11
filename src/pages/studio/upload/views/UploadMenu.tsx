@@ -20,6 +20,7 @@ import CreateFeedModal from '@/pages/settings/components/modal/CreateFeedModal'
 import { StudioContext } from '..'
 import { DisplayPage } from '..'
 import { Router } from 'next/router'
+import Translations from '@/layouts/components/Translations'
 
 // ** Styled Components
 const UploadBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
@@ -73,7 +74,7 @@ const UploadMenu = (props: Props) => {
         }}
         color={theme => theme.customBflyColors.primaryText}
       >
-        THE STUDIO PAGE - UPLOAD
+        <Translations text='THE STUDIO PAGE - UPLOAD' /> 
       </Typography>
 
       <BasicCard
@@ -95,22 +96,22 @@ const UploadMenu = (props: Props) => {
                 fontSize: ['.875rem', '1rem']
               }}
             >
-              Please Select content to upload
+              <Translations text='Please Select content to upload' />
             </Typography>
           </Grid>
           <Grid xs={12} item>
             <UploadBoxContainer>
-              <CustomButton onClick={handleUploadButtonClick}>Upload Video</CustomButton>
+              <CustomButton onClick={handleUploadButtonClick}><Translations text='Upload Video' /></CustomButton>
             </UploadBoxContainer>
           </Grid>
           <Grid xs={12} item>
             <UploadBoxContainer>
-              <CustomButton onClick={handleUploadAlbumClick}>Upload Album</CustomButton>
+              <CustomButton onClick={handleUploadAlbumClick}><Translations text='Upload Album' /></CustomButton>
             </UploadBoxContainer>
           </Grid>
           <Grid xs={12} item>
             <UploadBoxContainer sx={{ mt: '.5rem' }}>
-              <CustomButton onClick={handleNewsfeedsButtonClick}>Upload NEWSFEEDS</CustomButton>
+              <CustomButton onClick={handleNewsfeedsButtonClick}><Translations text='Upload NEWSFEEDS' /></CustomButton>
               <CreateFeedModal isOpen={feedModal} onClose={() => setFeedModal(false)} />
             </UploadBoxContainer>
           </Grid>

@@ -46,6 +46,10 @@ import authConfig from 'src/configs/auth'
 //* Context Import
 import { StudioContext, DisplayPage } from '..'
 
+// ** 3rd party
+import Translations from '@/layouts/components/Translations'
+import { useTranslation } from 'react-i18next'
+
 // Styled components
 const Img = styled('img')(({ theme }) => ({
   width: '100%',
@@ -65,8 +69,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 const CustomSelect = styled(Select)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   borderRadius: '5px',
-  '& .MuiSelect-select': {
-  }
+  '& .MuiSelect-select': {}
 }))
 
 const CustomStack = styled(Stack)(({ theme }) => ({
@@ -96,10 +99,9 @@ const ThumbnailBox = styled(Box)(({ theme }) => ({
   gap: '1rem',
   paddingBlock: '.5rem',
   [theme.breakpoints.down('sm')]: {
-    marginInline : 'auto'
-  },
+    marginInline: 'auto'
+  }
 }))
-
 
 // ** Props and interfaces
 type Props = {}
@@ -124,6 +126,9 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
+  // ** Translations
+  const { t } = useTranslation()
+
   /* States */
   const [trialUploadSwitch, setTrialUploadSwitch] = React.useState<boolean>(false)
   const [files, setFiles] = React.useState<File[] | null>([])
@@ -261,7 +266,7 @@ const UploadVideoStep1 = (props: Props) => {
       // handle add to Chip
       let tagWord = (e.target as HTMLInputElement).value as string
 
-      if ( tagWord == '' ) {
+      if (tagWord == '') {
         return
       }
 
@@ -531,7 +536,7 @@ const UploadVideoStep1 = (props: Props) => {
     <>
       <BasicCard
         sx={{
-          maxWidth: ['100%','85%'],
+          maxWidth: ['100%', '85%'],
           paddingTop: '0',
           '& .MuiCardContent-root': {
             paddingTop: '1rem'
@@ -546,7 +551,7 @@ const UploadVideoStep1 = (props: Props) => {
           color={theme => theme.customBflyColors.primaryTextContrast}
           textTransform='uppercase'
         >
-          Video Details
+          <Translations text='Video Details' />
         </Typography>
 
         <Grid container spacing={10}>
@@ -566,7 +571,7 @@ const UploadVideoStep1 = (props: Props) => {
                           <CustomSelect
                             displayEmpty
                             inputProps={{ 'aria-label': 'Without label' }}
-                            label='Select Content Creator'
+                            label={<Translations text='dsdasdas' />}
                             defaultValue=''
                             id='contentCreator'
                             labelId='cc-select-label'
@@ -576,7 +581,7 @@ const UploadVideoStep1 = (props: Props) => {
                             error={Boolean(errors.title)}
                           >
                             <MenuItem disabled value=''>
-                              Select Content Creator
+                              {`${t('Select Content Creator')}`}
                             </MenuItem>
                             {ccOptions.map(cc => (
                               <MenuItem key={cc.id} value={cc.id}>
@@ -602,7 +607,7 @@ const UploadVideoStep1 = (props: Props) => {
                         onBlur={onBlur}
                         onChange={onChange}
                         error={Boolean(errors.title)}
-                        placeholder='Title'
+                        placeholder= {`${t('Title')}`}
                         type='text'
                       />
                     )}
@@ -618,7 +623,7 @@ const UploadVideoStep1 = (props: Props) => {
                         multiline
                         rows={3}
                         fullWidth
-                        placeholder='Description'
+                        placeholder= {`${t('Description')}`}
                         type='text'
                         value={value}
                         onBlur={onBlur}
@@ -637,18 +642,25 @@ const UploadVideoStep1 = (props: Props) => {
                           {thumbnailFile?.length ? thumbImg : <img width='48' src='/images/studio/thumbnail.png' />}
 
                           <Button size='small' variant='contained'>
-                            {thumbnailFile?.length ? 'Change' : 'Upload'}
+                            {thumbnailFile?.length ? <Translations text='Change' /> : <Translations text='Upload' />}
                           </Button>
                         </ThumbnailBox>
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography textAlign={['center','left']} maxWidth='23ch' color={theme => theme.customBflyColors.primaryTextContrast}>
-                        THUMBNAIL <br />
+                      <Typography
+                        textAlign={['center', 'left']}
+                        maxWidth='23ch'
+                        color={theme => theme.customBflyColors.primaryTextContrast}
+                      >
+                        <Translations text='THUMBNAIL' /> <br />
                       </Typography>
-                      <Typography textAlign={['center','left']} fontSize={['.7rem',13]} color={ theme => theme.customBflyColors.primaryTextContrast }>
-                        Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and
-                        draws viewers attention.
+                      <Typography
+                        textAlign={['center', 'left']}
+                        fontSize={['.7rem', 13]}
+                        color={theme => theme.customBflyColors.primaryTextContrast}
+                      >
+                        <Translations text='Select or upload thumbnail that shows what’s in your video. A good thumbnail stands out and draws viewers attention.' />
                       </Typography>
                     </Grid>
                   </Grid>
@@ -661,10 +673,10 @@ const UploadVideoStep1 = (props: Props) => {
                             backgroundColor: theme => theme.palette.background.paper,
                             borderRadius: '4px',
                             '& .MuiOutlinedInput-notchedOutline': {
-                              display: 'none',
+                              display: 'none'
                             }
                           }}
-                          placeholder='Type your tag then press enter'
+                          placeholder={`${t('Type your tag then press enter')}`}
                           {...register('multiTags')}
                           onKeyDown={e => {
                             handleTagPressEnter(e)
@@ -684,13 +696,13 @@ const UploadVideoStep1 = (props: Props) => {
                         <LinearProgress color='success' />
                       ) : (
                         <FormControl fullWidth>
-                          <InputLabel id='multiple-taggings-label'>Select Groupings</InputLabel>
+                          <InputLabel id='multiple-taggings-label'>{`${t('Select Groupings')}`}</InputLabel>
                           <CustomSelect
                             multiple
                             label='Chip'
                             value={groupings}
                             id='multiple-taggings'
-                            onChange={(event, val : any) => {
+                            onChange={(event, val: any) => {
                               handleGroupingsChange(event as any)
                             }}
                             labelId='multiple-taggings-label'
@@ -729,7 +741,7 @@ const UploadVideoStep1 = (props: Props) => {
               </Grid>
             </form>
           </Grid>
-          <Grid pt={['0rem !important','2.5rem']} item xs={12} sm={4}>
+          <Grid pt={['0rem !important', '2.5rem']} item xs={12} sm={4}>
             <Box className='uploadBoxes'>
               <Box className='uploadWorkVidBox'>
                 <div {...mainFileRootProps({ className: 'dropzone' })}>
@@ -768,7 +780,7 @@ const UploadVideoStep1 = (props: Props) => {
                       display: 'block'
                     }}
                   >
-                    Upload Work Video
+                    <Translations text='Upload Work Video' />
                   </CustomButton>
                 </div>
               </Box>
@@ -826,16 +838,20 @@ const UploadVideoStep1 = (props: Props) => {
                 display: 'flex',
                 justifyContent: 'center',
                 gap: '2rem',
-                flexDirection : ['column','row']
+                flexDirection: ['column', 'row']
               }}
               className='buttonContainer'
             >
-              <Box sx={{ mt : ['1rem',0] }}>
-                <CustomButton onClick={handleCancelButton}>Cancel</CustomButton>
+              <Box sx={{ mt: ['1rem', 0] }}>
+                <CustomButton onClick={handleCancelButton}>
+                  <Translations text='Cancel' />
+                </CustomButton>
               </Box>
               <Box>
                 {!files?.length ? (
-                  <Alert severity='error'>Select a video</Alert>
+                  <Alert severity='error'>
+                    <Translations text='Select a video' />
+                  </Alert>
                 ) : (
                   <CustomButton
                     onClick={dummyNavigate}
