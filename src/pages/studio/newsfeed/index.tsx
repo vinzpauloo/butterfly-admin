@@ -5,6 +5,7 @@ import React from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
+import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Step Components
 import AllStory from './views/AllStory'
@@ -187,12 +188,13 @@ const NewsFeedList = (props: Props) => {
               <Grid mt={15} display='flex' justifyContent='center' alignItems='center' textAlign='center' item xs={12}>
 
                 <Button
+                  disabled={  isFetchingNextPage ? true : false}
                   variant='contained'
                   onClick={() => {
                     fetchNextPage()
                   }}
                 >
-                  {isFetchingNextPage ? 'Loading...' : 'Load More Stories'}
+                  {isFetchingNextPage ? <CircularProgress size={15} color='secondary' /> : 'Load More Stories'}
                 </Button>
 
               </Grid>
