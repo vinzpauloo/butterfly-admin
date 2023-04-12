@@ -7,13 +7,33 @@ import { GridRenderCellParams } from '@mui/x-data-grid'
 
 const Announcements = () => {
   const [pageSize, setPageSize] = useState<number>(5)
-  const [openModal, setOpenModal] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [data, setData] = useState([])
+  const [rowCount, setRowCount] = useState<number>(0)
+  const [page, setPage] = useState<number>(1)
+  const [openModal, setOpenModal] = useState<boolean>(false)
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [data, setData] = useState<any>([])
+  const [modalInfo, setModalInfo] = useState({
+    id: "",
+    title: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+    active: true
+  })
 
-  const openEditModal = () => {
+  const openEditModal = (id: string, title: string, description: string, start_date: string, end_date: any, active: boolean) => {
     setIsEditing(true)
     setOpenModal(true)
+
+    // PASS THIS DATA TO THE MODAL
+    setModalInfo({
+      id: id,
+      title: title,
+      description: description,
+      start_date: start_date,
+      end_date: end_date,
+      active: active
+    })    
   }
 
   const handleOpen = () => {
@@ -25,74 +45,92 @@ const Announcements = () => {
     setOpenModal(false)
   }
 
+  const activateDeactivateAnnouncement = (id: string, active: boolean) => {
+    // MUTATE QUERY
+    console.log(id)
+    console.log(active)
+  }
+
   const columns = [
     { field: 'title', headerName: 'Title', minWidth: 100, flex: 0.03, },
     { field: 'description', headerName: 'Description', minWidth: 200, flex: 0.15, },
     { field: 'start_date', headerName: 'Start Date', minWidth: 120, flex: 0.03, },
-    { field: 'end_date', headerName: 'End Date', minWidth: 120, flex: 0.03, },
+    {
+      field: 'end_date',
+      headerName: 'End Date',
+      minWidth: 120,
+      flex: 0.03,
+      renderCell: (params: GridRenderCellParams) => params.row.end_date === null ? "None" : params.row.end_date
+    },
     {
       field: 'active',
       headerName: 'Active',
       minWidth: 85,
       flex: 0.02,
-      renderCell: (params: GridRenderCellParams) => <Switch checked={params.value} />
+      renderCell: (params: GridRenderCellParams) =>
+        <Switch checked={params.value} onClick={() => activateDeactivateAnnouncement(params.row.id, !params.value)} />
     },
     {
       field: 'action',
       headerName: 'Action',
       minWidth: 85,
       flex: 0.02,
-      renderCell: () => (
+      renderCell: (params: GridRenderCellParams) => 
         <Box>
-          <Button onClick={openEditModal}>
+          <Button onClick={() => openEditModal(
+              params.row.id,
+              params.row.title,
+              params.row.description,
+              params.row.start_date,
+              params.row.end_date,
+              params.row.active)}>
             <EditOutlinedIcon sx={styles.icon} />
           </Button>
         </Box>
-      )
     },
   ]
 
   // FAKE DATA
   const announcementRows = [
     {
-      id: 1,
+      id: "1",
       title: 'Title 1',
       description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-04-05",
-      end_date: "2023-04-07",
+      start_date: "2023-05-15",
+      end_date: null,
       active: true
 
     },
     {
-      id: 2,
+      id: "2",
       title: 'Title 2',
       description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-04-05",
-      end_date: "2023-04-07",
+      start_date: "2023-04-12",
+      end_date: "2023-07-07",
       active: false
     },
     {
-      id: 3,
+      id: "3",
       title: 'Title 3',
       description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-04-05",
-      end_date: "2023-04-07",
+      start_date: "2024-01-02",
+      end_date: "2024-05-05",
       active: false
     },
     {
-      id: 4,
+      id: "4",
       title: 'Title 4',
       description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-04-05",
-      end_date: "2023-04-07",
+      start_date: "2023-02-05",
+      end_date:null,
       active: false
     },
     {
-      id: 5,
+      id: "5",
       title: 'Title 5',
       description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-04-05",
-      end_date: "2023-04-07",
+      start_date: "2023-07-05",
+      end_date: "2023-08-17",
       active: true
     },
   ]
@@ -116,11 +154,18 @@ const Announcements = () => {
             rowsPerPageOptions={[5, 10, 15]}
             disableSelectionOnClick
             checkboxSelection={false}
+            onPageChange={newPage => setPage(newPage + 1)}
+            onPageSizeChange={newPageSize => setPageSize(newPageSize)}
             sx={styles.dataGrid}
+            loading={false}
+            getRowId={row => row.id}
+            rowCount={rowCount} //total of data
+            paginationMode='server'
+            pagination
           />
         </Card>
       </Grid>
-      <AnnouncementModal isEditing={isEditing} isOpen={openModal} onClose={handleClose} />
+      <AnnouncementModal modalInfo={modalInfo} isEditing={isEditing} isOpen={openModal} onClose={handleClose} />
     </Grid>
   )
 }
