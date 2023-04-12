@@ -42,7 +42,7 @@ interface FormValues {
   description: string
   logo: File | null
   amount: number
-  note: string
+  user_note: string
 }
 
 const schema = yup.object().shape({
@@ -64,7 +64,7 @@ const schema = yup.object().shape({
   language_id: yup.string().required(),
   site_name: yup.string().required(),
   description: yup.string().min(3, 'Description must be at least 3 characters').required(),
-  note: yup.string().min(3, 'Description must be at least 3 characters').required()
+  user_note: yup.string().min(3, 'Description must be at least 3 characters').required()
 })
 interface SidebarAddUserType {
   open: boolean
@@ -103,7 +103,7 @@ const SADrawer = (props: SidebarAddUserType) => {
     description: '',
     logo: null,
     amount: 0,
-    note: ''
+    user_note: ''
   })
   const fileInputRef: any = useRef(null)
   const handleUploadBtnClick = () => {
@@ -186,7 +186,7 @@ const SADrawer = (props: SidebarAddUserType) => {
           description: '',
           logo: null,
           amount: 0,
-          note: ''
+          user_note: ''
         })
 
         // Re-fetches UserTable and CSV exportation
@@ -562,12 +562,12 @@ const SADrawer = (props: SidebarAddUserType) => {
                     fullWidth
                     multiline
                     rows={4}
-                    {...register('note')}
-                    error={!!errors.note}
-                    helperText={errors.note?.message}
-                    value={formValue.note}
+                    {...register('user_note')}
+                    error={!!errors.user_note}
+                    helperText={errors.user_note?.message}
+                    value={formValue.user_note}
                     onChange={handleFormInputChange}
-                    name='note'
+                    name='user_note'
                   />
                 </Box>
 
