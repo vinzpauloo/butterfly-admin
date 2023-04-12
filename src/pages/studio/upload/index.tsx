@@ -182,4 +182,10 @@ UploadContent.contentHeightFixed = false
 UploadContent.getLayout = (page: ReactNode) => (
   <UserLayoutNoPadding contentHeightFixed={UploadContent.contentHeightFixed}>{page}</UserLayoutNoPadding>
 )
+
+UploadContent.acl = {
+  action: 'read',
+  subject: 'cc-page'
+}
+
 export default UploadContent

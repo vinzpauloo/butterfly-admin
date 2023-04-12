@@ -9,7 +9,9 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Dashboard',
       icon: 'mdi:home-outline',
-      path: '/dashboard'
+      path: '/dashboard',
+      action: 'read',
+      subject: 'shared-page'
     },
     {
       title: 'Users',
@@ -48,7 +50,9 @@ const navigation = (): VerticalNavItemsType => {
       children: [
         {
           title: 'Upload Content',
-          path: '/studio/upload/'
+          path: '/studio/upload/',
+          action: 'read',
+          subject: 'cc-page'
         },
         {
           title: 'Content Approval',
@@ -56,11 +60,15 @@ const navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'Newsfeed List',
-          path: '/studio/newsfeed'
+          path: '/studio/newsfeed',
+          action: 'read',
+          subject: 'cc-page'
         },
         {
           title: 'Video List',
-          path: '/studio/video-list'
+          path: '/studio/video-list',
+          action: 'read',
+          subject: 'cc-page'
         },
         {
           title: 'Album List',

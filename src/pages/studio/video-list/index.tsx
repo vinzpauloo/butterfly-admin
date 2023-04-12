@@ -12,4 +12,9 @@ const VideosList = () => {
   )
 }
 
+VideosList.acl = {
+  action: 'read',
+  subject: 'cc-page'
+}
+
 export default VideosList
