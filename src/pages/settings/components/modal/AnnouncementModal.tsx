@@ -4,6 +4,7 @@ import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import format from 'date-fns/format'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
+import Translations from '../../../../layouts/components/Translations'
 
 interface ModalProps {
   isOpen: boolean
@@ -104,15 +105,17 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
     <DatePickerWrapper>
       <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'lg'}>
         <DialogContent sx={{ padding: 10 }}>
-          <DialogTitle sx={styles.dialogTitle}> {isEditing? "Edit" : "New" } Announcement </DialogTitle>
+          <DialogTitle sx={styles.dialogTitle}>
+            {isEditing ? <Translations text="Edit Announcement" /> : <Translations text="New Announcement" />}
+          </DialogTitle>
           <Box sx={styles.mainContent}>
             <Box sx={styles.textfieldContainer}>
-              <TextField label='Title:' value={title} onChange={(e) => {setTitle(e.target.value);  setTitleInputError(false)}} error={titleInputError} />
-              <TextField label='Description' value={description} onChange={(e) => {setDescription(e.target.value); setDescriptionInputError(false)}} multiline={true} minRows={20} error={descriptionInputError} />
+              <TextField label={<Translations text="Title" />} value={title} onChange={(e) => {setTitle(e.target.value);  setTitleInputError(false)}} error={titleInputError} />
+              <TextField label={<Translations text="Description" />} value={description} onChange={(e) => {setDescription(e.target.value); setDescriptionInputError(false)}} multiline={true} minRows={20} error={descriptionInputError} />
             </Box>
             <Box sx={styles.datePickerContainer}>
               <Box>
-                <Typography>Duration: Start Date</Typography>
+                <Typography><Translations text="Start Date"/></Typography>
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
                   selected={startDate}
@@ -123,7 +126,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                 />
               </Box>
               <Box>
-                <Typography sx={isDurationForever ? { color: "#999" } : null}>Duration: End Date</Typography>
+                <Typography sx={isDurationForever ? { color: "#999" } : null}><Translations text="End Date" /></Typography>
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
                   disabled={isDurationForever}
@@ -133,11 +136,11 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                   customInput={<CustomInput customWidth='100%' />}
                   minDate={new Date()}
                 />
-                <FormControlLabel sx={{mt:2}} control={<Checkbox checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label="Duration: Forever" />
+                <FormControlLabel sx={{ mt: 2 }} control={<Checkbox checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label={<Translations text="Duration: Forever" />} />
               </Box>
               <Box sx={{ display: 'flex', flexDirection: { xs: "column", md: "row"}, gap: 6, justifyContent:"center", alignItems:"center"}}>
-                <Button sx={styles.buttons} onClick={onClose}>Cancel</Button>
-                <Button sx={styles.buttons} onClick={isEditing? editAnnouncement : publishNewAnnouncement}>Publish</Button>
+                <Button sx={styles.buttons} onClick={onClose}><Translations text="Cancel" /></Button>
+                <Button sx={styles.buttons} onClick={isEditing ? editAnnouncement : publishNewAnnouncement}><Translations text="Publish" /></Button>
               </Box>
               <Box sx={styles.disclaimer}>
                 <Typography sx={{ textAlign: 'center' }}>
