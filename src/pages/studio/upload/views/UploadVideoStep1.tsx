@@ -187,13 +187,14 @@ const UploadVideoStep1 = (props: Props) => {
   })
 
   // load contentCreators
-  const { isLoading: isCCLoading } = useQuery({
+  const { data: CCData, isLoading: isCCLoading } = useQuery({
     queryKey: ['ccOptions'],
     queryFn: () => {
       return getAllDataFromCreator()
     },
     onSuccess: (data: any) => {
-      setCCOptions(data.data)
+      console.log('data CcOptions', data)
+      setCCOptions(data)
     }
   })
 
@@ -319,7 +320,7 @@ const UploadVideoStep1 = (props: Props) => {
         filename: file.name,
         filetype: file.type,
         user_id: contentCreator,
-        video_name: title,
+        file_name: title,
         video_type: 'full_video',
         authorization: `${accessToken}`
       },
@@ -369,7 +370,7 @@ const UploadVideoStep1 = (props: Props) => {
                 filename: tFile.name,
                 filetype: tFile.type,
                 user_id: contentCreator,
-                video_name: title,
+                file_name: title,
                 video_type: 'trial_video',
                 work_id: work_id,
                 authorization: `${accessToken}`
@@ -565,9 +566,8 @@ const UploadVideoStep1 = (props: Props) => {
                     rules={{ required: true }}
                     render={({ field: { value, onChange, onBlur } }) => (
                       <>
-                        {isCCLoading ? (
-                          <LinearProgress sx={{ maxWidth: '100px' }} color='success' />
-                        ) : (
+                        {isCCLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+                        {CCData && (
                           <CustomSelect
                             displayEmpty
                             inputProps={{ 'aria-label': 'Without label' }}
@@ -583,11 +583,12 @@ const UploadVideoStep1 = (props: Props) => {
                             <MenuItem disabled value=''>
                               {`${t('Select Content Creator')}`}
                             </MenuItem>
-                            {ccOptions.map(cc => (
-                              <MenuItem key={cc.id} value={cc.id}>
-                                {cc.username}
-                              </MenuItem>
-                            ))}
+                            {ccOptions &&
+                              ccOptions.map(cc => (
+                                <MenuItem key={cc.id} value={cc.id}>
+                                  {cc.username}
+                                </MenuItem>
+                              ))}
                           </CustomSelect>
                         )}
                       </>
@@ -607,7 +608,7 @@ const UploadVideoStep1 = (props: Props) => {
                         onBlur={onBlur}
                         onChange={onChange}
                         error={Boolean(errors.title)}
-                        placeholder= {`${t('Title')}`}
+                        placeholder={`${t('Title')}`}
                         type='text'
                       />
                     )}
@@ -623,7 +624,7 @@ const UploadVideoStep1 = (props: Props) => {
                         multiline
                         rows={3}
                         fullWidth
-                        placeholder= {`${t('Description')}`}
+                        placeholder={`${t('Description')}`}
                         type='text'
                         value={value}
                         onBlur={onBlur}

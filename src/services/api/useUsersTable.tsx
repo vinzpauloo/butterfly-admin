@@ -61,7 +61,7 @@ export const useUsersTable = () => {
         'X-Authorization': 'postman|0',
         'ngrok-skip-browser-warning': '69420' // only for dev
       },
-      url: `/users?role=CC`,
+      url: `/users?role=CC&all=true`,
       method: 'GET'
     })
   }
