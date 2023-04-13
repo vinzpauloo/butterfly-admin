@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Box, OutlinedInput, Typography } from '@mui/material'
+import { Box, OutlinedInput, Typography, Button } from '@mui/material'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
 
@@ -18,6 +18,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Interfaces
 import { IVideoRow } from '@/context/types'
+import useDebounce from '@/hooks/useDebounce'
 
 const navData = [
   {
@@ -89,7 +90,13 @@ const templateData = [
   }
 ]
 
-const Header = ({ setOpen, setHeader }: any) => {
+const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, searchTag, setSearchTag }: any) => {
+  const handleClear = () => {
+    setSearchCreator('')
+    setSearchTitle('')
+    setSearchTag('')
+  }
+
   return (
     <Box mb={2}>
       <Typography variant='h4' component='h4' mb={5}>
@@ -97,9 +104,33 @@ const Header = ({ setOpen, setHeader }: any) => {
       </Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
-          <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search Creator' size='small' />
-          <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search Title' size='small' />
-          <OutlinedInput fullWidth style={{ marginRight: 10 }} placeholder='Search Tag' size='small' />
+          <OutlinedInput
+            fullWidth
+            style={{ marginRight: 10 }}
+            placeholder='Search Creator'
+            size='small'
+            value={searchCreator}
+            onChange={e => setSearchCreator(e.target.value)}
+          />
+          <OutlinedInput
+            fullWidth
+            style={{ marginRight: 10 }}
+            placeholder='Search Title'
+            size='small'
+            value={searchTitle}
+            onChange={e => setSearchTitle(e.target.value)}
+          />
+          <OutlinedInput
+            fullWidth
+            style={{ marginRight: 10 }}
+            placeholder='Search Tag'
+            size='small'
+            value={searchTag}
+            onChange={e => setSearchTag(e.target.value)}
+          />
+          <Button variant='contained' color='error' onClick={handleClear}>
+            Clear
+          </Button>
         </Box>
       </Box>
     </Box>
@@ -108,14 +139,12 @@ const Header = ({ setOpen, setHeader }: any) => {
 
 
 
-const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setOpen, setHeader }: any) => {
+const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: any) => {
   
   // ** States
   const [editVideoOpen, setEditVideoOpen] = React.useState<boolean>(false)
   const [ editVideoRow, setEditVideoRow ] = React.useState<IVideoRow>()
-
   const toggleEditVideoDrawer = () => setEditVideoOpen(!editVideoOpen)
-
 
   const columnData = [
     {
@@ -241,12 +270,25 @@ function TableVideos() {
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
-  const [open, setOpen] = useState(false)
-  const [header, setHeader] = useState('')
+
+  const [searchCreator, setSearchCreator] = useState('')
+  const [searchTitle, setSearchTitle] = useState('')
+  const [searchTag, setSearchTag] = useState('')
+  const debouncedCreator = useDebounce(searchCreator, 1000)
+  const debouncedTitle = useDebounce(searchTitle, 1000)
+  const debouncedTag = useDebounce(searchTag, 1000)
+
+  const filterParams = () => {
+    const username = !!searchCreator && { username: searchCreator }
+    const title = !!searchTitle && { title: searchTitle }
+    const tags = !!searchTag && { tags: searchTag }
+
+    return { ...username, ...title, ...tags }
+  }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['videosList', page, pageSize],
-    queryFn: () => getAllVideos({ data: { with: 'user', page, paginate: pageSize } }),
+    queryKey: ['videosList', page, pageSize, debouncedCreator, debouncedTitle, debouncedTag],
+    queryFn: () => getAllVideos({ data: { with: 'user', page, paginate: pageSize, ...filterParams() } }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -262,7 +304,14 @@ function TableVideos() {
   return (
     <>
       <Container>
-        <Header setOpen={setOpen} setHeader={setHeader} />
+        <Header
+          searchCreator={searchCreator}
+          setSearchCreator={setSearchCreator}
+          searchTitle={searchTitle}
+          setSearchTitle={setSearchTitle}
+          searchTag={searchTag}
+          setSearchTag={setSearchTag}
+        />
         <Table
           data={data}
           isLoading={isLoading || isRefetching}
@@ -270,8 +319,6 @@ function TableVideos() {
           pageSize={pageSize}
           setPageSize={setPageSize}
           rowCount={rowCount}
-          setOpen={setOpen}
-          setHeader={setHeader}
         />
       </Container>
     </>

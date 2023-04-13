@@ -9,6 +9,7 @@ import CustomInput from '@/layouts/components/shared-components/Picker/CustomPic
 import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import AdvertisementService from "../../../../services/api/AdvertisementService"
+import Translations from '@/layouts/components/Translations'
 
 interface ModalProps {
   isOpen: boolean
@@ -237,7 +238,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     <DatePickerWrapper>
       <Dialog open={props.isOpen} onClose={props.onClose}>
         <DialogContent sx={styles.dialogContent}>
-          <DialogTitle sx={styles.title}>{adsCategory} Advertisement</DialogTitle>
+          <DialogTitle sx={styles.title}><Translations text={adsCategory}/> <Translations text='Advertisement'/></DialogTitle>
             {isBeingAddedUpdatedDelete ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
             <Box sx={styles.container} style={isBeingAddedUpdatedDelete? {opacity:0.5, cursor:"not-allowed"} : undefined}>
               <Box sx={styles.left}>
@@ -262,17 +263,22 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                   </Box>
                 </Box>
                 <Stack>
-                <Typography textAlign="center">Recommended Size: {adsWidth * 1.25}x{adsHeight * 1.25}</Typography>
+                <Typography textAlign="center"> <Translations text='Recommended Size'/>: {adsWidth * 1.25}x{adsHeight * 1.25}</Typography>
                   <Stack flexDirection="row" justifyContent="center" gap={{xs:4, md:12}} mt={4}>
                     {!isCreatingNewAds ? 
-                    <Button variant="contained" color="error" disabled={isBeingAddedUpdatedDelete} sx={{ width: 150 }} onClick={deleteAdvertisement}>DELETE</Button> : null}
-                    <Button variant="contained" disabled={isBeingAddedUpdatedDelete} component="label" sx={styles.uploadBtn}>{preview || adsPhotoURL? "Change" : "Select" } Image<input onChange={handleFileInputChange} type="file" hidden/></Button>
+                    <Button variant="contained" color="error" disabled={isBeingAddedUpdatedDelete} sx={{ width: 150, textTransform: "uppercase" }} onClick={deleteAdvertisement}>
+                      <Translations text='Delete' />
+                    </Button> : null}
+                    <Button variant="contained" disabled={isBeingAddedUpdatedDelete} component="label" sx={styles.uploadBtn}>
+                    <Translations text={preview || adsPhotoURL ? "Change" : "Select"} /> <Translations text='Image' />
+                      <input onChange={handleFileInputChange} type="file" hidden/>
+                    </Button>
                   </Stack>
                 </Stack>
               </Box>
               <Box sx={styles.right}>
                 <Box>
-                  <Typography>Duration: Start Date</Typography>
+                <Typography><Translations text='Start Date'/></Typography>
                   <DatePicker
                     dateFormat="dd/MM/yyyy"
                     disabled={isBeingAddedUpdatedDelete}
@@ -284,7 +290,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                   />
                 </Box>
                 <Box>
-                  <Typography sx={isDurationForever? {color: "#999"} : null}>Duration: End Date</Typography>
+                <Typography sx={isDurationForever ? { color: "#999" } : null}> <Translations text='End Date'/></Typography>
                    <DatePicker
                     dateFormat="dd/MM/yyyy"
                     disabled={isBeingAddedUpdatedDelete || isDurationForever}                    
@@ -295,16 +301,16 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                     minDate={new Date()}
                   />
                 <Stack>
-                  <FormControlLabel control={<Checkbox checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label="Duration: Forever" />
+                  <FormControlLabel control={<Checkbox checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label={<Translations text='Duration: Forever'/>} />
                 </Stack>
                 </Box>
                 <Box>
-                  <Typography>URL Link:</Typography>
+                <Typography><Translations text='URL Link'/></Typography>
                 <TextField fullWidth error={URLInputError} disabled={isBeingAddedUpdatedDelete} value={newURLLink} onChange={(event) => { setnewURLLink(event.target.value);  setURLInputError(false)}}/>
                 </Box>
                 <Box sx={styles.bottomBtnWrapper}>
-                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={props.onClose}>Cancel</Button>
-                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={isCreatingNewAds? publishAdvertisement : editAdvertisement}>Publish</Button>
+                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={props.onClose}><Translations text='Cancel'/></Button>
+                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={isCreatingNewAds? publishAdvertisement : editAdvertisement}><Translations text='Publish'/></Button>
                 </Box>
               </Box>
             </Box>

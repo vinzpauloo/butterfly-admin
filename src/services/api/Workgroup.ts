@@ -4,20 +4,19 @@ import authConfig from 'src/configs/auth'
 interface IGetWorkgroup {
   page: number
   paginate: number
+  sort: string
+  sort_by: string
+  search_by: string
+  search_value?: string
+  select?: string
+  navbar?: string
+  template_id?: string
 }
 interface IGetSpecificWorkgroup {
   id: string
 }
 interface IGetAllWorkgroup {
   workgroup_id: string
-}
-interface IGetSearchWorkgroup {
-  page: number
-  search_by: string
-  search_value?: string
-  select: string
-  navbar?: string
-  template_id?: string
 }
 
 interface IPostWorkgroup {
@@ -88,19 +87,6 @@ const WorkgroupService = () => {
     })
   }
 
-  const getSearchWorkgroups = (params: IGetSearchWorkgroup) => {
-    return request({
-      headers: {
-        'X-Authorization': 'postman|1',
-        'ngrok-skip-browser-warning': '69420', // only for dev
-        Authorization: `Bearer ${accessToken}`
-      },
-      url: '/workgroups',
-      method: 'GET',
-      params: params
-    })
-  }
-
   const getSpecificWorkgroup = (params: IGetSpecificWorkgroup) => {
     return request({
       headers: {
@@ -155,7 +141,6 @@ const WorkgroupService = () => {
   return {
     getWorkgroup,
     postWorkgroup,
-    getSearchWorkgroups,
     getSpecificWorkgroup,
     putWorkgroup,
     getAllWorkgroup,

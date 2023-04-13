@@ -106,7 +106,7 @@
     "Forms & Tables": "Forms & Tables",
     "Form Elements": "Form Elements",
     "Text Field": "Text Field",
-    "Select": "Select",
+    "Select": "選擇",
     "Checkbox": "Checkbox",
     "Radio": "Radio",
     "Custom Inputs": "Custom Inputs",
@@ -147,6 +147,20 @@
     "Active": "積極的",
     "Action": "行動",
     "Duration: Forever": "期間: 永遠",
-    "Publish": "發布"
+    "Publish": "發布",
+    "Privacy Policy": "隱私政策",
+    "Save as Draft": "保存為草稿",
+    "Terms of Service": "服務條款",
+    "Advertisement": "廣告",
+    "Add More": "添加更多",
+    "Preloading": "預加載",
+    "Pop-Up": "彈出窗口",
+    "Carousel": "旋轉木馬",
+    "Banner": "橫幅",
+    "Video-Grid": "視頻網格",
+    "URL Link": "網址連結",
+    "Delete": "刪除",
+    "Image": "圖像",
+    "Recommended Size": "推薦尺碼"
   }
   
