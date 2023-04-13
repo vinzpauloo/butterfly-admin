@@ -369,7 +369,7 @@ const UploadVideoStep1 = (props: Props) => {
                 filename: tFile.name,
                 filetype: tFile.type,
                 user_id: contentCreator,
-                file_name: title,
+                video_name: title,
                 video_type: 'trial_video',
                 work_id: work_id,
                 authorization: `${accessToken}`
