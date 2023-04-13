@@ -103,7 +103,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
       const feedHeaderData = {
         user_id: '25',
-        file_name: video.name,
+        video_name: video.name,
         video_type: 'feed_video'
       }
 

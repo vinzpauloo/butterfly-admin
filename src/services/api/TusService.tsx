@@ -21,7 +21,7 @@ type TUSServiceOptions = {
 
 type headerdata = {
   user_id: string
-  file_name: string
+  video_name: string
   video_type: 'full_video' | 'feed_video' | 'trial' | string
 }
 
