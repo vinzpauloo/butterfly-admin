@@ -78,27 +78,27 @@ const navData = [
 const templateData = [
   {
     value: 'videoSlider',
-    text: 'videoSlider',
+    text: 'Video Slider (minimum 6 videos)',
     image: '/images/template/videoSlider.png'
   },
   {
     value: 'reelslider',
-    text: 'reelSlider',
+    text: 'Reel Slider (minimum 6 videos)',
     image: '/images/template/reelSlider.png'
   },
   {
     value: 'singleVideoWithGrid',
-    text: 'singleVideoWithGrid',
+    text: 'Single Video With Grid (minimum 5 videos)',
     image: '/images/template/singleVideoWithGrid.png'
   },
   {
     value: 'singleVideoList',
-    text: 'singleVideoList',
+    text: 'Single Video List (minimum 10 videos)',
     image: '/images/template/singleVideoList.png'
   },
   {
     value: 'grid',
-    text: 'grid',
+    text: 'Grid (minimum 4 videos)',
     image: '/images/template/grid.png'
   }
 ]

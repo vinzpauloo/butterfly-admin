@@ -245,6 +245,24 @@ function WorkList({
     }
   ]
 
+  const videoCountChecker = (template: string) => {
+    switch (template) {
+      case 'videoSlider':
+        return 6
+      case 'reelslider':
+        return 6
+      case 'singleVideoWithGrid':
+        return 5
+      case 'singleVideoList':
+        return 10
+      case 'grid':
+        return 4
+
+      default:
+        return 4
+    }
+  }
+
   return (
     <Modal
       sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -267,7 +285,13 @@ function WorkList({
           disableColumnMenu
         />
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} mb={5}>
-          <Button size='large' variant='contained' sx={{ mr: 3 }} onClick={handleSave}>
+          <Button
+            disabled={!(allId.length >= videoCountChecker(template))}
+            size='large'
+            variant='contained'
+            sx={{ mr: 3 }}
+            onClick={handleSave}
+          >
             Save
           </Button>
           <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
