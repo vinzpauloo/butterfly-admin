@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from 'react'
 
 import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
@@ -97,47 +98,13 @@ const useDebounce = (value: any, delay: number) => {
   return debouncedValue
 }
 
-const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, setHeader }: any) => {
-  const { getSearchWorkgroups } = WorkgroupService()
-  const [search_value, setTitle] = useState('')
-  const [navbar, setNavbar] = useState('')
-  const [template_id, setTemplate] = useState('')
-
-  const debouncedTitle = useDebounce(search_value, 1000)
-
-  const filterParams = () => {
-    const title = !!search_value && { search_value }
-    const nav = !!navbar && { navbar }
-    const template = !!template_id && { template_id }
-
-    return { ...title, ...nav, ...template }
-  }
-
-  const { refetch } = useQuery({
-    queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page],
-    queryFn: () =>
-      getSearchWorkgroups({
-        page: page,
-        search_by: 'title',
-        select: '_id,navbar,title,template_id',
-        ...filterParams()
-      }),
-    onSuccess: data => {
-      setData(data.data)
-      setRowCount(data.total)
-      setPageSize(data.per_page)
-      setPage(data.current_page)
-    },
-    enabled: !!debouncedTitle || !!template_id || !!navbar
-  })
-
+const Header = ({ setOpen, setHeader, title, navbar, template_id, setTitle, setNavbar, setTemplate }: any) => {
   const handleClick = () => {
     setHeader('Add')
     setOpen(true)
   }
 
   const handleClear = () => {
-    refetch()
     setTitle('')
     setNavbar('')
     setTemplate('')
@@ -155,7 +122,7 @@ const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, set
             style={{ marginRight: 10 }}
             placeholder='Search'
             size='small'
-            value={search_value}
+            value={title}
             onChange={e => setTitle(e.target.value)}
           />
           <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
@@ -313,19 +280,34 @@ function index() {
   const [open, setOpen] = useState(false)
   const [header, setHeader] = useState('')
   const [sectionID, setSectionID] = useState('')
-  const [title, setTitle] = useState('')
+  const [search_value, setTitle] = useState('')
+  const [navbar, setNavbar] = useState('')
+  const [template_id, setTemplate] = useState('')
+
+  const debouncedTitle = useDebounce(search_value, 1000)
+
+  const filterParams = () => {
+    const title = !!search_value && { search_value }
+    const nav = !!navbar && { navbar }
+    const template = !!template_id && { template_id }
+
+    return { ...title, ...nav, ...template }
+  }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['workgroup', page, pageSize],
-    queryFn: () => getWorkgroup({ page: page, paginate: pageSize }),
+    queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page],
+    queryFn: () =>
+      getWorkgroup({
+        page: page,
+        search_by: 'title',
+        select: '_id,navbar,title,template_id',
+        ...filterParams()
+      }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
       setPageSize(data.per_page)
       setPage(data.current_page)
-    },
-    onError: err => {
-      console.log('workgroup error: ', err)
     }
   })
 
@@ -333,13 +315,14 @@ function index() {
     <>
       <Container>
         <Header
-          setData={setData}
-          page={page}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          setRowCount={setRowCount}
           setOpen={setOpen}
           setHeader={setHeader}
+          title={search_value}
+          navbar={navbar}
+          template_id={template_id}
+          setTitle={setTitle}
+          setNavbar={setNavbar}
+          setTemplate={setTemplate}
         />
         <Table
           data={data}
@@ -361,7 +344,7 @@ function index() {
           setOpen={setOpen}
           header={header}
           sectionID={sectionID}
-          title={title}
+          title={search_value}
           setTitle={setTitle}
         />
       ) : null}
