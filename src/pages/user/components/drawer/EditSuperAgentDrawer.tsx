@@ -42,7 +42,7 @@ interface FormValues {
   site_name: string
   description: string
   logo: File | null
-  note: string
+  user_note: string
 }
 
 const schema = yup.object().shape({})
@@ -104,7 +104,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     site_name: '',
     description: '',
     logo: null,
-    note: ''
+    user_note: ''
   })
   const [responseError, setResponseError] = useState<any>([])
 
@@ -243,6 +243,10 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     formData.append('site_id', siteData[0]?.id.toString())
 
     if (password === password_confirmation) {
+      // Display the key/value pairs
+      for (const pair of formData.entries()) {
+        console.log(`${pair[0]}, ${pair[1]}`)
+      }
       try {
         await mutation.mutateAsync({
           id: props.userId,
@@ -268,7 +272,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
             site_name: '',
             description: '',
             logo: null,
-            note: ''
+            user_note: ''
           })
 
           setResponseError(false)
@@ -454,7 +458,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     error={!!errors.partner_note}
                     helperText={errors.partner_note?.message}
                     onChange={handleFormInputChange}
-                    name='email'
+                    name='partner_note'
                     InputLabelProps={{
                       shrink: true
                     }}
@@ -612,11 +616,11 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                     fullWidth
                     multiline
                     rows={4}
-                    {...register('note')}
-                    error={!!errors.note}
-                    helperText={errors.note?.message}
+                    {...register('user_note')}
+                    error={!!errors.user_note}
+                    helperText={errors.user_note?.message}
                     onChange={handleFormInputChange}
-                    name='note'
+                    name='user_note'
                     InputLabelProps={{
                       shrink: true
                     }}

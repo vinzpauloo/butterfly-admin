@@ -65,8 +65,7 @@ const AuthProvider = ({ children }: Props) => {
         }
       })
       .then(async response => {
-        console.log('Login success!', response)
-        const tempUserData = { role: 'admin', username: params.email }
+        const tempUserData = { role: response.data.data.role, username: params.email }
 
         // setUser(tempUserData)
         params.rememberMe

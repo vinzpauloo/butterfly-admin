@@ -83,11 +83,9 @@ const NewsFeedList = (props: Props) => {
 
   // TURN THIS TO ENUM SO ITS READABLE
   const getActiveTabContent = (step: number) => {
-
     if (data) {
-
       let flatMapDataArray = data.pages.flatMap(data => [data.data])
-      let flatMap = flatMapDataArray.flatMap( data => [...data] )
+      let flatMap = flatMapDataArray.flatMap(data => [...data])
 
       switch (step) {
         case 0: {
@@ -115,18 +113,21 @@ const NewsFeedList = (props: Props) => {
       <Box
         sx={{
           display: 'flex',
-          justifyContent: ['center','space-between'],
+          justifyContent: ['center', 'space-between'],
           flexDirection: ['row'],
-          alignItems : ['center','initial'],
-          gap: ['0rem','2rem'],
+          alignItems: ['center', 'initial'],
+          gap: ['0rem', '2rem'],
           marginBottom: '2rem'
         }}
       >
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: ['column','row'],
-          gap: ['1rem','2.5rem'],
-          marginBottom: '0rem' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: ['column', 'row'],
+            gap: ['1rem', '2.5rem'],
+            marginBottom: '0rem'
+          }}
+        >
           {steps.map((step, index) => {
             return (
               <Button
@@ -186,9 +187,8 @@ const NewsFeedList = (props: Props) => {
           <Box>
             <Grid container spacing={10}>
               <Grid mt={15} display='flex' justifyContent='center' alignItems='center' textAlign='center' item xs={12}>
-
                 <Button
-                  disabled={  isFetchingNextPage ? true : false}
+                  disabled={isFetchingNextPage ? true : false}
                   variant='contained'
                   onClick={() => {
                     fetchNextPage()
@@ -196,7 +196,6 @@ const NewsFeedList = (props: Props) => {
                 >
                   {isFetchingNextPage ? <CircularProgress size={15} color='secondary' /> : 'Load More Stories'}
                 </Button>
-
               </Grid>
             </Grid>
           </Box>
@@ -204,6 +203,11 @@ const NewsFeedList = (props: Props) => {
       </Box>
     </Box>
   )
+}
+
+NewsFeedList.acl = {
+  action: 'read',
+  subject: 'cc-page'
 }
 
 export default NewsFeedList
