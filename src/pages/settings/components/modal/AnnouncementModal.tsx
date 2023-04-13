@@ -83,11 +83,10 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
   const publishNewAnnouncement = () => {
     if (validateInput()) {
       console.log("PUBLISH NEW ANNOUNCEMENT WIP")
-      console.log("PUBLISH NEW ANNOUNCEMENT")
       console.log(title)
       console.log(description)
       console.log(format(startDate, 'yyyy-MM-dd'))
-      console.log(format(endDate, 'yyyy-MM-dd'))
+      console.log(isDurationForever ? null : format(endDate, 'yyyy-MM-dd'))
     }
   }
 
@@ -104,7 +103,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
   return (
     <DatePickerWrapper>
       <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'lg'}>
-        <DialogContent sx={{ backgroundColor: '#FFF', padding: 10 }}>
+        <DialogContent sx={{ padding: 10 }}>
           <DialogTitle sx={styles.dialogTitle}> {isEditing? "Edit" : "New" } Announcement </DialogTitle>
           <Box sx={styles.mainContent}>
             <Box sx={styles.textfieldContainer}>
