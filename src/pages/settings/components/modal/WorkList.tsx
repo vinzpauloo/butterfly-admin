@@ -3,16 +3,15 @@ import React, { useState } from 'react'
 
 import { Box, Button, Checkbox, Modal, Typography } from '@mui/material'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import VideoService from '@/services/api/VideoService'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Utils import
 import formatDate from '@/utils/formatDate'
 import WorkgroupService from '@/services/api/Workgroup'
-import { log } from 'console'
 
-const CheckboxContent = ({ data, header, allId, setAllId, id, sectionID, setSelectedData }: any) => {
+const CheckboxContent = ({ header, allId, setAllId, id, sectionID }: any) => {
   const [isCheck, setIsCheck] = useState(allId.includes(id))
   const { deleteCheckWorkgroup, postCheckWorkgroup } = WorkgroupService()
 
@@ -27,13 +26,6 @@ const CheckboxContent = ({ data, header, allId, setAllId, id, sectionID, setSele
         return removeId
       })
 
-      setSelectedData((prev: any) => {
-        const removeId = prev.filter((item: any) => item !== id)
-        const newData = data.filter((item: any) => removeId.includes(item._id))
-
-        return newData
-      })
-
       if (header === 'Edit') {
         uncheckMutate({
           id: sectionID,
@@ -43,11 +35,6 @@ const CheckboxContent = ({ data, header, allId, setAllId, id, sectionID, setSele
       setIsCheck((prev: boolean) => !prev)
     } else {
       setAllId((prev: any) => [...prev, id])
-      setSelectedData((prev: any) => {
-        const newData = data.filter((item: any) => item._id === id)
-
-        return [...prev, ...newData]
-      })
 
       if (header === 'Edit') {
         checkMutate({
@@ -66,13 +53,41 @@ const CheckboxContent = ({ data, header, allId, setAllId, id, sectionID, setSele
   )
 }
 
-function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAll, setAllId, setModalData }: any) {
+const RandomVideoPicker = (num: number, all: string[]) => {
+  const choosenID: string[] = []
+
+  while (choosenID.length !== num) {
+    const pick = Math.floor(Math.random() * all.length)
+    if (choosenID.includes(all[pick])) continue
+    choosenID.push(all[pick])
+  }
+
+  return choosenID
+}
+
+function WorkList({
+  header,
+  allId,
+  modalOpen,
+  setModalOpen,
+  sectionID,
+  refetchAll,
+  setAllId,
+  control,
+  navbar,
+  template,
+  reset,
+  setNavbar,
+  setTemplate,
+  setOpen
+}: any) {
+  const queryClient = useQueryClient()
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [modalRowCount, setModalRowCount] = useState(0)
   const { getAllVideos } = VideoService()
-  const [selectedData, setSelectedData] = useState([])
+  const { postWorkgroup } = WorkgroupService()
   const { isLoading, isFetching } = useQuery({
     queryKey: ['worklist', page],
     queryFn: () => getAllVideos({ data: { sort: 'desc', sort_by: 'title', with: 'user', page: page } }),
@@ -87,6 +102,27 @@ function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAl
     }
   })
 
+  // @ts-ignore
+  const layoutPattern = template => {
+    switch (template) {
+      case 'videoSlider':
+        return RandomVideoPicker(6, allId)
+      case 'reelslider':
+        return RandomVideoPicker(6, allId)
+      case 'singleVideoWithGrid':
+        return RandomVideoPicker(5, allId)
+      case 'singleVideoList':
+        return RandomVideoPicker(10, allId)
+      case 'grid':
+        return RandomVideoPicker(4, allId)
+    }
+  }
+
+  // ** use to POST new workgroup
+  const { mutate: mutateWorkgroup } = useMutation(postWorkgroup, {
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workgroup'] })
+  })
+
   const handleClose = () => {
     setModalOpen(false)
   }
@@ -96,10 +132,35 @@ function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAl
   }
 
   const handleSave = () => {
-    setModalData(selectedData)
     setModalOpen(false)
     if (header === 'Edit') {
       refetchAll()
+    } else {
+      // @ts-ignore
+      const vid: string[] = layoutPattern(template)
+      if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
+        mutateWorkgroup({
+          title: control._fields.title._f.value,
+          navbar: navbar,
+          template_id: template,
+          single: vid[0],
+          multiple: vid?.slice(1),
+          all: allId
+        })
+      } else {
+        mutateWorkgroup({
+          title: control._fields.title._f.value,
+          navbar: navbar,
+          template_id: template,
+          multiple: vid,
+          all: allId
+        })
+      }
+      reset()
+      setTemplate('videoSlider')
+      setNavbar('selection')
+      setAllId([])
+      setOpen(false)
     }
   }
 
@@ -112,16 +173,7 @@ function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAl
       headerName: '',
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <CheckboxContent
-          allId={allId}
-          id={params.id}
-          sectionID={sectionID}
-          setAllId={setAllId}
-          setModalData={setModalData}
-          data={data}
-          header={header}
-          setSelectedData={setSelectedData}
-        />
+        <CheckboxContent allId={allId} id={params.id} sectionID={sectionID} setAllId={setAllId} header={header} />
       )
     },
     {
@@ -193,6 +245,24 @@ function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAl
     }
   ]
 
+  const videoCountChecker = (template: string) => {
+    switch (template) {
+      case 'videoSlider':
+        return 6
+      case 'reelslider':
+        return 6
+      case 'singleVideoWithGrid':
+        return 5
+      case 'singleVideoList':
+        return 10
+      case 'grid':
+        return 4
+
+      default:
+        return 4
+    }
+  }
+
   return (
     <Modal
       sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -215,7 +285,13 @@ function WorkList({ header, allId, modalOpen, setModalOpen, sectionID, refetchAl
           disableColumnMenu
         />
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} mb={5}>
-          <Button size='large' variant='contained' sx={{ mr: 3 }} onClick={handleSave}>
+          <Button
+            disabled={!(allId.length >= videoCountChecker(template))}
+            size='large'
+            variant='contained'
+            sx={{ mr: 3 }}
+            onClick={handleSave}
+          >
             Save
           </Button>
           <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>

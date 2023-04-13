@@ -137,6 +137,16 @@
     "Menu Level 3.2": "Menu Level 3.2",
     "Disabled Menu": "Disabled Menu",
     "Raise Support": "Raise Support",
-    "Documentation": "Documentation"
+    "Documentation": "Documentation",
+    "Announcement" : "公告",
+    "Add New Announcements": "添加新公告",
+    "New Announcement": "新公告",
+    "Edit Announcement": "編輯公告",
+    "Start Date": "開始日期",
+    "End Date": "結束日期",
+    "Active": "積極的",
+    "Action": "行動",
+    "Duration: Forever": "期間: 永遠",
+    "Publish": "發布"
   }
   

@@ -4,6 +4,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import AnnouncementModal from '../components/modal/AnnouncementModal'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import { GridRenderCellParams } from '@mui/x-data-grid'
+import Translations from '../../../layouts/components/Translations'
 
 const Announcements = () => {
   const [pageSize, setPageSize] = useState<number>(5)
@@ -52,19 +53,19 @@ const Announcements = () => {
   }
 
   const columns = [
-    { field: 'title', headerName: 'Title', minWidth: 100, flex: 0.03, },
-    { field: 'description', headerName: 'Description', minWidth: 200, flex: 0.15, },
-    { field: 'start_date', headerName: 'Start Date', minWidth: 120, flex: 0.03, },
+    { field: 'title', headerName: <Translations text="Title" />, minWidth: 100, flex: 0.03, },
+    { field: 'description', headerName: <Translations text="Description" />, minWidth: 200, flex: 0.15, },
+    { field: 'start_date', headerName: <Translations text="Start Date" />, minWidth: 120, flex: 0.03, },
     {
       field: 'end_date',
-      headerName: 'End Date',
+      headerName: <Translations text="End Date" />,
       minWidth: 120,
       flex: 0.03,
       renderCell: (params: GridRenderCellParams) => params.row.end_date === null ? "None" : params.row.end_date
     },
     {
       field: 'active',
-      headerName: 'Active',
+      headerName: <Translations text="Active" />,
       minWidth: 85,
       flex: 0.02,
       renderCell: (params: GridRenderCellParams) =>
@@ -72,7 +73,7 @@ const Announcements = () => {
     },
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: <Translations text="Action" />,
       minWidth: 85,
       flex: 0.02,
       renderCell: (params: GridRenderCellParams) => 
@@ -90,7 +91,7 @@ const Announcements = () => {
     },
   ]
 
-  // FAKE DATA
+  // FAKE DATA - MUST MATCH THE FIELD NAMES IN columns []
   const announcementRows = [
     {
       id: "1",
@@ -141,9 +142,9 @@ const Announcements = () => {
         <Card>
           <Box sx={styles.header}>
             <Box sx={styles.announcements}>
-              <Typography sx={styles.announceText}>Announcements</Typography>
+              <Typography sx={styles.announceText}><Translations text={"Announcement"} /></Typography>
             </Box>
-            <Button variant="contained" onClick={handleOpen}>+ Add New Announcements</Button>
+            <Button variant="contained" onClick={handleOpen}>+ <Translations text="Add New Announcements"/></Button>
           </Box>
           <Divider />
           <DataGrid
