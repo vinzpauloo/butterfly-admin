@@ -120,7 +120,7 @@ function WorkList({
 
   // ** use to POST new workgroup
   const { mutate: mutateWorkgroup } = useMutation(postWorkgroup, {
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workgroup'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['search-workgroup'] })
   })
 
   const handleClose = () => {

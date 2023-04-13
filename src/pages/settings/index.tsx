@@ -98,14 +98,14 @@ const useDebounce = (value: any, delay: number) => {
   return debouncedValue
 }
 
-const Header = ({ setOpen, setHeader, title, navbar, template_id, setTitle, setNavbar, setTemplate }: any) => {
+const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue, setNavbar, setTemplate }: any) => {
   const handleClick = () => {
     setHeader('Add')
     setOpen(true)
   }
 
   const handleClear = () => {
-    setTitle('')
+    setSearchValue('')
     setNavbar('')
     setTemplate('')
   }
@@ -123,7 +123,7 @@ const Header = ({ setOpen, setHeader, title, navbar, template_id, setTitle, setN
             placeholder='Search'
             size='small'
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={e => setSearchValue(e.target.value)}
           />
           <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
             <InputLabel id='demo-simple-select-label'>Navbar</InputLabel>
@@ -280,7 +280,8 @@ function index() {
   const [open, setOpen] = useState(false)
   const [header, setHeader] = useState('')
   const [sectionID, setSectionID] = useState('')
-  const [search_value, setTitle] = useState('')
+  const [title, setTitle] = useState('')
+  const [search_value, setSearchValue] = useState('')
   const [navbar, setNavbar] = useState('')
   const [template_id, setTemplate] = useState('')
 
@@ -295,12 +296,15 @@ function index() {
   }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page],
+    queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page, pageSize],
     queryFn: () =>
       getWorkgroup({
         page: page,
+        paginate: pageSize,
+        sort: 'desc',
+        sort_by: 'updated_at',
         search_by: 'title',
-        select: '_id,navbar,title,template_id',
+        select: '_id,navbar,title,template_id,updated_at',
         ...filterParams()
       }),
     onSuccess: data => {
@@ -320,7 +324,7 @@ function index() {
           title={search_value}
           navbar={navbar}
           template_id={template_id}
-          setTitle={setTitle}
+          setSearchValue={setSearchValue}
           setNavbar={setNavbar}
           setTemplate={setTemplate}
         />
@@ -344,7 +348,7 @@ function index() {
           setOpen={setOpen}
           header={header}
           sectionID={sectionID}
-          title={search_value}
+          title={title}
           setTitle={setTitle}
         />
       ) : null}

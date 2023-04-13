@@ -3,6 +3,9 @@ import authConfig from 'src/configs/auth'
 
 interface IGetWorkgroup {
   page: number
+  paginate: number
+  sort: string
+  sort_by: string
   search_by: string
   search_value?: string
   select?: string

@@ -217,7 +217,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
 
   // ** use to PUT or update the workgroup
   const { mutate: mutateEditWorkgroup } = useMutation(putWorkgroup, {
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workgroup'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['search-workgroup'] })
   })
 
   // @ts-ignore
