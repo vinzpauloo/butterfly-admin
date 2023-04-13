@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, CircularProgress, Checkbox, Stack, FormControlLabel, styled } from '@mui/material'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
+import format from 'date-fns/format'
 import DatePicker from 'react-datepicker'
-import { DateType } from '@/types/forms/reactDatepickerTypes'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
 import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -45,8 +45,8 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
   ]);
 
   // if creating new ads used this value, if editing use global store
-  const [newAdsStartDate, setNewAdsStartDate] = useState<DateType>(new Date())
-  const [newAdsEndDate, setNewAdsEndDate] = useState<DateType>(new Date())
+  const [newAdsStartDate, setNewAdsStartDate] = useState<Date>(new Date())
+  const [newAdsEndDate, setNewAdsEndDate] = useState<Date>(new Date())
   const [newURLLink, setnewURLLink] = useState("");
 
   const [selectedFile, setSelectedFile] = useState("");
@@ -189,8 +189,9 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
         data: {
           photo: selectedFile,
           url: newURLLink,
-          start_date: newAdsStartDate?.toISOString().split('T')[0],
-          end_date: isDurationForever ? "" : newAdsEndDate?.toISOString().split('T')[0],
+          
+          start_date: format(newAdsStartDate, 'yyyy-MM-dd'),
+          end_date: isDurationForever ? "" : format(newAdsEndDate, 'yyyy-MM-dd'),
           active: 1
         },
       });
@@ -207,8 +208,8 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
         // if something is selected, if none selected dont send
         photo: selectedFile === "" ? null : selectedFile,
         url: newURLLink,
-        start_date: newAdsStartDate?.toISOString().split('T')[0],
-        end_date: isDurationForever ? "" : newAdsEndDate?.toISOString().split('T')[0],
+        start_date: format(newAdsStartDate, 'yyyy-MM-dd'),
+        end_date: isDurationForever ? "" : format(newAdsEndDate, 'yyyy-MM-dd'),
         active: 1,
         _method: "put"
       },
@@ -275,7 +276,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                   <DatePicker
                     dateFormat="dd/MM/yyyy"
                     disabled={isBeingAddedUpdatedDelete}
-                  selected={newAdsStartDate}
+                    selected={newAdsStartDate}
                     onChange={(date: Date) => setNewAdsStartDate(date)}
                     placeholderText='Click to select a date'
                     customInput={<CustomInput customWidth='100%' />}
