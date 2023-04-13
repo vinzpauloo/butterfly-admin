@@ -1,13 +1,9 @@
-// ** React Imports
 import React from 'react'
-
-// ** MUI Imports
 import { Box, Typography, TextField, Button } from '@mui/material'
-
-// ** Style Imports
+import Translations from '../../../../layouts/components/Translations'
 
 interface TextAreaProps {
-  title: string
+  title: any
 }
 
 const TextArea: React.FC<TextAreaProps> = (props) => {
@@ -18,14 +14,12 @@ const TextArea: React.FC<TextAreaProps> = (props) => {
         <Typography sx={styles.title}>{props.title}</Typography>
         <TextField sx={styles.header} />
       </Box>
-
       <Box>
-        <TextField sx={styles.content} multiline={true} minRows={20} label='DESCRIPTION' />
+        <TextField sx={styles.content} multiline={true} minRows={20} label={<Translations text="Description"/>} />
       </Box>
-
       <Box sx={styles.btnContainer}>
-        <Button sx={styles.drafts}>Save as Drafts</Button>
-        <Button sx={styles.publish}>Publish</Button>
+        <Button sx={styles.drafts}><Translations text="Save as Draft" /></Button>
+        <Button sx={styles.publish}><Translations text="Publish" /></Button>
       </Box>
     </Box>
   )
@@ -34,21 +28,19 @@ const TextArea: React.FC<TextAreaProps> = (props) => {
 const styles = {
   container: {
     border: '1px solid black',
-    height: '80dvh',
-    backgroundColor: '#FFF',
     borderRadius: '12px',
     padding: 10,
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-evenly',
-    gap: 2
+    gap: 5
   },
   title: {
     textTransform: 'uppercase',
-    color: '#000',
     fontWeight: 400,
     fontSize: 20,
+    pb: 4,
     textAlign: {
       xs: 'center',
       md: 'left',
