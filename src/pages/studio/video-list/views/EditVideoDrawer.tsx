@@ -116,6 +116,11 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
     formData.append('title', title as string)
     formData.append('description', description as string)
     formData.append('_method', 'put')
+    if ( tags && tags.length > 0 ) {
+      tags.forEach( tag => {
+        formData.append('tags[]', tag.toString())
+      })
+    }
 
     mutateEditVideo({ formData : formData })
   }
