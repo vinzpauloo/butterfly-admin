@@ -1,19 +1,23 @@
 import React, { useState } from 'react'
 
-import * as yup from 'yup'
-import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
+import { Box, OutlinedInput, Typography } from '@mui/material'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
 
 import Container from '@/pages/components/Container'
 import WorkgroupService from '@/services/api/Workgroup'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import VideoService from '@/services/api/VideoService'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Utils import
 import formatDate from '@/utils/formatDate'
-import DialogEdit from '../views/DialogEdit'
+import EditVideoDrawer from '../views/EditVideoDrawer'
+
+// ** import types
+import Icon from 'src/@core/components/icon'
+
+// ** Interfaces
+import { IVideoRow } from '@/context/types'
 
 const navData = [
   {
@@ -102,7 +106,17 @@ const Header = ({ setOpen, setHeader }: any) => {
   )
 }
 
+
+
 const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setOpen, setHeader }: any) => {
+  
+  // ** States
+  const [editVideoOpen, setEditVideoOpen] = React.useState<boolean>(false)
+  const [ editVideoRow, setEditVideoRow ] = React.useState<IVideoRow>()
+
+  const toggleEditVideoDrawer = () => setEditVideoOpen(!editVideoOpen)
+
+
   const columnData = [
     {
       flex: 0.02,
@@ -171,36 +185,16 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
         </Typography>
       )
     },
-    // {
-    //   field: 'action',
-    //   headerName: 'Action',
-    //   width: 100,
-    //   renderCell: (params: any) => {
-    //     return (
-    //       <Box>
-    //         <Button
-    //           onClick={() => {
-    //             setHeader('Edit')
-    //             setOpen(true)
-    //           }}
-    //         >
-    //           <EditOutlinedIcon sx={styles.icon} />
-    //         </Button>
-    //       </Box>
-    //     )
-    //   }
-    // },
     {
       flex: 0.01,
       minWidth: 60,
       field: 'action',
       headerName: 'Action',
       sortable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <>
-          <DialogEdit params={params.row} />
-        </>
-      )
+      renderCell: (params: GridRenderCellParams) => <Icon onClick={() => {
+        setEditVideoRow({ ...params.row }) // pass the row value to state
+        toggleEditVideoDrawer()
+      } } icon='mdi:eye-outline' fontSize={20} cursor='pointer' />
     }
   ]
 
@@ -213,23 +207,30 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount, setO
   }
 
   return (
-    <DataGrid
-      rowCount={rowCount}
-      pageSize={pageSize}
-      paginationMode='server'
-      getRowId={row => row._id}
-      checkboxSelection={false}
-      disableSelectionOnClick
-      disableColumnMenu
-      autoHeight
-      loading={isLoading}
-      rows={data}
-      rowsPerPageOptions={[10, 25, 50]}
-      columns={columnData}
-      pagination
-      onPageChange={handlePageChange}
-      onPageSizeChange={handlePageSizeChange}
-    />
+    <>
+      <DataGrid
+        rowCount={rowCount}
+        pageSize={pageSize}
+        paginationMode='server'
+        getRowId={row => row._id}
+        checkboxSelection={false}
+        disableSelectionOnClick
+        disableColumnMenu
+        autoHeight
+        loading={isLoading}
+        rows={data}
+        rowsPerPageOptions={[10, 25, 50]}
+        columns={columnData}
+        pagination
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+      {
+        editVideoRow && 
+        <EditVideoDrawer open={editVideoOpen} toggle={toggleEditVideoDrawer} row={editVideoRow} />
+      }
+      
+    </>
   )
 }
 

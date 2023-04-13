@@ -104,3 +104,26 @@ export interface IContent {
   user_id: number;
   _id: string;
 }
+
+export interface IVideoRow {
+  approval: string
+  approved_by: number
+  created_at: string
+  description: string
+  endTimeSeconds: number
+  filename: string
+  full : {}
+  full_upload_url: string
+  full_video_uid: string
+  tags: string[]
+  groups : string[]
+  title : string
+  trial : {}
+  trial_video_hls : string
+  trial_video_uid : string 
+  updated_at : string
+  user : IUser
+  user_id : number
+  username : string
+  _id : string
+}
