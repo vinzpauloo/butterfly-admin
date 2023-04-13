@@ -89,11 +89,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/settings/pages/feedfeatures'
         },
         {
-          title: 'Advertisements',
+          title: 'Advertisement',
           path: '/settings/pages/ads'
         },
         {
-          title: 'Announcements',
+          title: 'Announcement',
           path: '/settings/pages/announcements'
         },
         {
@@ -101,7 +101,7 @@ const navigation = (): VerticalNavItemsType => {
           path: '/settings/pages/privacypolicy'
         },
         {
-          title: 'Terms of Services',
+          title: 'Terms of Service',
           path: '/settings/pages/tos'
         }
       ]

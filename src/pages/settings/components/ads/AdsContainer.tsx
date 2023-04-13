@@ -2,6 +2,7 @@ import React from 'react'
 import { ImageList, Button, Stack } from '@mui/material'
 import AdsItem from './AdsItem'
 import { adsGlobalStore } from '../../../../zustand/adsGlobalStore'
+import Translations from '@/layouts/components/Translations'
 
 type Props = {
   containerID: string
@@ -31,7 +32,7 @@ const AdsContainer = (props: Props) => {
   let customHeight = 0
   let customName = ""
 
-  if (props.type === "fullscreen_banner") { customHeight = 650; customWidht = 475; customName = "Pre-Loading" }
+  if (props.type === "fullscreen_banner") { customHeight = 650; customWidht = 475; customName = "Preloading" }
   else if (props.type === "popup_banner") { customHeight = 475; customWidht = 475; customName = "Pop-Up" }
   else if (props.type === "carousel_banner") { customHeight = 150; customWidht = 475; customName = "Carousel" }
   else if (props.type === "single_banner") { customHeight = 150; customWidht = 475; customName = "Banner" }
@@ -65,7 +66,7 @@ const AdsContainer = (props: Props) => {
             itemName={customName}
           />
         )}
-        <Button sx={{ mt: 4 }} variant="contained" onClick={openModalCreatingNewAds}>ADD MORE</Button>
+        <Button sx={{ mt: 4, textTransform: "uppercase" }} variant="contained" onClick={openModalCreatingNewAds}><Translations text="Add More" /></Button>
       </ImageList>
     </Stack>
   )

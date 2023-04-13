@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import AdvertisementService from "../../../services/api/AdvertisementService";
 import AdvertisementModal from '../components/modal/AdvertisementModal';
 import AdsContainer from '../components/ads/AdsContainer';
+import Translations from '@/layouts/components/Translations';
 
 const TabPanel = ({ children, index, value}: any) => {
   return (
@@ -36,14 +37,14 @@ const Advertisements = () => {
 
   return (
     <>
-      <Typography mb={8} textTransform="uppercase" textAlign="center" fontWeight={600} variant="h5">Advertisements</Typography>
+      <Typography mb={8} textTransform="uppercase" textAlign="center" fontWeight={600} variant="h5"><Translations text="Advertisement"/></Typography>
       <Stack flexDirection="row" justifyContent="center">
         <Tabs value={tabIndex} onChange={handleChange} variant="scrollable">
-          <Tab label="Preloading" />
-          <Tab label="Pop-Up" />
-          <Tab label="Carousel" />
-          <Tab label="Banner" />
-          <Tab label="Video-Grid" />
+          <Tab label={<Translations text="Preloading"/>} />
+          <Tab label={<Translations text="Pop-Up"/>} />
+          <Tab label={<Translations text="Carousel"/>} />
+          <Tab label={<Translations text="Banner"/>} />
+          <Tab label={<Translations text="Video-Grid"/>} />
         </Tabs>
       </Stack>
       {isLoading ?
