@@ -5,15 +5,21 @@ import AnnouncementModal from '../components/modal/AnnouncementModal'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import Translations from '../../../layouts/components/Translations'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import AnnoucementsService from "../../../services/api/AnnoucementsService";
 
 const Announcements = () => {
-  const [pageSize, setPageSize] = useState<number>(5)
-  const [rowCount, setRowCount] = useState<number>(0)
-  const [page, setPage] = useState<number>(1)
+  // in case pagination is added on backend
+  // const [pageSize, setPageSize] = useState<number>(5)
+  // const [rowCount, setRowCount] = useState<number>(0)
+  // const [page, setPage] = useState<number>(1)
+
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [data, setData] = useState<any>([])
+  const [data, setData] = useState([])
+  const [announcementID, setAnnouncementID] = useState<string>("")
   const [modalInfo, setModalInfo] = useState({
+    parentID: "",
     id: "",
     title: "",
     description: "",
@@ -22,12 +28,40 @@ const Announcements = () => {
     active: true
   })
 
+  // FETCH ALL ADMIN ANNOUNCEMENT
+  const { getAllAnnouncement, updateAnnouncement } = AnnoucementsService()
+  const { isLoading } = useQuery({
+    queryKey: ["allAnnouncement"],
+    queryFn: () => getAllAnnouncement({ data: { with: "introductions" } }),
+    onSuccess: (data) => {
+      setAnnouncementID(data?._id)
+      setData(data?.introductions)
+    },
+    onError: (error) => { console.log(error) }
+  })
+
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+
+  const { mutate: mutateUpdateAnnouncement, isLoading: updateLoading } = useMutation(updateAnnouncement, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["allAnnouncement"],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const openEditModal = (id: string, title: string, description: string, start_date: string, end_date: any, active: boolean) => {
     setIsEditing(true)
     setOpenModal(true)
 
     // PASS THIS DATA TO THE MODAL
     setModalInfo({
+      parentID: announcementID,
       id: id,
       title: title,
       description: description,
@@ -47,39 +81,50 @@ const Announcements = () => {
   }
 
   const activateDeactivateAnnouncement = (id: string, active: boolean) => {
-    // MUTATE QUERY
-    console.log(id)
-    console.log(active)
+    mutateUpdateAnnouncement({
+      parentID: announcementID,
+      announcementID: id,
+      data: {
+        active: active === true ? 1 : 0,
+        _method: "put"
+      },
+    })
   }
 
   const columns = [
-    { field: 'title', headerName: <Translations text="Title" />, minWidth: 100, flex: 0.03, },
-    { field: 'description', headerName: <Translations text="Description" />, minWidth: 200, flex: 0.15, },
-    { field: 'start_date', headerName: <Translations text="Start Date" />, minWidth: 120, flex: 0.03, },
+    { field: 'title', renderHeader: () => <Translations text="Title" />, minWidth: 100, flex: 0.05, },
+    { field: 'description', renderHeader: () => <Translations text="Description" />, minWidth: 200, flex: 0.15, },
     {
-      field: 'end_date',
-      headerName: <Translations text="End Date" />,
+      field: 'start_date',
+      renderHeader: () => <Translations text="Start Date" />,
       minWidth: 120,
       flex: 0.03,
-      renderCell: (params: GridRenderCellParams) => params.row.end_date === null ? "None" : params.row.end_date
+      renderCell: (params: GridRenderCellParams) => params.row.start_date.split("T")[0]
+    },
+    {
+      field: 'end_date',
+      renderHeader: () => <Translations text="End Date" />,
+      minWidth: 120,
+      flex: 0.03,
+      renderCell: (params: GridRenderCellParams) => params.row.end_date === null ? "None" : params.row.end_date.split("T")[0]
     },
     {
       field: 'active',
-      headerName: <Translations text="Active" />,
+      renderHeader: () => <Translations text="Active" />,
       minWidth: 85,
       flex: 0.02,
       renderCell: (params: GridRenderCellParams) =>
-        <Switch checked={params.value} onClick={() => activateDeactivateAnnouncement(params.row.id, !params.value)} />
+        <Switch checked={params.value} onClick={() => activateDeactivateAnnouncement(params.row._id, !params.value)} />
     },
     {
       field: 'action',
-      headerName: <Translations text="Action" />,
+      renderHeader: () => <Translations text="Action" />,
       minWidth: 85,
       flex: 0.02,
       renderCell: (params: GridRenderCellParams) => 
         <Box>
           <Button onClick={() => openEditModal(
-              params.row.id,
+              params.row._id,
               params.row.title,
               params.row.description,
               params.row.start_date,
@@ -88,51 +133,6 @@ const Announcements = () => {
             <EditOutlinedIcon sx={styles.icon} />
           </Button>
         </Box>
-    },
-  ]
-
-  // FAKE DATA - MUST MATCH THE FIELD NAMES IN columns []
-  const announcementRows = [
-    {
-      id: "1",
-      title: 'Title 1',
-      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-05-15",
-      end_date: null,
-      active: true
-
-    },
-    {
-      id: "2",
-      title: 'Title 2',
-      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-04-12",
-      end_date: "2023-07-07",
-      active: false
-    },
-    {
-      id: "3",
-      title: 'Title 3',
-      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2024-01-02",
-      end_date: "2024-05-05",
-      active: false
-    },
-    {
-      id: "4",
-      title: 'Title 4',
-      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-02-05",
-      end_date:null,
-      active: false
-    },
-    {
-      id: "5",
-      title: 'Title 5',
-      description: "Et facere et cumque illum aut dolores. Dicta quo eius et modi eveniet. Quasi ipsam exercitationem tempora aspernatur. Sit alias aut quo. Facilis quia culpa voluptate. Aspernatur odit ipsa nulla.",
-      start_date: "2023-07-05",
-      end_date: "2023-08-17",
-      active: true
     },
   ]
 
@@ -149,20 +149,22 @@ const Announcements = () => {
           <Divider />
           <DataGrid
             autoHeight
-            rows={announcementRows}
+            rows={data}
             columns={columns}
-            pageSize={pageSize}
-            rowsPerPageOptions={[5, 10, 15]}
             disableSelectionOnClick
             checkboxSelection={false}
-            onPageChange={newPage => setPage(newPage + 1)}
-            onPageSizeChange={newPageSize => setPageSize(newPageSize)}
             sx={styles.dataGrid}
-            loading={false}
-            getRowId={row => row.id}
-            rowCount={rowCount} //total of data
-            paginationMode='server'
-            pagination
+            loading={isLoading || updateLoading}
+            getRowId={row => row._id}
+            rowsPerPageOptions={[5, 10, 15]}
+            
+            // in case pagination is added on backend
+            // pagination
+            // pageSize={pageSize}
+            // onPageChange={newPage => setPage(newPage + 1)}
+            // onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+            // rowCount={rowCount} //total of data
+            // paginationMode='server'
           />
         </Card>
       </Grid>
