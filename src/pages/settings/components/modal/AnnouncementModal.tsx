@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, FormControlLabel, Checkbox, } from '@mui/material'
+import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, FormControlLabel, Checkbox, CircularProgress, } from '@mui/material'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import format from 'date-fns/format'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
 import Translations from '../../../../layouts/components/Translations'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import AnnoucementsService from '@/services/api/AnnoucementsService'
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
   isEditing?: boolean
   modalInfo: {
+    parentID: string,
     id: string,
     title: string,
     description: string,
@@ -81,25 +84,71 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
     return true
   }
 
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+  const { createAnnouncement, updateAnnouncement } = AnnoucementsService();
+  
+  const { mutate: mutateCreateNewAnnouncement, isLoading: addedLoading } = useMutation(createAnnouncement, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["allAnnouncement"],
+      });
+      onClose()
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const { mutate: mutateUpdateAnnouncement, isLoading: updateLoading } = useMutation(updateAnnouncement, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["allAnnouncement"],
+      });
+      onClose()
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const publishNewAnnouncement = () => {
     if (validateInput()) {
-      console.log("PUBLISH NEW ANNOUNCEMENT WIP")
-      console.log(title)
-      console.log(description)
-      console.log(format(startDate, 'yyyy-MM-dd'))
-      console.log(isDurationForever ? null : format(endDate, 'yyyy-MM-dd'))
+      // POST data to back-end
+      mutateCreateNewAnnouncement({
+        data: {
+          type: "introduction",
+          style: "text",
+          title: title,
+          description: description,
+          start_date: format(startDate, 'yyyy-MM-dd'),
+          end_date: isDurationForever ? "" : format(endDate, 'yyyy-MM-dd')
+        },
+      })
     }
   }
 
   const editAnnouncement = () => {
     if (validateInput()) {
-      console.log("EDIT ANNOUNCEMENT WIP")
-      console.log(title)
-      console.log(description)
-      console.log(format(startDate, 'yyyy-MM-dd'))
-      console.log(isDurationForever ? null : format(endDate, 'yyyy-MM-dd'))
+      // PUT data to back-end
+      mutateUpdateAnnouncement({
+        parentID: modalInfo.parentID,
+        announcementID: modalInfo.id,
+        data: {
+          style: "text",
+          title: title,
+          description: description,
+          start_date: format(startDate, 'yyyy-MM-dd'),
+          end_date: isDurationForever ? "" : format(endDate, 'yyyy-MM-dd'),
+          _method: "put"
+        },
+      })
     }
   }
+
+  const isBeingAddedUpdated = addedLoading || updateLoading
   
   return (
     <DatePickerWrapper>
@@ -108,15 +157,17 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
           <DialogTitle sx={styles.dialogTitle}>
             {isEditing ? <Translations text="Edit Announcement" /> : <Translations text="New Announcement" />}
           </DialogTitle>
-          <Box sx={styles.mainContent}>
+          {isBeingAddedUpdated ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
+          <Box sx={styles.mainContent} style={isBeingAddedUpdated ? { opacity: 0.5, cursor: "not-allowed" } : undefined}>
             <Box sx={styles.textfieldContainer}>
-              <TextField label={<Translations text="Title" />} value={title} onChange={(e) => {setTitle(e.target.value);  setTitleInputError(false)}} error={titleInputError} />
-              <TextField label={<Translations text="Description" />} value={description} onChange={(e) => {setDescription(e.target.value); setDescriptionInputError(false)}} multiline={true} minRows={20} error={descriptionInputError} />
+              <TextField disabled={isBeingAddedUpdated} label={<Translations text="Title" />} value={title} onChange={(e) => {setTitle(e.target.value);  setTitleInputError(false)}} error={titleInputError} />
+              <TextField disabled={isBeingAddedUpdated} label={<Translations text="Description" />} value={description} onChange={(e) => {setDescription(e.target.value); setDescriptionInputError(false)}} multiline={true} minRows={20} error={descriptionInputError} />
             </Box>
             <Box sx={styles.datePickerContainer}>
               <Box>
                 <Typography><Translations text="Start Date"/></Typography>
                 <DatePicker
+                  disabled={isBeingAddedUpdated}
                   dateFormat="dd/MM/yyyy"
                   selected={startDate}
                   onChange={(date: Date) => setStartDate(date)}
@@ -129,18 +180,18 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                 <Typography sx={isDurationForever ? { color: "#999" } : null}><Translations text="End Date" /></Typography>
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
-                  disabled={isDurationForever}
+                  disabled={isDurationForever || isBeingAddedUpdated}
                   selected={endDate}
                   onChange={(date: Date) => setEndDate(date)}
                   placeholderText='Click to select a date'
                   customInput={<CustomInput customWidth='100%' />}
                   minDate={new Date()}
                 />
-                <FormControlLabel sx={{ mt: 2 }} control={<Checkbox checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label={<Translations text="Duration: Forever" />} />
+                <FormControlLabel sx={{ mt: 2 }} control={<Checkbox disabled={isBeingAddedUpdated} checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label={<Translations text="Duration: Forever" />} />
               </Box>
               <Box sx={{ display: 'flex', flexDirection: { xs: "column", md: "row"}, gap: 6, justifyContent:"center", alignItems:"center"}}>
-                <Button sx={styles.buttons} onClick={onClose}><Translations text="Cancel" /></Button>
-                <Button sx={styles.buttons} onClick={isEditing ? editAnnouncement : publishNewAnnouncement}><Translations text="Publish" /></Button>
+                <Button disabled={isBeingAddedUpdated} sx={styles.buttons} onClick={onClose}><Translations text="Cancel" /></Button>
+                <Button disabled={isBeingAddedUpdated} sx={styles.buttons} onClick={isEditing ? editAnnouncement : publishNewAnnouncement}><Translations text="Publish" /></Button>
               </Box>
               <Box sx={styles.disclaimer}>
                 <Typography sx={{ textAlign: 'center' }}>
@@ -200,5 +251,14 @@ const styles = {
     mt: 5,
     border: '1px solid black',
     padding: 3 
+  },
+  loaderStyle: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    margin: "auto",
+    zIndex: 1
   }
 }
