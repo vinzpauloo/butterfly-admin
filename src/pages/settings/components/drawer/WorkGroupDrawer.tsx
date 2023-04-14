@@ -31,47 +31,48 @@ import WorkList from '../modal/WorkList'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
+import TranslateString from '@/utils/TranslateString'
 
 const navData = [
   {
     value: 'selection',
-    text: 'selection'
+    text: 'Selection'
   },
   {
     value: 'latest',
-    text: 'latest'
+    text: 'Latest'
   },
   {
     value: 'original',
-    text: 'original'
+    text: 'Original'
   },
   {
     value: 'homemade',
-    text: 'homemade'
+    text: 'Homemade'
   },
   {
     value: 'hot',
-    text: 'hot'
+    text: 'Hot'
   },
   {
     value: 'local',
-    text: 'local'
+    text: 'Local'
   },
   {
     value: 'pornstar',
-    text: 'pornstar'
+    text: 'Pornstar'
   },
   {
     value: 'loli',
-    text: 'loli'
+    text: 'Loli'
   },
   {
     value: 'av',
-    text: 'av'
+    text: 'AV'
   },
   {
     value: 'animation',
-    text: 'animation'
+    text: 'Animation'
   }
 ]
 
@@ -320,7 +321,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
         sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 600 } } }}
       >
         <Header>
-          <Typography variant='h6'>{header} Workgroup</Typography>
+          <Typography variant='h6'>{TranslateString(header)} {TranslateString("Workgroup")}</Typography>
           <IconButton size='small' onClick={() => setOpen(false)} sx={{ color: 'text.primary' }}>
             <Icon icon='mdi:close' fontSize={20} />
           </IconButton>
@@ -335,7 +336,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 render={({ field: { value, onChange } }) => (
                   <TextField
                     value={value}
-                    label='Title'
+                    label={TranslateString("Title")}
                     onChange={onChange}
                     placeholder='XXXXXX'
                     error={Boolean(errors.title)}
@@ -349,30 +350,30 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
               )}
             </FormControl>
             <FormControl fullWidth sx={{ mb: 6 }}>
-              <InputLabel id='role-select'>Navbar</InputLabel>
+              <InputLabel id='role-select'>{TranslateString("Navbar")}</InputLabel>
               <Select
                 fullWidth
                 value={navbar}
                 id='select-role'
-                label='Navbar'
+                label={TranslateString("Navbar")}
                 labelId='role-select'
                 onChange={e => setNavbar(e.target.value)}
                 inputProps={{ placeholder: 'Navbar' }}
               >
                 {navData.map((item, index) => (
                   <MenuItem key={index} value={item.value}>
-                    {item.text}
+                    {TranslateString(item.text)}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
             <FormControl fullWidth sx={{ mb: 6 }}>
-              <InputLabel id='role-select'>Template</InputLabel>
+              <InputLabel id='role-select'>{TranslateString("Template")}</InputLabel>
               <Select
                 fullWidth
                 value={template}
                 id='select-role'
-                label='Template'
+                label={TranslateString("Template")}
                 labelId='role-select'
                 onChange={e => setTemplate(e.target.value)}
                 inputProps={{ placeholder: 'Template' }}
@@ -381,7 +382,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                   <MenuItem key={index} value={item.value}>
                     <Box display='flex' alignItems='center'>
                       <Image src={item.image} alt='dfs' width='24' height='24' style={{ marginRight: 10 }} />
-                      {item.text}
+                      {TranslateString(item.text)}
                     </Box>
                   </MenuItem>
                 ))}
@@ -400,7 +401,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                     sx={{ mr: 3 }}
                     onClick={handleOpenModal}
                   >
-                    Select Content
+                    {TranslateString("Select Content")}
                   </Button>
                 )}
               />
@@ -427,7 +428,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 </Button>
               ) : null}
               <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
-                Cancel
+                {TranslateString("Cancel")}
               </Button>
             </Box>
           </form>

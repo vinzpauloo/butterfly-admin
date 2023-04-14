@@ -10,74 +10,76 @@ import WorkgroupService from '@/services/api/Workgroup'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
 import Image from 'next/image'
+import TranslateString from '@/utils/TranslateString'
+
 
 const navData = [
   {
     value: 'selection',
-    text: 'selection'
+    text: 'Selection'
   },
   {
     value: 'latest',
-    text: 'latest'
+    text: 'Latest'
   },
   {
     value: 'original',
-    text: 'original'
+    text: 'Original'
   },
   {
     value: 'homemade',
-    text: 'homemade'
+    text: 'Homemade'
   },
   {
     value: 'hot',
-    text: 'hot'
+    text: 'Hot'
   },
   {
     value: 'local',
-    text: 'local'
+    text: 'Local'
   },
   {
     value: 'pornstar',
-    text: 'pornstar'
+    text: 'Pornstar'
   },
   {
     value: 'loli',
-    text: 'loli'
+    text: 'Loli'
   },
   {
     value: 'av',
-    text: 'av'
+    text: 'AV'
   },
   {
     value: 'animation',
-    text: 'animation'
+    text: 'Animation'
   }
 ]
 
 const templateData = [
   {
     value: 'videoSlider',
-    text: 'videoSlider',
+    text: 'Video Slider',
     image: '/images/template/videoSlider.png'
   },
   {
     value: 'reelslider',
-    text: 'reelSlider',
+    text: 'Reel Slider',
     image: '/images/template/reelSlider.png'
   },
   {
     value: 'singleVideoWithGrid',
-    text: 'singleVideoWithGrid',
+    text: 'Single Video With Grid',
     image: '/images/template/singleVideoWithGrid.png'
   },
   {
     value: 'singleVideoList',
-    text: 'singleVideoList',
+    text: 'Single Video List',
     image: '/images/template/singleVideoList.png'
   },
   {
     value: 'grid',
-    text: 'grid',
+    text: 'Grid',
     image: '/images/template/grid.png'
   }
 ]
@@ -112,62 +114,55 @@ const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue
 
   return (
     <Box mb={2}>
-      <Typography variant='h4' component='h4' mb={5}>
-        Workgroup
-      </Typography>
+      <Typography variant='h4' component='h4' mb={5}>{TranslateString("Workgroup")}</Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} gap={2.5}>
           <OutlinedInput
             fullWidth
-            style={{ marginRight: 10 }}
-            placeholder='Search'
+            placeholder={TranslateString("Search")}
             size='small'
             value={title}
             onChange={e => setSearchValue(e.target.value)}
           />
-          <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
-            <InputLabel id='demo-simple-select-label'>Navbar</InputLabel>
+          <FormControl fullWidth size='small'>
+            <InputLabel id='demo-simple-select-label'>{TranslateString("Navbar")}</InputLabel>
             <Select
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={navbar}
-              label='Navbar'
+              label={TranslateString("Navbar")}
               onChange={e => setNavbar(e.target.value)}
             >
               {navData.map((item, index) => (
                 <MenuItem key={index} value={item.value}>
-                  {item.text}
+                  {TranslateString(item.text)}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
-            <InputLabel id='demo-simple-select-label'>Template</InputLabel>
+          <FormControl fullWidth size='small'>
+            <InputLabel id='demo-simple-select-label'>{TranslateString("Template")}</InputLabel>
             <Select
               style={{ display: 'flex', alignItems: 'center' }}
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={template_id}
-              label='Template'
+              label={TranslateString("Template")}
               onChange={e => setTemplate(e.target.value)}
             >
               {templateData.map((item, index) => (
                 <MenuItem key={index} value={item.value} style={{ display: 'flex', alignItems: 'flex-start' }}>
                   <Box display='flex' alignItems='center'>
                     <Image src={item.image} alt='dfs' width='24' height='24' style={{ marginRight: 10 }} />
-                    {item.text}
+                    {TranslateString(item.text)}
                   </Box>
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Button variant='contained' color='error' onClick={handleClear}>
-            Clear
-          </Button>
+          <Button variant='contained' color='error' sx={{width:150}} onClick={handleClear}>{TranslateString("Clear")}</Button>
         </Box>
-        <Button variant='contained' onClick={handleClick}>
-          Add Workgroup
-        </Button>
+        <Button variant='contained' onClick={handleClick}>{TranslateString("Add Workgroup")}</Button>
       </Box>
     </Box>
   )
@@ -188,19 +183,19 @@ const Table = ({
   const columnData = [
     {
       field: 'title',
-      headerName: 'Title',
+      headerName: TranslateString("Title"),
       width: 650,
       sortable: false
     },
     {
       field: 'navbar',
-      headerName: 'Navbar',
+      headerName: TranslateString("Navbar"),
       width: 300,
       sortable: false
     },
     {
       field: 'template_id',
-      headerName: 'Template ID',
+      headerName: TranslateString("Template") + "ID",
       width: 300,
       sortable: false,
       renderCell: (params: any) => {
@@ -220,7 +215,7 @@ const Table = ({
     },
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: TranslateString("Action"),
       width: 100,
       sortable: false,
       renderCell: (params: any) => {

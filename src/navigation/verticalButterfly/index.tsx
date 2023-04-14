@@ -111,11 +111,11 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:tag-multiple',
       children: [
         {
-          title: 'VIP Bundles',
+          title: 'VIP Bundle',
           path: '/bundles/pages/VIPBundlesPage'
         },
         {
-          title: 'Gold Coin Bundles',
+          title: 'Gold Coin Bundle',
           path: '/bundles/pages/GoldCoinBundlesPage'
         },
         {
