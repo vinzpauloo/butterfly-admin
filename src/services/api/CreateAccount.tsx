@@ -1,4 +1,6 @@
 import request from '../../lib/request'
+import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface UsersData {
   data: {
@@ -14,10 +16,13 @@ interface UsersData {
 
 export const CreateAccount = () => {
   const createUser = (params: UsersData) => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
-        'ngrok-skip-browser-warning': '69420' // only for dev
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
       },
       url: '/users',
       method: 'POST',
@@ -26,10 +31,13 @@ export const CreateAccount = () => {
   }
 
   const getLanguages = () => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
-        'ngrok-skip-browser-warning': '69420' // only for dev
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
       },
       url: '/languages',
       method: 'GET'
@@ -37,10 +45,13 @@ export const CreateAccount = () => {
   }
 
   const getCurrency = () => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
-        'ngrok-skip-browser-warning': '69420' // only for dev
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
       },
       url: '/currencies',
       method: 'GET'

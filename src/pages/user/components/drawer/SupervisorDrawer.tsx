@@ -1,8 +1,6 @@
 // ** React Imports
 import { useState } from 'react'
 
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Radio, RadioGroup, Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
 
@@ -33,23 +31,24 @@ interface FormValues {
   password_confirmation: string
   mobile: string
   email: string
-  note: string
+  user_note: string
 }
 
 const schema = yup.object().shape({
   role_id: yup.string().oneOf(['1', '2'], 'Role must be Operator or Supervisor').required('Role is required'),
-  username: yup.string().min(7, 'Username must be at least 7 characters').required(),
-  password: yup.string().min(7, 'Password must be at least 7 characters').required(),
+  username: yup.string().min(7, 'Username must be at least 7 characters').required('Username is required'),
+  password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
   password_confirmation: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required(),
+    .required('Password confirmation is required'),
   mobile: yup
     .string()
-    .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number')
-    .required(),
-  email: yup.string().email().required()
+    .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number, format should be (09/+639)')
+    .required('Mobile number is required'),
+  email: yup.string().email('Invalid email address').required('Email address is required')
 })
+
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
@@ -64,7 +63,6 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 }))
 
 const SupervisorDrawer = (props: SidebarAddUserType) => {
-  const router = useRouter()
   const queryClient = useQueryClient()
 
   // ** Props
@@ -72,48 +70,35 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
-  const [formValue, setFormValue] = useState<FormValues>({
-    role_id: '',
-    username: '',
-    password: '',
-    password_confirmation: '',
-    mobile: '',
-    email: '',
-    note: ''
-  })
 
   const {
     control,
-    register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<FormValues>({
     resolver: yupResolver(schema)
   })
 
-  const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-
-    if (name === 'role') {
-      setFormValue(prevState => ({
-        ...prevState,
-        role_id: value as '1' | '2' | ''
-      }))
-    } else {
-      setFormValue(prevState => ({
-        ...prevState,
-        [name]: value
-      }))
-    }
+  const resetForm = () => {
+    reset({
+      role_id: '',
+      username: '',
+      password: '',
+      password_confirmation: '',
+      mobile: '',
+      email: '',
+      user_note: ''
+    })
   }
 
   const { createUser } = CreateAccount()
   const mutation = useMutation(createUser)
   const [responseError, setResponseError] = useState<any>()
 
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (data: FormValues) => {
     const userData = {
-      data: formValue
+      data: data
     }
 
     try {
@@ -122,16 +107,8 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
 
       setTimeout(() => {
         toggle()
+        resetForm()
         setSubmitted(false)
-        setFormValue({
-          role_id: '',
-          username: '',
-          password: '',
-          password_confirmation: '',
-          mobile: '',
-          email: '',
-          note: ''
-        })
 
         // Re-fetches UserTable and CSV exportation
         queryClient.invalidateQueries({ queryKey: ['allUsers'] })
@@ -163,6 +140,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
 
   const handleClose = () => {
     toggle()
+    resetForm()
   }
 
   return (
@@ -195,7 +173,6 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                       {...field}
                       onChange={e => {
                         field.onChange(e)
-                        handleFormInputChange(e)
                       }}
                     >
                       <Box sx={styles.radio}>
@@ -227,93 +204,131 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
               )}
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Entire Desired Username'
-                    variant='outlined'
-                    fullWidth
-                    {...register('username')}
-                    error={!!errors.username}
-                    helperText={errors.username?.message}
-                    value={formValue.username}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='username'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Entire Desired Username'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.username}
+                        helperText={errors.username?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='username'
+                      />
+                    )}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Enter Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password')}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    value={formValue.password}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Entire Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='password'
+                        type='password'
+                      />
+                    )}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Re-enter Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password_confirmation')}
-                    error={!!errors.password_confirmation}
-                    helperText={errors.password_confirmation?.message}
-                    value={formValue.password_confirmation}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password_confirmation'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Re-enter Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password_confirmation}
+                        helperText={errors.password_confirmation?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='password_confirmation'
+                        type='password'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Mobile No.'
-                    variant='outlined'
-                    fullWidth
-                    {...register('mobile')}
-                    error={!!errors.mobile}
-                    helperText={errors.mobile?.message}
-                    value={formValue.mobile}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='mobile'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Mobile No.'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.mobile}
+                        helperText={errors.mobile?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        onKeyPress={e => {
+                          // Allow only numbers and the '+' symbol
+                          if (!/[0-9+]/.test(e.key)) {
+                            e.preventDefault()
+                          }
+                        }}
+                        name='mobile'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Email Address'
-                    variant='outlined'
-                    fullWidth
-                    {...register('email')}
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
-                    value={formValue.email}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='email'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Email Address'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='email'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Notes'
-                    variant='outlined'
-                    fullWidth
-                    multiline
-                    rows={4}
-                    {...register('note')}
-                    value={formValue.note}
-                    onChange={handleFormInputChange}
-                    name='note'
+                  <Controller
+                    name='user_note'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Notes'
+                        variant='outlined'
+                        fullWidth
+                        multiline
+                        rows={4}
+                        error={!!errors.user_note}
+                        helperText={errors.user_note?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='user_note'
+                      />
+                    )}
                   />
                 </Box>
 
                 {displayErrors()}
                 <Box sx={styles.formButtonContainer}>
                   <Box>
-                    <Button sx={styles.cancelButton}>
+                    <Button sx={styles.cancelButton} onClick={handleClose}>
                       <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>

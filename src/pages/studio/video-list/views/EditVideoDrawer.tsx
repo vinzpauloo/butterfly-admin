@@ -116,13 +116,13 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
     formData.append('title', title as string)
     formData.append('description', description as string)
     formData.append('_method', 'put')
-    if ( tags && tags.length > 0 ) {
-      tags.forEach( tag => {
+    if (tags && tags.length > 0) {
+      tags.forEach(tag => {
         formData.append('tags[]', tag.toString())
       })
     }
 
-    mutateEditVideo({ formData : formData })
+    mutateEditVideo({ formData: formData })
   }
 
   const handleClose = () => {
@@ -242,7 +242,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 sx={{ mr: 3 }}
                 disabled={isEditLoading ? true : false}
               >
-                { isEditLoading ? <CircularProgress size={12} sx={{mr:5}} /> : null } Submit
+                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} Submit
               </Button>
               <Button
                 disabled={isEditLoading ? true : false}

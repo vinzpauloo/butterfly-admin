@@ -253,7 +253,7 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.formButtonContainer}>
                   <Box>
-                    <Button sx={styles.cancelButton}>
+                    <Button sx={styles.cancelButton} onClick={handleClose}>
                       <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>

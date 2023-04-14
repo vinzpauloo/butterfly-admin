@@ -275,14 +275,6 @@ const SADrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4, justifyContent: 'space-between' }}>
-              <Box>
-                <Typography sx={styles.white}>Step 1</Typography>
-              </Box>
-              <Box>
-                <Typography sx={styles.white}>Create Super Agent</Typography>
-              </Box>
-            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
@@ -398,23 +390,6 @@ const SADrawer = (props: SidebarAddUserType) => {
                     name='partner_note'
                   />
                 </Box>
-
-                {/* <Box
-                  sx={{
-                    display: 'flex',
-                    backgroundColor: '#A459D1',
-                    padding: 4,
-                    justifyContent: 'space-between',
-                    mt: 5
-                  }}
-                >
-                  <Box>
-                    <Typography sx={styles.white}>Step 2</Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={styles.white}>Create Site</Typography>
-                  </Box>
-                </Box> */}
 
                 <Box sx={styles.fullWidth}>
                   <TextField
@@ -541,7 +516,7 @@ const SADrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <TextField
-                    label='Description (Optional)'
+                    label='Description'
                     variant='outlined'
                     fullWidth
                     multiline
@@ -574,7 +549,7 @@ const SADrawer = (props: SidebarAddUserType) => {
                 {displayErrors()}
                 <Box sx={styles.formButtonContainer}>
                   <Box>
-                    <Button sx={styles.cancelButton}>
+                    <Button sx={styles.cancelButton} onClick={handleClose}>
                       <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>

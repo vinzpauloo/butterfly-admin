@@ -1,4 +1,6 @@
 import request from '../../lib/request'
+import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface UsersData {
   data: {
@@ -9,6 +11,7 @@ interface UsersData {
     sort_by?: string
     search_by?: string
     search_value?: string
+    with?: string
   }
 }
 
@@ -29,10 +32,13 @@ const processData = (response: any) => {
 
 export const useUsersTable = () => {
   const getUsers = (params: UsersData) => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
-        'ngrok-skip-browser-warning': '69420' // only for dev
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
       },
       url: '/users',
       method: 'GET',
@@ -41,11 +47,14 @@ export const useUsersTable = () => {
   }
 
   const getAllDataForCSV = async (params: UsersData) => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request(
       {
         headers: {
-          'X-Authorization': 'postman|0',
-          'ngrok-skip-browser-warning': '69420' // only for dev
+          ...getHeaders(),
+          'ngrok-skip-browser-warning': '69420', // only for dev
+          Authorization: `Bearer ${accessToken}`
         },
         url: `/users?export=true&role=${params.data.role}`,
         method: 'GET',
@@ -56,10 +65,13 @@ export const useUsersTable = () => {
   }
 
   const getAllDataFromCreator = () => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
-        'ngrok-skip-browser-warning': '69420' // only for dev
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
       },
       url: `/users?role=CC&all=true`,
       method: 'GET'
@@ -67,11 +79,14 @@ export const useUsersTable = () => {
   }
 
   const updateUser = (id: any, data: any) => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
+        ...getHeaders(),
         'Content-Type': 'multipart/form-data',
-        'ngrok-skip-browser-warning': '69420' // only for dev
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
       },
       url: `/users/${id}`,
       method: 'POST',
@@ -80,11 +95,14 @@ export const useUsersTable = () => {
   }
 
   const getSpecificUser = (params: UserData) => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
+        ...getHeaders(),
         'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': '69420' // only for dev
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
       },
       url: `/users/${params.data.id}`,
       method: 'GET',

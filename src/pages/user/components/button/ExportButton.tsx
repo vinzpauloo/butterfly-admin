@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 
 // ** MUI Imports
-import { Button, Box } from '@mui/material'
+import { Button } from '@mui/material'
 
 // ** Hooks
 import { useUsersTable } from '../../../../services/api/useUsersTable'
@@ -29,7 +29,7 @@ const ExportButton = (props: Props) => {
 
   const { getAllDataForCSV } = useUsersTable()
 
-  const {} = useQuery({
+  useQuery({
     queryKey: ['UsersTableCSV', props.role, props.usernameValue, props.emailValue, props.mobileValue, props.role_id],
     queryFn: () =>
       getAllDataForCSV({
@@ -51,48 +51,19 @@ const ExportButton = (props: Props) => {
     saveAs(blob, `${props.role}-Data.csv`)
   }
 
-  console.log('propstitle', props.titleValue)
-
   useEffect(() => {
     if (props.emailValue) {
-      console.log(`TYPING IN EMAIL`)
       setSearch('email')
     } else if (props.mobileValue) {
-      console.log(`TYPING IN mobile`)
       setSearch('mobile')
     } else if (props.usernameValue) {
-      console.log(`TYPING IN username`)
       setSearch('username')
     } else if (props.titleValue) {
-      console.log(`TYPING IN ALBUM TITLE`)
       setSearch('title')
     }
   }, [props.emailValue, props.mobileValue, props.usernameValue, props.titleValue])
 
   return (
-    // <Box
-    //   sx={{
-    //     display: 'flex',
-    //     flexDirection: ['column', 'row'],
-    //     gap: 10,
-    //     mb: 5,
-    //     mt: {
-    //       xs: 0,
-    //       sm: 0,
-    //       md: 0,
-    //       lg: 5
-    //     }
-    //   }}
-    // >
-    //   <Button
-    //     color='secondary'
-    //     variant='outlined'
-    //     startIcon={<Icon icon='mdi:export-variant' fontSize={20} />}
-    //     onClick={handleExport}
-    //   >
-    //     Export
-    //   </Button>
-    // </Box>
     <Button
       color='secondary'
       variant='outlined'

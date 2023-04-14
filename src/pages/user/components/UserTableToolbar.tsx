@@ -55,7 +55,7 @@ const UserTableToolbar = (props: Props) => {
       >
         <TextField
           size='small'
-          value={props.emailValue}
+          value={props.emailValue ?? ''}
           onChange={props.onEmailChange}
           placeholder='Search email…'
           InputProps={{
@@ -64,10 +64,12 @@ const UserTableToolbar = (props: Props) => {
                 <Icon icon='mdi:magnify' fontSize={20} />
               </Box>
             ),
-            endAdornment: (
+            endAdornment: props?.emailValue ? (
               <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
                 <Icon icon='mdi:close' fontSize={20} />
               </IconButton>
+            ) : (
+              false
             )
           }}
           sx={{
@@ -85,7 +87,7 @@ const UserTableToolbar = (props: Props) => {
         {/* Add TextField for searching mobile number */}
         <TextField
           size='small'
-          value={props.mobileValue}
+          value={props.mobileValue ?? ''}
           onChange={props.onMobileChange}
           placeholder='Search mobile number…'
           InputProps={{
@@ -94,10 +96,12 @@ const UserTableToolbar = (props: Props) => {
                 <Icon icon='mdi:magnify' fontSize={20} />
               </Box>
             ),
-            endAdornment: (
+            endAdornment: props?.mobileValue ? (
               <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
                 <Icon icon='mdi:close' fontSize={20} />
               </IconButton>
+            ) : (
+              false
             )
           }}
           sx={{
@@ -113,7 +117,7 @@ const UserTableToolbar = (props: Props) => {
         />
         <TextField
           size='small'
-          value={props.usernameValue}
+          value={props.usernameValue ?? ''}
           onChange={props.onUsernameChange}
           placeholder='Search User…'
           InputProps={{
@@ -122,10 +126,12 @@ const UserTableToolbar = (props: Props) => {
                 <Icon icon='mdi:magnify' fontSize={20} />
               </Box>
             ),
-            endAdornment: (
+            endAdornment: props?.usernameValue ? (
               <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
                 <Icon icon='mdi:close' fontSize={20} />
               </IconButton>
+            ) : (
+              false
             )
           }}
           sx={{
