@@ -11,6 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import BundlesService from '../../../services/api/BudlesService';
 import IconList from './IconList';
+import TranslateString from '@/utils/TranslateString';
 
 type Props = {
 	bundleID: string
@@ -134,8 +135,8 @@ const VIPBundleItem = (props: Props) => {
 						</Stack>
 					</Stack>
 					<Stack flexDirection="row" gap={4} mt={2}>
-						<Button variant="contained" color="warning" fullWidth onClick={() => setOpen(true)}>EDIT</Button>
-						<Button variant="contained" color="error" fullWidth onClick={confirmDeleteVIPBundle}>DELETE</Button>
+						<Button variant="contained" color="warning" fullWidth onClick={() => setOpen(true)}>{TranslateString("Edit")}</Button>
+						<Button variant="contained" color="error" fullWidth onClick={confirmDeleteVIPBundle}>{TranslateString("Delete")}</Button>
 					</Stack>
 				</Stack>
 			</Stack>

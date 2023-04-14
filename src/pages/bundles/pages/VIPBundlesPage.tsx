@@ -9,6 +9,7 @@ import VIPBundleModal from '../components/VIPBundleModal';
 import CircularProgress from '@mui/material/CircularProgress';
 import BundlesService from '../../../services/api/BudlesService'
 import { useQuery } from '@tanstack/react-query';
+import TranslateString from '@/utils/TranslateString';
 
 const VIPBundlesPage = () => {
   const [open, setOpen] = useState(false);
@@ -31,8 +32,8 @@ const VIPBundlesPage = () => {
     <>
       <Stack sx={{ padding: { xs: 4, sm: 8 }}} bgcolor={theme => theme.customBflyColors.alwaysPrimary} borderRadius={1}>
         <Stack justifyContent={{ xs: "center", sm: "space-between" }} alignItems="center" flexDirection={{ xs: "column", sm: "row" }} gap={2} mb={4}>
-          <Typography variant="h5" component="div" color="white"> VIP BUNDLES - MEMBERSHIP </Typography>
-          <Button variant="contained" onClick={() => setOpen(true)}>CREATE VIP BUNDLE</Button>
+          <Typography variant="h5" component="div" color="white">{TranslateString("VIP Bundle")} - {TranslateString("Membership")}</Typography>
+          <Button variant="contained" onClick={() => setOpen(true)}>{TranslateString("Create VIP Bundle")}</Button>
         </Stack>
         {isLoading ?
           <Stack my={16} alignItems="center">

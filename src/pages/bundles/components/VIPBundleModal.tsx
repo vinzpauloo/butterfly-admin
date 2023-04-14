@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import BundlesService from "../../../services/api/BudlesService"
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import TranslateString from '@/utils/TranslateString';
 
 type Props = {
 
@@ -209,7 +210,7 @@ const VIPBundleModal = (props: Props) => {
 
 	return (
 		<Stack {...modalContainer}>
-			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingVIPBundle ? "EDIT" : "ADD"} VIP BUNDLE</Typography>
+			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingVIPBundle ? TranslateString("Edit") : TranslateString("Add")} {TranslateString("VIP Bundle")}</Typography>
 			<Stack flexDirection="column" gap={2} sx={loadingStyle} width={300}>
 				{isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
 				<Stack gap={2}>
@@ -220,7 +221,7 @@ const VIPBundleModal = (props: Props) => {
 								sx={textFieldStyle}
 								value={bundleName}
 								onChange={(event) => setBundleName(event.target.value)}
-								label="Bundle Name" />
+								label={TranslateString("Bundle Name")} />
 							<Switch checked={isBundleActive} onChange={event => { setIsBundleActive(event.target.checked) }} />
 						</Stack>
 						<TextField
@@ -229,7 +230,7 @@ const VIPBundleModal = (props: Props) => {
 							sx={textFieldStyle}
 							value={bundlePrice}
 							onChange={(event) => setBundlePrice(event.target.value)}
-							label="Bundle Price" />
+							label={TranslateString("Bundle Price")} />
 					</Stack>
 					<Stack {...cardContainer}>
 						<TextField
@@ -237,14 +238,14 @@ const VIPBundleModal = (props: Props) => {
 							sx={textFieldStyle}
 							value={bundleDescription}
 							onChange={(event) => setBundleDescription(event.target.value)}
-							label="Bundle Description"
+							label={TranslateString("Bundle Description")}
 							multiline
 							rows={4} />
 					</Stack>
 				</Stack>
 				<Stack bgcolor="#D9D9D9" borderRadius={.5} p={2} width={300} height="max-content">
 					<Stack bgcolor="white" borderRadius={.5} gap={4} p={1} sx={featuresSelectionError? { outline: "1px solid red" }: null}>
-						<Typography variant="subtitle1" borderRadius={.5} textAlign="center">Select Features</Typography>
+						<Typography variant="subtitle1" borderRadius={.5} textAlign="center">{TranslateString("Select")} {TranslateString("Features")}</Typography>
 						<Grid container gap={2.5}>
 							{featuresList.map((item, index) =>
 								<Grid style={{ cursor: "pointer" }} onClick={item.setFunction} item key={index} {...gridItemProps}>
@@ -257,8 +258,8 @@ const VIPBundleModal = (props: Props) => {
 				</Stack>
 			</Stack>
 			<Stack flexDirection="row" gap={2} mt={4}>
-				<Button variant="contained" color="error" onClick={props.onClose} fullWidth>CANCEL</Button>
-				<Button variant="contained" color="success" onClick={props.isEditingVIPBundle? confirmEditVIPBundle : addNewVIPBundle} fullWidth>SAVE</Button>
+				<Button variant="contained" color="error" onClick={props.onClose} fullWidth>{TranslateString("Cancel")}</Button>
+				<Button variant="contained" color="success" onClick={props.isEditingVIPBundle ? confirmEditVIPBundle : addNewVIPBundle} fullWidth>{TranslateString("Save")}</Button>
 			</Stack>
 		</Stack>
 	)

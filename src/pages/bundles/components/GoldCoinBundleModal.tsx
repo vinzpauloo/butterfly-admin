@@ -7,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import BundlesService from "../../../services/api/BudlesService"
+import TranslateString from '@/utils/TranslateString';
 
 type Props = {
 
@@ -116,7 +117,7 @@ const GoldCoinBundleModal = (props: Props) => {
 	
 	return (
 		<Stack {...modalContainer}>
-			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingGoldCoinBundle ? "EDIT" : "ADD"} GOLD COIN BUNDLE</Typography>
+			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingGoldCoinBundle ? TranslateString("Edit") : TranslateString("Add")} {TranslateString("Gold Coin Bundle")}</Typography>
 			<Stack gap={2} width={300} sx={loadingStyle}>
 				{isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
 				<Stack {...cardContainer}>
@@ -126,7 +127,7 @@ const GoldCoinBundleModal = (props: Props) => {
 							sx={textFieldStyle}
 							value={bundleName}
 							onChange={(event) => { setBundleName(event.target.value); console.log(bundleName)}}
-							label="Bundle Name" />
+							label={TranslateString("Bundle Name")} />
 						<Switch checked={isBundleActive} onChange={event => { setIsBundleActive(event.target.checked)}} />
 					</Stack>
 					<TextField
@@ -135,7 +136,7 @@ const GoldCoinBundleModal = (props: Props) => {
 						sx={textFieldStyle}
 						value={bundlePrice}
 						onChange={(event) => {setBundlePrice(event.target.value); console.log(bundlePrice)}}
-						label="Gold Coins" />
+						label={TranslateString("Gold Coin")} />
 				</Stack>
 				<Stack {...cardContainer}>
 					<TextField
@@ -143,13 +144,13 @@ const GoldCoinBundleModal = (props: Props) => {
 						sx={textFieldStyle}
 						value={bundleDescription}
 						onChange={(event) => setBundleDescription(event.target.value)}
-						label="Description"
+						label={TranslateString("Description")}
 						multiline
 						rows={4} />
 				</Stack>
 				<Stack flexDirection="row" gap={2} mt={4}>
-					<Button variant="contained" color="error" onClick={props.onClose} fullWidth>CANCEL</Button>
-					<Button variant="contained" color="success" onClick={props.isEditingGoldCoinBundle? editGoldCoinBundle : addGoldCoinBundle} fullWidth>SAVE</Button>
+					<Button variant="contained" color="error" onClick={props.onClose} fullWidth>{TranslateString("Cancel")}</Button>
+					<Button variant="contained" color="success" onClick={props.isEditingGoldCoinBundle ? editGoldCoinBundle : addGoldCoinBundle} fullWidth>{TranslateString("Save")}</Button>
 				</Stack>
 			</Stack>
 		</Stack>
