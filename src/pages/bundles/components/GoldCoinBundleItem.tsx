@@ -77,13 +77,13 @@ const GoldCoinBundleItem = (props: Props) => {
 				{isBeingDeletedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
 				<Stack {...cardContainer}>
 					<Stack flexDirection="row" alignItems="center" justifyContent="space-between">
-						<Typography {...textContainer} variant="h6">{props.bundleName}</Typography>
+						<Typography {...textContainer} variant="h6" sx={{ wordBreak: "break-word" }}>{props.bundleName}</Typography>
 						<Switch checked={props.isBundleOn} onClick={SwtichOnAndOffGoldCoinBundle} />
 					</Stack>
-					<Typography {...textContainer} variant="body1">{props.bundlePrice}</Typography>
+					<Typography {...textContainer} variant="body1" sx={{ wordBreak: "break-word" }}>{props.bundlePrice}</Typography>
 				</Stack>
 				<Stack {...cardContainer}>
-					<Typography bgcolor="white" variant="body2" p={2} borderRadius={0.5}>{props.bundleDescription}</Typography>
+					<Typography bgcolor="white" variant="body2" p={2} borderRadius={0.5} sx={{ wordBreak: "break-word" }} >{props.bundleDescription}</Typography>
 				</Stack>
 				<Stack flexDirection="row" gap={4} mt={2}>
 					<Button variant="contained" color="warning" fullWidth onClick={() => setOpen(true)}>{TranslateString("Edit")}</Button>

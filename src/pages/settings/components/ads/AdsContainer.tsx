@@ -66,8 +66,8 @@ const AdsContainer = (props: Props) => {
             itemName={customName}
           />
         )}
-        <Button sx={{ mt: 4, textTransform: "uppercase" }} variant="contained" onClick={openModalCreatingNewAds}><Translations text="Add More" /></Button>
       </ImageList>
+      <Button sx={{ mt: 4, textTransform: "uppercase", width: customWidht }} variant="contained" onClick={openModalCreatingNewAds}><Translations text="Add More" /></Button>
     </Stack>
   )
 }
@@ -81,7 +81,6 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 2,
   },
   titleWrapper: {
     border: '1px solid #000',

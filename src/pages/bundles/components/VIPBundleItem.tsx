@@ -113,17 +113,17 @@ const VIPBundleItem = (props: Props) => {
 				<Stack bgcolor="#D9D9D9" borderRadius={.5} p={2} width={300}>
 					<Stack gap={2}>
 						<Stack gap={2} flexDirection="row" justifyContent="space-between">
-							<Typography variant="h6" bgcolor="white" p={2} borderRadius={.5} width="max-content">{props.bundleName}</Typography>
+							<Typography variant="h6" bgcolor="white" p={2} borderRadius={.5} width="max-content" sx={{ wordBreak: "break-word" }}>{props.bundleName}</Typography>
 							<Switch checked={props.isBundleOn} onClick={SwtichOnAndOffVIPBundle} />
 						</Stack>
-						<Typography variant="body1" bgcolor="white" p={2} borderRadius={.5} textAlign="center">{props.bundlePrice}</Typography>
-						<Typography variant="body2" bgcolor="white" p={2} borderRadius={.5}>{props.bundleDescription}</Typography>
+						<Typography variant="body1" bgcolor="white" p={2} borderRadius={.5} textAlign="center" sx={{ wordBreak: "break-word" }}>{props.bundlePrice}</Typography>
+						<Typography variant="body2" bgcolor="white" p={2} borderRadius={.5} sx={{ wordBreak: "break-word" }}>{props.bundleDescription}</Typography>
 					</Stack>
 				</Stack>
 				<Stack >
 					<Stack bgcolor="#D9D9D9" borderRadius={.5} p={2} >
 						<Stack bgcolor="white" borderRadius={.5} gap={4} p={1}>
-							<Typography variant="body1" borderRadius={.5} textAlign="center">{props.bundleName}</Typography>
+							<Typography variant="body1" borderRadius={.5} textAlign="center" sx={{ wordBreak: "break-word" }}>{props.bundleName}</Typography>
 							<Grid container gap={2} >
 								{props.bundlePerks.map((item, index) =>
 									<Grid item key={index} {...gridItemProps}>

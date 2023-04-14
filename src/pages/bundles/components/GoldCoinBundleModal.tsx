@@ -134,6 +134,7 @@ const GoldCoinBundleModal = (props: Props) => {
 						type="number"
 						error={bundlePrice !== "" ? false : undefined || bundlePriceError}
 						sx={textFieldStyle}
+						inputProps={{ min: 0 }}
 						value={bundlePrice}
 						onChange={(event) => {setBundlePrice(event.target.value); console.log(bundlePrice)}}
 						label={TranslateString("Gold Coin")} />
@@ -181,6 +182,10 @@ const cardContainer: StackProps = {
 const textFieldStyle = {
 	backgroundColor: "white",
 	borderRadius: 1,
+	'& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+		"WebkitAppearance": "none",
+		"margin": 0
+	},
 }
 
 const loaderStyle =
