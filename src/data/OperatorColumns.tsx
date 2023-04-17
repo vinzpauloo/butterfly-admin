@@ -1,6 +1,7 @@
 // ** MUI Imports
-import { Box, Card, Grid, Tab } from '@mui/material'
+import { Box } from '@mui/material'
 
+// ** Project Imports
 import ToggleButton from '@/pages/user/components/button/ToggleButton'
 import formatDate from '@/utils/formatDate'
 import EditBtn from '@/pages/user/components/button/EditButton'
@@ -47,8 +48,16 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
 }
 
 export const operatorColumns = [
-  { field: 'username', headerName: 'User Profile', width: 200 },
-  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
+  {
+    field: 'role',
+    headerName: 'Role',
+    width: 130,
+    valueGetter: (params: any) => {
+      return params?.row.role ? params?.row.role.name : ''
+    }
+  },
+  { field: 'username', headerName: 'User Profile', width: 150 },
+  { field: 'mobile', headerName: 'Mobile Number', width: 150 },
   { field: 'email', headerName: 'Email', width: 250 },
   {
     field: 'created_at',

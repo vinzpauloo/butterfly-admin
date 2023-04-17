@@ -129,7 +129,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
         }),
       onSuccess: (data: any) => {
         setPartner(data.partner)
-        const site = data.sites.map((item: any) => {
+        const site = data?.sites.map((item: any) => {
           return item
         })
         setSiteData(site)
@@ -138,7 +138,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   }
 
   if (props.roleId && props.roleId === 4) {
-    const {} = SitesPartnerQuery(props.userId)
+    SitesPartnerQuery(props.userId)
   }
 
   const [languages, setLanguages] = useState([])
@@ -193,6 +193,9 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
       password_confirmation: '*******'
     }
   })
+
+  console.log(`partner`, partner)
+  console.log(`siteData`, siteData)
 
   // ** Handles the defaultValues of the TextFields
   useEffect(() => {
@@ -635,7 +638,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                   ))}
                 <Box sx={styles.formButtonContainer}>
                   <Box>
-                    <Button sx={styles.cancelButton}>
+                    <Button sx={styles.cancelButton} onClick={handleClose}>
                       <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>
