@@ -1,5 +1,6 @@
 import { Box, Button, Drawer, Typography } from '@mui/material'
 import React from 'react'
+import TranslateString from '@/utils/TranslateString'
 
 function EditDrawer({ open, setOpen }: any) {
   const handleClose = () => {
@@ -31,7 +32,7 @@ function EditDrawer({ open, setOpen }: any) {
           Y41,100 CNY
         </Typography>
         <Box mt={2} p={2} sx={styles.donation}>
-          <Typography variant='h6'>IMPORTANT NOTES</Typography>
+          <Typography variant='h6' textTransform="uppercase">{TranslateString("Important Notes")}</Typography>
           <Box mt={2} px={3}>
             <Typography variant='body1' p={2} align='center'>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
@@ -42,11 +43,11 @@ function EditDrawer({ open, setOpen }: any) {
           </Box>
         </Box>
         <Box mt={5}>
-          <Button style={{ marginRight: 20 }} variant='contained' onClick={handleClose}>
-            BACK
+          <Button style={{ marginRight: 20, textTransform: "uppercase" }} variant='contained' onClick={handleClose}>
+            {TranslateString("Back")}
           </Button>
-          <Button style={{ marginLeft: 20 }} variant='contained'>
-            UPDATE
+          <Button style={{ marginLeft: 20, textTransform: "uppercase" }} variant='contained'>
+            {TranslateString("Update")}
           </Button>
         </Box>
       </Box>

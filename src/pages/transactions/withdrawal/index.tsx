@@ -5,6 +5,7 @@ import Transaction from '@/pages/transactions'
 import { Box, Button } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import ShowWithdrawDrawer from './ShowWithdrawDrawer'
+import Translations from '@/layouts/components/Translations'
 
 const rowData = [
   {
@@ -123,15 +124,15 @@ function index() {
   const [open, setOpen] = useState(false)
 
   const columnData = [
-    { field: 'contentCreator', headerName: 'Content Creator', width: 169, sortable: false },
-    { field: 'siteName', headerName: 'Site Name', width: 169, sortable: false },
-    { field: 'amount', headerName: 'Amount', width: 140, sortable: false },
-    { field: 'paymentMethod', headerName: 'Payment Method', width: 160, sortable: false },
-    { field: 'requestDate', headerName: 'Request Date', width: 169, sortable: false },
-    { field: 'lastUpdate', headerName: 'Last Update', width: 169, sortable: false },
+    { field: 'contentCreator', headerName: <Translations text='Content Creator'/>, width: 169, sortable: false },
+    { field: 'siteName', headerName: <Translations text='Site Name'/>, width: 169, sortable: false },
+    { field: 'amount', headerName: <Translations text='Amount'/>, width: 140, sortable: false },
+    { field: 'paymentMethod', headerName: <Translations text='Payment Method'/>, width: 160, sortable: false },
+    { field: 'requestDate', headerName: <Translations text='Request Date'/>, width: 169, sortable: false },
+    { field: 'lastUpdate', headerName: <Translations text='Last Update'/>, width: 169, sortable: false },
     {
       field: 'status',
-      headerName: 'Status',
+      headerName: <Translations text='Status'/>,
       width: 169,
       sortable: false,
       renderCell: () => (
@@ -144,7 +145,7 @@ function index() {
     },
     {
       field: 'approvedBy',
-      headerName: 'Approved By',
+      headerName: <Translations text='Approved By'/>,
       width: 140,
       sortable: false
     },

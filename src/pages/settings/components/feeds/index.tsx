@@ -15,6 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import TranslateString from '@/utils/TranslateString'
 
 // ** Style Imports
 
@@ -29,7 +30,7 @@ const steps = [
         title: 'All Video Feeds',
     },
     {
-        title: 'Videos with Photos',
+        title: 'Videos With Photos',
     },
 ]
 
@@ -70,12 +71,12 @@ const SelectFeaturedFeeds: React.FC<FeedsProps> = ({ onClose }) => {
         <Box sx={styles.container}>
             <Box sx={styles.topButtons}>
                 <Box sx={styles.inputSave}>
-                    <TextField sx={styles.title} label="FEED FEATURED TITLE (TYPE HERE)" />
+                    <TextField sx={styles.title} label={TranslateString("Featured Feed Title")} />
                     <Button
                         sx={styles.saveBtn}
                         onClick={handleBtnClick}
                     >
-                        Save
+                        {TranslateString("Save")}
                     </Button>
                 </Box>
                 <Box sx={styles.steps}>
@@ -89,14 +90,14 @@ const SelectFeaturedFeeds: React.FC<FeedsProps> = ({ onClose }) => {
                                 }}
                                 key={index}
                                 size='medium'
-                                onClick={() => { setActiveTab(index) }} >{step.title}
+                                onClick={() => { setActiveTab(index) }} >{TranslateString(step.title)}
                             </Button>
                         )
                     })}
                     <TextField
                         sx={styles.search}
                         variant='outlined'
-                        placeholder='Search'
+                        placeholder={TranslateString("Search")}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position='end'>

@@ -10,6 +10,7 @@ import AlbumTableToolbar from '../components/AlbumTableToolbar'
 
 // ** Other Imports
 import { AlbumColumns } from '@/data/AlbumColumns'
+import TranslateString from '@/utils/TranslateString'
 
 // ** Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
@@ -115,7 +116,7 @@ const TableAlbums = () => {
         <Card>
           <Box sx={{ mx: 5, mt: 5, ...styles.buttonContainer }}>
             <Typography variant='h4' component='h4'>
-              Album List
+              {TranslateString("Album List")}
             </Typography>
           </Box>
 

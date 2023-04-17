@@ -2,6 +2,7 @@ import { Box, Button, Drawer, Typography } from '@mui/material'
 import InputUnstyled from '@mui/base/InputUnstyled'
 import { styled } from '@mui/system'
 import React from 'react'
+import TranslateString from '@/utils/TranslateString'
 
 const blue = {
   100: '#DAECFF',
@@ -72,20 +73,20 @@ function NotesDrawer({ open, setOpen }: any) {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 600 } } }}
     >
       <Box display='flex' flexDirection='column' alignItems='center' p={5}>
-        <Typography mb={5} variant='h5'>
-          IMPORTANT NOTES
+        <Typography mb={5} variant='h5' textTransform="uppercase">
+          {TranslateString("Important Notes")}
         </Typography>
         <InputUnstyled
           slots={{ textarea: StyledTextareaElement }}
           multiline
-          placeholder='CONTENT (NOTES OR DESCRIPTION)'
+          placeholder={TranslateString("Notes")}
         />
         <Box mt={5}>
-          <Button style={{ marginRight: 20 }} variant='contained' onClick={handleClose}>
-            BACK
+          <Button style={{ marginRight: 20, textTransform: "uppercase" }} variant='contained' onClick={handleClose}>
+            {TranslateString("Back")}
           </Button>
-          <Button style={{ marginLeft: 20 }} variant='contained'>
-            UPDATE
+          <Button style={{ marginLeft: 20, textTransform: "uppercase" }} variant='contained'>
+            {TranslateString("Update")}
           </Button>
         </Box>
       </Box>

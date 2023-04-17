@@ -8,6 +8,8 @@ import { DataGrid } from '@mui/x-data-grid'
 // ** Other Imports
 import SelectFeedsModal from '../components/modal/SelectFeedsModal'
 import CreateFeedModal from '../components/modal/CreateFeedModal'
+import TranslateString from '@/utils/TranslateString'
+import Translations from '@/layouts/components/Translations'
 
 // ** Style Imports
 
@@ -76,14 +78,14 @@ const feedFeatureRows = [
 ]
 
 const feedFeatureColumns = [
-  { field: 'title', headerName: 'Title', width: 200 },
-  { field: 'MobileNumber', headerName: 'Mobile Number', width: 200 },
-  { field: 'Email', headerName: 'Email', width: 200 },
-  { field: 'dateCreated', headerName: 'Date Created', width: 250 },
-  { field: 'lastLogIn', headerName: 'Last Log In', width: 250 },
+  { field: 'title', headerName: <Translations text='Title'/>, width: 200 },
+  { field: 'MobileNumber', headerName: <Translations text='Mobile Number' />, width: 200 },
+  { field: 'Email', headerName: <Translations text='Email' />, width: 200 },
+  { field: 'dateCreated', headerName: <Translations text='Date Created' />, width: 250 },
+  { field: 'lastLogIn', headerName: <Translations text='Last Login' />, width: 250 },
   {
     field: 'action',
-    headerName: 'Action',
+    headerName: <Translations text='Action' />,
     width: 100,
     renderCell: () => (
       <Box>
@@ -93,7 +95,7 @@ const feedFeatureColumns = [
   },
   {
     field: 'status',
-    headerName: 'Status',
+    headerName: <Translations text='Status' />,
     width: 100,
     renderCell: () => (
       <Box>
@@ -118,16 +120,16 @@ const FeedFeatures = () => {
         <Card>
           <Box sx={styles.header}>
             <Box sx={styles.feeds}>
-              <Typography sx={styles.feedText}>Feed Features</Typography>
+              <Typography sx={styles.feedText}>{TranslateString("Feed Features")}</Typography>
             </Box>
 
             <Box sx={styles.buttonContainer}>
               <Button sx={styles.button} onClick={() => handleModalToggle('select')}>
-                Select Featured Feeds
+                {TranslateString("Select Featured Feeds")}
               </Button>
 
               <Button sx={styles.button} onClick={() => handleModalToggle('create')}>
-                Create Feed
+                {TranslateString("Create Feed")}
               </Button>
             </Box>
           </Box>

@@ -23,6 +23,8 @@ import ContentService from '@/services/api/ContentService'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import TranslateString from '@/utils/TranslateString'
+
 
 // ** renders client column
 const renderClient = (params: GridRenderCellParams) => {
@@ -96,7 +98,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.1,
       minWidth: 150,
       field: 'video_thumbnail',
-      headerName: 'Video Thumbnail',
+      headerName: TranslateString("Video Thumbnail"),
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
@@ -107,7 +109,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.15,
       minWidth: 150,
       field: 'full_name',
-      headerName: 'Content Creator',
+      headerName: TranslateString("Content Creator"),
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -123,7 +125,7 @@ const ContentTable = (props: IContentTable) => {
     {
       flex: 0.1,
       minWidth: 120,
-      headerName: 'Title',
+      headerName: TranslateString("Title"),
       field: 'title',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -136,7 +138,7 @@ const ContentTable = (props: IContentTable) => {
       minWidth: 110,
       field: 'video_url',
       align: 'center',
-      headerName: 'Video URL',
+      headerName: TranslateString("Video") + " " + TranslateString("URL"),
       renderCell: (params: GridRenderCellParams) => (
         <>
           <Icon
@@ -151,7 +153,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.13,
       minWidth: 140,
       field: 'tags',
-      headerName: 'Tags',
+      headerName: TranslateString("Tags"),
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.tags.join(', ')}
@@ -162,7 +164,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.1,
       minWidth: 140,
       field: 'last_update',
-      headerName: 'Last Update',
+      headerName: TranslateString("Last Update"),
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {formatDate(params.row.updated_at)}
@@ -173,7 +175,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.01,
       minWidth: 140,
       field: 'status',
-      headerName: 'Status',
+      headerName: TranslateString("Status"),
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams) => {
@@ -184,7 +186,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.06,
       minWidth: 50,
       field: 'actions',
-      headerName: 'View',
+      headerName: TranslateString("View"),
       align: 'center',
       renderCell: (params: GridRenderCellParams) => {
         return <ContentDialog param={params.row} />
@@ -200,7 +202,7 @@ const ContentTable = (props: IContentTable) => {
   return (
     <>
       <Card>
-        <CardHeader title='THE STUDIO PAGE - CONTENT APPROVAL' />
+        <CardHeader sx={{textTransform:"uppercase"}} title={TranslateString("The Studio Page") + " - " + TranslateString("Content Approval")}/>
         <DataGrid
           loading={isLoading || isRefetching}
           getRowId={row => row._id}

@@ -10,11 +10,12 @@ import formatDate from '@/utils/formatDate'
 import Transaction from '@/pages/transactions'
 import TransactionsService from '@/services/api/Transactions'
 import TranslateString from '@/utils/TranslateString'
+import Translations from '@/layouts/components/Translations'
 
 const columnData = [
   {
     field: 'content_creator',
-    headerName: 'Content Creator',
+    headerName: <Translations text='Content Creator'/>,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -25,7 +26,7 @@ const columnData = [
   },
   {
     field: 'customer',
-    headerName: 'Customer',
+    headerName: <Translations text='Customer'/>,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -36,7 +37,7 @@ const columnData = [
   },
   {
     field: 'site',
-    headerName: 'Site Name',
+    headerName: <Translations text='Site Name'/>,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -47,7 +48,7 @@ const columnData = [
   },
   {
     field: 'coin_amount',
-    headerName: 'Amount (Coin)',
+    headerName: <Translations text='Amount (Gold)'/>,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -58,7 +59,7 @@ const columnData = [
   },
   {
     field: 'money_amount',
-    headerName: 'Amount (Money)',
+    headerName: <Translations text='Amount (CNY)'/>,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -69,7 +70,7 @@ const columnData = [
   },
   {
     field: 'created_at',
-    headerName: 'Date Created',
+    headerName: <Translations text='Date Created'/>,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -80,7 +81,7 @@ const columnData = [
   },
   {
     field: 'updated_at',
-    headerName: 'Last Update',
+    headerName: <Translations text='Last Update'/>,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -106,6 +107,7 @@ const useDebounce = (value: any, delay: number) => {
 
   return debouncedValue
 }
+
 
 function index() {
   const [contentCreator, setContentCreator] = useState('')

@@ -29,6 +29,8 @@ import VideoService from '@/services/api/VideoService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircularProgress } from '@mui/material'
 
+import TranslateString from '@/utils/TranslateString'
+
 interface SidebarEditVideoType {
   open: boolean
   toggle: () => void
@@ -197,7 +199,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
             <FormControl fullWidth sx={{ mb: 6 }}>
               <TextField
                 {...register('title')}
-                label='Title'
+                label={TranslateString('Title')}
                 placeholder='Title'
                 defaultValue={row.title}
                 error={Boolean(errors.title)}
@@ -207,7 +209,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
             <FormControl fullWidth sx={{ mb: 6 }}>
               <TextField
                 {...register('description')}
-                label='Description'
+                label={TranslateString('Description')}
                 placeholder='Description'
                 defaultValue={row.description}
                 error={Boolean(errors.description)}
@@ -218,7 +220,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
               {errors.tags && <p style={{ color: 'red' }}>{errors.tags.message}</p>}
               <TextField
                 sx={{ mb: 5 }}
-                placeholder='Type your tag then press enter'
+                placeholder={TranslateString('Type your tag then press enter')}
                 {...register('tagTextField')}
                 onKeyDown={e => {
                   handleTagPressEnter(e)
@@ -242,7 +244,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 sx={{ mr: 3 }}
                 disabled={isEditLoading ? true : false}
               >
-                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} Submit
+                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString("Submit")}
               </Button>
               <Button
                 disabled={isEditLoading ? true : false}
@@ -251,7 +253,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 color='secondary'
                 onClick={handleClose}
               >
-                Cancel
+                {TranslateString("Cancel")}
               </Button>
             </Box>
           </form>

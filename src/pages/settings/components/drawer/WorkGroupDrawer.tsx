@@ -32,6 +32,7 @@ import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
 import TranslateString from '@/utils/TranslateString'
+import Translations from '@/layouts/components/Translations'
 
 const navData = [
   {
@@ -104,12 +105,12 @@ const templateData = [
   }
 ]
 
-const columns: GridColumns = [
+const columns = [
   {
     flex: 0.02,
     minWidth: 70,
     field: 'thumbnail_url',
-    headerName: 'Video Thumbnail',
+    headerName: <Translations text='Video Thumbnail'/>,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => {
       return (
@@ -127,7 +128,7 @@ const columns: GridColumns = [
   {
     flex: 0.02,
     minWidth: 90,
-    headerName: 'Content Creator',
+    headerName: <Translations text='Content Creator'/>,
     field: 'content_creator',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -140,7 +141,7 @@ const columns: GridColumns = [
     flex: 0.03,
     minWidth: 60,
     field: 'title',
-    headerName: 'Title',
+    headerName: <Translations text='Title' />,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>

@@ -16,6 +16,8 @@ import { useUsersTable } from '@/services/api/useUsersTable'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { GridRenderCellParams } from '@mui/x-data-grid'
+import TranslateString from '@/utils/TranslateString'
+import Translations from '@/layouts/components/Translations'
 
 interface ToggleViewProps {
   data: any
@@ -34,12 +36,12 @@ const ToggleView: React.FC<ToggleViewProps> = ({ data }) => {
 export const AlbumColumns = [
   {
     field: 'title',
-    headerName: 'Title',
+    headerName: <Translations text='Title' />,
     width: 400
   },
   {
     field: 'created_at',
-    headerName: 'Date Created',
+    headerName: <Translations text='Date Created' />,
     width: 250,
     valueFormatter: (params: any) => {
       return formatDate(params?.value)
@@ -47,7 +49,7 @@ export const AlbumColumns = [
   },
   {
     field: 'updated_at',
-    headerName: 'Last Updated',
+    headerName: <Translations text='Last Update' />,
     width: 250,
     valueFormatter: (params: any) => {
       return formatDate(params?.value)
@@ -55,7 +57,7 @@ export const AlbumColumns = [
   },
   {
     field: 'cover',
-    headerName: 'Cover Photo',
+    headerName: <Translations text='Cover Photo' />,
     width: 250,
     renderCell: (params: GridRenderCellParams) => {
       return (
@@ -72,7 +74,7 @@ export const AlbumColumns = [
   },
   {
     field: 'album',
-    headerName: 'Gallery',
+    headerName: <Translations text='Gallery' />,
     width: 100,
     renderCell: (params: GridRenderCellParams) => {
       return <ToggleView data={params.row._id} />
