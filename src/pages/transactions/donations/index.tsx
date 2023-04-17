@@ -108,7 +108,6 @@ const useDebounce = (value: any, delay: number) => {
   return debouncedValue
 }
 
-
 function index() {
   const [contentCreator, setContentCreator] = useState('')
   const [customer, setCustomer] = useState('')
