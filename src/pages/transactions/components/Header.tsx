@@ -1,3 +1,4 @@
+import TranslateString from '@/utils/TranslateString'
 import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import React, { useState } from 'react'
 
@@ -28,11 +29,11 @@ function Header({}: Props) {
   return (
     <Box mb={5}>
       <Typography variant='h4' component='h4'>
-        Transactions
+        {TranslateString("Transactions")}
       </Typography>
       <Box mt={5} width={300}>
         <FormControl fullWidth size='small'>
-          <InputLabel id='demo-simple-select-label'>Select Super Agent</InputLabel>
+          <InputLabel id='demo-simple-select-label'>{TranslateString("Select Super Agent")}</InputLabel>
           <Select
             labelId='demo-simple-select-label'
             id='demo-simple-select'

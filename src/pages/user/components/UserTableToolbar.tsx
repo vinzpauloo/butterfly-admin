@@ -12,6 +12,8 @@ import { CardHeader } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import ExportButton from './button/ExportButton'
 
+import TranslateString from '@/utils/TranslateString'
+
 interface Props {
   usernameValue: string
   emailValue: string
@@ -34,7 +36,7 @@ const UserTableToolbar = (props: Props) => {
     >
       <Box>
         <CardHeader
-          title='Search Filters'
+          title={TranslateString("Search") + " " + TranslateString("Filters")}
           sx={{
             margin: 0,
             padding: 0
@@ -57,7 +59,7 @@ const UserTableToolbar = (props: Props) => {
           size='small'
           value={props.emailValue ?? ''}
           onChange={props.onEmailChange}
-          placeholder='Search email…'
+          placeholder={TranslateString("Search") + " " + TranslateString("Email") + "..."}
           InputProps={{
             startAdornment: (
               <Box sx={{ mr: 2, display: 'flex' }}>
@@ -89,7 +91,7 @@ const UserTableToolbar = (props: Props) => {
           size='small'
           value={props.mobileValue ?? ''}
           onChange={props.onMobileChange}
-          placeholder='Search mobile number…'
+          placeholder={TranslateString("Search") + " " + TranslateString("Mobile Number") + "..." }
           InputProps={{
             startAdornment: (
               <Box sx={{ mr: 2, display: 'flex' }}>
@@ -119,7 +121,7 @@ const UserTableToolbar = (props: Props) => {
           size='small'
           value={props.usernameValue ?? ''}
           onChange={props.onUsernameChange}
-          placeholder='Search User…'
+          placeholder={TranslateString("Search") + " " + TranslateString("Users") + "..."}
           InputProps={{
             startAdornment: (
               <Box sx={{ mr: 2, display: 'flex' }}>
@@ -167,7 +169,7 @@ const UserTableToolbar = (props: Props) => {
             role_id={props.role_id}
           />
           <Button onClick={() => props.toggle(props.role)} variant='contained'>
-            Add User
+            { TranslateString("Add") + " " + TranslateString("User")}
           </Button>
         </Box>
       </Box>

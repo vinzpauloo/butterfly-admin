@@ -18,6 +18,7 @@ import UserTableToolbar from './UserTableToolbar'
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
+import TranslateString from '@/utils/TranslateString'
 
 // ** Hooks
 import { useUsersTable } from '../../../services/api/useUsersTable'
@@ -27,6 +28,7 @@ import { useQuery } from '@tanstack/react-query'
 import { operatorColumns } from '@/data/OperatorColumns'
 import { superAgentColumns } from '@/data/SuperAgentColumns'
 import { contentCreatorColumns } from '@/data/ContentCreatorColumns'
+
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -239,7 +241,7 @@ const UserTable = () => {
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
                       <Icon fontSize={20} icon='mdi:account-outline' />
-                      Operators
+                      {TranslateString("Operators")}
                     </Box>
                   }
                 />
@@ -248,7 +250,7 @@ const UserTable = () => {
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
                       <Icon fontSize={20} icon='mdi:lock-outline' />
-                      Super Agent
+                      {TranslateString("Super Agent")}
                     </Box>
                   }
                 />
@@ -257,7 +259,7 @@ const UserTable = () => {
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
                       <Icon fontSize={20} icon='mdi:bookmark-outline' />
-                      Content Creator
+                      {TranslateString("Content Creator")}
                     </Box>
                   }
                 />
