@@ -20,7 +20,7 @@ function ShowWithdrawDrawer({ open, setOpen }: any) {
           <Typography color='#FFF'>Withdraw Request</Typography>
           <Typography color='#FFF'>Ticket Nos.: 000123</Typography>
         </Box>
-        <Box mt={2} p={2} style={styles.donation}>
+        <Box mt={2} p={2} sx={styles.donation}>
           <Typography variant='h6'>DONATIONS RECORD</Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -89,13 +89,13 @@ function ShowWithdrawDrawer({ open, setOpen }: any) {
             DONATION TOTAL: Y20,550
           </Typography>
         </Box>
-        <Box mt={2} p={2} style={styles.donation}>
+        <Box mt={2} p={2} sx={styles.donation}>
           <Typography variant='h6'>TOTAL AMOUNT TO WITHDRAW</Typography>
           <Box mt={2} style={{ border: '1px solid #000', borderRadius: 10 }} px={3}>
             <Typography variant='h4'>Y41,100 CNY</Typography>
           </Box>
         </Box>
-        <Box mt={2} p={2} style={styles.donation}>
+        <Box mt={2} p={2} sx={styles.donation}>
           <Typography variant='h6'>NOTES</Typography>
           <Box mt={2} style={{ border: '1px solid #000', borderRadius: 10 }} px={3}>
             <Typography variant='body1' p={2} align='center'>
@@ -106,7 +106,7 @@ function ShowWithdrawDrawer({ open, setOpen }: any) {
             </Typography>
           </Box>
         </Box>
-        <Box mt={2} p={2} style={styles.donation}>
+        <Box mt={2} p={2} sx={styles.donation}>
           <Typography>ACTION</Typography>
           <Box mt={2} display='flex' alignItems='center' justifyContent='space-evenly' width='100%'>
             <Button variant='contained' color='warning'>
