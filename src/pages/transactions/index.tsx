@@ -8,12 +8,9 @@ import TabLists from '@/pages/transactions/components/TabLists'
 
 import { useRouter } from 'next/router'
 
-function index({ rowData, columnData }: any) {
+function index({ isLoading, isFetching, rowData, columnData, rowCount, pageSize, setPage, setOpen = null }: any) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<any>('donations')
-
-  // @ts-ignore
-  // const { rowData, columnData } = TabsSampleData[activeTab]
 
   useEffect(() => {
     const path = router.pathname.split('/')
@@ -24,8 +21,16 @@ function index({ rowData, columnData }: any) {
   return (
     <Container>
       <Header />
-      <TabLists activeTab={activeTab} setActiveTab={setActiveTab} />
-      <Table rowData={rowData} columnData={columnData} />
+      <TabLists activeTab={activeTab} setActiveTab={setActiveTab} setOpen={setOpen} />
+      <Table
+        isLoading={isLoading}
+        isFetching={isFetching}
+        rowData={rowData}
+        columnData={columnData}
+        rowCount={rowCount}
+        pageSize={pageSize}
+        setPage={setPage}
+      />
     </Container>
   )
 }

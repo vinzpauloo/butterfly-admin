@@ -1,121 +1,126 @@
-import React from 'react'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
+import TransactionsService from '@/services/api/Transactions'
+import { useQuery } from '@tanstack/react-query'
+import { GridRenderCellParams } from '@mui/x-data-grid'
+import { Typography } from '@mui/material'
+import formatDate from '@/utils/formatDate'
 
-const rowData = [
-  {
-    id: 1,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 2,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 3,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 4,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 5,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 6,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 7,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 8,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 9,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 10,
-    contentCreator: 'Syaoran Taio',
-    customer: '阿蕾克三',
-    siteName: 'Sugar Honey Pop',
-    amountGold: '2,543 Golds',
-    amountCNY: '2,543 RMB',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  }
-]
 const columnData = [
-  { field: 'contentCreator', headerName: 'Content Creator', width: 193, sortable: false },
-  { field: 'customer', headerName: 'Customer', width: 193, sortable: false },
-  { field: 'siteName', headerName: 'Site Name', width: 193, sortable: false },
-  { field: 'amountGold', headerName: 'Amount (Gold)', width: 193, sortable: false },
-  { field: 'amountCNY', headerName: 'Amount (CNY)', width: 193, sortable: false },
-  { field: 'dateCreated', headerName: 'Date Created', width: 193, sortable: false },
-  { field: 'lastUpdate', headerName: 'Last Update', width: 193, sortable: false }
+  {
+    field: 'content_creator',
+    headerName: 'Content Creator',
+    width: 193,
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {params.row.users.username}
+      </Typography>
+    )
+  },
+  {
+    field: 'customer',
+    headerName: 'Customer',
+    width: 193,
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {params.row.customers.username}
+      </Typography>
+    )
+  },
+  {
+    field: 'site',
+    headerName: 'Site Name',
+    width: 193,
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {params.row.sites.name}
+      </Typography>
+    )
+  },
+  {
+    field: 'coin_amount',
+    headerName: 'Amount (Coin)',
+    width: 193,
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {params.row.coin_amount}
+      </Typography>
+    )
+  },
+  {
+    field: 'money_amount',
+    headerName: 'Amount (Money)',
+    width: 193,
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {params.row.money_amount}
+      </Typography>
+    )
+  },
+  {
+    field: 'created_at',
+    headerName: 'Date Created',
+    width: 193,
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {formatDate(params.row.created_at)}
+      </Typography>
+    )
+  },
+  {
+    field: 'updated_at',
+    headerName: 'Last Update',
+    width: 193,
+    sortable: false,
+    renderCell: (params: GridRenderCellParams) => (
+      <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {formatDate(params.row.updated_at)}
+      </Typography>
+    )
+  }
 ]
 
 function index() {
-  return <Transaction rowData={rowData} columnData={columnData} />
+  const [data, setData] = useState([])
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [rowCount, setRowCount] = useState(0)
+  const { getDonations } = TransactionsService()
+
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['donations', page],
+    queryFn: () => getDonations({ data: { with: 'users,customers,sites', page: page } }),
+    onSuccess: data => {
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+    },
+    onError: error => {
+      console.log('Transactions Donations Tab', error)
+    }
+  })
+
+  return (
+    <Transaction
+      isLoading={isLoading}
+      isFetching={isFetching}
+      rowData={data}
+      columnData={columnData}
+      rowCount={rowCount}
+      pageSize={pageSize}
+      setPage={setPage}
+    />
+  )
 }
 
 export default index

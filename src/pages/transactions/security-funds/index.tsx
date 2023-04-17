@@ -131,7 +131,7 @@ function index() {
 
   return (
     <>
-      <Transaction rowData={rowData} columnData={columnData} />
+      <Transaction rowData={rowData} columnData={columnData} setOpen={setOpen} />
       {open ? <EditDrawer open={open} setOpen={setOpen} /> : null}
     </>
   )

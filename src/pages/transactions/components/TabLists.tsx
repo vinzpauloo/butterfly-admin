@@ -10,7 +10,6 @@ import TabListData from '@/data/TabLists'
 import TranslateString from '@/utils/TranslateString'
 import Translations from '@/layouts/components/Translations'
 
-
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
     display: 'none'
@@ -31,7 +30,7 @@ const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   }
 }))
 
-function TabLists({ activeTab, setActiveTab }: any) {
+function TabLists({ activeTab, setActiveTab, setOpen }: any) {
   const router = useRouter()
   const handleChange = (event: any, value: string) => {
     setActiveTab(value)
@@ -68,10 +67,10 @@ function TabLists({ activeTab, setActiveTab }: any) {
         </TabList>
       </TabContext>
       <Box display={'flex'} flexDirection='column'>
-        <OutlinedInput style={{ marginBottom: '10px' }} placeholder={TranslateString("Search")} size='small' />
+        <OutlinedInput style={{ marginBottom: '10px' }} placeholder={TranslateString('Search')} size='small' />
         {haveAddMore ? (
-          <Button style={{ marginBottom: '10px' }} size='small' variant='contained'>
-            <Translations text="Add More"/>
+          <Button style={{ marginBottom: '10px' }} size='small' variant='contained' onClick={() => setOpen(true)}>
+            <Translations text='Add More' />
           </Button>
         ) : null}
       </Box>
