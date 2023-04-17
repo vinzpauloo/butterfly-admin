@@ -21,6 +21,7 @@ export const CreateAccount = () => {
     return request({
       headers: {
         ...getHeaders(),
+        'Content-Type': 'multipart/form-data',
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },

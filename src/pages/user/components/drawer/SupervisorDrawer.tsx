@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import { Radio, RadioGroup, Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
@@ -138,9 +138,13 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
     return errorElements
   }
 
+  const [resetKey, setResetKey] = useState(0)
+
   const handleClose = () => {
-    toggle()
     resetForm()
+    setResetKey(prevKey => prevKey + 1)
+    setResponseError({})
+    toggle()
   }
 
   return (
@@ -161,7 +165,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            <form onSubmit={handleSubmit(handleFormSubmit)}>
+            <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.header}>
                 <Controller
                   name='role_id'
