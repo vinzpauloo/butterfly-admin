@@ -15,40 +15,12 @@ import { useQuery } from '@tanstack/react-query'
 import FeedsService from '@/services/api/FeedsService'
 
 // ** Types Imports
-import { ThemeColor } from 'src/@core/layouts/types'
 import { IFeedStory } from '@/context/types'
 import { GridSortDirection } from '@mui/x-data-grid'
 import TableNewsFeedApproval from '../views/TableNewsFeedApproval'
 
 // ** Custom Hooks
 import useDebounce from '@/hooks/useDebounce'
-
-
-interface StatusObj {
-  [key: number]: {
-    title: string
-    color: ThemeColor
-  }
-}
-interface FeedsObj {
-  [key: number]: {
-    title: string
-    iconPath: string
-  }
-}
-
-
-
-const statusObj: StatusObj = {
-  1: { title: 'pending', color: 'warning' },
-  2: { title: 'declined', color: 'error' }
-}
-
-const feedsObj: FeedsObj = {
-  1: { title: 'Story', iconPath: '/images/feeds/storyIcon.png' },
-  2: { title: 'Videos', iconPath: '/images/feeds/videoIcon.png' },
-  3: { title: 'Photos', iconPath: '/images/feeds/photoIcon.png' }
-}
 
 
 const NewsFeedApproval = () => {
@@ -153,17 +125,18 @@ const NewsFeedApproval = () => {
               </Button>
 
               <Button size='small' variant='outlined' onClick={() => handleFilterButtonClick('photos_videos')}>
-                Videos With handleFilterButtonClick
+                Videos and Photos
               </Button>
             </Box>
           }
         />
         <TableNewsFeedApproval 
-          isLoading={getFeedQuery.isLoading} 
+          isLoading={getFeedQuery.isLoading || getFeedQuery.isFetching} 
           rowCount={total}
           rows={rowData} 
-          pageSize={pageSize}
-          setPageSize={setPageSize}
+          pageSize={paginate}
+          setPageSize={setPaginate}
+          searchText={searchText}
           setSearchText={setSearchText}
           handlePageChange={ handlePageChange }
           handleSetSort={handleSetSort}

@@ -10,7 +10,11 @@ interface IGetFeedsParams {
   story_feeds_only? : boolean,
   video_only? : boolean,
   with? : string,
-  page? : number
+  page? : number,
+  paginate? : number,
+  sort? : 'desc' | 'asc',
+  sortBy : any, // returned columns of GET admin/feeds
+  all? : boolean
 }
 
 
