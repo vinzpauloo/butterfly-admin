@@ -43,28 +43,41 @@ interface FormValues {
   logo: File | null
   amount: number
   user_note: string
+  note: string
 }
 
 const schema = yup.object().shape({
-  username: yup.string().min(7, 'Username must be at least 7 characters').required(),
-  password: yup.string().min(7, 'Password must be at least 7 characters').required(),
+  username: yup.string().min(7, 'Username must be at least 7 characters').required('Username is required'),
+  password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
   password_confirmation: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Confirm Password is required.'),
+    .required('Password confirmation is required'),
   mobile: yup
     .string()
-    .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number')
-    .required(),
-  email: yup.string().email().required('Email is required.'),
-  partner_name: yup.string().required('Company Name is required.'),
-  partner_code: yup.string().required('Company Code is required.'),
-  partner_note: yup.string().min(3, 'Note must be at least 3 characters').required(),
-  currency_id: yup.string().required(),
-  language_id: yup.string().required(),
-  site_name: yup.string().required(),
-  description: yup.string().min(3, 'Description must be at least 3 characters').required(),
-  user_note: yup.string().min(3, 'Description must be at least 3 characters').required()
+    .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number, format should be (09/+639)')
+    .required('Mobile number is required'),
+  email: yup.string().email('Invalid email address').required('Email address is required'),
+  partner_name: yup
+    .string()
+    .min(3, 'Company Name must be at least 3 characters.')
+    .required('Company Name is required.'),
+  partner_code: yup
+    .string()
+    .min(3, 'Company Code must be at least 3 characters.')
+    .required('Company Code is required.'),
+  partner_note: yup
+    .string()
+    .min(3, 'Note must be at least 3 characters')
+    .required('Notes is required. (Company notes)'),
+  currency_id: yup.string().required('Please choose a currency.'),
+  language_id: yup.string().required('Please choose a language.'),
+  site_name: yup.string().min(3, 'Site Name must be at least 3 characters.').required('Site name is required.'),
+  description: yup.string().min(3, 'Description must be at least 3 characters').required('Description is required.'),
+  user_note: yup
+    .string()
+    .min(3, 'Notes(For Approval) must be at least 3 characters')
+    .required('Notes(For Approval) is required.')
 })
 interface SidebarAddUserType {
   open: boolean
@@ -87,24 +100,7 @@ const SADrawer = (props: SidebarAddUserType) => {
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
-  const [formValue, setFormValue] = useState<FormValues>({
-    role_id: '4',
-    username: '',
-    password: '',
-    password_confirmation: '',
-    mobile: '',
-    email: '',
-    partner_name: '',
-    partner_code: '',
-    partner_note: '',
-    currency_id: '',
-    language_id: '',
-    site_name: '',
-    description: '',
-    logo: null,
-    amount: 0,
-    user_note: ''
-  })
+
   const fileInputRef: any = useRef(null)
   const handleUploadBtnClick = () => {
     fileInputRef.current.click()
@@ -113,31 +109,33 @@ const SADrawer = (props: SidebarAddUserType) => {
 
   const {
     control,
-    register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<FormValues>({
     resolver: yupResolver(schema)
   })
 
-  const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = event.target
-
-    if (name === 'logo' && files) {
-      const file = files[0]
-      if (file) {
-        setFileName(file.name)
-        setFormValue(prevState => ({
-          ...prevState,
-          [name]: file
-        }))
-      }
-    } else {
-      setFormValue(prevState => ({
-        ...prevState,
-        [name]: value
-      }))
-    }
+  const resetForm = () => {
+    reset({
+      role_id: '4',
+      username: '',
+      password: '',
+      password_confirmation: '',
+      mobile: '',
+      email: '',
+      partner_name: '',
+      partner_code: '',
+      partner_note: '',
+      currency_id: '',
+      language_id: '',
+      site_name: '',
+      description: '',
+      logo: null,
+      amount: 0,
+      user_note: '',
+      note: ''
+    })
   }
 
   const { createUser, getLanguages, getCurrency } = CreateAccount()
@@ -148,16 +146,31 @@ const SADrawer = (props: SidebarAddUserType) => {
     return value instanceof File
   }
 
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (data: FormValues) => {
     const formData = new FormData()
-    for (const key in formValue) {
-      const value = formValue[key]
+
+    /* Iterates through 'formValue' to check if the key is 'logo' and if the value is a file. */
+    for (const key in data) {
+      const value = data[key]
+
+      /* If true, it appends the file to the 'FormData' object with the key and the file name. */
       if (key === 'logo' && isFile(value)) {
         formData.append(key, value, value.name)
+
+        /* If the key is 'amount', parse the value as a number and append it to the `FormData` object with the key. */
+      } else if (key === 'amount' && value) {
+        formData.append(key, Number(value).toString())
+
+        /* If the value is a string
+    or a number, it appends the value as a string to the `FormData` object with the key. */
       } else if (typeof value === 'string' || typeof value === 'number') {
         formData.append(key, value.toString())
       }
     }
+
+    //These are currently required by backend, not visible in UI
+    formData.append('role_id', '4')
+    formData.append('note', 'For approval')
 
     const form: any = {
       data: formData
@@ -169,25 +182,10 @@ const SADrawer = (props: SidebarAddUserType) => {
 
       setTimeout(() => {
         toggle()
+        resetForm()
+        setFileName('')
+        setResponseError({})
         setSubmitted(false)
-        setFormValue({
-          role_id: '4',
-          username: '',
-          password: '',
-          password_confirmation: '',
-          mobile: '',
-          email: '',
-          partner_name: '',
-          partner_code: '',
-          partner_note: '',
-          currency_id: '',
-          language_id: '',
-          site_name: '',
-          description: '',
-          logo: null,
-          amount: 0,
-          user_note: ''
-        })
 
         // Re-fetches UserTable and CSV exportation
         queryClient.invalidateQueries({ queryKey: ['allUsers'] })
@@ -201,20 +199,13 @@ const SADrawer = (props: SidebarAddUserType) => {
     }
   }
 
-  const {} = useQueries({
+  useQueries({
     queries: [
       {
         queryKey: ['Languages'],
         queryFn: getLanguages,
         onSuccess: (data: any) => {
           setLanguages(data?.data)
-
-          if (data?.data && data?.data.length > 0 && !formValue.language_id) {
-            setFormValue(prevState => ({
-              ...prevState,
-              language_id: data?.data[0]?.code
-            }))
-          }
         }
       },
       {
@@ -222,13 +213,6 @@ const SADrawer = (props: SidebarAddUserType) => {
         queryFn: getCurrency,
         onSuccess: (data: any) => {
           setCurrencies(data?.data)
-
-          if (data?.data && data?.data.length > 0 && !formValue.currency_id) {
-            setFormValue(prevState => ({
-              ...prevState,
-              currency_id: data?.data[0]?.code
-            }))
-          }
         }
       }
     ]
@@ -253,8 +237,14 @@ const SADrawer = (props: SidebarAddUserType) => {
     return errorElements
   }
 
+  const [resetKey, setResetKey] = useState(0)
+
   const handleClose = () => {
     toggle()
+    resetForm()
+    setResetKey(prevKey => prevKey + 1)
+    setFileName('')
+    setResponseError({})
   }
 
   return (
@@ -275,133 +265,186 @@ const SADrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            <form onSubmit={handleSubmit(handleFormSubmit)}>
+            <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Company Name'
-                    variant='outlined'
-                    fullWidth
-                    {...register('partner_name')}
-                    error={!!errors.partner_name}
-                    helperText={errors.partner_name?.message}
-                    value={formValue.partner_name}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='partner_name'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Company Name'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.partner_name}
+                        helperText={errors.partner_name?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='partner_name'
+                      />
+                    )}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Company Code'
-                    variant='outlined'
-                    fullWidth
-                    {...register('partner_code')}
-                    error={!!errors.partner_code}
-                    helperText={errors.partner_code?.message}
-                    value={formValue.partner_code}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='partner_code'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Company Code'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.partner_code}
+                        helperText={errors.partner_code?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='partner_code'
+                      />
+                    )}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Username'
-                    variant='outlined'
-                    fullWidth
-                    {...register('username')}
-                    error={!!errors.username}
-                    helperText={errors.username?.message}
-                    value={formValue.username}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='username'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Entire Desired Username'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.username}
+                        helperText={errors.username?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='username'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Enter Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password')}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    value={formValue.password}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Entire Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='password'
+                        type='password'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Re-enter Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password_confirmation')}
-                    error={!!errors.password_confirmation}
-                    helperText={errors.password_confirmation?.message}
-                    value={formValue.password_confirmation}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password_confirmation'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Re-enter Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password_confirmation}
+                        helperText={errors.password_confirmation?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='password_confirmation'
+                        type='password'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Mobile No.'
-                    variant='outlined'
-                    fullWidth
-                    {...register('mobile')}
-                    error={!!errors.mobile}
-                    helperText={errors.mobile?.message}
-                    value={formValue.mobile}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='mobile'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Mobile No.'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.mobile}
+                        helperText={errors.mobile?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        onKeyPress={e => {
+                          // Allow only numbers and the '+' symbol
+                          if (!/[0-9+]/.test(e.key)) {
+                            e.preventDefault()
+                          }
+                        }}
+                        name='mobile'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Email Address'
-                    variant='outlined'
-                    fullWidth
-                    {...register('email')}
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
-                    value={formValue.email}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='email'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Email Address'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='email'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Notes'
-                    variant='outlined'
-                    fullWidth
-                    multiline
-                    rows={4}
-                    {...register('partner_note')}
-                    error={!!errors.partner_note}
-                    helperText={errors.partner_note?.message}
-                    value={formValue.partner_note}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='partner_note'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Notes'
+                        variant='outlined'
+                        fullWidth
+                        multiline
+                        rows={4}
+                        error={!!errors.partner_note}
+                        helperText={errors.partner_note?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='partner_note'
+                      />
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Please input site name'
-                    variant='outlined'
-                    fullWidth
-                    {...register('site_name')}
-                    error={!!errors.site_name}
-                    helperText={errors.site_name?.message}
-                    value={formValue.site_name}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='site_name'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Please input site name'
+                        variant='outlined'
+                        fullWidth
+                        multiline
+                        rows={4}
+                        error={!!errors.site_name}
+                        helperText={errors.site_name?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='site_name'
+                      />
+                    )}
                   />
                 </Box>
 
@@ -409,22 +452,17 @@ const SADrawer = (props: SidebarAddUserType) => {
                   <Controller
                     name='currency_id'
                     control={control}
-                    rules={{ required: true }}
-                    defaultValue={formValue.currency_id}
                     render={({ field }) => (
                       <TextField
                         select
                         label='Choose Currency'
                         variant='outlined'
                         fullWidth
+                        error={!!errors.currency_id}
+                        helperText={errors.currency_id?.message}
                         value={field.value}
-                        onChange={e => {
-                          field.onChange(e)
-                          setFormValue(prevState => ({
-                            ...prevState,
-                            currency_id: e.target.value
-                          }))
-                        }}
+                        onChange={field.onChange}
+                        name='currency_id'
                       >
                         {currencies.map((item: any, index) => (
                           <MenuItem key={index} value={item?.id} sx={{ textTransform: 'uppercase' }}>
@@ -440,22 +478,17 @@ const SADrawer = (props: SidebarAddUserType) => {
                   <Controller
                     name='language_id'
                     control={control}
-                    rules={{ required: true }}
-                    defaultValue={formValue.language_id}
                     render={({ field }) => (
                       <TextField
                         select
                         label='Choose Language'
                         variant='outlined'
                         fullWidth
+                        error={!!errors.language_id}
+                        helperText={errors.language_id?.message}
                         value={field.value}
-                        onChange={e => {
-                          field.onChange(e)
-                          setFormValue(prevState => ({
-                            ...prevState,
-                            language_id: e.target.value
-                          }))
-                        }}
+                        onChange={field.onChange}
+                        name='language_id'
                       >
                         {languages.map((item: any, index) => (
                           <MenuItem key={index} value={item?.id} sx={{ textTransform: 'uppercase' }}>
@@ -468,81 +501,109 @@ const SADrawer = (props: SidebarAddUserType) => {
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Add Security Funds'
-                    variant='outlined'
-                    fullWidth
-                    {...register('amount')}
-                    error={!!errors.amount}
-                    helperText={errors.amount?.message}
-                    value={formValue.amount}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='amount'
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Box>
-                    <input
-                      type='file'
-                      accept='.jpg, .jpeg, .png'
-                      style={{ display: 'none' }}
-                      name='logo'
-                      id='logo'
-                      onChange={handleFormInputChange}
-                      ref={fileInputRef}
-                    />
-                    <label htmlFor='logo'>
+                    control={control}
+                    render={({ field }) => (
                       <TextField
-                        value={fileName}
-                        placeholder='Select a file'
+                        label='Add Security Funds'
                         variant='outlined'
                         fullWidth
-                        onClick={handleUploadBtnClick}
-                        InputProps={{
-                          readOnly: true,
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <Box sx={styles.upload}>
-                                <Typography sx={styles.white}>UPLOAD</Typography>
-                              </Box>
-                            </InputAdornment>
-                          )
-                        }}
+                        error={!!errors.amount}
+                        helperText={errors.amount?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='amount'
                       />
-                    </label>
-                  </Box>
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Description'
-                    variant='outlined'
-                    fullWidth
-                    multiline
-                    rows={4}
-                    {...register('description')}
-                    error={!!errors.description}
-                    helperText={errors.description?.message}
-                    value={formValue.description}
-                    onChange={handleFormInputChange}
-                    name='description'
+                    )}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Notes (For Approval)'
-                    variant='outlined'
-                    fullWidth
-                    multiline
-                    rows={4}
-                    {...register('user_note')}
-                    error={!!errors.user_note}
-                    helperText={errors.user_note?.message}
-                    value={formValue.user_note}
-                    onChange={handleFormInputChange}
+                  <Controller
+                    name='logo'
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <input
+                          type='file'
+                          accept='.jpg, .jpeg, .png'
+                          style={{ display: 'none' }}
+                          name='logo'
+                          id='logo'
+                          onChange={e => {
+                            if (e.target.files && e.target.files.length > 0) {
+                              setFileName(e.target.files[0].name)
+                              field.onChange(e.target.files[0])
+                            } else {
+                              field.onChange(null)
+                            }
+                          }}
+                          ref={fileInputRef}
+                        />
+                        <label htmlFor='logo'>
+                          <TextField
+                            value={fileName}
+                            placeholder='Select a file'
+                            variant='outlined'
+                            fullWidth
+                            onClick={handleUploadBtnClick}
+                            InputProps={{
+                              readOnly: true,
+                              endAdornment: (
+                                <InputAdornment position='end'>
+                                  <Box sx={styles.upload}>
+                                    <Typography sx={styles.white}>UPLOAD</Typography>
+                                  </Box>
+                                </InputAdornment>
+                              )
+                            }}
+                          />
+                        </label>
+                      </>
+                    )}
+                  />
+                </Box>
+
+                <Box sx={styles.fullWidth}>
+                  <Controller
+                    name='description'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Description(Mandatory)'
+                        variant='outlined'
+                        fullWidth
+                        multiline
+                        rows={4}
+                        error={!!errors.description}
+                        helperText={errors.description?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='description'
+                      />
+                    )}
+                  />
+                </Box>
+
+                <Box sx={styles.fullWidth}>
+                  <Controller
                     name='user_note'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Notes'
+                        variant='outlined'
+                        fullWidth
+                        multiline
+                        rows={4}
+                        error={!!errors.user_note}
+                        helperText={errors.user_note?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='user_note'
+                      />
+                    )}
                   />
                 </Box>
 
