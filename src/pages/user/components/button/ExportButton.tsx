@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Custom Imports
 import { saveAs } from 'file-saver'
+import TranslateString from '@/utils/TranslateString'
 
 interface Props {
   usernameValue: string
@@ -70,7 +71,7 @@ const ExportButton = (props: Props) => {
       startIcon={<Icon icon='mdi:export-variant' fontSize={20} />}
       onClick={handleExport}
     >
-      Export
+      {TranslateString("Export")}
     </Button>
   )
 }

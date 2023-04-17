@@ -1,6 +1,7 @@
 {
     "Dashboard": "仪表板",
     "Users": "用户",
+    "User": "用户",
     "Transactions": "交易",
     "Overview": "概述",
     "Reports": "报告",
@@ -202,6 +203,27 @@
     "Gold Coin": "金幣",
     "Bundle Price": "捆綁價格",
     "Bundle Description": "捆綁包說明",
-    "Features": "特徵"
+    "Features": "特徵",
+    "Donations": "捐款",
+    "Commissions": "佣金",
+    "Withdrawal": "退出",
+    "Security Funds": "保障基金",
+    "Select Super Agent": "選擇超級代理",
+    "Operators": "運營商",
+    "Operator": "運營商",
+    "Super Agent": "超級特工",
+    "Content Creator": "內容創建者",
+    "Filters": "過濾器",
+    "Email": "電子郵件",
+    "Mobile Number": "手機號碼",
+    "Supervisors": "導師",
+    "Supervisor": "導師",
+    "Enter": "進入",
+    "Username": "用戶名",
+    "Password": "密碼",
+    "Notes": "筆記",
+    "Continue": "繼續",
+    "Re-enter": "重新輸入",
+    "Export": "出口"
   }
   

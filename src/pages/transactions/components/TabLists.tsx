@@ -7,6 +7,9 @@ import { styled } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 
 import TabListData from '@/data/TabLists'
+import TranslateString from '@/utils/TranslateString'
+import Translations from '@/layouts/components/Translations'
+
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -57,7 +60,7 @@ function TabLists({ activeTab, setActiveTab }: any) {
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
                   {item.icon}
-                  {item.title}
+                  {TranslateString(item.title)}
                 </Box>
               }
             />
@@ -65,10 +68,10 @@ function TabLists({ activeTab, setActiveTab }: any) {
         </TabList>
       </TabContext>
       <Box display={'flex'} flexDirection='column'>
-        <OutlinedInput style={{ marginBottom: '10px' }} placeholder='Search' size='small' />
+        <OutlinedInput style={{ marginBottom: '10px' }} placeholder={TranslateString("Search")} size='small' />
         {haveAddMore ? (
           <Button style={{ marginBottom: '10px' }} size='small' variant='contained'>
-            Add More
+            <Translations text="Add More"/>
           </Button>
         ) : null}
       </Box>
