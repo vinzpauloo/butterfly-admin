@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
+import { Box, Button, OutlinedInput, Typography } from '@mui/material'
+import { GridRenderCellParams } from '@mui/x-data-grid'
+import { useQuery } from '@tanstack/react-query'
+
+import formatDate from '@/utils/formatDate'
 import Transaction from '@/pages/transactions'
 import TransactionsService from '@/services/api/Transactions'
-import { useQuery } from '@tanstack/react-query'
-import { GridRenderCellParams } from '@mui/x-data-grid'
-import { Typography } from '@mui/material'
-import formatDate from '@/utils/formatDate'
+import TranslateString from '@/utils/TranslateString'
 
 const columnData = [
   {
@@ -89,16 +91,48 @@ const columnData = [
   }
 ]
 
+const useDebounce = (value: any, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
 function index() {
+  const [contentCreator, setContentCreator] = useState('')
+  const [customer, setCustomer] = useState('')
+  const [sitename, setSiteName] = useState('')
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
   const { getDonations } = TransactionsService()
 
+  const filterParams = () => {
+    const userUsername = !!contentCreator && { user_username: contentCreator }
+    const customerUsername = !!customer && { customer_username: customer }
+    const siteName = !!sitename && { site_name: sitename }
+
+    return { ...userUsername, ...customerUsername, ...siteName }
+  }
+
+  const debouncedContentCreator = useDebounce(contentCreator, 1000)
+  const debouncedCustomer = useDebounce(customer, 1000)
+  const debouncedSitename = useDebounce(sitename, 1000)
+
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['donations', page],
-    queryFn: () => getDonations({ data: { with: 'users,customers,sites', page: page } }),
+    queryKey: ['donations', debouncedContentCreator, debouncedCustomer, debouncedSitename, pageSize, page],
+    queryFn: () =>
+      getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize, ...filterParams() } }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -110,6 +144,12 @@ function index() {
     }
   })
 
+  const handleClear = () => {
+    setContentCreator('')
+    setCustomer('')
+    setSiteName('')
+  }
+
   return (
     <Transaction
       isLoading={isLoading}
@@ -119,7 +159,35 @@ function index() {
       rowCount={rowCount}
       pageSize={pageSize}
       setPage={setPage}
-    />
+      setPageSize={setPageSize}
+    >
+      <Box>
+        <OutlinedInput
+          style={{ marginBottom: '10px', marginRight: '10px' }}
+          placeholder='Content Creator'
+          size='small'
+          value={contentCreator}
+          onChange={e => setContentCreator(e.target.value)}
+        />
+        <OutlinedInput
+          style={{ marginBottom: '10px', marginRight: '10px' }}
+          placeholder='Customer'
+          size='small'
+          value={customer}
+          onChange={e => setCustomer(e.target.value)}
+        />
+        <OutlinedInput
+          style={{ marginBottom: '10px', marginRight: '10px' }}
+          placeholder='Sitename'
+          size='small'
+          value={sitename}
+          onChange={e => setSiteName(e.target.value)}
+        />
+        <Button variant='contained' color='error' sx={{ width: 50 }} onClick={handleClear}>
+          {TranslateString('Clear')}
+        </Button>
+      </Box>
+    </Transaction>
   )
 }
 

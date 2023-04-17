@@ -2,7 +2,7 @@ import React from 'react'
 
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
-import { Box, Button, OutlinedInput, Tab } from '@mui/material'
+import { Box, Button, Tab } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 
@@ -67,7 +67,7 @@ function TabLists({ activeTab, setActiveTab, setOpen }: any) {
         </TabList>
       </TabContext>
       <Box display={'flex'} flexDirection='column'>
-        <OutlinedInput style={{ marginBottom: '10px' }} placeholder={TranslateString('Search')} size='small' />
+        {/* <OutlinedInput style={{ marginBottom: '10px' }} placeholder={TranslateString('Search')} size='small' /> */}
         {haveAddMore ? (
           <Button style={{ marginBottom: '10px' }} size='small' variant='contained' onClick={() => setOpen(true)}>
             <Translations text='Add More' />

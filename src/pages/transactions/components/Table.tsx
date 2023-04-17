@@ -1,26 +1,33 @@
-import { DataGrid } from '@mui/x-data-grid'
 import React from 'react'
 
-function Table({ isLoading, isFetching, rowData, columnData, rowCount, pageSize, setPage }: any) {
+import { DataGrid } from '@mui/x-data-grid'
+
+function Table({ isLoading, isFetching, rowData, columnData, rowCount, pageSize, setPage, setPageSize }: any) {
   const handlePageChange = (newPage: number) => {
     setPage(newPage + 1)
   }
 
+  const handlePageSizeChange = (pageSize: number) => {
+    setPageSize(pageSize)
+  }
+
   return (
     <DataGrid
-      loading={isLoading || isFetching}
+      autoHeight
+      columns={columnData}
       checkboxSelection={false}
       disableSelectionOnClick
-      autoHeight
-      getRowId={row => row.id}
-      rows={rowData}
-      columns={columnData}
       disableColumnMenu
-      rowCount={rowCount}
-      pageSize={pageSize}
-      paginationMode='server'
-      pagination
+      getRowId={row => row.id}
+      loading={isLoading || isFetching}
       onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
+      pageSize={pageSize}
+      pagination
+      paginationMode='server'
+      rowCount={rowCount}
+      rows={rowData}
+      rowsPerPageOptions={[10, 25, 50]}
     />
   )
 }

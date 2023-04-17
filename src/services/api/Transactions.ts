@@ -7,6 +7,10 @@ interface IDonationsParams {
   data: {
     with: string
     page: number
+    paginate: number
+    user_username?: string
+    customer_username?: string
+    site_name?: string
   }
 }
 
