@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
@@ -11,7 +11,7 @@ import { styled } from '@mui/material/styles'
 // ** Third Party Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -28,14 +28,15 @@ import { useUsersTable } from '@/services/api/useUsersTable'
 interface FormValues {
   password: string
   password_confirmation: string
+  user_note: string
 }
 
 const schema = yup.object().shape({
-  password: yup.string().required('Please enter your desired new password.'),
+  password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
   password_confirmation: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Please re-enter your new password to confirm.')
+    .required('Password confirmation is required')
 })
 
 interface SidebarAddUserType {
@@ -62,22 +63,29 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
-  const [formValue, setFormValue] = useState<FormValues>({
-    password: '',
-    password_confirmation: ''
-  })
 
   const {
-    register,
+    control,
     handleSubmit,
-    formState: { errors }
+    reset,
+    formState: { errors },
+    setValue
   } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      password: '*******',
-      password_confirmation: '*******'
-    }
+    resolver: yupResolver(schema)
   })
+
+  useEffect(() => {
+    if (props?.data) {
+      setValue('user_note', props?.data.note)
+    }
+  }, [props?.data, setValue])
+
+  const resetForm = () => {
+    reset({
+      password: '',
+      password_confirmation: ''
+    })
+  }
 
   const { updateUser } = useUsersTable()
   const mutation = useMutation(async (data: { id: any; data: any }) => {
@@ -87,26 +95,29 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
     }
   })
 
-  const [responseError, setResponseError] = useState([])
+  interface ResponseErrorProps {
+    password?: string
+    user_note?: string
+  }
 
-  const handleFormSubmit = async () => {
-    const { password, password_confirmation } = formValue
+  const [responseError, setResponseError] = useState<ResponseErrorProps>()
+
+  const handleFormSubmit = async (data: FormValues) => {
+    const { password, password_confirmation, user_note } = data
 
     if (password === password_confirmation) {
       try {
         await mutation.mutateAsync({
           id: props.userId,
-          data: { password, password_confirmation, _method: 'put' }
+          data: { password, password_confirmation, _method: 'put', user_note }
         })
         setSubmitted(true)
 
         setTimeout(() => {
           toggle()
           setSubmitted(false)
-          setFormValue({
-            password: '',
-            password_confirmation: ''
-          })
+          resetForm()
+          setResponseError({ password: '' })
 
           // Re-fetches UserTable and CSV exportation
           queryClient.invalidateQueries({ queryKey: ['allUsers'] })
@@ -121,17 +132,10 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
     }
   }
 
-  const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-
-    setFormValue(prevState => ({
-      ...prevState,
-      [name]: value
-    }))
-  }
-
   const handleClose = () => {
     toggle()
+    resetForm()
+    setResponseError({ password: '' })
   }
 
   return (
@@ -164,40 +168,44 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                     InputLabelProps={{
                       shrink: true
                     }}
-                    value={props?.data.username}
+                    value={props?.data.username || ' '}
                     disabled
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Enter New Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password')}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Enter New Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        onChange={field.onChange}
+                        name='password'
+                        type='password'
+                      />
+                    )}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Re-enter New Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password_confirmation')}
-                    error={!!errors.password_confirmation}
-                    helperText={errors.password_confirmation?.message}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password_confirmation'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Re-enter New Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password_confirmation}
+                        helperText={errors.password_confirmation?.message}
+                        onChange={field.onChange}
+                        name='password_confirmation'
+                        type='password'
+                      />
+                    )}
                   />
                 </Box>
 
@@ -211,7 +219,7 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                       shrink: true
                     }}
                     disabled
-                    value={props?.data.mobile}
+                    value={props?.data.mobile || ''}
                   />
                 </Box>
 
@@ -225,36 +233,37 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                       shrink: true
                     }}
                     disabled
-                    value={props?.data.email}
+                    value={props?.data.email || ''}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Note'
-                    variant='outlined'
-                    fullWidth
-                    multiline
-                    rows={4}
-                    name='note'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    disabled
-                    value={props?.data.note}
+                  <Controller
+                    name='user_note'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        variant='outlined'
+                        fullWidth
+                        multiline
+                        rows={4}
+                        error={!!errors.user_note}
+                        helperText={errors.user_note?.message}
+                        onChange={field.onChange}
+                        name='user_note'
+                        defaultValue={field.value}
+                      />
+                    )}
                   />
                 </Box>
 
-                {responseError &&
-                  responseError?.map((item, index) => (
-                    <Typography key={index} color='red'>
-                      {item}
-                    </Typography>
-                  ))}
+                {responseError && (
+                  <Typography color='red'>{responseError.password || responseError.user_note}</Typography>
+                )}
 
                 <Box sx={styles.formButtonContainer}>
                   <Box>
-                    <Button sx={styles.cancelButton}>
+                    <Button sx={styles.cancelButton} onClick={handleClose}>
                       <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>

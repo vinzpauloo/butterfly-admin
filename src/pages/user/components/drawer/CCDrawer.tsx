@@ -12,7 +12,7 @@ import Box, { BoxProps } from '@mui/material/Box'
 // ** Third Party Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -82,7 +82,6 @@ const CCDrawer = (props: SidebarAddUserType) => {
   })
 
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors }
@@ -175,9 +174,6 @@ const CCDrawer = (props: SidebarAddUserType) => {
       <Box sx={{ p: 5 }}>
         {!submitted ? (
           <Box sx={styles.container}>
-            {/* <Box sx={{ display: 'flex', backgroundColor: '#A459D1', padding: 4 }}>
-              <Typography sx={styles.white}>Content Creator</Typography>
-            </Box> */}
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
@@ -267,7 +263,7 @@ const CCDrawer = (props: SidebarAddUserType) => {
                 {displayErrors()}
                 <Box sx={styles.formButtonContainer}>
                   <Box>
-                    <Button sx={styles.cancelButton}>
+                    <Button sx={styles.cancelButton} onClick={handleClose}>
                       <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>

@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState, useEffect, ChangeEvent } from 'react'
+import React, { useState, useEffect, ChangeEvent, useCallback } from 'react'
 
 // ** MUI Imports
 import { Box, Card, Grid, Tab } from '@mui/material'
@@ -13,8 +13,6 @@ import Icon from 'src/@core/components/icon'
 
 // ** Custom Table Components Imports
 import UserTableToolbar from './UserTableToolbar'
-
-// ** Style Imports
 
 // ** Other Imports
 import SupervisorDrawer from './drawer/SupervisorDrawer'
@@ -77,13 +75,15 @@ const UserTable = () => {
   const [columnType, setColumnType] = useState('SUPERVISOR')
   const [rowCount, setRowCount] = useState<any>()
 
+  const [subRole] = useState('role')
+
   const [sort, setSort] = useState<SortType>('desc')
   const [sortName, setSortName] = useState<string>('created_at')
 
-  const [search, setSearch] = useState<string>()
-  const [emailSearchValue, setEmailSearchValue] = useState<string>('')
-  const [mobileSearchValue, setMobileSearchValue] = useState<string>('')
-  const [searchValue, setSearchValue] = useState<string>('')
+  const [search, setSearch] = useState<string | undefined>(undefined)
+  const [emailSearchValue, setEmailSearchValue] = useState<string | undefined>(undefined)
+  const [mobileSearchValue, setMobileSearchValue] = useState<string | undefined>(undefined)
+  const [searchValue, setSearchValue] = useState<string | undefined>(undefined)
 
   const debouncedUsername = useDebounce(searchValue, 1000)
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
@@ -98,7 +98,12 @@ const UserTable = () => {
       sort,
       sortName,
       search,
-      search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
+      search === 'username'
+        ? debouncedUsername || undefined
+        : search === 'email'
+        ? debouncedEmail || undefined
+        : debouncedMobile || undefined,
+      subRole
     ],
     queryFn: () =>
       getUsers({
@@ -110,7 +115,8 @@ const UserTable = () => {
           sort_by: sortName,
           search_by: search,
           search_value:
-            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
+            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile,
+          ...(role === 'SUPERVISOR' ? { with: subRole } : {})
         }
       }),
     onSuccess: (data: any) => {
@@ -121,7 +127,7 @@ const UserTable = () => {
     }
   })
 
-  const handleRoleChange = (newRole: any) => {
+  const handleRoleChange = useCallback((newRole: any) => {
     setRole(newRole)
 
     // Updates the row data based on the newRole
@@ -138,14 +144,13 @@ const UserTable = () => {
       default:
         break
     }
-  }
+  }, [])
 
   const [rowData, setRowData] = useState<any>()
 
-  const handlePageChange = (newPage: any) => {
+  const handlePageChange = useCallback((newPage: any) => {
     setPage(newPage + 1)
-    console.log(page)
-  }
+  }, [])
 
   const columnsMap = new Map([
     ['operators', operatorColumns],
@@ -162,7 +167,7 @@ const UserTable = () => {
     setRoleId('2')
   }, [])
 
-  const handleSortModel = (newModel: GridSortModel) => {
+  const handleSortModel = useCallback((newModel: GridSortModel) => {
     if (newModel.length) {
       setSort(newModel[0].sort)
       setSortName(newModel[0].field)
@@ -170,9 +175,9 @@ const UserTable = () => {
       setSort('asc')
       setSortName('username')
     }
-  }
+  }, [])
 
-  const handleSearch = (value: string, type: string) => {
+  const handleSearch = useCallback((value: string, type: string) => {
     setSearch(type)
     switch (type) {
       case 'username':
@@ -185,7 +190,7 @@ const UserTable = () => {
         setMobileSearchValue(value)
         break
     }
-  }
+  }, [])
 
   const [activeTab, setActiveTab] = useState<any>()
   const handleChange = (event: any, value: string) => {
@@ -194,7 +199,7 @@ const UserTable = () => {
 
   useEffect(() => {
     handleRoleChange(activeTab)
-  }, [activeTab])
+  })
 
   type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
   const [openDrawer, setOpenDrawer] = useState<DrawerType>(null)
@@ -222,7 +227,7 @@ const UserTable = () => {
       <Grid item xs={12}>
         <Card>
           <Box sx={{ mx: 5, mt: 5, ...styles.buttonContainer }}>
-            <TabContext value={activeTab}>
+            <TabContext value={activeTab || 'SUPERVISOR'}>
               <TabList
                 variant='scrollable'
                 scrollButtons='auto'
@@ -269,10 +274,11 @@ const UserTable = () => {
             autoHeight
             rows={rowData ?? []}
             columns={filteredColumns}
-            pageSize={pageSize}
+            pageSize={pageSize || 10}
             pagination
             onPageChange={handlePageChange}
-            rowCount={rowCount}
+            rowCount={rowCount || 10}
+            rowsPerPageOptions={[10]}
             onSortModelChange={handleSortModel}
             components={{ Toolbar: UserTableToolbar }}
             componentsProps={{
