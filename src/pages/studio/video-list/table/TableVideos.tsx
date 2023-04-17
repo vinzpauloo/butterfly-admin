@@ -19,6 +19,8 @@ import Icon from 'src/@core/components/icon'
 // ** Interfaces
 import { IVideoRow } from '@/context/types'
 import useDebounce from '@/hooks/useDebounce'
+import TranslateString from '@/utils/TranslateString'
+import Translations from '@/layouts/components/Translations'
 
 const navData = [
   {
@@ -100,14 +102,14 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
   return (
     <Box mb={2}>
       <Typography variant='h4' component='h4' mb={5}>
-        Video List
+        {TranslateString("Video List")}
       </Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
           <OutlinedInput
             fullWidth
             style={{ marginRight: 10 }}
-            placeholder='Search Creator'
+            placeholder={TranslateString("Search") + " " + TranslateString("Content Creator")}
             size='small'
             value={searchCreator}
             onChange={e => setSearchCreator(e.target.value)}
@@ -115,7 +117,7 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
           <OutlinedInput
             fullWidth
             style={{ marginRight: 10 }}
-            placeholder='Search Title'
+            placeholder={TranslateString("Search") + " " + TranslateString("Title")}
             size='small'
             value={searchTitle}
             onChange={e => setSearchTitle(e.target.value)}
@@ -123,13 +125,13 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
           <OutlinedInput
             fullWidth
             style={{ marginRight: 10 }}
-            placeholder='Search Tag'
+            placeholder={TranslateString("Search") + " " + TranslateString("Tags")}
             size='small'
             value={searchTag}
             onChange={e => setSearchTag(e.target.value)}
           />
-          <Button variant='contained' color='error' onClick={handleClear}>
-            Clear
+          <Button variant='contained' color='error' sx={{ width: 150 }} onClick={handleClear}>
+            {TranslateString("Clear")}
           </Button>
         </Box>
       </Box>
@@ -151,7 +153,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.02,
       minWidth: 70,
       field: 'thumbnail_url',
-      headerName: 'Video Thumbnail',
+      headerName: TranslateString("Video Thumbnail"),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
@@ -169,7 +171,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
     {
       flex: 0.02,
       minWidth: 90,
-      headerName: 'Content Creator',
+      headerName: TranslateString("Content Creator"),
       sortable: false,
       field: 'content_creator',
       renderCell: (params: GridRenderCellParams) => (
@@ -182,7 +184,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.03,
       minWidth: 60,
       field: 'title',
-      headerName: 'Title',
+      headerName: TranslateString("Title"),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -194,7 +196,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.04,
       field: 'tag',
       minWidth: 80,
-      headerName: 'Tag',
+      headerName: TranslateString("Tags"),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -206,7 +208,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.04,
       minWidth: 140,
       field: 'last_update',
-      headerName: 'Last Update',
+      headerName: TranslateString("Last Update"),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -218,7 +220,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.01,
       minWidth: 60,
       field: 'action',
-      headerName: 'Action',
+      headerName: TranslateString("Action"),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => <Icon onClick={() => {
         setEditVideoRow({ ...params.row }) // pass the row value to state

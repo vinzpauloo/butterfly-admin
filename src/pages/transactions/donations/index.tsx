@@ -1,6 +1,6 @@
 import React from 'react'
-
 import Transaction from '@/pages/transactions'
+import Translations from '@/layouts/components/Translations'
 
 const rowData = [
   {
@@ -105,13 +105,13 @@ const rowData = [
   }
 ]
 const columnData = [
-  { field: 'contentCreator', headerName: 'Content Creator', width: 193, sortable: false },
-  { field: 'customer', headerName: 'Customer', width: 193, sortable: false },
-  { field: 'siteName', headerName: 'Site Name', width: 193, sortable: false },
-  { field: 'amountGold', headerName: 'Amount (Gold)', width: 193, sortable: false },
-  { field: 'amountCNY', headerName: 'Amount (CNY)', width: 193, sortable: false },
-  { field: 'dateCreated', headerName: 'Date Created', width: 193, sortable: false },
-  { field: 'lastUpdate', headerName: 'Last Update', width: 193, sortable: false }
+  { field: 'contentCreator', headerName: <Translations text='Content Creator'/>, width: 193, sortable: false },
+  { field: 'customer', headerName: <Translations text='Customer'/>, width: 193, sortable: false },
+  { field: 'siteName', headerName: <Translations text='Site Name'/>, width: 193, sortable: false },
+  { field: 'amountGold', headerName: <Translations text='Amount (Gold)'/>, width: 193, sortable: false },
+  { field: 'amountCNY', headerName: <Translations text='Amount (CNY)'/>, width: 193, sortable: false },
+  { field: 'dateCreated', headerName: <Translations text='Date Created'/>, width: 193, sortable: false },
+  { field: 'lastUpdate', headerName: <Translations text='Last Update'/>, width: 193, sortable: false }
 ]
 
 function index() {

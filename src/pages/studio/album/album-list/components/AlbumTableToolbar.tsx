@@ -11,6 +11,7 @@ import { CardHeader } from '@mui/material'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import ExportButton from '@/pages/user/components/button/ExportButton'
+import TranslateString from '@/utils/TranslateString'
 
 interface Props {
   usernameValue: string
@@ -35,7 +36,7 @@ const AlbumTableToolbar = (props: Props) => {
     >
       <Box>
         <CardHeader
-          title='Search Filters'
+          title={TranslateString("Search") + " " + TranslateString("Filters")}
           sx={{
             margin: 0,
             padding: 0
@@ -58,7 +59,7 @@ const AlbumTableToolbar = (props: Props) => {
           size='small'
           value={props.titleValue}
           onChange={props.onTitleChange}
-          placeholder='Search Title...'
+          placeholder={TranslateString("Search") + " " + TranslateString("Title") + "..."}
           InputProps={{
             startAdornment: (
               <Box sx={{ mr: 2, display: 'flex' }}>

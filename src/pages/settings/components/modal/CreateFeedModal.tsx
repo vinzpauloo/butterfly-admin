@@ -23,6 +23,8 @@ import { useDropzone } from 'react-dropzone'
 import FeedsService from '@/services/api/FeedsService'
 import TUSService from '@/services/api/TusService'
 
+import TranslateString from '@/utils/TranslateString'
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -224,7 +226,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       <DialogContent sx={{ ...styles.dialogContent, bgcolor: theme => theme.customBflyColors.primary }}>
         <Box>
           <DialogTitle color={theme => theme.customBflyColors.primaryTextContrast} sx={styles.title}>
-            Upload NewsFeeds
+            {TranslateString("Upload NewsFeeds")}
           </DialogTitle>
         </Box>
         {isLoading ? (
@@ -235,13 +237,13 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           <>
             <Box sx={styles.textContainer}>
               <TextField
-                label='Story'
+                label={TranslateString("Story")}
                 minRows={10}
                 multiline={true}
                 sx={{...styles.fullWidth, backgroundColor: theme => theme.palette.background.paper, borderRadius:'8px'}}
                 {...register('string_story')}
               />
-              <TextField label='Tagging' sx={{...styles.fullWidth, backgroundColor: theme => theme.palette.background.paper, borderRadius:'8px'}} {...register('tags')} />
+              <TextField label={TranslateString("Tags")} sx={{...styles.fullWidth, backgroundColor: theme => theme.palette.background.paper, borderRadius:'8px'}} {...register('tags')} />
             </Box>
 
             <Box sx={styles.buttonContainer}>
@@ -249,7 +251,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 <input {...getVidInputProps()} />
                 <Box sx={styles.button}>
                   <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>Upload Video</Button>
+                  <Button sx={styles.upload}>{TranslateString("Upload Video")}</Button>
                   {feedVideo.length != 0 ? <p>Selected 1 video</p> : null}
                 </Box>
               </div>
@@ -258,7 +260,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 <input {...getInputProps()} />
                 <Box sx={styles.button}>
                   <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>Upload Photo</Button>
+                  <Button sx={styles.upload}>{TranslateString("Upload Photo")}</Button>
                 </Box>
               </div>
 
@@ -268,7 +270,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                     <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
                     <div className='buttons' style={{textAlign:'center'}}>
                       <Button sx={{marginInline:'auto'}} color='error' variant='outlined' onClick={handleRemoveAllFiles}>
-                        Remove All
+                        {TranslateString("Remove All")}
                       </Button>
                     </div>
                   </>
@@ -279,7 +281,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
             <Box sx={styles.bottomBtnContainer}>
               <Button onClick={handleCancel} sx={styles.bottomBtn}>
-                Cancel
+                {TranslateString("Cancel")}
               </Button>
               <Button
                 onClick={() => {
@@ -287,7 +289,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 }}
                 sx={styles.bottomBtn}
               >
-                Publish
+                {TranslateString("Publish")}
               </Button>
             </Box>
           </>

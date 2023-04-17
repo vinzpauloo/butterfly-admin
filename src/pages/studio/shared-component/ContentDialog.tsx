@@ -29,6 +29,7 @@ import ReactPlayer from 'react-player'
 import { useForm, Controller } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import ContentService from '../../../services/api/ContentService'
+import TranslateString from '@/utils/TranslateString'
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -222,8 +223,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                     '& svg': { mr: 2 }
                   }}
                 >
-                  <Typography variant='body1'>Content Creator : {param.user.username}</Typography>
-                  <Typography variant='body2'>Date Uploaded: {formatDate(param.updated_at)}</Typography>
+                  <Typography variant='body1'>{TranslateString("Content Creator")} : {param.user.username}</Typography>
+                  <Typography variant='body2'>{TranslateString("Date Uploaded")} : {formatDate(param.updated_at)}</Typography>
                 </Box>
               </Box>
             </Grid>
@@ -245,7 +246,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
               <FormControl fullWidth sx={{ display: 'flex', gap: '2rem' }}>
                 <TextField
                   disabled
-                  label='Video Title'
+                  label={TranslateString('Video Title')}
                   fullWidth
                   placeholder='Title'
                   defaultValue={param.title}
@@ -253,7 +254,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                 />
                 <TextField
                   disabled
-                  label='Description'
+                  label={TranslateString('Description')}
                   multiline
                   rows={3}
                   fullWidth
@@ -273,7 +274,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
         </DialogContent>
         <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'center' }}>
           <Button variant='contained' color='error' sx={{ mr: 1 }} onClick={() => setShowNotes(true)}>
-            Decline
+            {TranslateString('Decline')}
           </Button>
           <Button
             disabled={isLoading ? true : false}
@@ -281,7 +282,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
             color='primary'
             onClick={() => handleApproveContent()}
           >
-            {isLoading ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} Approve
+            {isLoading ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} {TranslateString('Approve')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -310,8 +311,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                   fullWidth
                   multiline
                   minRows={3}
-                  label='Note'
-                  placeholder="Dont't leave the note blank..."
+                  label={TranslateString('Note')}
+                  placeholder={TranslateString("Don't leave the note blank...")}
                   sx={{ '& .MuiOutlinedInput-root': { alignItems: 'baseline' } }}
                   InputProps={{
                     startAdornment: (
@@ -331,7 +332,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                   variant='contained'
                   size='large'
                 >
-                  {isLoading ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} Submit Note
+                  {isLoading ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} {TranslateString("Submit Note")}
                 </Button>
               </Grid>
             </Grid>

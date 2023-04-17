@@ -5,6 +5,7 @@ import Transaction from '@/pages/transactions'
 import { Box, Button } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import EditDrawer from './EditDrawer'
+import Translations from '@/layouts/components/Translations'
 
 const rowData = [
   {
@@ -102,15 +103,15 @@ const rowData = [
 function index() {
   const [open, setOpen] = useState(false)
   const columnData = [
-    { field: 'contentCreator', headerName: 'Content Creator', width: 225, sortable: false },
-    { field: 'amount', headerName: 'Amount', width: 225, sortable: false },
-    { field: 'balance', headerName: 'Balance', width: 160, sortable: false },
-    { field: 'type', headerName: 'Type (Debit|Credit)', width: 160, sortable: false },
-    { field: 'dateCreate', headerName: 'Date Created', width: 225, sortable: false },
-    { field: 'lastUpdate', headerName: 'Last Update', width: 225, sortable: false },
+    { field: 'contentCreator', headerName: <Translations text='Content Creator'/>, width: 225, sortable: false },
+    { field: 'amount', headerName: <Translations text='Amount'/>, width: 225, sortable: false },
+    { field: 'balance', headerName: <Translations text='Balance'/>, width: 150, sortable: false },
+    { field: 'type', headerName: <Translations text='Type (Debit | Credit)'/>, width: 170, sortable: false },
+    { field: 'dateCreate', headerName: <Translations text='Date Created'/>, width: 225, sortable: false },
+    { field: 'lastUpdate', headerName: <Translations text='Last Update'/>, width: 225, sortable: false },
     {
       field: 'edit',
-      headerName: 'Edit',
+      headerName: <Translations text='Edit'/>,
       width: 130,
       sortable: false,
       renderCell: () => {

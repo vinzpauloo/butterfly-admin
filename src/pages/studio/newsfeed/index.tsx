@@ -24,6 +24,8 @@ import FeedsService from '@/services/api/FeedsService'
 
 // ** Utils
 import createSkeleton from '@/utils/createSkeleton'
+import TranslateString from '@/utils/TranslateString'
+import Translations from '@/layouts/components/Translations'
 
 const steps = [
   {
@@ -36,7 +38,7 @@ const steps = [
     title: 'All Video Feeds'
   },
   {
-    title: 'Videos with Photos'
+    title: 'Videos With Photos'
   }
 ]
 
@@ -139,7 +141,7 @@ const NewsFeedList = (props: Props) => {
                 }}
                 variant={index == activeTab ? 'contained' : 'outlined'}
               >
-                {step.title}
+                {TranslateString(step.title)}
               </Button>
             )
           })}
@@ -194,7 +196,7 @@ const NewsFeedList = (props: Props) => {
                     fetchNextPage()
                   }}
                 >
-                  {isFetchingNextPage ? <CircularProgress size={15} color='secondary' /> : 'Load More Stories'}
+                  {isFetchingNextPage ? <CircularProgress size={15} color='secondary' /> : <Translations text="Load More Stories"/>}
                 </Button>
               </Grid>
             </Grid>
