@@ -17,20 +17,20 @@ function EditDrawer({ open, setOpen }: any) {
     >
       <Box height='100%' display='flex' flexDirection='column' alignItems='center' p={5} sx={{ background: '#3c4b64' }}>
         <Box my={3} display='flex' width='100%'>
-          <Typography p={2} mr={2} style={styles.donation} align='center'>
+          <Typography p={2} mr={2} sx={styles.donation} align='center'>
             LOOP KISSER
           </Typography>
-          <Typography p={2} ml={2} style={styles.donation} align='center'>
+          <Typography p={2} ml={2} sx={styles.donation} align='center'>
             2023-03-09 05:24:26
           </Typography>
         </Box>
-        <Typography p={2} variant='h6' mx={2} style={styles.donation} align='center'>
+        <Typography p={2} variant='h6' mx={2} sx={styles.donation} align='center'>
           DEPOSIT
         </Typography>
-        <Typography my={3} py={15} variant='h2' mx={2} style={styles.donation} align='center'>
+        <Typography my={3} py={15} variant='h2' mx={2} sx={styles.donation} align='center'>
           Y41,100 CNY
         </Typography>
-        <Box mt={2} p={2} style={styles.donation}>
+        <Box mt={2} p={2} sx={styles.donation}>
           <Typography variant='h6'>IMPORTANT NOTES</Typography>
           <Box mt={2} px={3}>
             <Typography variant='body1' p={2} align='center'>
