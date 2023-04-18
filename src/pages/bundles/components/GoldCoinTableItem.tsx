@@ -8,7 +8,7 @@ import GoldCoinBundleModal from "../components/GoldCoinBundleModal";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import BundlesService from "../../../services/api/BudlesService";
+import BundlesService from '@/services/api/BundlesService';
 
 type Props = {
 	bundleID: string

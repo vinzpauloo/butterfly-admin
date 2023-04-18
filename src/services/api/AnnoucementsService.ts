@@ -1,10 +1,12 @@
 import request from '@/lib/request'
 import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface IAnnouncementParams {
 	parentID?: string
 	announcementID?: string
 	data: {
+		site_id?: number
 		with?: "introductions"
 		style?: "text" | "image"
 		type?: "introduction"
@@ -24,7 +26,7 @@ const AnnouncementsService = () => {
 	const getAllAnnouncement = (params: IAnnouncementParams) => {
 		return request({
 			headers: {
-				'X-Authorization': 'postman|1',
+				...getHeaders(),
 				'ngrok-skip-browser-warning': '69420', // only for dev
 				Authorization: `Bearer ${accessToken}`
 			},
@@ -37,7 +39,7 @@ const AnnouncementsService = () => {
 	const createAnnouncement = (params: IAnnouncementParams) => {
 		return request({
 			headers: {
-				'X-Authorization': 'postman|1',
+				...getHeaders(),
 				'ngrok-skip-browser-warning': '69420', // only for dev
 				'Content-Type': 'multipart/form-data',
 				Authorization: `Bearer ${accessToken}`
@@ -51,7 +53,7 @@ const AnnouncementsService = () => {
 	const updateAnnouncement = (params: IAnnouncementParams) => {
 		return request({
 			headers: {
-				'X-Authorization': 'postman|1',
+				...getHeaders(),
 				'ngrok-skip-browser-warning': '69420', // only for dev
 				'Content-Type': 'multipart/form-data',
 				Authorization: `Bearer ${accessToken}`
@@ -66,7 +68,7 @@ const AnnouncementsService = () => {
 	// const deleteAnnouncement = (params: IAnnouncementParams) => {
 	// 	return request({
 	// 		headers: {
-	// 			'X-Authorization': 'postman|1',
+	// 			...getHeaders(),
 	// 			'ngrok-skip-browser-warning': '69420', // only for dev
 	// 			Authorization: `Bearer ${accessToken}`
 	// 		},

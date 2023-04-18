@@ -13,6 +13,8 @@ import authConfig from 'src/configs/auth'
 // ** Types
 import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataType } from './types'
 
+import { getHeaders } from '@/lib/cryptoJs'
+
 // ** Defaults
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -61,7 +63,7 @@ const AuthProvider = ({ children }: Props) => {
     axios
       .post(`${baseUrl + authConfig.loginEndpoint}`, newParams, {
         headers: {
-          'X-Authorization': 'postman|0'
+          ...getHeaders(),
         }
       })
       .then(async response => {

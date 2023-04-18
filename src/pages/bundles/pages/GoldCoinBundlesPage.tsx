@@ -8,7 +8,7 @@ import GoldCoinBundleModal from '../components/GoldCoinBundleModal';
 import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useQuery } from '@tanstack/react-query';
-import BundlesService from '../../../services/api/BudlesService'
+import BundlesService from '@/services/api/BundlesService';
 import TranslateString from '@/utils/TranslateString';
 
 
@@ -20,7 +20,7 @@ const GoldCoinBundlesPage = () => {
   const { getAllCoinsBundle } = BundlesService()
   const { isLoading, data } = useQuery({
     queryKey: ["allCoinsBundle"],
-    queryFn: () => getAllCoinsBundle({ data: { site_id: 1 } }),
+    queryFn: () => getAllCoinsBundle({ data: { site_id: 0 } }),
     onSuccess: (data) => { console.log("COINS BUNDLE:", data?.bundles) },
     onError: (error) => { console.log(error) }
   })

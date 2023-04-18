@@ -6,7 +6,7 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import BundlesService from "../../../services/api/BudlesService"
+import BundlesService from '@/services/api/BundlesService';
 import TranslateString from '@/utils/TranslateString';
 
 type Props = {
