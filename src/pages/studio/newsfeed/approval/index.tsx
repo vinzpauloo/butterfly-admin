@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -7,210 +7,90 @@ import Card from '@mui/material/Card'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 
 // ** Third Party Components
+import { useQuery } from '@tanstack/react-query'
 
-// ** Custom Components
-import CustomChip from 'src/@core/components/mui/chip'
-import SearchToolbar from '@/pages/studio/shared-component/SearchToolbar'
-import FeedDialog from '@/pages/studio/shared-component/FeedDialog'
+// ** API
+import FeedsService from '@/services/api/FeedsService'
 
 // ** Types Imports
-import { ThemeColor } from 'src/@core/layouts/types'
-import { DataGridRowType } from '@/context/types'
+import { IFeedStory } from '@/context/types'
+import { GridSortDirection } from '@mui/x-data-grid'
+import TableNewsFeedApproval from '../views/TableNewsFeedApproval'
 
-// ** Data Import
-import { rows } from '@/data/dummyNewsFeedData'
+// ** Custom Hooks
+import useDebounce from '@/hooks/useDebounce'
 
-interface StatusObj {
-  [key: number]: {
-    title: string
-    color: ThemeColor
-  }
-}
-interface FeedsObj {
-  [key: number]: {
-    title: string
-    iconPath: string
-  }
-}
-
-const renderFeedType = (params: GridRenderCellParams) => {
-  const { row } = params
-
-  if (row.feedTypes.length) {
-
-    return (
-      <Box sx={{ display: 'flex', gap: '.5rem' }}>
-        {
-          row.feedTypes.map((feed: number, index: number) => (
-            <img key={index} alt={`${feedsObj[feed].title}`} width={20} src={`${feedsObj[feed].iconPath}`} />
-          ))
-        }
-      </Box>
-    )
-
-  } else {
-    return <></>
-  }
-
-}
-
-const statusObj: StatusObj = {
-  1: { title: 'pending', color: 'warning' },
-  2: { title: 'declined', color: 'error' },
-}
-
-const feedsObj: FeedsObj = {
-  1: { title: 'Story', iconPath: '/images/feeds/storyIcon.png' },
-  2: { title: 'Videos', iconPath: '/images/feeds/videoIcon.png' },
-  3: { title: 'Photos', iconPath: '/images/feeds/photoIcon.png' },
-}
-
-const escapeRegExp = (value: string) => {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-}
 
 const NewsFeedApproval = () => {
   // ** States
-  const [pageSize, setPageSize] = useState<number>(7)
-  const [hideNameColumn, setHideNameColumn] = useState(false)
-  const [data] = useState<DataGridRowType[]>(rows)
-  const [searchText, setSearchText] = useState<string>('')
-  const [filteredData, setFilteredData] = useState<DataGridRowType[]>([])
+  const [hideNameColumn, setHideNameColumn] = React.useState(false)
+  const [rowData, setRowData] = React.useState<IFeedStory[]>([])
+  const [pageSize, setPageSize] = React.useState(7)
+  const [total, setTotal] = React.useState(0)
+  //feed params
+  const [ paginate, setPaginate ] = React.useState<number>(7)
+  const [ page, setPage ] = React.useState<number>(1)
+  const [searchText, setSearchText] = React.useState('')
+  const debounceSearchText = useDebounce(searchText, 600)
+  const [ sort, setSort ] = React.useState<'desc' | 'asc'>('asc')
+  const [specificType, setSpecificType] = React.useState<{} | null>(null)
+  const [ searchBy, setSearchBy ] = React.useState<string>('username') //data columns
+  const [ sortBy, setSortBy ] = React.useState<string>('username') //data columns
 
-  const handleSearch = (searchValue: string) => {
-    setSearchText(searchValue)
-    const searchRegex = new RegExp(escapeRegExp(searchValue), 'i')
-    const filteredRows = data.filter(row => {
-      return Object.keys(row).some(field => {
-        // @ts-ignore
-        return searchRegex.test(row[field].toString())
-      })
-    })
-    if (searchValue.length) {
-      setFilteredData(filteredRows)
-    } else {
-      setFilteredData([])
-    }
+
+  const handleSetSort = (sort : GridSortDirection) => {
+    setSort(sort as any)
+  }
+  const handleSetSortBy = (sortBy : string) => {
+    console.log('new SORTING BY IS', sortBy)
+    setSortBy(sortBy as any)
   }
 
-  const columns: GridColDef[] = [
-    {
-      flex: 0.1,
-      minWidth: 150,
-      field: 'feed_type',
-      headerName: 'Feed Type',
-      align: 'center',
-      headerAlign: 'center',
-      hide: hideNameColumn,
-      renderCell: (params: GridRenderCellParams) => {
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {renderFeedType(params)}
-          </Box>
-        )
-      }
-    },
-    {
-      flex: 0.15,
-      minWidth: 150,
-      field: 'full_name',
-      headerName: 'Content Creator',
-      hide: hideNameColumn,
-      renderCell: (params: GridRenderCellParams) => {
-        const { row } = params
 
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {row.full_name}
-              </Typography>
-            </Box>
-          </Box>
-        )
-      }
-    },
-    {
-      flex: 0.1,
-      minWidth: 120,
-      headerName: 'Title',
-      field: 'title',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.title}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.15,
-      minWidth: 110,
-      field: 'video_url',
-      headerName: 'Video URL',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.email}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.13,
-      minWidth: 140,
-      field: 'category',
-      headerName: 'Category',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          Multiple Categories
-        </Typography>
-      )
-    },
-    {
-      flex: 0.1,
-      minWidth: 140,
-      field: 'post_update',
-      headerName: 'Post Update',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.post_update}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.01,
-      minWidth: 140,
-      field: 'status',
-      headerName: 'Status',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        const status = statusObj[params.row.status]
-
-        return (
-          <CustomChip
-            size='small'
-            skin='light'
-            color={status.color}
-            label={status.title}
-            sx={{ '&': { padding: '1em 1em', borderRadius: '3px !important' }, '& .MuiChip-label': { textTransform: 'capitalize' } }}
-          />
-        )
-      }
-    },
-    {
-      flex: 0.06,
-      minWidth: 50,
-      field: 'actions',
-      headerName: '',
-      align: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return (
-          <FeedDialog param={params.row} />
-        )
-      }
+  // ** Tanstack and API
+  const { getFeeds } = FeedsService()
+  const getFeedQuery = useQuery({
+    keepPreviousData: false,
+    queryKey: ['getFeeds', paginate, page, debounceSearchText, sort, sortBy, specificType],
+    queryFn: () => getFeeds({
+      paginate : paginate,
+      page : page,
+      sort : sort,
+      sortBy : sortBy,
+      ...(searchText !== "" && { search_value: searchText }),
+      ...(specificType !== null && {...specificType}), // video_only, images_only, video_images
+      with : 'user',
+      search_all : true,
+      all : true
+    }),
+    onSuccess: response => {
+      setRowData(response.data)
+      setTotal(response.total)
     }
-  ]
+  })
+
+  const handlePageChange = (newPage : number) => {
+    console.log('call handle page', newPage + 1)
+    setPage(newPage + 1) // 0 based
+  }
+
+  const handleFilterFeedTypeClick = (filter : 'all' | 'photos' | 'videos' | 'photos_videos') => {
+
+    switch( filter ) {
+      case 'all' : setSpecificType({})
+      break;
+      case 'photos' : setSpecificType({images_only : true})
+      break;
+      case 'videos' : setSpecificType({video_only : true})
+      break;
+      case 'photos_videos' : setSpecificType({video_images : true})
+      break;
+      default : setSpecificType({})
+    }
+    console.log('filter',filter)
+  }
 
   return (
     <>
@@ -239,48 +119,41 @@ const NewsFeedApproval = () => {
           }}
           action={
             <Box sx={{ display: 'flex', gap: '1rem' }}>
-              <Button size='small' variant='contained' onClick={() => setHideNameColumn(!hideNameColumn)}>
+              <Button size='small' variant='contained' onClick={() => handleFilterFeedTypeClick('all')}>
                 All Feeds
               </Button>
 
-              <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
+              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('photos')}>
                 All Photo Feeds
               </Button>
 
-              <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
+              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('videos')}>
                 All Video Feeds
               </Button>
 
-              <Button size='small' variant='outlined' onClick={() => setHideNameColumn(!hideNameColumn)}>
-                Videos With Photos
+              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('photos_videos')}>
+                Videos and Photos
               </Button>
             </Box>
-
           }
         />
-        <DataGrid
-          disableSelectionOnClick
-          autoHeight
-          rows={filteredData.length ? filteredData : data}
-          columns={columns}
-          pageSize={pageSize}
-          rowsPerPageOptions={[7, 10, 25, 50]}
-          components={{ Toolbar: SearchToolbar }}
-          componentsProps={{
-            baseButton: {
-              variant: 'outlined'
-            },
-            toolbar: {
-              value: searchText,
-              clearSearch: () => handleSearch(''),
-              onChange: (event: React.ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-            }
-          }}
-          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-        />
+        <TableNewsFeedApproval 
+          isLoading={getFeedQuery.isLoading || getFeedQuery.isFetching} 
+          rowCount={total}
+          rows={rowData} 
+          pageSize={paginate}
+          setPageSize={setPaginate}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          handlePageChange={ handlePageChange }
+          handleSetSort={handleSetSort}
+          handleSetSortBy={handleSetSortBy}
+          />
       </Card>
     </>
   )
 }
+
+
 
 export default NewsFeedApproval

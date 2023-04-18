@@ -1,4 +1,5 @@
 import request from "@/lib/request";
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface IGroupingServiceParams {
   data: {
@@ -12,7 +13,7 @@ const useGroupingService = () => {
   const getGroupings = (params: IGroupingServiceParams) => {
     return request({
       headers: { 
-        'X-authorization' : 'postman|1', 
+        ...getHeaders(),
         "ngrok-skip-browser-warning": "69420" // only for dev
       },
       url: "/workgroups",

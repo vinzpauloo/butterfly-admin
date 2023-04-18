@@ -1,4 +1,5 @@
 import request from '@/lib/request'
+import { getHeaders } from '@/lib/cryptoJs'
 
 // ** Configs
 import authConfig from 'src/configs/auth'
@@ -20,7 +21,7 @@ const TransactionsService = () => {
   const getDonations = (params: IDonationsParams) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },

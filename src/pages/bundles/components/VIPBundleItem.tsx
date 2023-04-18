@@ -9,7 +9,7 @@ import Modal from '@mui/material/Modal';
 import VIPBundleModal from './VIPBundleModal';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import BundlesService from '../../../services/api/BudlesService';
+import BundlesService from '@/services/api/BundlesService';
 import IconList from './IconList';
 import TranslateString from '@/utils/TranslateString';
 

@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import GoldCoinBundleModal from '../components/GoldCoinBundleModal';
 import GoldCoinTableItem from '../components/GoldCoinTableItem';
-import BundlesService from '../../../services/api/BudlesService';
+import BundlesService from '@/services/api/BundlesService';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Stack } from '@mui/material';
 
@@ -31,7 +31,7 @@ const GoldCoinTablesPage = () => {
 	const { getAllCoinsBundle } = BundlesService()
 	const { isLoading, data } = useQuery({
 		queryKey: ["allCoinsBundle"],
-		queryFn: () => getAllCoinsBundle({ data: { site_id: 1 } }),
+		queryFn: () => getAllCoinsBundle({ data: { site_id: 0 } }),
 		onSuccess: (data) => { console.log("COINS BUNDLE:", data?.bundles) },
 		onError: (error) => { console.log(error) }
 	})

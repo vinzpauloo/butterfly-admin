@@ -1,5 +1,6 @@
 import request from "@/lib/request";
 import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface IAdvertisementParams {
 	id?: string
@@ -23,7 +24,7 @@ const AdvertisementService = () => {
 	const getAllAdminAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json",
 				Authorization: `Bearer ${accessToken}`
@@ -37,7 +38,7 @@ const AdvertisementService = () => {
 	const createNewAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				'Content-Type': 'multipart/form-data', // if POST is form-data
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json",
@@ -52,7 +53,7 @@ const AdvertisementService = () => {
 	const updateAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				'Content-Type': 'multipart/form-data', // if POST is form-data
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json",
@@ -67,7 +68,7 @@ const AdvertisementService = () => {
 	const deleteAds = (params: IAdvertisementParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json",
 				Authorization: `Bearer ${accessToken}`

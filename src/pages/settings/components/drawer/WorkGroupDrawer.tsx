@@ -110,7 +110,7 @@ const columns = [
     flex: 0.02,
     minWidth: 70,
     field: 'thumbnail_url',
-    headerName: <Translations text='Video Thumbnail'/>,
+    headerName: <Translations text='Video Thumbnail' />,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => {
       return (
@@ -128,7 +128,7 @@ const columns = [
   {
     flex: 0.02,
     minWidth: 90,
-    headerName: <Translations text='Content Creator'/>,
+    headerName: <Translations text='Content Creator' />,
     field: 'content_creator',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -322,7 +322,9 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
         sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 600 } } }}
       >
         <Header>
-          <Typography variant='h6'>{TranslateString(header)} {TranslateString("Workgroup")}</Typography>
+          <Typography variant='h6'>
+            {TranslateString(header)} {TranslateString('Workgroup')}
+          </Typography>
           <IconButton size='small' onClick={() => setOpen(false)} sx={{ color: 'text.primary' }}>
             <Icon icon='mdi:close' fontSize={20} />
           </IconButton>
@@ -337,7 +339,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 render={({ field: { value, onChange } }) => (
                   <TextField
                     value={value}
-                    label={TranslateString("Title")}
+                    label={TranslateString('Title')}
                     onChange={onChange}
                     placeholder='XXXXXX'
                     error={Boolean(errors.title)}
@@ -351,12 +353,12 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
               )}
             </FormControl>
             <FormControl fullWidth sx={{ mb: 6 }}>
-              <InputLabel id='role-select'>{TranslateString("Navbar")}</InputLabel>
+              <InputLabel id='role-select'>{TranslateString('Navbar')}</InputLabel>
               <Select
                 fullWidth
                 value={navbar}
                 id='select-role'
-                label={TranslateString("Navbar")}
+                label={TranslateString('Navbar')}
                 labelId='role-select'
                 onChange={e => setNavbar(e.target.value)}
                 inputProps={{ placeholder: 'Navbar' }}
@@ -369,12 +371,12 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
               </Select>
             </FormControl>
             <FormControl fullWidth sx={{ mb: 6 }}>
-              <InputLabel id='role-select'>{TranslateString("Template")}</InputLabel>
+              <InputLabel id='role-select'>{TranslateString('Template')}</InputLabel>
               <Select
                 fullWidth
                 value={template}
                 id='select-role'
-                label={TranslateString("Template")}
+                label={TranslateString('Template')}
                 labelId='role-select'
                 onChange={e => setTemplate(e.target.value)}
                 inputProps={{ placeholder: 'Template' }}
@@ -402,7 +404,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                     sx={{ mr: 3 }}
                     onClick={handleOpenModal}
                   >
-                    {TranslateString("Select Content")}
+                    {TranslateString('Select Content')}
                   </Button>
                 )}
               />
@@ -410,6 +412,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
             <Box sx={{ mb: 6 }}>
               <DataGrid
                 rowCount={rowCount}
+                // @ts-ignore
                 columns={columns}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
@@ -429,7 +432,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 </Button>
               ) : null}
               <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
-                {TranslateString("Cancel")}
+                {TranslateString('Cancel')}
               </Button>
             </Box>
           </form>
