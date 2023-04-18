@@ -85,7 +85,8 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
     } else {
         console.log("SUBMIT AND DECLINE")
         let callAfter = await states.outterHandleSubmit(data)
-        console.log('call this after', callAfter)
+        resetField('notes')
+        setNoteValue('')
     }
   }
 
@@ -94,7 +95,6 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
       <Dialog
         maxWidth='sm'
         scroll='body'
-        onClose={() => handleNoteDialogClose() }
         TransitionComponent={Transition}
         open={states.open}
       >

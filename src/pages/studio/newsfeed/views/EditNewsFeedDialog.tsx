@@ -33,7 +33,7 @@ import DialogNotes from '@/shared-components/DialogNotes'
 
 // ** Tanstack and API Service
 import FeedsService from '@/services/api/FeedsService'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -66,10 +66,14 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
   }
 
   const { approveNewsFeedContent} = FeedsService()
+  const queryClient = useQueryClient()
   const feedM = useMutation({
     mutationFn : approveNewsFeedContent,
     onSuccess : (response) => { console.log('response from approve mutate', response) },
-    onMutate : () => {}
+    onMutate : () => {},
+    onSettled : () => {
+        queryClient.invalidateQueries(['getFeeds']) 
+    }
   })
 
   const handleNoteSubmit = async (data : { notes : string }) => {
@@ -78,7 +82,7 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
     const mutatedData = await feedM.mutateAsync({
         data: {
            foreign_id : row._id,
-           action : "Approved",
+           action : "Declined",
            _method : 'put',
            notes : data.notes 
         }
@@ -92,7 +96,20 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
   }
 
   const handleApproveFeed =  () => {
+    setNoteLoader(true)
     setDisableActionButtons(true)
+    feedM.mutate({
+        data: {
+           foreign_id : row._id,
+           action : "Approved",
+           _method : 'put',
+        }
+    }, { onSettled : () => {
+        setNoteLoader(false)
+        setDisableActionButtons(false)
+        toggle()
+    }})
+    
   }
 
 

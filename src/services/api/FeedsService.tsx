@@ -67,7 +67,7 @@ const FeedsService = () => {
         "Accept": "application/json",
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/feeds/approval',
+      url: '/admin/feeds/approval',
       method: 'POST',
       data: params.data, // if body is JSON
     })
