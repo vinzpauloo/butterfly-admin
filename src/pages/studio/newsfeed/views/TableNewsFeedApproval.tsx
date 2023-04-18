@@ -17,7 +17,7 @@ import { Icon } from '@iconify/react'
 
 // ** Utils
 import formatDate from '@/utils/formatDate'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Import SideDrawer
 import EditNewsFeedDrawer from './EditNewsFeedDrawer'
@@ -98,7 +98,9 @@ const TableNewsFeedApproval = ({rows, isLoading, rowCount, pageSize, setPageSize
                     {params.includes ('image') && <img width={20} src={feedsObj['image'].iconPath } />}
                 </>
        )
-    }
+  }
+  
+  const TranslateString = useTranslateString()
 
     // ** Columns
     const columns: GridColumns = [

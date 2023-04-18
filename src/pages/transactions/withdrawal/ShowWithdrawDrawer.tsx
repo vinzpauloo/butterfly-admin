@@ -1,11 +1,13 @@
 import React from 'react'
 import { Box, Button, Drawer, Grid, Typography } from '@mui/material'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 function ShowWithdrawDrawer({ open, setOpen }: any) {
   const handleClose = () => {
     setOpen(false)
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Drawer

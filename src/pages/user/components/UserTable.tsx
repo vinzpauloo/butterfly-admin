@@ -18,7 +18,7 @@ import UserTableToolbar from './UserTableToolbar'
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Hooks
 import { useUsersTable } from '../../../services/api/useUsersTable'
@@ -223,6 +223,8 @@ const UserTable = () => {
     }
     setOpenDrawer(prevDrawer => (prevDrawer === drawerType ? null : drawerType))
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Grid container spacing={6}>

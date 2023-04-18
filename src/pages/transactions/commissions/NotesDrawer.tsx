@@ -2,7 +2,7 @@ import { Box, Button, Drawer, Typography } from '@mui/material'
 import InputUnstyled from '@mui/base/InputUnstyled'
 import { styled } from '@mui/system'
 import React from 'react'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 const blue = {
   100: '#DAECFF',
@@ -62,6 +62,8 @@ function NotesDrawer({ open, setOpen }: any) {
   const handleClose = () => {
     setOpen(false)
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Drawer

@@ -24,7 +24,7 @@ import FeedsService from '@/services/api/FeedsService'
 
 // ** Utils
 import createSkeleton from '@/utils/createSkeleton'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
 
 const steps = [
@@ -109,6 +109,8 @@ const NewsFeedList = (props: Props) => {
   const renderContent = () => {
     return getActiveTabContent(activeTab)
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Box sx={{ marginInline: 'auto', marginTop: '2rem', paddingBottom: '4rem', alignItems: 'center' }}>

@@ -16,7 +16,7 @@ import { useUsersTable } from '@/services/api/useUsersTable'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { GridRenderCellParams } from '@mui/x-data-grid'
-import TranslateString from '@/utils/TranslateString'
+
 import Translations from '@/layouts/components/Translations'
 
 interface ToggleViewProps {

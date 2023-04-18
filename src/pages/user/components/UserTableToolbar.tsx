@@ -12,7 +12,7 @@ import { CardHeader } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import ExportButton from './button/ExportButton'
 
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 interface Props {
   usernameValue: string
@@ -28,6 +28,9 @@ interface Props {
 }
 
 const UserTableToolbar = (props: Props) => {
+  
+  const TranslateString = useTranslateString()
+
   return (
     <Box
       sx={{

@@ -11,7 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import BundlesService from '@/services/api/BundlesService';
 import IconList from './IconList';
-import TranslateString from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString';
 
 type Props = {
 	bundleID: string
@@ -105,6 +105,8 @@ const VIPBundleItem = (props: Props) => {
 
 	const isBeingDeletedOrEdited = deletingLoading || editingLoading
 	const loadingStyle = isBeingDeletedOrEdited ? { opacity: 0.5, cursor: "not-allowed" } : null
+
+	const TranslateString = useTranslateString()
 
 	return (
 		<>

@@ -16,7 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Util Import
 import formatDate from '@/utils/formatDate'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Types
 import { IFeedStory } from '@/context/types'
@@ -112,6 +112,7 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
     
   }
 
+  const TranslateString = useTranslateString()
 
   return (
     <Card>

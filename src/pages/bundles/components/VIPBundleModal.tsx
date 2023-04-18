@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import BundlesService from '@/services/api/BundlesService';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import TranslateString from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString';
 
 type Props = {
 
@@ -207,6 +207,8 @@ const VIPBundleModal = (props: Props) => {
 
 	const isBeingAddedOrEdited = (addedLoading || addedSuccess) || (editingLoading || editingSuccess)
 	const loadingStyle = isBeingAddedOrEdited ? { opacity: 0.5, cursor: "not-allowed" } : null
+
+	const TranslateString = useTranslateString()
 
 	return (
 		<Stack {...modalContainer}>

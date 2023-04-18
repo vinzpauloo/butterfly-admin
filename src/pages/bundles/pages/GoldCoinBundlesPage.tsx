@@ -9,7 +9,7 @@ import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useQuery } from '@tanstack/react-query';
 import BundlesService from '@/services/api/BundlesService';
-import TranslateString from '@/utils/TranslateString';
+import { useTranslateString }  from '@/utils/TranslateString';
 
 
 const GoldCoinBundlesPage = () => {
@@ -24,6 +24,8 @@ const GoldCoinBundlesPage = () => {
     onSuccess: (data) => { console.log("COINS BUNDLE:", data?.bundles) },
     onError: (error) => { console.log(error) }
   })
+
+  const TranslateString = useTranslateString()
   
   return (
     <>

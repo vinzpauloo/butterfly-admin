@@ -8,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import GoldCoinBundleModal from './GoldCoinBundleModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import BundlesService from '@/services/api/BundlesService';
-import TranslateString from '@/utils/TranslateString';
+import { useTranslateString }  from '@/utils/TranslateString';
 
 type Props = {
 	bundleID: string
@@ -70,6 +70,8 @@ const GoldCoinBundleItem = (props: Props) => {
 
 	const isBeingDeletedOrEdited = deletingLoading || editingLoading
 	const loadingStyle = isBeingDeletedOrEdited ? { opacity: 0.5, cursor: "not-allowed" } : null
+
+	const TranslateString = useTranslateString()
 
 	return (
 		<>

@@ -19,8 +19,7 @@ import Icon from 'src/@core/components/icon'
 // ** Interfaces
 import { IVideoRow } from '@/context/types'
 import useDebounce from '@/hooks/useDebounce'
-import TranslateString from '@/utils/TranslateString'
-import Translations from '@/layouts/components/Translations'
+import { useTranslateString } from '@/utils/TranslateString';
 
 const navData = [
   {
@@ -99,6 +98,8 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
     setSearchTag('')
   }
 
+  const TranslateString = useTranslateString()
+
   return (
     <Box mb={2}>
       <Typography variant='h4' component='h4' mb={5}>
@@ -147,6 +148,8 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
   const [editVideoOpen, setEditVideoOpen] = React.useState<boolean>(false)
   const [ editVideoRow, setEditVideoRow ] = React.useState<IVideoRow>()
   const toggleEditVideoDrawer = () => setEditVideoOpen(!editVideoOpen)
+
+  const TranslateString = useTranslateString()
 
   const columnData = [
     {

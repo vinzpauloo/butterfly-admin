@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import BundlesService from '@/services/api/BundlesService';
-import TranslateString from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString';
 
 type Props = {
 
@@ -113,7 +113,9 @@ const GoldCoinBundleModal = (props: Props) => {
 	}
 
 	const isBeingAddedOrEdited = (addedLoading || addedSuccess) || (editingLoading || editingSuccess)
-	const loadingStyle = isBeingAddedOrEdited ? {opacity: 0.5, cursor: "not-allowed"} : null
+	const loadingStyle = isBeingAddedOrEdited ? { opacity: 0.5, cursor: "not-allowed" } : null
+	
+	const TranslateString = useTranslateString()
 	
 	return (
 		<Stack {...modalContainer}>

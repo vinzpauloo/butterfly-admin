@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Custom Imports
 import { saveAs } from 'file-saver'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 interface Props {
   usernameValue: string
@@ -63,6 +63,8 @@ const ExportButton = (props: Props) => {
       setSearch('title')
     }
   }, [props.emailValue, props.mobileValue, props.usernameValue, props.titleValue])
+
+  const TranslateString = useTranslateString()
 
   return (
     <Button

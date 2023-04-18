@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 
 import TabListData from '@/data/TabLists'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
@@ -41,6 +41,8 @@ function TabLists({ activeTab, setActiveTab, setOpen }: any) {
   const handleClick = (value: string) => {
     router.push(`/transactions/${value}`)
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Box display={'flex'} alignItems='flex-end' justifyContent={'space-between'}>

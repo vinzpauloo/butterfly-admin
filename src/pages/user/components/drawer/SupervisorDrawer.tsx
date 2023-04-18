@@ -17,7 +17,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Other Imports
 import CreatedSuccessful from '../form/CreatedSuccessful'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -147,6 +147,8 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
     setResponseError({})
     toggle()
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Drawer

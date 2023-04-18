@@ -18,7 +18,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Third Party Components
 import { useForm } from 'react-hook-form'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -89,6 +89,8 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
         setNoteValue('')
     }
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <>
