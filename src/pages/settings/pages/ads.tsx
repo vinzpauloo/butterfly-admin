@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { CircularProgress, Typography, Stack, Tabs, Tab  } from '@mui/material'
-import { useQuery } from '@tanstack/react-query'
-import AdvertisementService from "../../../services/api/AdvertisementService";
+import { useQuery } from '@tanstack/react-query' 
 import AdvertisementModal from '../components/modal/AdvertisementModal';
 import AdsContainer from '../components/ads/AdsContainer';
 import Translations from '@/layouts/components/Translations';
+import AdvertisementService from '@/services/api/AdvertisementService';
 
 const TabPanel = ({ children, index, value}: any) => {
   return (

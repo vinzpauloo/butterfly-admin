@@ -1,5 +1,6 @@
 import request from '@/lib/request'
 import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface AlbumData {
   data: {
@@ -37,7 +38,7 @@ export const AlbumService = () => {
   const getAlbums = (params: AlbumData) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -50,7 +51,7 @@ export const AlbumService = () => {
   const getSpecificUserAlbum = (params: AlbumData) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -63,7 +64,7 @@ export const AlbumService = () => {
   const postAlbum = (params: AlbumUpload) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`
@@ -77,7 +78,7 @@ export const AlbumService = () => {
   const editAlbum = (_id: any, data: any) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|0',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`

@@ -8,7 +8,7 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import BundlesService from "../../../services/api/BudlesService"
+import BundlesService from '@/services/api/BundlesService';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import TranslateString from '@/utils/TranslateString';
 

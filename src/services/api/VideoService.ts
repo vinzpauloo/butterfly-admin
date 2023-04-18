@@ -1,4 +1,5 @@
 import request from '@/lib/request'
+import { getHeaders } from '@/lib/cryptoJs'
 
 // ** Configs
 import authConfig from 'src/configs/auth'
@@ -24,7 +25,7 @@ const VideoService = () => {
   const getAllVideos = (params: IVideoParams) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -37,6 +38,7 @@ const VideoService = () => {
   const updateVideoByWorkId = (params: IUpdateVideoParams) => {
     return request({
       headers: {
+        ...getHeaders(),
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`
       },

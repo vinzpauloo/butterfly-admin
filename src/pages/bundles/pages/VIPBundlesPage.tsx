@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import Modal from '@mui/material/Modal';
 import VIPBundleModal from '../components/VIPBundleModal';
 import CircularProgress from '@mui/material/CircularProgress';
-import BundlesService from '../../../services/api/BudlesService'
+import BundlesService from '@/services/api/BundlesService';
 import { useQuery } from '@tanstack/react-query';
 import TranslateString from '@/utils/TranslateString';
 
@@ -19,11 +19,7 @@ const VIPBundlesPage = () => {
   const { getAllVIPBundles } = BundlesService()
   const { isLoading, data } = useQuery({
     queryKey: ['allVIPBundles'],
-    queryFn: () => getAllVIPBundles({
-      data: {
-        site_id: 1
-      },
-    }),
+    queryFn: () => getAllVIPBundles({data: {site_id: 0}}),
     onSuccess: (data) => { console.log("VIP BUNDLES:", data?.bundles) },
     onError: (error) => { console.log(error) }
   })

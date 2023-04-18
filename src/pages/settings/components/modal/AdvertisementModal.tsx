@@ -8,7 +8,7 @@ import DatePicker from 'react-datepicker'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
 import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import AdvertisementService from "../../../../services/api/AdvertisementService"
+import AdvertisementService from '@/services/api/AdvertisementService';
 import Translations from '@/layouts/components/Translations'
 
 interface ModalProps {

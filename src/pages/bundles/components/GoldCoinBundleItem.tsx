@@ -7,7 +7,7 @@ import Switch from '@mui/material/Switch';
 import CircularProgress from '@mui/material/CircularProgress';
 import GoldCoinBundleModal from './GoldCoinBundleModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import BundlesService from '../../../services/api/BudlesService';
+import BundlesService from '@/services/api/BundlesService';
 import TranslateString from '@/utils/TranslateString';
 
 type Props = {
