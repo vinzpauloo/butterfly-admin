@@ -3,7 +3,7 @@ import { ImageListItem, Switch, Stack, CircularProgress, styled } from '@mui/mat
 import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 import Image from 'next/image'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import AdvertisementService from '../../../../services/api/AdvertisementService';
+import AdvertisementService from '@/services/api/AdvertisementService';
 
 const AdsItem = ({ containerID, adsID, openModal, photoURL, adsURL, startDate, endDate, isActive, itemWidth, itemHeight, itemName }: any) => {
 	// subscribe to ads global store

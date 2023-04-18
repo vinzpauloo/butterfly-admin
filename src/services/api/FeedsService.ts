@@ -1,6 +1,9 @@
 import request from '@/lib/request'
+
 // ** Configs
 import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
+
 
 interface IFeedsPostParams {
   formData: FormData
@@ -33,7 +36,7 @@ const FeedsService = () => {
   const uploadFeed = (params: IFeedsPostParams) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`
       },
@@ -46,7 +49,7 @@ const FeedsService = () => {
   const getFeeds = (params : IGetFeedsParams) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -60,7 +63,7 @@ const FeedsService = () => {
 
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         'Content-Type': 'multipart/form-data', // if POST is form-data
         "Accept": "application/json",

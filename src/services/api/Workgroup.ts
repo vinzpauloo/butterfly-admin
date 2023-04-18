@@ -1,5 +1,6 @@
 import request from '../../lib/request'
 import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface IGetWorkgroup {
   page: number
@@ -51,7 +52,7 @@ const WorkgroupService = () => {
   const getWorkgroup = (params: IGetWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -64,7 +65,7 @@ const WorkgroupService = () => {
   const postWorkgroup = (params: IPostWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -77,7 +78,7 @@ const WorkgroupService = () => {
   const putWorkgroup = (params: IPutWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -90,7 +91,7 @@ const WorkgroupService = () => {
   const getSpecificWorkgroup = (params: IGetSpecificWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -102,7 +103,7 @@ const WorkgroupService = () => {
   const getAllWorkgroup = (params: IGetAllWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -115,7 +116,7 @@ const WorkgroupService = () => {
   const deleteCheckWorkgroup = (params: ICheckWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -128,7 +129,7 @@ const WorkgroupService = () => {
   const postCheckWorkgroup = (params: ICheckWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },

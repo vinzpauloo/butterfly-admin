@@ -1,7 +1,8 @@
 import request from "@/lib/request";
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface IBundlesParams {
-	data: {
+	data?: {
 		site_id?: number
 		bundle_id?: string
 		name?: string
@@ -31,7 +32,7 @@ const BundlesService = () => {
 	const getAllVIPBundles = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
@@ -44,7 +45,7 @@ const BundlesService = () => {
 	const addVIPBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
@@ -57,7 +58,7 @@ const BundlesService = () => {
 	const deleteVIPBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
@@ -70,7 +71,7 @@ const BundlesService = () => {
 	const editVIPBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
@@ -83,7 +84,7 @@ const BundlesService = () => {
 	const getAllCoinsBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
@@ -96,7 +97,7 @@ const BundlesService = () => {
 	const addCoinsBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
@@ -109,7 +110,7 @@ const BundlesService = () => {
 	const deleteCoinsBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},
@@ -122,7 +123,7 @@ const BundlesService = () => {
 	const editCoinsBundle = (params: IBundlesParams) => {
 		return request({
 			headers: {
-				"X-Authorization": "postman|1",
+				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
 				"Accept": "application/json"
 			},

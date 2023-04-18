@@ -32,7 +32,7 @@ const Announcements = () => {
   const { getAllAnnouncement, updateAnnouncement } = AnnoucementsService()
   const { isLoading } = useQuery({
     queryKey: ["allAnnouncement"],
-    queryFn: () => getAllAnnouncement({ data: { with: "introductions" } }),
+    queryFn: () => getAllAnnouncement({ data: { with: "introductions", site_id: 0 } }),
     onSuccess: (data) => {
       setAnnouncementID(data?._id)
       setData(data?.introductions)

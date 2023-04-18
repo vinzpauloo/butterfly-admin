@@ -1,5 +1,6 @@
 import request from '@/lib/request'
 import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface IGetContentsParams {
   data: {
@@ -25,7 +26,7 @@ const ContentService = () => {
   const getContents = (params : IGetContentsParams) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -38,7 +39,7 @@ const ContentService = () => {
   const approveContent = (params: IGetContentsParams) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         'Content-Type': 'multipart/form-data', // if POST is form-data
         "Accept": "application/json",
