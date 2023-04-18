@@ -59,6 +59,10 @@ const navigation = (): VerticalNavItemsType => {
           path: '/studio/content'
         },
         {
+          title: 'Newsfeed Approval',
+          path: '/studio/newsfeed/approval'
+        },
+        {
           title: 'Newsfeed List',
           path: '/studio/newsfeed',
           action: 'read',

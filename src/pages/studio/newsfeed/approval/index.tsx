@@ -53,16 +53,16 @@ const NewsFeedApproval = () => {
   const { getFeeds } = FeedsService()
   const getFeedQuery = useQuery({
     keepPreviousData: false,
-    queryKey: ['getFeeds', paginate, page, debounceSearchText, sort, searchBy, sortBy, specificType],
+    queryKey: ['getFeeds', paginate, page, debounceSearchText, sort, sortBy, specificType],
     queryFn: () => getFeeds({
       paginate : paginate,
       page : page,
       sort : sort,
       sortBy : sortBy,
-      ...(searchText !== "" && { search_by : searchBy }),
       ...(searchText !== "" && { search_value: searchText }),
-      ...(specificType !== null && {specificType : specificType}),
+      ...(specificType !== null && {...specificType}), // video_only, images_only, video_images
       with : 'user',
+      search_all : true,
       all : true
     }),
     onSuccess: response => {
@@ -76,13 +76,20 @@ const NewsFeedApproval = () => {
     setPage(newPage + 1) // 0 based
   }
 
-  const handleFilterButtonClick = (filter : 'all' | 'photos' | 'videos' | 'photos_videos') => {
+  const handleFilterFeedTypeClick = (filter : 'all' | 'photos' | 'videos' | 'photos_videos') => {
 
+    switch( filter ) {
+      case 'all' : setSpecificType({})
+      break;
+      case 'photos' : setSpecificType({images_only : true})
+      break;
+      case 'videos' : setSpecificType({video_only : true})
+      break;
+      case 'photos_videos' : setSpecificType({video_images : true})
+      break;
+      default : setSpecificType({})
+    }
     console.log('filter',filter)
-    setSpecificType({
-      video : true
-    })
-
   }
 
   return (
@@ -112,19 +119,19 @@ const NewsFeedApproval = () => {
           }}
           action={
             <Box sx={{ display: 'flex', gap: '1rem' }}>
-              <Button size='small' variant='contained' onClick={() => handleFilterButtonClick('all')}>
+              <Button size='small' variant='contained' onClick={() => handleFilterFeedTypeClick('all')}>
                 All Feeds
               </Button>
 
-              <Button size='small' variant='outlined' onClick={() => handleFilterButtonClick('photos')}>
+              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('photos')}>
                 All Photo Feeds
               </Button>
 
-              <Button size='small' variant='outlined' onClick={() => handleFilterButtonClick('videos')}>
+              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('videos')}>
                 All Video Feeds
               </Button>
 
-              <Button size='small' variant='outlined' onClick={() => handleFilterButtonClick('photos_videos')}>
+              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('photos_videos')}>
                 Videos and Photos
               </Button>
             </Box>

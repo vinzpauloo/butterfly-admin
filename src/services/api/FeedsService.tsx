@@ -14,9 +14,18 @@ interface IGetFeedsParams {
   paginate? : number,
   sort? : 'desc' | 'asc',
   sortBy : any, // returned columns of GET admin/feeds
+  search_all? : boolean,
   all? : boolean
 }
 
+interface IApproveFeedParams {
+  data : {
+    foreign_id : string
+    action : 'Approved' | 'Declined'
+    note : string
+    _method: 'put'
+  }
+}
 
 const FeedsService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -46,9 +55,24 @@ const FeedsService = () => {
       params: params
     })
   }
-  
 
-  return { uploadFeed, getFeeds }
+  const approveNewsFeedContent = (params: IApproveFeedParams) => {
+
+    return request({
+      headers: {
+        'X-Authorization': 'postman|1',
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        'Content-Type': 'multipart/form-data', // if POST is form-data
+        "Accept": "application/json",
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/feeds/approval',
+      method: 'POST',
+      data: params.data, // if body is JSON
+    })
+  }
+
+  return { uploadFeed, getFeeds, approveNewsFeedContent }
 }
 
 export default FeedsService
