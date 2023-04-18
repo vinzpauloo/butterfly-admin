@@ -116,7 +116,7 @@ const TableAlbums = () => {
         <Card>
           <Box sx={{ mx: 5, mt: 5, ...styles.buttonContainer }}>
             <Typography variant='h4' component='h4'>
-              {TranslateString("Album List")}
+              {TranslateString('Album List')}
             </Typography>
           </Box>
 
@@ -130,6 +130,7 @@ const TableAlbums = () => {
             autoHeight
             rows={albumData ?? []}
             getRowId={(row: AlbumData) => row?._id}
+            // @ts-ignore
             columns={AlbumColumns}
             pageSize={pageSize}
             pagination

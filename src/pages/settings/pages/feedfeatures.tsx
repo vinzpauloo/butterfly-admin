@@ -78,7 +78,7 @@ const feedFeatureRows = [
 ]
 
 const feedFeatureColumns = [
-  { field: 'title', headerName: <Translations text='Title'/>, width: 200 },
+  { field: 'title', headerName: <Translations text='Title' />, width: 200 },
   { field: 'MobileNumber', headerName: <Translations text='Mobile Number' />, width: 200 },
   { field: 'Email', headerName: <Translations text='Email' />, width: 200 },
   { field: 'dateCreated', headerName: <Translations text='Date Created' />, width: 250 },
@@ -120,16 +120,16 @@ const FeedFeatures = () => {
         <Card>
           <Box sx={styles.header}>
             <Box sx={styles.feeds}>
-              <Typography sx={styles.feedText}>{TranslateString("Feed Features")}</Typography>
+              <Typography sx={styles.feedText}>{TranslateString('Feed Features')}</Typography>
             </Box>
 
             <Box sx={styles.buttonContainer}>
               <Button sx={styles.button} onClick={() => handleModalToggle('select')}>
-                {TranslateString("Select Featured Feeds")}
+                {TranslateString('Select Featured Feeds')}
               </Button>
 
               <Button sx={styles.button} onClick={() => handleModalToggle('create')}>
-                {TranslateString("Create Feed")}
+                {TranslateString('Create Feed')}
               </Button>
             </Box>
           </Box>
@@ -138,6 +138,7 @@ const FeedFeatures = () => {
           <DataGrid
             autoHeight
             rows={feedFeatureRows}
+            // @ts-ignore
             columns={feedFeatureColumns}
             pageSize={pageSize}
             disableSelectionOnClick
