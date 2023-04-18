@@ -40,7 +40,8 @@ interface FeedsObj {
 }
 const statusObj: StatusObj = {
   'Approved': { title: 'Approved', color: 'success' },
-  'Declined': { title: 'Declined', color: 'error' }
+  'Declined': { title: 'Declined', color: 'error' },
+  'Pending': { title: 'Pending', color: 'warning' }
 }
 
 const feedsObj: FeedsObj = {

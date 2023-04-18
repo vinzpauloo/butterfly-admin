@@ -22,6 +22,30 @@ import TableNewsFeedApproval from '../views/TableNewsFeedApproval'
 // ** Custom Hooks
 import useDebounce from '@/hooks/useDebounce'
 
+// ** Struct
+const ButtonFilters = [
+  {
+    id : 1,
+    title : 'All Feeds',
+    filter : 'all'
+  },
+  {
+    id : 2,
+    title : 'All Photo Feeds',
+    filter : 'photos'
+  },
+  {
+    id : 3,
+    title : 'All Video Feeds',
+    filter : 'videos'
+  },
+  {
+    id : 4,
+    title : 'Videos and Photos',
+    filter : 'photos_videos'
+  },
+]
+
 
 const NewsFeedApproval = () => {
   // ** States
@@ -76,7 +100,7 @@ const NewsFeedApproval = () => {
     setPage(newPage + 1) // 0 based
   }
 
-  const handleFilterFeedTypeClick = (filter : 'all' | 'photos' | 'videos' | 'photos_videos') => {
+  const handleFilterFeedTypeClick = (filter : 'all' | 'photos' | 'videos' | 'photos_videos' | string) => {
 
     switch( filter ) {
       case 'all' : setSpecificType({})
@@ -119,21 +143,13 @@ const NewsFeedApproval = () => {
           }}
           action={
             <Box sx={{ display: 'flex', gap: '1rem' }}>
-              <Button size='small' variant='contained' onClick={() => handleFilterFeedTypeClick('all')}>
-                All Feeds
-              </Button>
-
-              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('photos')}>
-                All Photo Feeds
-              </Button>
-
-              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('videos')}>
-                All Video Feeds
-              </Button>
-
-              <Button size='small' variant='outlined' onClick={() => handleFilterFeedTypeClick('photos_videos')}>
-                Videos and Photos
-              </Button>
+              {
+                ButtonFilters.map( button => (
+                  <Button key={button.id} size='small' variant='contained' onClick={() => handleFilterFeedTypeClick(`${button.filter}`) }>
+                    {button.title}
+                  </Button>
+                ))
+              }
             </Box>
           }
         />
