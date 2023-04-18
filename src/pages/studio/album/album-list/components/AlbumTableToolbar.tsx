@@ -11,7 +11,7 @@ import { CardHeader } from '@mui/material'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import ExportButton from '@/pages/user/components/button/ExportButton'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 interface Props {
   usernameValue: string
@@ -28,6 +28,8 @@ interface Props {
 }
 
 const AlbumTableToolbar = (props: Props) => {
+  const TranslateString = useTranslateString()
+
   return (
     <Box
       sx={{

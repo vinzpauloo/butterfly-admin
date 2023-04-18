@@ -29,7 +29,7 @@ import VideoService from '@/services/api/VideoService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircularProgress } from '@mui/material'
 
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 interface SidebarEditType {
   open: boolean
@@ -156,6 +156,8 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
 
 
   }, [row])
+
+  const TranslateString = useTranslateString()
 
   if (row == undefined) return <></>
 

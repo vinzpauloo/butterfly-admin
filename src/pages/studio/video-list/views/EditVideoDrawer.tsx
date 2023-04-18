@@ -29,7 +29,7 @@ import VideoService from '@/services/api/VideoService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircularProgress } from '@mui/material'
 
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 interface SidebarEditVideoType {
   open: boolean
@@ -156,6 +156,8 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
     }
   }
 
+  const TranslateString = useTranslateString()
+
   const handleTagDelete = (tag: string) => {
     let filteredTags = getValues('tags')?.filter(e => e !== tag)
     setValue('tags', filteredTags as [])
@@ -172,6 +174,8 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
   }, [row])
 
   if (row == undefined) return <></>
+
+  
 
   if (row) {
     return (

@@ -29,7 +29,7 @@ import ReactPlayer from 'react-player'
 import { useForm, Controller } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import ContentService from '../../../services/api/ContentService'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -180,6 +180,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
       })
     }
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <>

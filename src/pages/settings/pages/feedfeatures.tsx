@@ -8,7 +8,7 @@ import { DataGrid } from '@mui/x-data-grid'
 // ** Other Imports
 import SelectFeedsModal from '../components/modal/SelectFeedsModal'
 import CreateFeedModal from '../components/modal/CreateFeedModal'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
 
 // ** Style Imports
@@ -113,6 +113,8 @@ const FeedFeatures = () => {
   const handleModalToggle = (modalType: ModalType) => {
     setOpenModal(prevModal => (prevModal === modalType ? null : modalType))
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Grid container spacing={6}>

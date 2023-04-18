@@ -1,12 +1,11 @@
-// ** Third Party Import
 import { useTranslation } from 'react-i18next'
 
-
-const TranslateString = (text: string) => {
-	// ** Hook
+export const useTranslateString = () => {
 	const { t } = useTranslation()
 
-	return `${t(text)}`
-}
+	const TranslateString = (text: string) => {
+		return `${t(text)}`
+	}
 
-export default TranslateString
+	return TranslateString
+}

@@ -31,7 +31,7 @@ import WorkList from '../modal/WorkList'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
 
 const navData = [
@@ -310,6 +310,8 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
 
     return () => setTitle('')
   }, [open])
+
+  const TranslateString = useTranslateString()
 
   return (
     <>

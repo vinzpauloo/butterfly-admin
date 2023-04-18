@@ -1,4 +1,4 @@
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import React, { useState } from 'react'
 
@@ -25,6 +25,8 @@ const data = [
 
 function Header({}: Props) {
   const [superAgent, setSuperAgent] = useState('')
+
+  const TranslateString = useTranslateString()
 
   return (
     <Box mb={5}>

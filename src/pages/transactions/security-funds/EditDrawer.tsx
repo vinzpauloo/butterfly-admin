@@ -1,11 +1,13 @@
 import { Box, Button, Drawer, Typography } from '@mui/material'
 import React from 'react'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 function EditDrawer({ open, setOpen }: any) {
   const handleClose = () => {
     setOpen(false)
   }
+
+  const TranslateString = useTranslateString()
 
   return (
     <Drawer

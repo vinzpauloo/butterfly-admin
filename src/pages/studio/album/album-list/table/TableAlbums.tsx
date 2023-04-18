@@ -10,7 +10,7 @@ import AlbumTableToolbar from '../components/AlbumTableToolbar'
 
 // ** Other Imports
 import { AlbumColumns } from '@/data/AlbumColumns'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
@@ -110,6 +110,8 @@ const TableAlbums = () => {
     }
   }
 
+  const TranslateString = useTranslateString()
+  
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>

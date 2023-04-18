@@ -15,7 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Style Imports
 
@@ -66,6 +66,8 @@ const SelectFeaturedFeeds: React.FC<FeedsProps> = ({ onClose }) => {
     const handleBtnClick = () => {
         onClose();
     }
+    
+    const TranslateString = useTranslateString()
 
     return (
         <Box sx={styles.container}>

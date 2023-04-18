@@ -10,7 +10,7 @@ import WorkgroupService from '@/services/api/Workgroup'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
 import Image from 'next/image'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 
 const navData = [
@@ -112,6 +112,8 @@ const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue
     setTemplate('')
   }
 
+  const TranslateString = useTranslateString()
+
   return (
     <Box mb={2}>
       <Typography variant='h4' component='h4' mb={5}>{TranslateString("Workgroup")}</Typography>
@@ -180,6 +182,7 @@ const Table = ({
   setSectionID,
   setTitle
 }: any) => {
+  const TranslateString = useTranslateString()
   const columnData = [
     {
       field: 'title',
@@ -195,7 +198,7 @@ const Table = ({
     },
     {
       field: 'template_id',
-      headerName: TranslateString("Template") + "ID",
+      headerName: TranslateString("Template") + " ID",
       width: 300,
       sortable: false,
       renderCell: (params: any) => {

@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import formatDate from '@/utils/formatDate'
 import Transaction from '@/pages/transactions'
 import TransactionsService from '@/services/api/Transactions'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
 
 const columnData = [
@@ -151,6 +151,8 @@ function index() {
     setSiteName('')
   }
 
+  const TranslateString = useTranslateString()
+
   return (
     <Transaction
       isLoading={isLoading}
@@ -184,7 +186,7 @@ function index() {
           value={sitename}
           onChange={e => setSiteName(e.target.value)}
         />
-        <Button variant='contained' color='error' sx={{ width: 50 }} onClick={handleClear}>
+        <Button variant='contained' color='error' sx={{ width: 100 }} onClick={handleClear}>
           {TranslateString('Clear')}
         </Button>
       </Box>

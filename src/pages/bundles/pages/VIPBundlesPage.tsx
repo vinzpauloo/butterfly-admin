@@ -9,7 +9,7 @@ import VIPBundleModal from '../components/VIPBundleModal';
 import CircularProgress from '@mui/material/CircularProgress';
 import BundlesService from '@/services/api/BundlesService';
 import { useQuery } from '@tanstack/react-query';
-import TranslateString from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString';
 
 const VIPBundlesPage = () => {
   const [open, setOpen] = useState(false);
@@ -23,6 +23,8 @@ const VIPBundlesPage = () => {
     onSuccess: (data) => { console.log("VIP BUNDLES:", data?.bundles) },
     onError: (error) => { console.log(error) }
   })
+
+  const TranslateString = useTranslateString()
   
   return (
     <>

@@ -23,7 +23,7 @@ import { useDropzone } from 'react-dropzone'
 import FeedsService from '@/services/api/FeedsService'
 import TUSService from '@/services/api/TusService'
 
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 interface ModalProps {
   isOpen: boolean
@@ -220,6 +220,8 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       </IconButton>
     </ListItem>
   ))
+
+  const TranslateString = useTranslateString()
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'sm'}>

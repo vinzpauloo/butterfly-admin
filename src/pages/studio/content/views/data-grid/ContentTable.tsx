@@ -23,7 +23,7 @@ import ContentService from '@/services/api/ContentService'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import TranslateString from '@/utils/TranslateString'
+import { useTranslateString } from '@/utils/TranslateString';
 
 
 // ** renders client column
@@ -92,6 +92,7 @@ const ContentTable = (props: IContentTable) => {
     },
   })
 
+  const TranslateString = useTranslateString()
 
   const columns: GridColDef[] = [
     {
