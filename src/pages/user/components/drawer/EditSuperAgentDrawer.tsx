@@ -515,16 +515,21 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Security Funds'
-                    variant='outlined'
-                    fullWidth
-                    value={siteData[0]?.security_funds_balance}
+                  <Controller
                     name='amount'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    disabled
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.amount}
+                        helperText={errors.amount?.message}
+                        onChange={field.onChange}
+                        name='amount'
+                        value={field.value || ''}
+                        disabled
+                      />
+                    )}
                   />
                 </Box>
 

@@ -12,7 +12,6 @@ import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
 import Image from 'next/image'
 import { useTranslateString } from '@/utils/TranslateString';
 
-
 const navData = [
   {
     value: 'selection',
@@ -116,23 +115,25 @@ const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue
 
   return (
     <Box mb={2}>
-      <Typography variant='h4' component='h4' mb={5}>{TranslateString("Workgroup")}</Typography>
+      <Typography variant='h4' component='h4' mb={5}>
+        {TranslateString('Workgroup')}
+      </Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} gap={2.5}>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} gap={2.5} width={900}>
           <OutlinedInput
             fullWidth
-            placeholder={TranslateString("Search")}
+            placeholder={TranslateString('Search')}
             size='small'
             value={title}
             onChange={e => setSearchValue(e.target.value)}
           />
           <FormControl fullWidth size='small'>
-            <InputLabel id='demo-simple-select-label'>{TranslateString("Navbar")}</InputLabel>
+            <InputLabel id='demo-simple-select-label'>{TranslateString('Navbar')}</InputLabel>
             <Select
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={navbar}
-              label={TranslateString("Navbar")}
+              label={TranslateString('Navbar')}
               onChange={e => setNavbar(e.target.value)}
             >
               {navData.map((item, index) => (
@@ -143,13 +144,13 @@ const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue
             </Select>
           </FormControl>
           <FormControl fullWidth size='small'>
-            <InputLabel id='demo-simple-select-label'>{TranslateString("Template")}</InputLabel>
+            <InputLabel id='demo-simple-select-label'>{TranslateString('Template')}</InputLabel>
             <Select
               style={{ display: 'flex', alignItems: 'center' }}
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={template_id}
-              label={TranslateString("Template")}
+              label={TranslateString('Template')}
               onChange={e => setTemplate(e.target.value)}
             >
               {templateData.map((item, index) => (
@@ -162,9 +163,13 @@ const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue
               ))}
             </Select>
           </FormControl>
-          <Button variant='contained' color='error' sx={{width:150}} onClick={handleClear}>{TranslateString("Clear")}</Button>
+          <Button variant='contained' color='error' sx={{ width: 150 }} onClick={handleClear}>
+            {TranslateString('Clear')}
+          </Button>
         </Box>
-        <Button variant='contained' onClick={handleClick}>{TranslateString("Add Workgroup")}</Button>
+        <Button variant='contained' onClick={handleClick}>
+          {TranslateString('Add Workgroup')}
+        </Button>
       </Box>
     </Box>
   )
@@ -186,13 +191,13 @@ const Table = ({
   const columnData = [
     {
       field: 'title',
-      headerName: TranslateString("Title"),
+      headerName: TranslateString('Title'),
       width: 650,
       sortable: false
     },
     {
       field: 'navbar',
-      headerName: TranslateString("Navbar"),
+      headerName: TranslateString('Navbar'),
       width: 300,
       sortable: false
     },
@@ -218,7 +223,7 @@ const Table = ({
     },
     {
       field: 'action',
-      headerName: TranslateString("Action"),
+      headerName: TranslateString('Action'),
       width: 100,
       sortable: false,
       renderCell: (params: any) => {
