@@ -31,7 +31,7 @@ type DialogNotesProps = {
     states: {
         open : boolean
         toggle : () => void
-        outterHandleSubmit? : ( data : any ) => void // note data
+        outterHandleSubmit : ( data : any ) => void // note data
         isLoading : boolean
     }
 }
@@ -69,9 +69,13 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
     handleSubmit,
     clearErrors,
     formState: { errors }
-  } = useForm()
+  } = useForm({
+    defaultValues : {
+        notes : ''
+    }
+  })
 
-  const onSubmitNote = (data : any) => {
+  const onSubmitNote = async (data : any) => {
 
     // TO CONFIRM DECLINE OF WORK
     let note = watch('notes')
@@ -80,7 +84,8 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
       return
     } else {
         console.log("SUBMIT AND DECLINE")
-        { states.outterHandleSubmit && states.outterHandleSubmit(data) }
+        let callAfter = await states.outterHandleSubmit(data)
+        console.log('call this after', callAfter)
     }
   }
 

@@ -5,24 +5,18 @@ import { Ref, useState, forwardRef, ReactElement, ChangeEvent } from 'react'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
-import Switch from '@mui/material/Switch'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
-import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
 import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import FormControlLabel from '@mui/material/FormControlLabel'
-
+import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Util Import
 import formatDate from '@/utils/formatDate'
-
-// ** Styles Import
-import 'react-credit-cards/es/styles-compiled.css'
+import TranslateString from '@/utils/TranslateString'
 
 // ** Types
 import { IFeedStory } from '@/context/types'
@@ -36,6 +30,10 @@ import FeedAttachments from '@/pages/studio/shared-component/feed/FeedAttachment
 import FeedVideoCard from '@/pages/studio/shared-component/feed/FeedVideoCard'
 import PhotoGridCard from '@/pages/studio/shared-component/feed/PhotoGridCard'
 import DialogNotes from '@/shared-components/DialogNotes'
+
+// ** Tanstack and API Service
+import FeedsService from '@/services/api/FeedsService'
+import { useMutation } from '@tanstack/react-query'
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -57,6 +55,7 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
   // ** States
   const [openNote, setOpenNote] = useState<boolean>(false)
   const [ noteLoader, setNoteLoader ] = useState<boolean>(false)
+  const [disableActionButtons, setDisableActionButtons] = useState<boolean>(false)
 
   const toggleNote = () => {
     setOpenNote(!openNote)
@@ -66,20 +65,34 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
     setOpenNote(true)
   }
 
-  const handleNoteSubmit = (data : { notes : string }) => {
+  const { approveNewsFeedContent} = FeedsService()
+  const feedM = useMutation({
+    mutationFn : approveNewsFeedContent,
+    onSuccess : (response) => { console.log('response from approve mutate', response) },
+    onMutate : () => {}
+  })
+
+  const handleNoteSubmit = async (data : { notes : string }) => {
+
     setNoteLoader(true)
-    setTimeout( () => {
-        setNoteLoader(false)
-        setOpenNote(false)
-        toggle()
-    }, 2000 )
-    console.log('call handleNoteSubmit Outside', data)
+    const mutatedData = await feedM.mutateAsync({
+        data: {
+           foreign_id : row._id,
+           action : "Approved",
+           _method : 'put',
+           notes : data.notes 
+        }
+    })
+
+    setNoteLoader(false)
+    setOpenNote(false)
+    toggle()
+
+    return mutatedData
   }
 
-  const handleApproveFeed = () => {
-    setTimeout( () => {
-        toggle()
-    }, 2000 )
+  const handleApproveFeed =  () => {
+    setDisableActionButtons(true)
   }
 
 
@@ -139,20 +152,21 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
                                 <FeedVideoCard source={row.videos.url} />
                             </FeedAttachments>
                         )}
-                            <FeedAttachments>
-                                <PhotoGridCard>
-                                    {row &&
-                                    row?.images &&
-                                    row?.images.map(image => {
-                                        return (
-                                        <img
-                                            key={image._id}
-                                            src={image.url.replace('http://localhost/', 'http://192.168.50.9/')} //TBR
-                                        />
-                                        )
-                                    })}
-                                </PhotoGridCard>
-                            </FeedAttachments>
+                        
+                        <FeedAttachments>
+                            <PhotoGridCard>
+                                {row &&
+                                row?.images &&
+                                row?.images.map(image => {
+                                    return (
+                                    <img
+                                        key={image._id}
+                                        src={image.url.replace('http://localhost/', 'http://192.168.50.9/')} //TBR
+                                    />
+                                    )
+                                })}
+                            </PhotoGridCard>
+                        </FeedAttachments>
                         
                   </FeedCard>
 
@@ -160,13 +174,15 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'center' }}>
-          <Button variant='contained' color='error' sx={{ mr: 1 }} onClick={ () => handleDecline() }>
+          <Button 
+            disabled={disableActionButtons ? true : false}
+            variant='contained' color='error' sx={{ mr: 1 }} onClick={ () => handleDecline() }>
             Decline
           </Button>
           <Button 
-            
+            disabled={disableActionButtons ? true : false}
             variant='contained' color='primary' onClick={ () => handleApproveFeed()}>
-            Approve
+            { disableActionButtons ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} {TranslateString("Approve") }
           </Button>
         </DialogActions>
       </Dialog>

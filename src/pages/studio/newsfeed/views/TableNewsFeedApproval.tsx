@@ -120,7 +120,7 @@ const TableNewsFeedApproval = ({rows, isLoading, rowCount, pageSize, setPageSize
           flex: 1,
           minWidth: 150,
           maxWidth:150,
-          headerName: 'Username',
+          headerName: 'Content Creator',
           field: 'username',
           renderCell: (params: GridRenderCellParams) => (
             <Typography variant='body2' sx={{ color: 'text.primary' }}>
