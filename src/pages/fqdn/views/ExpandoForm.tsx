@@ -1,7 +1,23 @@
 import React from 'react'
 
 // ** MUI
-import { Box, Button, Grid, Typography, TextField, Card, CardContent, CircularProgress } from '@mui/material'
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  TextField,
+  Card,
+  CardContent,
+  IconButton,
+  CircularProgress,
+  FormControl,
+  OutlinedInput,
+  InputAdornment
+} from '@mui/material'
+
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 
 // ** Third Party imports
 import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form'
@@ -10,7 +26,7 @@ type ExpandoFormProps = {
   pageHeader: string
   fileType: string
   handleExpandoSubmit?: (data: FormInputs) => void
-  isLoading? : boolean
+  isLoading?: boolean
 }
 
 type FormInputs = {
@@ -19,8 +35,7 @@ type FormInputs = {
   }[]
 }
 
-const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading=false }: ExpandoFormProps) => {
-
+const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = false }: ExpandoFormProps) => {
   // ** UseForm
   const {
     control,
@@ -61,20 +76,31 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading=fals
             <Grid container spacing={5}>
               {fields.map((field, index) => (
                 <Grid key={field.id} item xs={12}>
-                  <TextField
-                    type={fileType}
-                    fullWidth
-                    placeholder={`Option ${index + 1}`}
+                  <FormControl 
                     error={Boolean(errors.expando)}
-                    // important to include key with field's id
-                    {...register(`expando.${index}.value`, { required: true })}
-                  />
+                    {...register(`expando.${index}.value`, { required: true })} 
+                    fullWidth
+                  >
+                    <OutlinedInput
+                      placeholder={`Option ${index + 1}`}
+                      type={fileType}
+                      endAdornment={
+                        index >= 3 ? (
+                          <InputAdornment position='end'>
+                            <IconButton edge='end' onClick={() => { console.log('ehey')}} onMouseDown={() => { remove(index) }}>
+                              <Icon color='red' icon='mdi:close' />
+                            </IconButton>
+                          </InputAdornment>
+                        ) : <></>
+                      }
+                    />
+                  </FormControl>
                 </Grid>
               ))}
               <Grid item xs={12}>
                 <Box display='flex' justifyContent='space-evenly'>
                   <Button
-                    disabled={ isLoading ? true : false }
+                    disabled={isLoading ? true : false}
                     variant='contained'
                     color='info'
                     onClick={() => {
@@ -83,12 +109,8 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading=fals
                   >
                     Add More
                   </Button>
-                  <Button
-                    disabled={ isLoading ? true : false }
-                    type='submit' 
-                    variant='contained' 
-                    color='primary'>
-                    { isLoading ? <CircularProgress size={12} sx={{ mr : 2 }} /> : null } Save
+                  <Button disabled={isLoading ? true : false} type='submit' variant='contained' color='primary'>
+                    {isLoading ? <CircularProgress size={12} sx={{ mr: 2 }} /> : null} Save
                   </Button>
                 </Box>
               </Grid>
