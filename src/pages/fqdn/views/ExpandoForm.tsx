@@ -77,17 +77,18 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
               {fields.map((field, index) => (
                 <Grid key={field.id} item xs={12}>
                   <FormControl 
-                    error={Boolean(errors.expando)}
-                    {...register(`expando.${index}.value`, { required: true })} 
+                    
                     fullWidth
                   >
                     <OutlinedInput
+                      {...register(`expando.${index}.value`, {required : true})} 
+                      error={Boolean(errors.expando)}
                       placeholder={`Option ${index + 1}`}
                       type={fileType}
                       endAdornment={
                         index >= 3 ? (
                           <InputAdornment position='end'>
-                            <IconButton edge='end' onClick={() => { console.log('ehey')}} onMouseDown={() => { remove(index) }}>
+                            <IconButton edge='end' onClick={() => { remove(index) }} onMouseDown={() => { remove(index) }}>
                               <Icon color='red' icon='mdi:close' />
                             </IconButton>
                           </InputAdornment>
