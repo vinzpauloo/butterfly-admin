@@ -11,7 +11,7 @@ import { CardHeader } from '@mui/material'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import ExportButton from '@/pages/user/components/button/ExportButton'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 interface Props {
   usernameValue: string
@@ -30,21 +30,25 @@ interface Props {
 const AlbumTableToolbar = (props: Props) => {
   const TranslateString = useTranslateString()
 
+  const handleClear = () => {
+    props.clearSearch()
+  }
+
   return (
     <Box
       sx={{
         padding: 5
       }}
     >
-      <Box>
+      {/* <Box>
         <CardHeader
-          title={TranslateString("Search") + " " + TranslateString("Filters")}
+          title={TranslateString('Search') + ' ' + TranslateString('Filters')}
           sx={{
             margin: 0,
             padding: 0
           }}
         />
-      </Box>
+      </Box> */}
       <Box
         sx={{
           display: 'flex',
@@ -61,17 +65,19 @@ const AlbumTableToolbar = (props: Props) => {
           size='small'
           value={props.titleValue}
           onChange={props.onTitleChange}
-          placeholder={TranslateString("Search") + " " + TranslateString("Title") + "..."}
+          placeholder={TranslateString('Search') + ' ' + TranslateString('Title') + '...'}
           InputProps={{
             startAdornment: (
               <Box sx={{ mr: 2, display: 'flex' }}>
                 <Icon icon='mdi:magnify' fontSize={20} />
               </Box>
             ),
-            endAdornment: (
+            endAdornment: props?.titleValue ? (
               <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
                 <Icon icon='mdi:close' fontSize={20} />
               </IconButton>
+            ) : (
+              false
             )
           }}
           sx={{
@@ -85,8 +91,25 @@ const AlbumTableToolbar = (props: Props) => {
             }
           }}
         />
+        <Button
+          variant='contained'
+          color='error'
+          sx={{
+            width: {
+              xs: 'auto',
+              sm: 'auto',
+              md: 'auto',
+              lg: 150
+            }
+          }}
+          onClick={handleClear}
+        >
+          {TranslateString('Clear')}
+        </Button>
       </Box>
-      <Box
+
+      {/* Export Button commented out for possible future use. */}
+      {/* <Box
         sx={{
           mt: 5,
           borderTop: '1px solid #d3d3d3'
@@ -99,16 +122,16 @@ const AlbumTableToolbar = (props: Props) => {
             justifyContent: 'space-between'
           }}
         >
-          {/* <ExportButton
+          <ExportButton
             role={props.role}
             emailValue={props.emailValue}
             mobileValue={props.mobileValue}
             usernameValue={props.usernameValue}
             role_id={props.role_id}
             titleValue={props.titleValue}
-          /> */}
+          />
         </Box>
-      </Box>
+      </Box> */}
     </Box>
   )
 }

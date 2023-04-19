@@ -12,7 +12,7 @@ import { CardHeader } from '@mui/material'
 import Icon from 'src/@core/components/icon'
 import ExportButton from './button/ExportButton'
 
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 interface Props {
   usernameValue: string
@@ -28,8 +28,11 @@ interface Props {
 }
 
 const UserTableToolbar = (props: Props) => {
-  
   const TranslateString = useTranslateString()
+
+  const handleClear = () => {
+    props.clearSearch()
+  }
 
   return (
     <Box
@@ -37,15 +40,6 @@ const UserTableToolbar = (props: Props) => {
         padding: 5
       }}
     >
-      <Box>
-        <CardHeader
-          title={TranslateString("Search") + " " + TranslateString("Filters")}
-          sx={{
-            margin: 0,
-            padding: 0
-          }}
-        />
-      </Box>
       <Box
         sx={{
           display: 'flex',
@@ -54,104 +48,152 @@ const UserTableToolbar = (props: Props) => {
             md: 'column',
             lg: 'row'
           },
-          padding: 0,
-          gap: 5
+          justifyContent: 'space-between'
         }}
       >
-        <TextField
-          size='small'
-          value={props.emailValue ?? ''}
-          onChange={props.onEmailChange}
-          placeholder={TranslateString("Search") + " " + TranslateString("Email") + "..."}
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ mr: 2, display: 'flex' }}>
-                <Icon icon='mdi:magnify' fontSize={20} />
-              </Box>
-            ),
-            endAdornment: props?.emailValue ? (
-              <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
-                <Icon icon='mdi:close' fontSize={20} />
-              </IconButton>
-            ) : (
-              false
-            )
-          }}
+        <Box
           sx={{
-            width: {
-              xs: 1,
-              sm: 'auto',
-              lg: '100%'
+            display: 'flex',
+            flexDirection: {
+              xs: 'column',
+              md: 'column',
+              lg: 'row'
             },
-            '& .MuiInputBase-root > svg': {
-              mr: 2
-            }
+            gap: 2
           }}
-        />
+        >
+          <TextField
+            size='small'
+            value={props.emailValue ?? ''}
+            onChange={props.onEmailChange}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Email') + '...'}
+            InputProps={{
+              startAdornment: (
+                <Box sx={{ mr: 2, display: 'flex' }}>
+                  <Icon icon='mdi:magnify' fontSize={20} />
+                </Box>
+              ),
+              endAdornment: props?.emailValue ? (
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+                  <Icon icon='mdi:close' fontSize={20} />
+                </IconButton>
+              ) : (
+                false
+              )
+            }}
+            sx={{
+              width: {
+                xs: 'auto',
+                sm: 'auto',
+                md: 'auto',
+                lg: 250
+              }
+            }}
+          />
 
-        {/* Add TextField for searching mobile number */}
-        <TextField
-          size='small'
-          value={props.mobileValue ?? ''}
-          onChange={props.onMobileChange}
-          placeholder={TranslateString("Search") + " " + TranslateString("Mobile Number") + "..." }
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ mr: 2, display: 'flex' }}>
-                <Icon icon='mdi:magnify' fontSize={20} />
-              </Box>
-            ),
-            endAdornment: props?.mobileValue ? (
-              <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
-                <Icon icon='mdi:close' fontSize={20} />
-              </IconButton>
-            ) : (
-              false
-            )
-          }}
+          {/* Add TextField for searching mobile number */}
+          <TextField
+            size='small'
+            value={props.mobileValue ?? ''}
+            onChange={props.onMobileChange}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Mobile Number') + '...'}
+            InputProps={{
+              startAdornment: (
+                <Box sx={{ mr: 2, display: 'flex' }}>
+                  <Icon icon='mdi:magnify' fontSize={20} />
+                </Box>
+              ),
+              endAdornment: props?.mobileValue ? (
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+                  <Icon icon='mdi:close' fontSize={20} />
+                </IconButton>
+              ) : (
+                false
+              )
+            }}
+            sx={{
+              width: {
+                xs: 'auto',
+                sm: 'auto',
+                md: 'auto',
+                lg: 250
+              }
+            }}
+          />
+          <TextField
+            size='small'
+            value={props.usernameValue ?? ''}
+            onChange={props.onUsernameChange}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Users') + '...'}
+            InputProps={{
+              startAdornment: (
+                <Box sx={{ mr: 2, display: 'flex' }}>
+                  <Icon icon='mdi:magnify' fontSize={20} />
+                </Box>
+              ),
+              endAdornment: props?.usernameValue ? (
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+                  <Icon icon='mdi:close' fontSize={20} />
+                </IconButton>
+              ) : (
+                false
+              )
+            }}
+            sx={{
+              width: {
+                xs: 'auto',
+                sm: 'auto',
+                md: 'auto',
+                lg: 250
+              }
+            }}
+          />
+          <Button
+            variant='contained'
+            color='error'
+            sx={{
+              width: {
+                xs: 'auto',
+                sm: 'auto',
+                md: 'auto',
+                lg: 150
+              }
+            }}
+            onClick={handleClear}
+          >
+            {TranslateString('Clear')}
+          </Button>
+        </Box>
+        <Box
           sx={{
-            width: {
-              xs: 1,
-              sm: 'auto',
-              lg: '100%'
-            },
-            '& .MuiInputBase-root > svg': {
-              mr: 2
+            mt: {
+              xs: 5,
+              sm: 5,
+              md: 5,
+              lg: 0
             }
           }}
-        />
-        <TextField
-          size='small'
-          value={props.usernameValue ?? ''}
-          onChange={props.onUsernameChange}
-          placeholder={TranslateString("Search") + " " + TranslateString("Users") + "..."}
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ mr: 2, display: 'flex' }}>
-                <Icon icon='mdi:magnify' fontSize={20} />
-              </Box>
-            ),
-            endAdornment: props?.usernameValue ? (
-              <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
-                <Icon icon='mdi:close' fontSize={20} />
-              </IconButton>
-            ) : (
-              false
-            )
-          }}
-          sx={{
-            width: {
-              xs: 1,
-              sm: 'auto',
-              lg: '100%'
-            },
-            '& .MuiInputBase-root > svg': {
-              mr: 2
-            }
-          }}
-        />
+        >
+          <Button
+            sx={{
+              width: {
+                xs: 'auto',
+                sm: 'auto',
+                md: 'auto',
+                lg: 150
+              },
+              float: 'right'
+            }}
+            onClick={() => props.toggle(props.role)}
+            variant='contained'
+          >
+            {TranslateString('Add') + ' ' + TranslateString('User')}
+          </Button>
+        </Box>
       </Box>
-      <Box
+
+      {/* Export Button is commented for now, might be used in the future */}
+      {/* <Box
         sx={{
           mt: 5,
           borderTop: '1px solid #d3d3d3'
@@ -171,11 +213,8 @@ const UserTableToolbar = (props: Props) => {
             usernameValue={props.usernameValue}
             role_id={props.role_id}
           />
-          <Button onClick={() => props.toggle(props.role)} variant='contained'>
-            { TranslateString("Add") + " " + TranslateString("User")}
-          </Button>
         </Box>
-      </Box>
+      </Box> */}
     </Box>
   )
 }

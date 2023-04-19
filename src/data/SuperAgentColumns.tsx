@@ -47,23 +47,25 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
 }
 
 export const superAgentColumns = [
-  { field: 'username', headerName: 'Super Agent', width: 200 },
+  { sortable: false, field: 'username', headerName: 'Super Agent', width: 200 },
 
   // { field: 'SiteName', headerName: 'Site Name', width: 250 },
-  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
-  { field: 'email', headerName: 'Email', width: 250 },
+  { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 210 },
+  { sortable: false, field: 'email', headerName: 'Email', width: 250 },
   {
+    sortable: false,
     field: 'created_at',
     headerName: 'Date Created',
-    width: 250,
+    width: 285,
     valueFormatter: (params: any) => {
       return formatDate(params?.value)
     }
   },
   {
+    sortable: false,
     field: 'updated_at',
     headerName: 'Last Log In',
-    width: 250,
+    width: 285,
     valueFormatter: (params: any) => {
       return formatDate(params?.value)
     }
@@ -71,9 +73,10 @@ export const superAgentColumns = [
 
   // { field: 'SecurityFunds', headerName: 'Security Funds', width: 250 },
   {
+    sortable: false,
     field: 'status',
     headerName: 'Action',
-    width: 150,
+    width: 135,
     renderCell: (params: any) => {
       return (
         <Box>
