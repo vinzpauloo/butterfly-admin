@@ -26,11 +26,17 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)({
 type FQDNProps = {}
 
 const FQDN = (props: FQDNProps) => {
-    
+
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+
   const handleAPISubmit = (data: any) => {
     const { expando: values } = data
     console.log('data submit from outside', values)
     // DO MUTATIONS
+    setIsLoading(true)
+    setTimeout( () => {
+        setIsLoading(false)
+    }, 1300)
   }
 
   return (
@@ -39,7 +45,7 @@ const FQDN = (props: FQDNProps) => {
         <PageHeader title={<Typography variant='h5'>FQDN</Typography>} />
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', gap: '5rem', flexDirection: 'column' }}>
-            <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader="API's" />
+            <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader="API's" isLoading={isLoading} />
             <ExpandoForm fileType='text' pageHeader='STREAMING' />
             <ExpandoForm fileType='file' pageHeader='PHOTOS' />
           </Box>

@@ -1,7 +1,7 @@
 import React from 'react'
 
 // ** MUI
-import { Box, Button, Grid, Typography, TextField, Card, CardContent } from '@mui/material'
+import { Box, Button, Grid, Typography, TextField, Card, CardContent, CircularProgress } from '@mui/material'
 
 // ** Third Party imports
 import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form'
@@ -9,7 +9,8 @@ import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form'
 type ExpandoFormProps = {
   pageHeader: string
   fileType: string
-  handleExpandoSubmit? : (data : FormInputs) => void
+  handleExpandoSubmit?: (data: FormInputs) => void
+  isLoading? : boolean
 }
 
 type FormInputs = {
@@ -18,8 +19,15 @@ type FormInputs = {
   }[]
 }
 
-const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit }: ExpandoFormProps) => {
-  const { control, register, handleSubmit, formState : {errors} } = useForm<FormInputs>({
+const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading=false }: ExpandoFormProps) => {
+
+  // ** UseForm
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<FormInputs>({
     defaultValues: {
       expando: [{ value: '' }, { value: '' }, { value: '' }]
     }
@@ -37,7 +45,9 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit }: ExpandoFormP
 
   const onSubmit: SubmitHandler<FormInputs> = data => {
     console.log(`SUBMIT ${pageHeader}`, data)
-    { handleExpandoSubmit && handleExpandoSubmit( data ) }
+    {
+      handleExpandoSubmit && handleExpandoSubmit(data)
+    }
   }
 
   return (
@@ -57,13 +67,14 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit }: ExpandoFormP
                     placeholder={`Option ${index + 1}`}
                     error={Boolean(errors.expando)}
                     // important to include key with field's id
-                    {...register(`expando.${index}.value`, {required : true})}
+                    {...register(`expando.${index}.value`, { required: true })}
                   />
                 </Grid>
               ))}
               <Grid item xs={12}>
                 <Box display='flex' justifyContent='space-evenly'>
                   <Button
+                    disabled={ isLoading ? true : false }
                     variant='contained'
                     color='info'
                     onClick={() => {
@@ -72,8 +83,12 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit }: ExpandoFormP
                   >
                     Add More
                   </Button>
-                  <Button type='submit' variant='contained' color='primary'>
-                    Save
+                  <Button
+                    disabled={ isLoading ? true : false }
+                    type='submit' 
+                    variant='contained' 
+                    color='primary'>
+                    { isLoading ? <CircularProgress size={12} sx={{ mr : 2 }} /> : null } Save
                   </Button>
                 </Box>
               </Grid>
