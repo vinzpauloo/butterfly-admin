@@ -1,10 +1,11 @@
 import request from "@/lib/request";
+import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
 interface IBundlesParams {
+	bundle_id?: string
 	data?: {
 		site_id?: number
-		bundle_id?: string
 		name?: string
 		description?: string
 		price?: number
@@ -29,14 +30,17 @@ interface IBundlesParams {
 }
 
 const BundlesService = () => {
+	const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
 	const getAllVIPBundles = (params: IBundlesParams) => {
 		return request({
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/subcriptions/bundles",
+			url: "admin/subcriptions",
 			method: "GET",
 			params: params.data,
 		});
@@ -47,9 +51,10 @@ const BundlesService = () => {
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/subcriptions",
+			url: "admin/subcriptions",
 			method: "POST",
 			data: params.data, // if body is JSON
 		});
@@ -60,9 +65,10 @@ const BundlesService = () => {
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/subcriptions",
+			url: `admin/subcriptions/${params.bundle_id}`,
 			method: "DELETE",
 			params: params.data,
 		});
@@ -73,9 +79,10 @@ const BundlesService = () => {
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/subcriptions",
+			url: `admin/subcriptions/${params.bundle_id}`,
 			method: "PUT",
 			data: params.data, // if body is JSON
 		});
@@ -86,9 +93,10 @@ const BundlesService = () => {
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/coins/bundles",
+			url: "admin/coins",
 			method: "GET",
 			params: params.data,
 		});
@@ -99,9 +107,10 @@ const BundlesService = () => {
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/coins",
+			url: "admin/coins",
 			method: "POST",
 			data: params.data, // if body is JSON
 		});
@@ -112,9 +121,10 @@ const BundlesService = () => {
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/coins",
+			url: `admin/coins/${params.bundle_id}`,
 			method: "DELETE",
 			params: params.data,
 		});
@@ -125,9 +135,10 @@ const BundlesService = () => {
 			headers: {
 				...getHeaders(),
 				"ngrok-skip-browser-warning": "69420", // only for dev
-				"Accept": "application/json"
+				"Accept": "application/json",
+				Authorization: `Bearer ${accessToken}`
 			},
-			url: "/coins",
+			url: `admin/coins/${params.bundle_id}`,
 			method: "PUT",
 			data: params.data, // if body is JSON
 		});

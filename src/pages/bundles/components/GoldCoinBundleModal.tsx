@@ -86,8 +86,9 @@ const GoldCoinBundleModal = (props: Props) => {
 	const editGoldCoinBundle = () => {
 		if (validateInputs()) {
 			mutateEditCoinBundle({
+				bundle_id: props.bundleID,
 				data: {
-					bundle_id: props.bundleID,
+					site_id: 0,
 					name: bundleName,
 					price: Number(bundlePrice),
 					amount: Number(bundlePrice),
@@ -102,6 +103,7 @@ const GoldCoinBundleModal = (props: Props) => {
 		if (validateInputs()) {
 			mutateAddNewCoinBundle({
 				data: {
+					site_id: 0,
 					name: bundleName,
 					price: Number(bundlePrice),
 					amount: Number(bundlePrice),

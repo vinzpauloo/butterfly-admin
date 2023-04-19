@@ -20,7 +20,7 @@ const VIPBundlesPage = () => {
   const { isLoading, data } = useQuery({
     queryKey: ['allVIPBundles'],
     queryFn: () => getAllVIPBundles({data: {site_id: 0}}),
-    onSuccess: (data) => { console.log("VIP BUNDLES:", data?.bundles) },
+    onSuccess: (data) => { console.log("VIP BUNDLES:", data?.data) },
     onError: (error) => { console.log(error) }
   })
 
@@ -41,11 +41,11 @@ const VIPBundlesPage = () => {
           <Grid
             container
             gap={10.5}
-            justifyContent={{ xs: "center", sm: data?.bundles?.length % 4 === 0 ? "space-between" : "flex-start" }}>
-            {data?.bundles.map((item: any) =>
+            justifyContent={{ xs: "center", sm: data?.data?.length % 4 === 0 ? "space-between" : "flex-start" }}>
+            {data?.data?.map((item: any) =>
               <VIPBundleItem
-                key={item.bundle_id}
-                bundleID={item.bundle_id}
+                key={item._id}
+                bundleID={item._id}
                 bundleName={item.name}
                 bundlePrice={item.price}
                 bundleDescription={item.description}

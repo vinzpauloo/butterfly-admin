@@ -51,14 +51,14 @@ const GoldCoinTableItem = (props: Props) => {
 
 	const deleteGoldCoinBundle = () => {
 		mutateDeleteCoinBundle({
-			data: { bundle_id: props.bundleID },
+			bundle_id: props.bundleID
 		});
 	}
 
 	const SwtichOnAndOffGoldCoinBundle = () => {
 		mutateEditCoinBundle({
+			bundle_id: props.bundleID,
 			data: {
-				bundle_id: props.bundleID,
 				name: props.bundleName,
 				price: Number(props.bundlePrice),
 				amount: Number(props.bundlePrice),

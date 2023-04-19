@@ -21,7 +21,7 @@ const GoldCoinBundlesPage = () => {
   const { isLoading, data } = useQuery({
     queryKey: ["allCoinsBundle"],
     queryFn: () => getAllCoinsBundle({ data: { site_id: 0 } }),
-    onSuccess: (data) => { console.log("COINS BUNDLE:", data?.bundles) },
+    onSuccess: (data) => { console.log("COINS BUNDLE:", data?.data) },
     onError: (error) => { console.log(error) }
   })
 
@@ -42,11 +42,11 @@ const GoldCoinBundlesPage = () => {
           <Grid
             container
             gap={10.5}
-            justifyContent={{ xs: "center", sm: data?.bundles?.length % 4 === 0 ? "space-between" : "flex-start" }}>
-            {data?.bundles?.map((item: any) =>
+            justifyContent={{ xs: "center", sm: data?.data?.length % 4 === 0 ? "space-between" : "flex-start" }}>
+            {data?.data?.map((item: any) =>
               <GoldCoinBundleItem
-                key={item.bundle_id}
-                bundleID={item.bundle_id}
+                key={item._id}
+                bundleID={item._id}
                 bundleName={item.name}
                 bundlePrice={item.price}
                 bundleDescription={item.description}

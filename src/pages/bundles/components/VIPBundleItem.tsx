@@ -78,14 +78,15 @@ const VIPBundleItem = (props: Props) => {
 
 	const confirmDeleteVIPBundle = () => {
 		mutateDeleteVIPBundle({
-			data: { bundle_id: props.bundleID },
+			bundle_id: props.bundleID
 		});
 	}
 
 	const SwtichOnAndOffVIPBundle = () => {
 		mutateEditVIPBundle({
+			bundle_id: props.bundleID,
 			data: {
-				bundle_id: props.bundleID,
+				site_id: 0,
 				name: props.bundleName,
 				price: Number(props.bundlePrice),
 				description: props.bundleDescription,
