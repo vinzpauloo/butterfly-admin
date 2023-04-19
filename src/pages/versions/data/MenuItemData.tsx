@@ -31,30 +31,30 @@ export const MenuItemData = () => {
   const row1 = [
     {
       id: 1,
-      platform: 'OS',
+      os: 'OS',
       version: '1.0',
-      site_name: 'The Butterfly Project',
+      name: 'The Butterfly Project',
       created_at: '2'
     },
     {
       id: 2,
-      platform: 'Android',
+      os: 'Android',
       version: '1.0',
-      site_name: 'The Butterfly Project',
+      name: 'The Butterfly Project',
       created_at: '2'
     },
     {
       id: 3,
-      platform: 'OS',
+      os: 'OS',
       version: '2.0',
-      site_name: 'The Butterfly Project',
+      name: 'The Butterfly Project',
       created_at: '2'
     },
     {
       id: 4,
-      platform: 'Android',
+      os: 'Android',
       version: '2.0',
-      site_name: 'The Butterfly Project',
+      name: 'The Butterfly Project',
       created_at: '2'
     }
   ]
@@ -62,30 +62,30 @@ export const MenuItemData = () => {
   const row2 = [
     {
       id: 1,
-      platform: 'OS',
+      os: 'OS',
       version: '1.0',
-      site_name: 'ASANA',
+      name: 'ASANA',
       created_at: '2'
     },
     {
       id: 2,
-      platform: 'Android',
+      os: 'Android',
       version: '1.0',
-      site_name: 'ASANA',
+      name: 'ASANA',
       created_at: '2'
     },
     {
       id: 3,
-      platform: 'OS',
+      os: 'OS',
       version: '2.0',
-      site_name: 'ASANA',
+      name: 'ASANA',
       created_at: '2'
     },
     {
       id: 4,
-      platform: 'Android',
+      os: 'Android',
       version: '2.0',
-      site_name: 'ASANA',
+      name: 'ASANA',
       created_at: '2'
     }
   ]
@@ -93,30 +93,30 @@ export const MenuItemData = () => {
   const row3 = [
     {
       id: 1,
-      platform: 'OS',
+      os: 'OS',
       version: '1.0',
-      site_name: 'Twitter',
+      name: 'Twitter',
       created_at: '2'
     },
     {
       id: 2,
-      platform: 'Android',
+      os: 'Android',
       version: '1.0',
-      site_name: 'Twitter',
+      name: 'Twitter',
       created_at: '2'
     },
     {
       id: 3,
-      platform: 'OS',
+      os: 'OS',
       version: '2.0',
-      site_name: 'Twitter',
+      name: 'Twitter',
       created_at: '2'
     },
     {
       id: 4,
-      platform: 'Android',
+      os: 'Android',
       version: '2.0',
-      site_name: 'Twitter',
+      name: 'Twitter',
       created_at: '2'
     }
   ]
@@ -124,38 +124,38 @@ export const MenuItemData = () => {
   const row4 = [
     {
       id: 1,
-      platform: 'OS',
+      os: 'OS',
       version: '1.0',
-      site_name: 'LinkedIn',
+      name: 'LinkedIn',
       created_at: '2'
     },
     {
       id: 2,
-      platform: 'Android',
+      os: 'Android',
       version: '1.0',
-      site_name: 'LinkedIn',
+      name: 'LinkedIn',
       created_at: '2'
     },
     {
       id: 3,
-      platform: 'OS',
+      os: 'OS',
       version: '2.0',
-      site_name: 'LinkedIn',
+      name: 'LinkedIn',
       created_at: '2'
     },
     {
       id: 4,
-      platform: 'Android',
+      os: 'Android',
       version: '2.0',
-      site_name: 'LinkedIn',
+      name: 'LinkedIn',
       created_at: '2'
     }
   ]
 
   const columns = [
-    { sortable: false, field: 'platform', headerName: 'OS Platform', width: 300 },
+    { sortable: false, field: 'os', headerName: 'OS Platform', width: 300 },
     { sortable: false, field: 'version', headerName: 'Version', width: 300 },
-    { sortable: false, field: 'site_name', headerName: 'Site Name', width: 300 },
+    { sortable: false, field: 'name', headerName: 'Site Name', width: 300 },
     {
       sortable: false,
       field: 'created_at',

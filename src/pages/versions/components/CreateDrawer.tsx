@@ -25,7 +25,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 // ** Hooks
 
 interface FormValues {
-  input_file_name: string
+  download_link: string
   os: 'android' | 'ios' | ''
   version: string
   patch_notes: string
@@ -64,7 +64,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
 
   const resetForm = () => {
     reset({
-      input_file_name: '',
+      download_link: '',
       os: '',
       version: '',
       patch_notes: ''
@@ -107,15 +107,15 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
           <Box sx={styles.container}>
             <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
               <Controller
-                name='input_file_name'
+                name='download_link'
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    label={TranslateString('Input') + ' ' + TranslateString('File') + ' ' + TranslateString('Name')}
+                    label={TranslateString('Download') + ' ' + TranslateString('Link')}
                     variant='outlined'
                     fullWidth
-                    error={!!errors.input_file_name}
-                    helperText={errors.input_file_name?.message}
+                    error={!!errors.download_link}
+                    helperText={errors.download_link?.message}
                     defaultValue={field.value}
                     onChange={field.onChange}
                     name='input_file_name'

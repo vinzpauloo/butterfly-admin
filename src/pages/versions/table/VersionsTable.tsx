@@ -1,32 +1,29 @@
 // ** React Imports
-import React from 'react'
+import React, { useState } from 'react'
 
 // ** MUI Imports
-import { DataGrid, GridColumns, GridRowModel } from '@mui/x-data-grid'
+import { DataGrid, GridRowModel } from '@mui/x-data-grid'
 
 // ** Other Imports
 import { useSiteContext } from '../context/SiteContext'
 import { MenuItemData } from '../data/MenuItemData'
 
-// type SiteColumns = {
-//   [key: string]: GridColumns
-// }
+// ** TanStack Query
+import { useQuery } from '@tanstack/react-query'
 
-//If we want a feature wherein columns change as well
-// const siteColumns: SiteColumns = {
-//   site1: columns,
-//   site2: columns,
-//   site3: columns,
-//   site4: columns
-// }
+// ** Hooks/Services
+import { ApkService } from '@/services/api/ApkService'
 
-type SiteRows = {
+interface SiteRows {
   [key: string]: GridRowModel[]
 }
 
 const VersionsTable = () => {
   const { selectedSite } = useSiteContext()
+  const { getAllApks } = ApkService()
   const { columns, row1, row2, row3, row4 } = MenuItemData()
+
+  const [rowData, setRowData] = useState<[]>([])
 
   const siteRows: SiteRows = {
     site1: row1,
@@ -34,6 +31,15 @@ const VersionsTable = () => {
     site3: row3,
     site4: row4
   }
+
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['allApk'],
+    queryFn: () => getAllApks(),
+    onSuccess: (data: any) => {
+      console.log(`Success, APK data`, data)
+      setRowData(data?.data)
+    }
+  })
 
   return (
     <DataGrid
@@ -43,12 +49,11 @@ const VersionsTable = () => {
       disableSelectionOnClick
       autoHeight
       columns={columns}
-      rows={siteRows[selectedSite] ?? []}
+      // rows={siteRows[selectedSite] ?? []}
+      rows={rowData ?? []}
       pagination
     />
   )
 }
-
-// columns={siteColumns[selectedSite]} If we want a feature wherein columns change as well
 
 export default VersionsTable
