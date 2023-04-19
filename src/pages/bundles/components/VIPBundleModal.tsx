@@ -163,8 +163,9 @@ const VIPBundleModal = (props: Props) => {
 	const confirmEditVIPBundle = () => {
 		if (validateInputs()) {
 			mutateEditVIPBundle({
+				bundle_id: props.bundleID,
 				data: {
-					bundle_id: props.bundleID,
+					site_id: 0,
 					name: bundleName,
 					price: Number(bundlePrice),
 					description: bundleDescription,
@@ -187,6 +188,7 @@ const VIPBundleModal = (props: Props) => {
 		if (validateInputs()) {
 			mutateAddNewVIPBundle({
 				data: {
+					site_id: 0,
 					name: bundleName,
 					price: Number(bundlePrice),
 					description: bundleDescription,

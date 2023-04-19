@@ -32,7 +32,7 @@ const GoldCoinTablesPage = () => {
 	const { isLoading, data } = useQuery({
 		queryKey: ["allCoinsBundle"],
 		queryFn: () => getAllCoinsBundle({ data: { site_id: 0 } }),
-		onSuccess: (data) => { console.log("COINS BUNDLE:", data?.bundles) },
+		onSuccess: (data) => { console.log("COINS BUNDLE:", data?.data) },
 		onError: (error) => { console.log(error) }
 	})
 	
@@ -65,10 +65,10 @@ const GoldCoinTablesPage = () => {
 								</TableRow>
 							)
 								:
-							data?.bundles?.map((item: any) => 
+							data?.data?.map((item: any) => 
 								<GoldCoinTableItem
-									key={item.bundle_id}
-									bundleID={item.bundle_id}
+									key={item._id}
+									bundleID={item._id}
 									bundleName={item.name}
 									bundleDescription={item.description}
 									bundlePrice={item.price}
