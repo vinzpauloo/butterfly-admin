@@ -46,8 +46,8 @@ const FQDN = (props: FQDNProps) => {
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', gap: '5rem', flexDirection: 'column' }}>
             <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader="API's" isLoading={isLoading} />
-            <ExpandoForm fileType='text' pageHeader='STREAMING' />
-            <ExpandoForm fileType='file' pageHeader='PHOTOS' />
+            <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader='STREAMING' isLoading={isLoading} />
+            <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='file' pageHeader='PHOTOS' isLoading={isLoading} />
           </Box>
         </Grid>
       </Grid>
