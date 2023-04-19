@@ -19,6 +19,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/user/list'
     },
     {
+      title: 'FQDN',
+      icon: 'mdi:web',
+      path: '/fqdn'
+    },
+    {
       title: 'Transactions',
       icon: 'mdi:file-document-outline',
       children: [
