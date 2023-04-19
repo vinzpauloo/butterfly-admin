@@ -10,7 +10,7 @@ import AlbumTableToolbar from '../components/AlbumTableToolbar'
 
 // ** Other Imports
 import { AlbumColumns } from '@/data/AlbumColumns'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
@@ -111,7 +111,8 @@ const TableAlbums = () => {
   }
 
   const TranslateString = useTranslateString()
-  
+  const albumColumns = AlbumColumns()
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -123,6 +124,7 @@ const TableAlbums = () => {
           </Box>
 
           <DataGrid
+            disableColumnMenu
             rowsPerPageOptions={[]}
             loading={isLoading || isRefetching}
             checkboxSelection={false}
@@ -132,8 +134,7 @@ const TableAlbums = () => {
             autoHeight
             rows={albumData ?? []}
             getRowId={(row: AlbumData) => row?._id}
-            // @ts-ignore
-            columns={AlbumColumns}
+            columns={albumColumns}
             pageSize={pageSize}
             pagination
             onPageChange={handlePageChange}
