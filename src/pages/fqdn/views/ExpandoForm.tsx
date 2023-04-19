@@ -6,7 +6,6 @@ import {
   Button,
   Grid,
   Typography,
-  TextField,
   Card,
   CardContent,
   IconButton,
@@ -47,7 +46,7 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
       expando: [{ value: '' }, { value: '' }, { value: '' }]
     }
   })
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
     name: 'expando' // unique name for your Field Array
   })
