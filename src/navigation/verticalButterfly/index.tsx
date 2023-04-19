@@ -132,6 +132,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/bundles/pages/GoldCoinTablesPage'
         }
       ]
+    },
+    {
+      title: 'Versions',
+      icon: 'mdi:source-branch',
+      path: '/versions'
     }
   ]
 }
