@@ -45,7 +45,7 @@ const steps = [
 type Props = {}
 
 // ** Feeds Params
-const defaultParams = { story_feeds_only: true, with: 'user', page: 1 }
+const defaultParams = { story_feeds_only: true, with: 'user', page: 1, status : 'Approved' }
 
 const NewsFeedList = (props: Props) => {
   // ** States

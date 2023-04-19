@@ -11,9 +11,6 @@ import FeedCard from '../../shared-component/feed/FeedCard'
 import FeedAttachments from '../../shared-component/feed/FeedAttachments'
 import FeedVideoCard from '../../shared-component/feed/FeedVideoCard'
 
-// ** Third Party Components
-import PerfectScrollbar from 'react-perfect-scrollbar'
-
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
@@ -25,7 +22,7 @@ type AllVideoProps = {
   handleFeedParams?: any
 }
 
-const videoOnlyParams = { video_only: true, with: 'user', page : 1 }
+const videoOnlyParams = { video_only: true, with: 'user', page : 1, status : 'Approved' }
 
 const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
   React.useEffect(() => {

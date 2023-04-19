@@ -11,9 +11,6 @@ import FeedCard from '../../shared-component/feed/FeedCard'
 import FeedAttachments from '../../shared-component/feed/FeedAttachments'
 import PhotoGridCard from '../../shared-component/feed/PhotoGridCard'
 
-// ** Third Party Components
-import PerfectScrollbar from 'react-perfect-scrollbar'
-
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
@@ -25,7 +22,7 @@ type Props = {
   handleFeedParams?: any
 }
 
-const photoOnlyParams = { images_only: true, with: 'user', page : 1 }
+const photoOnlyParams = { images_only: true, with: 'user', page : 1, status : 'Approved' }
 
 const AllPhoto = ({ data, handleFeedParams }: Props) => {
   React.useEffect(() => {

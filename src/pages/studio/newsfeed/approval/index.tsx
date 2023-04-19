@@ -49,9 +49,7 @@ const ButtonFilters = [
 
 const NewsFeedApproval = () => {
   // ** States
-  const [hideNameColumn, setHideNameColumn] = React.useState(false)
   const [rowData, setRowData] = React.useState<IFeedStory[]>([])
-  const [pageSize, setPageSize] = React.useState(7)
   const [total, setTotal] = React.useState(0)
   //feed params
   const [ paginate, setPaginate ] = React.useState<number>(7)
@@ -68,7 +66,6 @@ const NewsFeedApproval = () => {
     setSort(sort as any)
   }
   const handleSetSortBy = (sortBy : string) => {
-    console.log('new SORTING BY IS', sortBy)
     setSortBy(sortBy as any)
   }
 
@@ -87,7 +84,8 @@ const NewsFeedApproval = () => {
       ...(specificType !== null && {...specificType}), // video_only, images_only, video_images
       with : 'user',
       search_all : true,
-      all : true
+      all : true,
+      status : 'Pending'
     }),
     onSuccess: response => {
       setRowData(response.data)

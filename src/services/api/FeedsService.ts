@@ -8,6 +8,8 @@ interface IFeedsPostParams {
   formData: FormData
 }
 
+type NewsFeedStatusType = 'Approved' | 'Declined' | 'Pending'
+
 interface IGetFeedsParams {
   story_feeds_only? : boolean,
   video_only? : boolean,
@@ -17,7 +19,8 @@ interface IGetFeedsParams {
   sort? : 'desc' | 'asc',
   sortBy : any, // returned columns of GET admin/feeds
   search_all? : boolean,
-  all? : boolean
+  all? : boolean,
+  status : NewsFeedStatusType
 }
 
 interface IApproveFeedParams {

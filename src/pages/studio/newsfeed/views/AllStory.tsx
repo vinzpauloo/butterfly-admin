@@ -13,9 +13,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import FeedCard from '../../shared-component/feed/FeedCard'
 import FeedAttachments from '../../shared-component/feed/FeedAttachments'
 
-// ** Third Party Components
-import PerfectScrollbar from 'react-perfect-scrollbar'
-
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
@@ -28,7 +25,7 @@ type StoryProps = {
   handleFeedParams? : any
 }
 
-const StoryOnlyParams = { story_feeds_only: true, with: 'user', page : 1 }
+const StoryOnlyParams = { story_feeds_only: true, with: 'user', page : 1, status : 'Approved' }
 
 const AllStory = ({data, handleFeedParams}: StoryProps) => {
   React.useEffect(() => {

@@ -5,25 +5,41 @@ import React from 'react'
 import Image from 'next/image'
 
 // ** MUI Imports
-import { Dialog, DialogContent, Box, TextField, Button, DialogTitle } from '@mui/material'
+import {
+  Dialog,
+  DialogContent,
+  Box,
+  TextField,
+  Button,
+  DialogTitle,
+  LinearProgress,
+  Select,
+  MenuItem
+} from '@mui/material'
 import CircularProgress from '@mui/material/CircularProgress'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import IconButton from '@mui/material/IconButton'
+import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Third Party Components
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
 
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
 import TUSService from '@/services/api/TusService'
+import { useUsersTable } from '@/services/api/useUsersTable'
+import { useQuery } from '@tanstack/react-query'
 
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
+
+// ** Auth
+import { useAuth } from '@/services/useAuth'
 
 interface ModalProps {
   isOpen: boolean
@@ -35,15 +51,33 @@ type Inputs = {
   tags: string
   'images[]'?: any
   video: any
+  user_id?: string
 }
 
 //maximum Images that can be uploaded
 const limitFiles = 9
 
+// ** Styled components
+const CustomSelect = styled(Select)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: '5px',
+  '& .MuiSelect-select': {}
+}))
+
 const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+  const auth = useAuth()
+
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
   const [feedVideo, setFeedVideo] = React.useState<File[]>([])
+
+  // ** APIs and Tanstacks
+  const { getAllDataFromCreator } = useUsersTable()
+
+  const getCCsQuery = useQuery({
+    queryKey: ['ccOptions'],
+    queryFn: () => getAllDataFromCreator()
+  })
 
   // ** Hooks
   const {
@@ -51,6 +85,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     getValues,
     setValue,
     reset,
+    control,
     formState: { errors }
   } = useForm<Inputs>()
 
@@ -97,6 +132,8 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   }
 
   const handlePublish = () => {
+
+    let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
     const { video } = getValues()
 
@@ -104,7 +141,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       console.log('there is a video')
 
       const feedHeaderData = {
-        user_id: '25',
+        ...(hasUserID && { user_id: getValues()?.user_id }),
         video_name: video.name,
         video_type: 'feed_video'
       }
@@ -141,7 +178,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       }
 
       //Start TUS Uplaod
-      const { upload } = TUSService(video, { customOnProgress, customOnAfterResponse }, feedHeaderData)
+      const { upload } = TUSService(video, { customOnProgress, customOnAfterResponse }, feedHeaderData as any)
       upload.start()
     } else {
       // HAS NO VIDEO - continue upload Feed
@@ -154,8 +191,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         reset()
       })
     }
-
-    console.log(getValues())
 
     setIsLoading(true)
   }
@@ -228,7 +263,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       <DialogContent sx={{ ...styles.dialogContent, bgcolor: theme => theme.customBflyColors.primary }}>
         <Box>
           <DialogTitle color={theme => theme.customBflyColors.primaryTextContrast} sx={styles.title}>
-            {TranslateString("Upload NewsFeeds")}
+            {TranslateString('Upload NewsFeeds')}
           </DialogTitle>
         </Box>
         {isLoading ? (
@@ -237,15 +272,66 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           </Box>
         ) : (
           <>
+            {auth?.user?.role != 'CC' && (
+              <Box sx={{ ...styles.textContainer, marginBlock: '1rem' }}>
+                {getCCsQuery.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+                <Controller
+                  name='user_id'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <>
+                      { getCCsQuery?.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+                      {getCCsQuery?.data && (
+                        <CustomSelect
+                          displayEmpty
+                          inputProps={{ 'aria-label': 'Without label' }}
+                          defaultValue=''
+                          id='contentCreator'
+                          labelId='cc-select-label'
+                          value={value}
+                          onBlur={onBlur}
+                          onChange={onChange}
+                          error={Boolean(errors.user_id)}
+                        >
+                          <MenuItem disabled value=''>
+                            Select Content Creator
+                          </MenuItem>
+                          {getCCsQuery?.data &&
+                            getCCsQuery?.data.map((cc : any) => (
+                              <MenuItem key={cc.id} value={cc.id}>
+                                {cc.username}
+                              </MenuItem>
+                            ))}
+                        </CustomSelect>
+                      )}
+                    </>
+                  )}
+                />
+              </Box>
+            )}
+
             <Box sx={styles.textContainer}>
               <TextField
-                label={TranslateString("Story")}
+                label={TranslateString('Story')}
                 minRows={10}
                 multiline={true}
-                sx={{...styles.fullWidth, backgroundColor: theme => theme.palette.background.paper, borderRadius:'8px'}}
+                sx={{
+                  ...styles.fullWidth,
+                  backgroundColor: theme => theme.palette.background.paper,
+                  borderRadius: '8px'
+                }}
                 {...register('string_story')}
               />
-              <TextField label={TranslateString("Tags")} sx={{...styles.fullWidth, backgroundColor: theme => theme.palette.background.paper, borderRadius:'8px'}} {...register('tags')} />
+              <TextField
+                label={TranslateString('Tags')}
+                sx={{
+                  ...styles.fullWidth,
+                  backgroundColor: theme => theme.palette.background.paper,
+                  borderRadius: '8px'
+                }}
+                {...register('tags')}
+              />
             </Box>
 
             <Box sx={styles.buttonContainer}>
@@ -253,7 +339,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 <input {...getVidInputProps()} />
                 <Box sx={styles.button}>
                   <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>{TranslateString("Upload Video")}</Button>
+                  <Button sx={styles.upload}>{TranslateString('Upload Video')}</Button>
                   {feedVideo.length != 0 ? <p>Selected 1 video</p> : null}
                 </Box>
               </div>
@@ -262,7 +348,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 <input {...getInputProps()} />
                 <Box sx={styles.button}>
                   <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>{TranslateString("Upload Photo")}</Button>
+                  <Button sx={styles.upload}>{TranslateString('Upload Photo')}</Button>
                 </Box>
               </div>
 
@@ -270,20 +356,24 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 {multipleImages.length ? (
                   <>
                     <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
-                    <div className='buttons' style={{textAlign:'center'}}>
-                      <Button sx={{marginInline:'auto'}} color='error' variant='outlined' onClick={handleRemoveAllFiles}>
-                        {TranslateString("Remove All")}
+                    <div className='buttons' style={{ textAlign: 'center' }}>
+                      <Button
+                        sx={{ marginInline: 'auto' }}
+                        color='error'
+                        variant='outlined'
+                        onClick={handleRemoveAllFiles}
+                      >
+                        {TranslateString('Remove All')}
                       </Button>
                     </div>
                   </>
                 ) : null}
               </Box>
-
             </Box>
 
             <Box sx={styles.bottomBtnContainer}>
               <Button onClick={handleCancel} sx={styles.bottomBtn}>
-                {TranslateString("Cancel")}
+                {TranslateString('Cancel')}
               </Button>
               <Button
                 onClick={() => {
@@ -291,7 +381,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 }}
                 sx={styles.bottomBtn}
               >
-                {TranslateString("Publish")}
+                {TranslateString('Publish')}
               </Button>
             </Box>
           </>

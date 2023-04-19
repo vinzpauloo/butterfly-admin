@@ -15,9 +15,6 @@ import PhotoGridCard from '../../shared-component/feed/PhotoGridCard'
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
-// ** Third Party Components
-import PerfectScrollbar from 'react-perfect-scrollbar'
-
 type videoPhotosProps = {
   data?: any
   handleFeedParams?: any
@@ -26,7 +23,7 @@ type videoPhotosProps = {
 // ** Types
 import { IFeedStory } from '@/context/types'
 
-const videoWithPhotos = { video_images: true, with: 'user', page : 1 }
+const videoWithPhotos = { video_images: true, with: 'user', page : 1, status : 'Approved' }
 
 const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
   React.useEffect(() => {
