@@ -44,7 +44,7 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
 
   const handleNoteOnChange = (value: string) => {
     if (value.length <= 0) {
-      setError('notes', { type: 'custom' })
+      setError('note', { type: 'custom' })
     } else {
       clearErrors()
     }
@@ -52,11 +52,11 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
   }
 
   const setNoteError = () => {
-    setError('notes', { type: 'custom' })
+    setError('note', { type: 'custom' })
   }
 
   const handleNoteDialogClose = () => {
-    resetField('notes')
+    resetField('note')
     states.toggle()
   }
 
@@ -71,21 +71,21 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
     formState: { errors }
   } = useForm({
     defaultValues : {
-        notes : ''
+        note : ''
     }
   })
 
-  const onSubmitNote = async (data : any) => {
+  const onSubmitNote = async (data : { note : string }) => {
 
     // TO CONFIRM DECLINE OF WORK
-    let note = watch('notes')
+    let note = watch('note')
     if (note.length == 0) {
       setNoteError()
       return
     } else {
         console.log("SUBMIT AND DECLINE")
         let callAfter = await states.outterHandleSubmit(data)
-        resetField('notes')
+        resetField('note')
         setNoteValue('')
     }
   }
@@ -104,13 +104,13 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
           <form onSubmit={handleSubmit(onSubmitNote)}>
             <Grid container spacing={5}>
               <Grid item xs={12}>
-                {errors.notes && (
+                {errors.note && (
                   <Alert sx={{ mb: 5 }} severity='error'>
                     Cannot leave an empty note
                   </Alert>
                 )}
                 <TextField
-                  {...register('notes')}
+                  {...register('note')}
                   value={noteValue} //should be a state
                   onChange={event => handleNoteOnChange(event.target.value)}
                   fullWidth
@@ -131,7 +131,7 @@ const DialogNotes = ({ states }: DialogNotesProps) => {
 
               <Grid display='flex' justifyContent='center' alignItems='center' item xs={12}>
                 <Button
-                  disabled={errors.notes || states.isLoading ? true : false}
+                  disabled={errors.note || states.isLoading ? true : false}
                   sx={{ marginInline: 'auto' }}
                   type='submit'
                   variant='contained'

@@ -76,7 +76,7 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
     }
   })
 
-  const handleNoteSubmit = async (data : { notes : string }) => {
+  const handleNoteSubmit = async (data : { note : string }) => {
 
     setNoteLoader(true)
     const mutatedData = await feedM.mutateAsync({
@@ -84,7 +84,7 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
            foreign_id : row._id,
            action : "Declined",
            _method : 'put',
-           notes : data.notes 
+           note : data.note
         }
     })
 

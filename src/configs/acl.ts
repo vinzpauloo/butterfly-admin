@@ -17,7 +17,7 @@ export type ACLObj = {
  * admin can manage everything and client can just visit ACL page
  */
 const defineRulesFor = (role: string, subject: string) => {
-  const { can, rules } = new AbilityBuilder(AppAbility)
+  const { can, cannot, rules } = new AbilityBuilder(AppAbility)
 
   /*
   ADMIN ROLES: (1 GOD, 2 SUPERVISOR, 3 CC, 4 SA, 5 AGENT)
@@ -25,11 +25,14 @@ const defineRulesFor = (role: string, subject: string) => {
 
   const allActions = ['read', 'create', 'update', 'delete']
   can(allActions, 'shared-page')
+  can(allActions, 'cc-post-status')
 
   if (role === 'admin' || role === 'GOD' || role === 'SUPERVISOR') {
     can('manage', 'all')
+    cannot('manage', 'cc-post-status')
   } else if (role === 'CC') {
     can(allActions, 'cc-page')
+    can(allActions, 'cc-post-status')
   } else if (role === 'SA') {
     can(allActions, 'sa-page')
   } else if (role === 'AGENT') {

@@ -27,9 +27,13 @@ interface IApproveFeedParams {
   data : {
     foreign_id : string
     action : 'Approved' | 'Declined'
-    notes? : string
+    note? : string
     _method?: 'put'
   }
+}
+interface IGetFeedsByCC {
+  all : boolean,
+  with? : string
 }
 
 const FeedsService = () => {
@@ -61,6 +65,19 @@ const FeedsService = () => {
     })
   }
 
+  const getFeedsByCC = (params : IGetFeedsByCC) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/feeds',
+      method: 'GET',
+      params: params
+    })
+  }
+
   const approveNewsFeedContent = (params: IApproveFeedParams) => {
 
     return request({
@@ -77,7 +94,7 @@ const FeedsService = () => {
     })
   }
 
-  return { uploadFeed, getFeeds, approveNewsFeedContent }
+  return { uploadFeed, getFeeds, approveNewsFeedContent, getFeedsByCC }
 }
 
 export default FeedsService
