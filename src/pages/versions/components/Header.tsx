@@ -9,24 +9,44 @@ import { SelectChangeEvent } from '@mui/material/Select'
 import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Other Imports
-import { MenuItemData } from '../data/MenuItemData'
 import { useSiteContext } from '../context/SiteContext'
 import VersionsDrawer from './CreateDrawer'
 
+// ** TanStack Query
+import { useQuery } from '@tanstack/react-query'
+
+// ** Hooks/Services
+import { ApkService } from '@/services/api/ApkService'
+
+interface SiteNameProps {
+  name: string
+  id: number
+  logo: string
+}
+
 const Header = () => {
   const { selectedSite, setSelectedSite } = useSiteContext()
-  const { siteData } = MenuItemData()
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const [siteName, setSiteName] = useState<SiteNameProps[]>([])
 
+  const { getAllSites } = ApkService()
   const TranslateString = useTranslateString()
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedSite(event.target.value as string)
   }
 
-  const [openDrawer, setOpenDrawer] = useState(false)
   const handleDrawerToggle = () => {
     setOpenDrawer(isDrawerOpen => !isDrawerOpen)
   }
+
+  useQuery({
+    queryKey: ['getAllSites'],
+    queryFn: () => getAllSites(),
+    onSuccess: (data: any) => {
+      setSiteName(data)
+    }
+  })
 
   return (
     <Box mb={5}>
@@ -46,18 +66,23 @@ const Header = () => {
             <MenuItem value='' sx={{ ...styles.menuItem, fontWeight: '600', textTransform: 'uppercase' }}>
               <em>None</em>
             </MenuItem>
-            {siteData.map((item, index) => (
-              <MenuItem key={index} value={item.value} sx={styles.menuItem}>
-                <img src={item.image} alt='' width={40} />
-                {item.text}
-              </MenuItem>
-            ))}
+            {siteName &&
+              siteName?.map((item, index) => (
+                <MenuItem key={index} value={item.id} sx={styles.menuItem}>
+                  <img src={item.logo} alt='Site Logo' width={40} />
+                  {item.name}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
         <Box sx={styles.buttonWrapper}>
-          <Button sx={styles.button} variant='contained' onClick={handleDrawerToggle}>
-            {TranslateString('Add') + ' ' + TranslateString('New')}
-          </Button>
+          {selectedSite === '' ? (
+            false
+          ) : (
+            <Button sx={styles.button} variant='contained' onClick={handleDrawerToggle}>
+              {TranslateString('Add') + ' ' + TranslateString('New')}
+            </Button>
+          )}
         </Box>
         <VersionsDrawer open={openDrawer} toggle={handleDrawerToggle} />
       </Box>

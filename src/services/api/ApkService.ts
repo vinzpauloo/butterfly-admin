@@ -2,9 +2,34 @@ import request from '../../lib/request'
 import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
+interface ApkProps {
+  data: {
+    site_id?: string
+    name?: string
+    version?: string
+    download_link?: string
+    os?: string
+  }
+}
+
 export const ApkService = () => {
+
+  const getAllSites = () => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+        return request({
+            headers: {
+                ...getHeaders(),
+                 'ngrok-skip-browser-warning': '69420', // only for dev
+                Authorization: `Bearer ${accessToken}`
+            },
+            url: '/admin/sites?select=id,name,logo&paginate=false',
+            method: 'GET',
+
+        })
+  }
  
-    const getAllApks = () => {
+    const getAllApks = (params: ApkProps) => {
         const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
         return request({
@@ -13,13 +38,31 @@ export const ApkService = () => {
                  'ngrok-skip-browser-warning': '69420', // only for dev
                 Authorization: `Bearer ${accessToken}`
             },
-            url: '/admin/apks',
+            url: `/admin/apks`,
             method: 'GET',
+            params: params.data
+        })
+  }
+  
+  const postAPK = (params: ApkProps) => {
+        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
+        return request({
+            headers: {
+            ...getHeaders(),
+              'Content-Type': 'multipart/form-data',
+                 'ngrok-skip-browser-warning': '69420', // only for dev
+                Authorization: `Bearer ${accessToken}`
+            },
+            url: `/admin/apks`,
+            method: 'POST',
+            data: params.data
         })
     }
 
   return {
-    getAllApks
+    getAllApks,
+    getAllSites,
+    postAPK
   }
 }

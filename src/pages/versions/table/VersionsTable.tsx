@@ -1,8 +1,8 @@
 // ** React Imports
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 // ** MUI Imports
-import { DataGrid, GridRowModel } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
 
 // ** Other Imports
 import { useSiteContext } from '../context/SiteContext'
@@ -14,29 +14,27 @@ import { useQuery } from '@tanstack/react-query'
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
 
-interface SiteRows {
-  [key: string]: GridRowModel[]
-}
-
 const VersionsTable = () => {
   const { selectedSite } = useSiteContext()
   const { getAllApks } = ApkService()
-  const { columns, row1, row2, row3, row4 } = MenuItemData()
+  const { columns } = MenuItemData()
 
   const [rowData, setRowData] = useState<[]>([])
+  const [siteId, setSiteId] = useState<string | undefined>()
 
-  const siteRows: SiteRows = {
-    site1: row1,
-    site2: row2,
-    site3: row3,
-    site4: row4
-  }
+  useEffect(() => {
+    setSiteId(selectedSite)
+  }, [selectedSite])
 
-  const { isLoading, isFetching } = useQuery({
-    queryKey: ['allApk'],
-    queryFn: () => getAllApks(),
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: ['allApk', siteId],
+    queryFn: () =>
+      getAllApks({
+        data: {
+          site_id: siteId
+        }
+      }),
     onSuccess: (data: any) => {
-      console.log(`Success, APK data`, data)
       setRowData(data?.data)
     }
   })
@@ -44,12 +42,12 @@ const VersionsTable = () => {
   return (
     <DataGrid
       disableColumnMenu
+      loading={isLoading || isRefetching}
       rowsPerPageOptions={[]}
       checkboxSelection={false}
       disableSelectionOnClick
       autoHeight
       columns={columns}
-      // rows={siteRows[selectedSite] ?? []}
       rows={rowData ?? []}
       pagination
     />

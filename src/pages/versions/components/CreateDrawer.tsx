@@ -20,15 +20,19 @@ import CreatedSuccessful from '@/pages/user/components/form/CreatedSuccessful'
 import { useTranslateString } from '@/utils/TranslateString'
 
 // ** TanStack Query
-// import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
+import { ApkService } from '@/services/api/ApkService'
+import { useSiteContext } from '../context/SiteContext'
 
 interface FormValues {
+  [key: string]: any
   download_link: string
   os: 'android' | 'ios' | ''
   version: string
   patch_notes: string
+  name: string
 }
 
 const schema = yup.object().shape({})
@@ -47,11 +51,13 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 }))
 
 const VersionsDrawer = (props: SidebarAddUserType) => {
+  const queryClient = useQueryClient()
+
   // ** Props
   const { open, toggle } = props
 
   // ** State
-  const [submitted] = useState<boolean>()
+  const [submitted, setSubmitted] = useState<boolean>()
 
   const {
     control,
@@ -67,12 +73,46 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
       download_link: '',
       os: '',
       version: '',
-      patch_notes: ''
+      patch_notes: '',
+      name: ''
     })
   }
 
-  const handleFormSubmit = () => {
-    alert(`SUCCESS`)
+  const { postAPK } = ApkService()
+  const mutation = useMutation(postAPK)
+
+  const { selectedSite } = useSiteContext()
+
+  const handleFormSubmit = async (data: FormValues) => {
+    const formData = new FormData()
+
+    for (const key in data) {
+      const value = data[key]
+
+      formData.append(key, value.toString())
+    }
+
+    formData.append('site_id', `${selectedSite}`)
+
+    const apkData: any = {
+      data: formData
+    }
+
+    try {
+      await mutation.mutateAsync(apkData)
+      setSubmitted(true)
+
+      setTimeout(() => {
+        toggle()
+        resetForm()
+        setSubmitted(false)
+
+        // Re-fetches UserTable and CSV exportation
+        queryClient.invalidateQueries({ queryKey: ['allApk'] })
+      }, 1500)
+    } catch (e) {
+      console.log(`Error`, e)
+    }
   }
 
   const [resetKey, setResetKey] = useState(0)
@@ -118,7 +158,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                     helperText={errors.download_link?.message}
                     defaultValue={field.value}
                     onChange={field.onChange}
-                    name='input_file_name'
+                    name='download_link'
                   />
                 )}
               />
@@ -132,6 +172,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                   <Controller
                     name='os'
                     control={control}
+                    defaultValue=''
                     render={({ field }) => (
                       <TextField
                         select
@@ -144,13 +185,31 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='os'
                       >
-                        <MenuItem value={1} sx={{ textTransform: 'uppercase' }}>
+                        <MenuItem value={'android'} sx={{ textTransform: 'uppercase' }}>
                           <Typography sx={{ textTransform: 'uppercase' }}>Android</Typography>
                         </MenuItem>
-                        <MenuItem value={2} sx={{ textTransform: 'uppercase' }}>
+                        <MenuItem value={'ios'} sx={{ textTransform: 'uppercase' }}>
                           <Typography sx={{ textTransform: 'uppercase' }}>IOS</Typography>
                         </MenuItem>
                       </TextField>
+                    )}
+                  />
+                </Box>
+                <Box sx={styles.fullWidth}>
+                  <Controller
+                    name='name'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label={TranslateString('Site') + ' ' + TranslateString('Name')}
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='name'
+                      />
                     )}
                   />
                 </Box>
