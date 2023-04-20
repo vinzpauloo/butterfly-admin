@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Typography, { TypographyProps } from '@mui/material/Typography';
 import Stack, { StackProps } from '@mui/material/Stack';
 import Grid, { GridProps } from '@mui/material/Grid';
-import { Icon, IconProps } from '@mui/material';
+import { Box, Icon, IconProps, Menu, MenuItem } from '@mui/material';
 import IconList from './IconList';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
@@ -11,6 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import BundlesService from '@/services/api/BundlesService';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslateString } from '@/utils/TranslateString';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 type Props = {
 
@@ -31,6 +32,7 @@ type Props = {
 	isWatchTicketIncluded?: boolean
 	isOfflineBenefitsIncluded?: boolean
 	onClose: () => void
+	uniqueSites?: any
 }
 
 const VIPBundleModal = (props: Props) => {
@@ -56,6 +58,14 @@ const VIPBundleModal = (props: Props) => {
 	const [isOfflineBenefitsIncluded, setIsOfflineBenefitsIncluded] = useState(props.isOfflineBenefitsIncluded ?? false)
 
 	const [featuresSelectionError, setFeaturesSelectionError] = useState(false)
+
+	// MENU
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const isMenuOpen = Boolean(anchorEl);
+	const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget)
+	const closeMenu = () => setAnchorEl(null)
+
+	const [selectedSiteID, setSelectedSiteID] = useState(0)
 
 	const featuresList = [
 		{
@@ -165,7 +175,7 @@ const VIPBundleModal = (props: Props) => {
 			mutateEditVIPBundle({
 				bundle_id: props.bundleID,
 				data: {
-					site_id: 0,
+					site_id: selectedSiteID,
 					name: bundleName,
 					price: Number(bundlePrice),
 					description: bundleDescription,
@@ -188,7 +198,7 @@ const VIPBundleModal = (props: Props) => {
 		if (validateInputs()) {
 			mutateAddNewVIPBundle({
 				data: {
-					site_id: 0,
+					site_id: selectedSiteID,
 					name: bundleName,
 					price: Number(bundlePrice),
 					description: bundleDescription,
@@ -217,6 +227,15 @@ const VIPBundleModal = (props: Props) => {
 			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingVIPBundle ? TranslateString("Edit") : TranslateString("Add")} {TranslateString("VIP Bundle")}</Typography>
 			<Stack flexDirection="column" gap={2} sx={loadingStyle} width={300}>
 				{isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
+				{props.isEditingVIPBundle ? null :
+					<Box>
+						<Button variant="contained" color="primary" onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>Site ID: {selectedSiteID}</Button>
+						<Menu anchorEl={anchorEl} open={isMenuOpen} onClose={closeMenu}>
+							<MenuItem onClick={() => { setSelectedSiteID(0); closeMenu() }}>0: Default</MenuItem>
+							{props.uniqueSites.map((item: any) => <MenuItem key={item?.id} onClick={() => { setSelectedSiteID(item?.id); closeMenu() }}>{item?.id}: {item?.name}</MenuItem>)}
+						</Menu>
+					</Box>
+				}
 				<Stack gap={2}>
 					<Stack {...cardContainer}>
 						<Stack flexDirection="row" alignItems="center" justifyContent="space-between">
