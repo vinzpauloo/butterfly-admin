@@ -51,6 +51,7 @@ const NewsFeedApproval = () => {
   // ** States
   const [rowData, setRowData] = React.useState<IFeedStory[]>([])
   const [total, setTotal] = React.useState(0)
+  const [buttonSelectedId, setButtonSelectedId] = React.useState<number>(1)
   //feed params
   const [ paginate, setPaginate ] = React.useState<number>(7)
   const [ page, setPage ] = React.useState<number>(1)
@@ -98,7 +99,7 @@ const NewsFeedApproval = () => {
     setPage(newPage + 1) // 0 based
   }
 
-  const handleFilterFeedTypeClick = (filter : 'all' | 'photos' | 'videos' | 'photos_videos' | string) => {
+  const handleFilterFeedTypeClick = (filter : 'all' | 'photos' | 'videos' | 'photos_videos' | string, buttonId : number) => {
 
     switch( filter ) {
       case 'all' : setSpecificType({})
@@ -111,6 +112,7 @@ const NewsFeedApproval = () => {
       break;
       default : setSpecificType({})
     }
+    setButtonSelectedId(buttonId)
     console.log('filter',filter)
   }
 
@@ -143,7 +145,10 @@ const NewsFeedApproval = () => {
             <Box sx={{ display: 'flex', gap: '1rem' }}>
               {
                 ButtonFilters.map( button => (
-                  <Button key={button.id} size='small' variant='contained' onClick={() => handleFilterFeedTypeClick(`${button.filter}`) }>
+                  <Button 
+                    key={button.id} 
+                    size='small' variant={ (buttonSelectedId == button.id) ? 'contained' : 'outlined' } 
+                    onClick={() => handleFilterFeedTypeClick(`${button.filter}`, Number(`${button.id}`)) }>
                     {button.title}
                   </Button>
                 ))
