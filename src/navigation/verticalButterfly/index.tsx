@@ -21,7 +21,9 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'FQDN',
       icon: 'mdi:web',
-      path: '/fqdn'
+      path: '/fqdn',
+      action: 'read',
+      subject: 'sa-page'
     },
     {
       title: 'Transactions',

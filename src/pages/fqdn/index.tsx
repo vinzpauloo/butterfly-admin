@@ -55,4 +55,9 @@ const FQDN = (props: FQDNProps) => {
   )
 }
 
+FQDN.acl = {
+  action: 'read',
+  subject: 'sa-page'
+}
+
 export default FQDN
