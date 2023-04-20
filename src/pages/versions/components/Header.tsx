@@ -73,7 +73,11 @@ const Header = () => {
             {siteName &&
               siteName?.map((item, index) => (
                 <MenuItem key={index} value={item.id}>
-                  <img src={item.logo} alt='Site Logo' width={40} />
+                  {item.logo ? (
+                    <img src={item.logo} alt='Logo' width={40} />
+                  ) : (
+                    <img src='/images/studio/butterfly_file_upload.png' alt='Placeholder Logo' width={40} />
+                  )}
                   {item.name}
                 </MenuItem>
               ))}
