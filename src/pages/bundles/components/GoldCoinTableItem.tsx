@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import BundlesService from '@/services/api/BundlesService';
 
 type Props = {
+	site_id: number
 	bundleID: string
 	bundleName: string
 	bundleDescription: string
@@ -75,6 +76,7 @@ const GoldCoinTableItem = (props: Props) => {
 	return (
 		<>
 			<TableRow key={props.bundleName} sx={loadingStyle}>
+				<TableCell>{props.site_id}</TableCell>
 				<TableCell>{isBeingDeletedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}{props.bundleName}</TableCell>
 				<TableCell>{props.bundleDescription}</TableCell>
 				<TableCell>{props.bundlePrice}</TableCell>

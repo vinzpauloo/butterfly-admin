@@ -14,6 +14,8 @@ interface IBundlesParams {
 		product?: string
 		amount?: number
 		active?: boolean
+		with?: "sites"
+		exclude?: number
 
 		// POST create subscription
 		videos?: boolean

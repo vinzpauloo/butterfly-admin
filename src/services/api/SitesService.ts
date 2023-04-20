@@ -9,11 +9,25 @@ interface ISitesParams {
 		about?: string
 		_method?: "put"
 		detail?: "provisions" | "policy" | "about"
+		paginate?: number
 	}
 }
 
 const SitesService = () => {
 	const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+	const getSitesList = (params: ISitesParams) => {
+		return request({
+			headers: {
+				...getHeaders(),
+				'ngrok-skip-browser-warning': '69420', // only for dev
+				Authorization: `Bearer ${accessToken}`
+			},
+			url: '/admin/sites',
+			method: 'GET',
+			params: params.data,
+		})
+	}
 
 	const getSiteOtherDetails = (params: ISitesParams) => {
 		return request({
@@ -42,7 +56,7 @@ const SitesService = () => {
 		})
 	}
 
-	return { getSiteOtherDetails, updateSiteOtherDetails }
+	return { getSitesList, getSiteOtherDetails, updateSiteOtherDetails }
 }
 
 export default SitesService

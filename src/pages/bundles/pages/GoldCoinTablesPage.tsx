@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button, Stack } from '@mui/material';
 
 const tableHeader = [
+	"Site ID",
 	"Bundle Name",
 	"Description",
 	"Price",
@@ -31,7 +32,7 @@ const GoldCoinTablesPage = () => {
 	const { getAllCoinsBundle } = BundlesService()
 	const { isLoading, data } = useQuery({
 		queryKey: ["allCoinsBundle"],
-		queryFn: () => getAllCoinsBundle({ data: { site_id: 0 } }),
+		queryFn: () => getAllCoinsBundle({}),
 		onSuccess: (data) => { console.log("COINS BUNDLE:", data?.data) },
 		onError: (error) => { console.log(error) }
 	})
@@ -69,6 +70,7 @@ const GoldCoinTablesPage = () => {
 								<GoldCoinTableItem
 									key={item._id}
 									bundleID={item._id}
+									site_id={item.site_id}
 									bundleName={item.name}
 									bundleDescription={item.description}
 									bundlePrice={item.price}

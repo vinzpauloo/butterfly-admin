@@ -14,6 +14,8 @@ import IconList from './IconList';
 import { useTranslateString } from '@/utils/TranslateString';
 
 type Props = {
+	site_id: number
+	siteName: string
 	bundleID: string
 	bundleName: string
 	bundlePrice: number
@@ -115,6 +117,7 @@ const VIPBundleItem = (props: Props) => {
 				{isBeingDeletedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
 				<Stack bgcolor="#D9D9D9" borderRadius={.5} p={2} width={300}>
 					<Stack gap={2}>
+						<Typography variant="body1" sx={{ wordBreak: "break-word" }}>{props.site_id}: {props.siteName}</Typography>
 						<Stack gap={2} flexDirection="row" justifyContent="space-between">
 							<Typography variant="h6" bgcolor="white" p={2} borderRadius={.5} width="max-content" sx={{ wordBreak: "break-word" }}>{props.bundleName}</Typography>
 							<Switch checked={props.isBundleOn} onClick={SwtichOnAndOffVIPBundle} />

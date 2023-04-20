@@ -11,6 +11,8 @@ import BundlesService from '@/services/api/BundlesService';
 import { useTranslateString }  from '@/utils/TranslateString';
 
 type Props = {
+	site_id: number
+	siteName: string
 	bundleID: string
 	bundleName: string
 	bundlePrice: string
@@ -79,7 +81,8 @@ const GoldCoinBundleItem = (props: Props) => {
 			<Stack gap={2} height="max-content" width={300} sx={loadingStyle} position="relative">
 				{isBeingDeletedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
 				<Stack {...cardContainer}>
-					<Stack flexDirection="row" alignItems="center" justifyContent="space-between">
+					<Typography variant="body1" sx={{ wordBreak: "break-word" }}>{props.site_id}: {props.siteName}</Typography>
+					<Stack flexDirection="row" alignItems="center" justifyContent="space-between">						
 						<Typography {...textContainer} variant="h6" sx={{ wordBreak: "break-word" }}>{props.bundleName}</Typography>
 						<Switch checked={props.isBundleOn} onClick={SwtichOnAndOffGoldCoinBundle} />
 					</Stack>
@@ -99,6 +102,7 @@ const GoldCoinBundleItem = (props: Props) => {
 				<GoldCoinBundleModal
 					onClose={handleClose}
 					isEditingGoldCoinBundle
+					site_id={props.site_id}
 					bundleID={props.bundleID}
 					bundleName={props.bundleName}
 					bundlePrice={props.bundlePrice}

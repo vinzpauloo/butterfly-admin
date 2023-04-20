@@ -8,12 +8,16 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import BundlesService from '@/services/api/BundlesService';
 import { useTranslateString } from '@/utils/TranslateString';
+import { Box, Menu, MenuItem } from '@mui/material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 type Props = {
 
 	// optional props to be passed if editing a bundle instead
 	isEditingGoldCoinBundle?: boolean
 	bundleID?: string
+	site_id?: number
+	uniqueSites?: any
 	bundleName?: string
 	bundlePrice?: string
 	bundleDescription?: string
@@ -23,32 +27,21 @@ type Props = {
 
 const GoldCoinBundleModal = (props: Props) => {
 	const [bundleName, setBundleName] = useState(props.bundleName ?? "")
-	const [bundleNameError, setBundleNameError] = useState(false)
-
-	const [bundlePrice, setBundlePrice] = useState(props.bundlePrice ?? "")
-	const [bundlePriceError, setBundlePriceError] = useState(false)
-
+	const [bundlePrice, setBundlePrice] = useState<any>(props.bundlePrice ?? "")
 	const [bundleDescription, setBundleDescription] = useState(props.bundleDescription ?? "")
-	const [bundleDescriptionError, setBundleDescriptionError] = useState(false)
-
 	const [isBundleActive, setIsBundleActive] = useState(props.isBundleOn ?? false)
+	const [selectedSiteID, setSelectedSiteID] = useState(0)
+
+	// MENU
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const isMenuOpen = Boolean(anchorEl);
+	const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget)
+	const closeMenu = () => setAnchorEl(null)
 
 	const validateInputs = () => {
-		if (bundleName === "") {
-			setBundleNameError(true)
-
-			return false
-		}
-		if (bundlePrice === "") {
-			setBundlePriceError(true)
-
-			return false
-		}
-		if (bundleDescription === "") {
-			setBundleDescriptionError(true)
-
-			return false
-		}
+		if (bundleName === "") return false
+		if (bundlePrice === "" || bundlePrice < 200) return false
+		if (bundleDescription === "") return false
 
 		return true
 	}
@@ -88,7 +81,7 @@ const GoldCoinBundleModal = (props: Props) => {
 			mutateEditCoinBundle({
 				bundle_id: props.bundleID,
 				data: {
-					site_id: 0,
+					site_id: selectedSiteID,
 					name: bundleName,
 					price: Number(bundlePrice),
 					amount: Number(bundlePrice),
@@ -103,7 +96,7 @@ const GoldCoinBundleModal = (props: Props) => {
 		if (validateInputs()) {
 			mutateAddNewCoinBundle({
 				data: {
-					site_id: 0,
+					site_id: selectedSiteID,
 					name: bundleName,
 					price: Number(bundlePrice),
 					amount: Number(bundlePrice),
@@ -123,29 +116,39 @@ const GoldCoinBundleModal = (props: Props) => {
 		<Stack {...modalContainer}>
 			<Typography variant="h5" color="white" textAlign="center" my={2} mb={4}>{props.isEditingGoldCoinBundle ? TranslateString("Edit") : TranslateString("Add")} {TranslateString("Gold Coin Bundle")}</Typography>
 			<Stack gap={2} width={300} sx={loadingStyle}>
+				{props.isEditingGoldCoinBundle ? null : 
+					<Box>
+						<Button variant="contained" color="primary" onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>Site ID: {selectedSiteID}</Button>
+						<Menu anchorEl={anchorEl} open={isMenuOpen} onClose={closeMenu}>
+							<MenuItem onClick={() => { setSelectedSiteID(0); closeMenu() }}>0: Default</MenuItem>
+							{props.uniqueSites.map((item: any) => <MenuItem key={item?.id} onClick={() => { setSelectedSiteID(item?.id); closeMenu() }}>{item?.id}: {item?.name}</MenuItem>)}
+						</Menu>
+					</Box>
+				}
 				{isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
 				<Stack {...cardContainer}>
 					<Stack flexDirection="row" alignItems="center" justifyContent="space-between">
 						<TextField
-							error={bundleName !== "" ? false : undefined || bundleNameError}
+							error={props.isEditingGoldCoinBundle ? bundleName === "" : false}
 							sx={textFieldStyle}
 							value={bundleName}
-							onChange={(event) => { setBundleName(event.target.value); console.log(bundleName)}}
+							onChange={(event) => setBundleName(event.target.value)}
 							label={TranslateString("Bundle Name")} />
 						<Switch checked={isBundleActive} onChange={event => { setIsBundleActive(event.target.checked)}} />
 					</Stack>
 					<TextField
 						type="number"
-						error={bundlePrice !== "" ? false : undefined || bundlePriceError}
+						error={props.isEditingGoldCoinBundle ? bundlePrice < 200 || bundlePrice === "" : false}
 						sx={textFieldStyle}
 						inputProps={{ min: 0 }}
 						value={bundlePrice}
-						onChange={(event) => {setBundlePrice(event.target.value); console.log(bundlePrice)}}
+						onChange={(event) => setBundlePrice(event.target.value)}
 						label={TranslateString("Gold Coin")} />
+					{props.isEditingGoldCoinBundle && bundlePrice < 200 ? <Typography variant="caption" color="error">must be atleast 200</Typography> : undefined}
 				</Stack>
 				<Stack {...cardContainer}>
 					<TextField
-						error={bundleDescription !== "" ? false : undefined || bundleDescriptionError}
+						error={props.isEditingGoldCoinBundle ? bundleDescription === "" : false}
 						sx={textFieldStyle}
 						value={bundleDescription}
 						onChange={(event) => setBundleDescription(event.target.value)}
