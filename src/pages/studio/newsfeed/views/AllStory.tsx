@@ -6,8 +6,6 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
-// ** API
-import { useQueryClient } from '@tanstack/react-query'
 
 // ** Custom Components
 import FeedCard from '../../shared-component/feed/FeedCard'
@@ -18,7 +16,9 @@ import formatDate from '@/utils/formatDate'
 
 // ** Types
 import { IFeedStory } from '@/context/types'
-import { IUser } from '@/context/types'
+
+// ** Views
+import NoPostsFound from './NoPostsFound'
 
 type StoryProps = {
   data? : any,
@@ -33,6 +33,10 @@ const AllStory = ({data, handleFeedParams}: StoryProps) => {
       handleFeedParams(StoryOnlyParams)
     }
   }, [data])
+
+  if ( data?.length == 0 ) {
+    return <NoPostsFound />
+  }
   
   if (data) {
 
