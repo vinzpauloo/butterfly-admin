@@ -11,7 +11,6 @@ import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
 //** Views Imports */
 import UploadMenu from './views/UploadMenu'
 import UploadVideoStep1 from './views/UploadVideoStep1'
-import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
 import LoadingScreen from './views/LoadingScreen'
 import VideoVisibility from './views/VideoVisibility'
 import UploadVideoPublish from './views/UploadVideoPublish'
@@ -42,7 +41,6 @@ export enum DisplayPage {
   MainPage,
   UploadVideoStep1,
   UploadAlbum,
-  UploadNewsfeedsStep1,
   LoadingScreen,
   VideoVisibility,
   UploadVideoPublish,
@@ -139,7 +137,6 @@ const UploadContent = () => {
     if (displayPage == DisplayPage.MainPage) return <UploadMenu />
     if (displayPage == DisplayPage.UploadVideoStep1) return <UploadVideoStep1 />
     if (displayPage == DisplayPage.UploadAlbum) return <UploadAlbum />
-    if (displayPage == DisplayPage.UploadNewsfeedsStep1) return <UploadNewsfeedsStep1 />
     if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
     if (displayPage == DisplayPage.VideoVisibility) return <VideoVisibility />
     if (displayPage == DisplayPage.UploadVideoPublish) return <UploadVideoPublish />

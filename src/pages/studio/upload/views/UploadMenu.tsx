@@ -59,7 +59,6 @@ const UploadMenu = (props: Props) => {
   }
 
   const handleNewsfeedsButtonClick = () => {
-    //studioContext?.setDisplayPage(DisplayPage.UploadNewsfeedsStep1)
     setFeedModal(true)
   }
 
