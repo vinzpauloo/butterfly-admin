@@ -54,7 +54,7 @@ const Advertisements = () => {
           </Stack>
         </TabPanel>
         :
-        data.map((item: any, index: any) =>
+        data?.map((item: any, index: any) =>
           <TabPanel value={tabIndex} index={index} key={index}>
             <AdsContainer
               containerID={item._id}
