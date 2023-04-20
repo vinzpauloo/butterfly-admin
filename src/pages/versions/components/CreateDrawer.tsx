@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography, MenuItem } from '@mui/material'
-
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -18,24 +17,33 @@ import Icon from 'src/@core/components/icon'
 // ** Other Imports
 import CreatedSuccessful from '@/pages/user/components/form/CreatedSuccessful'
 import { useTranslateString } from '@/utils/TranslateString'
+import { useSiteContext } from '../context/SiteContext'
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { ApkService } from '@/services/api/ApkService'
-import { useSiteContext } from '../context/SiteContext'
 
 interface FormValues {
   [key: string]: any
   download_link: string
   os: 'android' | 'ios' | ''
   version: string
-  patch_notes: string
+  patch_note: string
   name: string
 }
 
-const schema = yup.object().shape({})
+const schema = yup.object().shape({
+  download_link: yup
+    .string()
+    .url('Link must be a valid URL. e.g.: https://www.example.com')
+    .required('Download link is required.'),
+  os: yup.string().required('Please choose an operating system.'),
+  version: yup.string().required('Please input a version.'),
+  name: yup.string().required('Please enter your name.'),
+  patch_note: yup.string().required('Please input your patch notes.')
+})
 
 interface SidebarAddUserType {
   open: boolean
@@ -89,7 +97,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
     for (const key in data) {
       const value = data[key]
 
-      formData.append(key, value.toString())
+      formData.append(key, value)
     }
 
     formData.append('site_id', `${selectedSite}`)
@@ -159,14 +167,10 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                     defaultValue={field.value}
                     onChange={field.onChange}
                     name='download_link'
+                    type='url'
                   />
                 )}
               />
-              {errors.os && (
-                <Typography variant='caption' color='error' sx={{ marginLeft: 4 }}>
-                  {errors.os.message}
-                </Typography>
-              )}
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
                   <Controller
@@ -234,7 +238,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <Controller
-                    name='patch_notes'
+                    name='patch_note'
                     control={control}
                     render={({ field }) => (
                       <TextField
@@ -243,11 +247,11 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                         fullWidth
                         multiline
                         rows={20}
-                        error={!!errors.patch_notes}
-                        helperText={errors.patch_notes?.message}
+                        error={!!errors.patch_note}
+                        helperText={errors.patch_note?.message}
                         defaultValue={field.value}
                         onChange={field.onChange}
-                        name='user_note'
+                        name='patch_note'
                       />
                     )}
                   />

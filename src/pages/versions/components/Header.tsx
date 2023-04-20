@@ -62,13 +62,17 @@ const Header = () => {
             label='Select Site'
             value={selectedSite || ''}
             onChange={handleChange}
+            sx={styles.menuSelect}
+            MenuProps={{
+              sx: { ...styles.menuList }
+            }}
           >
             <MenuItem value='' sx={{ ...styles.menuItem, fontWeight: '600', textTransform: 'uppercase' }}>
               <em>None</em>
             </MenuItem>
             {siteName &&
               siteName?.map((item, index) => (
-                <MenuItem key={index} value={item.id} sx={styles.menuItem}>
+                <MenuItem key={index} value={item.id}>
                   <img src={item.logo} alt='Site Logo' width={40} />
                   {item.name}
                 </MenuItem>
@@ -127,6 +131,19 @@ const styles = {
       lg: 150
     },
     float: 'right'
+  },
+  menuSelect: {
+    '& .MuiSelect-select': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }
+  },
+  menuList: {
+    '& .MuiMenuItem-root': {
+      display: 'flex',
+      justifyContent: 'space-between'
+    }
   }
 }
 
