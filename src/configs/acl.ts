@@ -25,7 +25,6 @@ const defineRulesFor = (role: string, subject: string) => {
 
   const allActions = ['read', 'create', 'update', 'delete']
   can(allActions, 'shared-page')
-  can(allActions, 'cc-post-status')
 
   if (role === 'admin' || role === 'GOD' || role === 'SUPERVISOR') {
     can('manage', 'all')
