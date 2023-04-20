@@ -15,7 +15,7 @@ const SiteContext = createContext<SiteContextProps>({
 export const useSiteContext = (): SiteContextProps => useContext(SiteContext)
 
 export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedSite, setSelectedSite] = useState('')
+  const [selectedSite, setSelectedSite] = useState('1')
 
   return <SiteContext.Provider value={{ selectedSite, setSelectedSite }}>{children}</SiteContext.Provider>
 }
