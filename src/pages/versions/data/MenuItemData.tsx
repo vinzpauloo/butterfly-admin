@@ -4,6 +4,12 @@ import formatDate from '@/utils/formatDate'
 // ** Other Imports
 import EditButton from '../components/EditButton'
 
+interface RowProps {
+  row: {
+    id: number
+  }
+}
+
 export const MenuItemData = () => {
   const columns = [
     { sortable: false, field: 'os', headerName: 'OS Platform', width: 300 },
@@ -23,8 +29,8 @@ export const MenuItemData = () => {
       field: 'status',
       headerName: 'Action',
       width: 135,
-      renderCell: () => {
-        return <EditButton />
+      renderCell: (params: RowProps) => {
+        return <EditButton id={params?.row.id} data={params?.row} />
       }
     }
   ]

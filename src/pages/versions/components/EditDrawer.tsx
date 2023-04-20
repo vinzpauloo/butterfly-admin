@@ -1,9 +1,8 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography, MenuItem } from '@mui/material'
-
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -18,24 +17,39 @@ import Icon from 'src/@core/components/icon'
 // ** Other Imports
 import CreatedSuccessful from '@/pages/user/components/form/CreatedSuccessful'
 import { useTranslateString } from '@/utils/TranslateString'
+import { useSiteContext } from '../context/SiteContext'
 
 // ** TanStack Query
-// import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
+import { ApkService } from '@/services/api/ApkService'
 
 interface FormValues {
+  [key: string]: any
   download_link: string
   os: 'android' | 'ios' | ''
   version: string
-  patch_notes: string
+  patch_note: string
+  name: string
 }
 
-const schema = yup.object().shape({})
+const schema = yup.object().shape({
+  download_link: yup
+    .string()
+    .url('Link must be a valid URL. e.g.: https://www.example.com')
+    .required('Download link is required.'),
+  os: yup.string().required('Please choose an operating system.'),
+  version: yup.string().required('Please input a version.'),
+  name: yup.string().required('Please enter your name.'),
+  patch_note: yup.string().required('Please input your patch notes.')
+})
 
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
+  id: any
+  rowData: any
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -47,32 +61,92 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 }))
 
 const EditVersionDrawer = (props: SidebarAddUserType) => {
+  const queryClient = useQueryClient()
+
   // ** Props
-  const { open, toggle } = props
+  const { open, toggle, id, rowData } = props
 
   // ** State
-  const [submitted] = useState<boolean>()
+  const [submitted, setSubmitted] = useState<boolean>()
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
+    setValue
   } = useForm<FormValues>({
     resolver: yupResolver(schema)
   })
+
+  useEffect(() => {
+    if (rowData) {
+      const initialValues: FormValues = {
+        download_link: rowData?.download_link,
+        os: rowData?.os,
+        patch_note: rowData?.patch_note,
+        version: rowData?.version,
+        name: rowData?.name
+      }
+      for (const key in initialValues) {
+        setValue(key, initialValues[key])
+      }
+    }
+  }, [rowData, setValue])
 
   const resetForm = () => {
     reset({
       download_link: '',
       os: '',
       version: '',
-      patch_notes: ''
+      patch_notes: '',
+      name: ''
     })
   }
 
-  const handleFormSubmit = () => {
-    alert(`SUCCESS`)
+  const { editAPK } = ApkService()
+  const mutation = useMutation(async (data: { id: any; data: any }) => {
+    const response = await editAPK(data.id, data.data)
+    if (response.ok) {
+      await response.json()
+    }
+  })
+
+  const { selectedSite } = useSiteContext()
+
+  const handleFormSubmit = async (data: FormValues) => {
+    const formData = new FormData()
+
+    for (const key in data) {
+      const value = data[key]
+
+      formData.append(key, value)
+    }
+
+    formData.append('site_id', `${selectedSite}`)
+    formData.append('_method', 'put')
+
+    const apkData: any = {
+      data: formData
+    }
+
+    try {
+      await mutation.mutateAsync({
+        id: id,
+        data: apkData
+      })
+      setSubmitted(true)
+
+      setTimeout(() => {
+        toggle()
+        setSubmitted(false)
+
+        // Re-fetches UserTable and CSV exportation
+        queryClient.invalidateQueries({ queryKey: ['allApk'] })
+      }, 1500)
+    } catch (e) {
+      console.log(`Error`, e)
+    }
   }
 
   const [resetKey, setResetKey] = useState(0)
@@ -116,22 +190,19 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
                     fullWidth
                     error={!!errors.download_link}
                     helperText={errors.download_link?.message}
-                    defaultValue={field.value}
+                    value={field.value || ''}
                     onChange={field.onChange}
                     name='download_link'
+                    type='url'
                   />
                 )}
               />
-              {errors.os && (
-                <Typography variant='caption' color='error' sx={{ marginLeft: 4 }}>
-                  {errors.os.message}
-                </Typography>
-              )}
               <Box sx={styles.formContent}>
                 <Box sx={styles.fullWidth}>
                   <Controller
                     name='os'
                     control={control}
+                    defaultValue=''
                     render={({ field }) => (
                       <TextField
                         select
@@ -144,13 +215,31 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='os'
                       >
-                        <MenuItem value={1} sx={{ textTransform: 'uppercase' }}>
+                        <MenuItem value={'android'} sx={{ textTransform: 'uppercase' }}>
                           <Typography sx={{ textTransform: 'uppercase' }}>Android</Typography>
                         </MenuItem>
-                        <MenuItem value={2} sx={{ textTransform: 'uppercase' }}>
+                        <MenuItem value={'ios'} sx={{ textTransform: 'uppercase' }}>
                           <Typography sx={{ textTransform: 'uppercase' }}>IOS</Typography>
                         </MenuItem>
                       </TextField>
+                    )}
+                  />
+                </Box>
+                <Box sx={styles.fullWidth}>
+                  <Controller
+                    name='name'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label={TranslateString('Site') + ' ' + TranslateString('Name')}
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='name'
+                      />
                     )}
                   />
                 </Box>
@@ -175,7 +264,7 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <Controller
-                    name='patch_notes'
+                    name='patch_note'
                     control={control}
                     render={({ field }) => (
                       <TextField
@@ -184,11 +273,11 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
                         fullWidth
                         multiline
                         rows={20}
-                        error={!!errors.patch_notes}
-                        helperText={errors.patch_notes?.message}
+                        error={!!errors.patch_note}
+                        helperText={errors.patch_note?.message}
                         defaultValue={field.value}
                         onChange={field.onChange}
-                        name='user_note'
+                        name='patch_note'
                       />
                     )}
                   />

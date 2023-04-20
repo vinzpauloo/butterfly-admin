@@ -4,11 +4,18 @@ import React, { useState } from 'react'
 // ** MUI Imports
 import { Button } from '@mui/material'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+
+// ** Other Imports
 import EditVersionDrawer from './EditDrawer'
 
-// ** Custom Imports
+interface EditButtonProps {
+  id: number
+  data: any
+}
 
-const EditButton = () => {
+const EditButton = (props: EditButtonProps) => {
+  const { id, data } = props
+
   const [openDrawer, setOpenDrawer] = useState(false)
   const handleDrawerToggle = () => {
     setOpenDrawer(isDrawerOpen => !isDrawerOpen)
@@ -19,7 +26,7 @@ const EditButton = () => {
       <Button style={styles.button} onClick={handleDrawerToggle}>
         <EditOutlinedIcon sx={styles.icon} />
       </Button>
-      <EditVersionDrawer open={openDrawer} toggle={handleDrawerToggle} />
+      <EditVersionDrawer id={id} rowData={data} open={openDrawer} toggle={handleDrawerToggle} />
     </>
   )
 }

@@ -58,11 +58,28 @@ export const ApkService = () => {
             method: 'POST',
             data: params.data
         })
-    }
+  }
+  
+  const editAPK = (id:any,params: ApkProps) => {
+        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+        return request({
+            headers: {
+            ...getHeaders(),
+              'Content-Type': 'multipart/form-data',
+                 'ngrok-skip-browser-warning': '69420', // only for dev
+                Authorization: `Bearer ${accessToken}`
+            },
+            url: `/admin/apks/${id}`,
+            method: 'POST',
+            data: params.data
+        })
+  }
 
   return {
     getAllApks,
     getAllSites,
-    postAPK
+    postAPK,
+    editAPK
   }
 }
