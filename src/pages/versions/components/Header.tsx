@@ -67,9 +67,9 @@ const Header = () => {
               sx: { ...styles.menuList }
             }}
           >
-            <MenuItem value='' sx={{ ...styles.menuItem, fontWeight: '600', textTransform: 'uppercase' }}>
+            {/* <MenuItem value='' sx={{ ...styles.menuItem, fontWeight: '600', textTransform: 'uppercase' }}>
               <em>None</em>
-            </MenuItem>
+            </MenuItem> */}
             {siteName &&
               siteName?.map((item, index) => (
                 <MenuItem key={index} value={item.id}>

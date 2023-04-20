@@ -14,6 +14,8 @@ import { useQuery } from '@tanstack/react-query'
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
 
+type SortType = 'asc' | 'desc' | undefined | null
+
 const VersionsTable = () => {
   const { selectedSite } = useSiteContext()
   const { getAllApks } = ApkService()
@@ -21,6 +23,9 @@ const VersionsTable = () => {
 
   const [rowData, setRowData] = useState<[]>([])
   const [siteId, setSiteId] = useState<string | undefined>()
+
+  const [sort] = useState<SortType>('desc')
+  const [sortName] = useState<string>('created_at')
 
   useEffect(() => {
     setSiteId(selectedSite)
@@ -31,7 +36,9 @@ const VersionsTable = () => {
     queryFn: () =>
       getAllApks({
         data: {
-          site_id: siteId
+          site_id: siteId,
+          sort: sort,
+          sort_by: sortName
         }
       }),
     onSuccess: (data: any) => {

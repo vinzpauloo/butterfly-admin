@@ -9,6 +9,8 @@ interface ApkProps {
     version?: string
     download_link?: string
     os?: string
+    sort?: any
+    sort_by?: string
   }
 }
 
