@@ -16,7 +16,9 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Users',
       icon: 'mdi:user-circle',
-      path: '/user/list'
+      path: '/user/list',
+      action: 'read',
+      subject: 'shared-page'
     },
     {
       title: 'FQDN',
@@ -28,22 +30,25 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Transactions',
       icon: 'mdi:file-document-outline',
+      action: 'read',
+      subject: 'shared-page',
+      path: '/transactions',
       children: [
         {
           title: 'Donations',
-          path: '/transactions/donations'
+          path: '/transactions/donations',
         },
         {
           title: 'Commissions',
-          path: '/transactions/commissions'
+          path: '/transactions/commissions',
         },
         {
           title: 'Withdrawal',
-          path: '/transactions/withdrawal'
+          path: '/transactions/withdrawal',
         },
         {
           title: 'Security Funds',
-          path: '/transactions/security-funds'
+          path: '/transactions/security-funds',
         }
       ]
     },
