@@ -5,7 +5,7 @@ import React from 'react'
 import Container from './components/Container'
 import Header from './components/Header'
 import VersionsTable from './table/VersionsTable'
-import { SiteProvider } from './context/SiteContext'
+import { SiteProvider } from '../../context/SiteContext'
 
 const Versions = () => {
   return (

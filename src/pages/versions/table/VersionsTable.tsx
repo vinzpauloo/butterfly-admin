@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 
 // ** Other Imports
-import { useSiteContext } from '../context/SiteContext'
-import { MenuItemData } from '../data/MenuItemData'
+import { useSiteContext } from '../../../context/SiteContext'
+import { MenuItemData } from '../../../data/MenuItemData'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'

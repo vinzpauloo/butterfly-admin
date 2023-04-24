@@ -17,7 +17,7 @@ import Icon from 'src/@core/components/icon'
 // ** Other Imports
 import CreatedSuccessful from '@/pages/user/components/form/CreatedSuccessful'
 import { useTranslateString } from '@/utils/TranslateString'
-import { useSiteContext } from '../context/SiteContext'
+import { useSiteContext } from '../../../context/SiteContext'
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'

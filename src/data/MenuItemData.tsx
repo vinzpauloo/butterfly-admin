@@ -2,7 +2,7 @@
 import formatDate from '@/utils/formatDate'
 
 // ** Other Imports
-import EditButton from '../components/EditButton'
+import EditButton from '../pages/versions/components/EditButton'
 
 interface RowProps {
   row: {
