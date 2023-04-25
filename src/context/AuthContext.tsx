@@ -67,7 +67,12 @@ const AuthProvider = ({ children }: Props) => {
         }
       })
       .then(async response => {
-        const tempUserData = { id: response.data.data.id, role: response.data.data.role, username: params.email }
+        const tempUserData = {
+          id: response.data.data.id,
+          role: response.data.data.role,
+          username: params.email,
+          photo: response.data.data.photo
+        }
 
         // setUser(tempUserData)
         params.rememberMe
