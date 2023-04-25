@@ -63,11 +63,11 @@ const AuthProvider = ({ children }: Props) => {
     axios
       .post(`${baseUrl + authConfig.loginEndpoint}`, newParams, {
         headers: {
-          ...getHeaders(),
+          ...getHeaders()
         }
       })
       .then(async response => {
-        const tempUserData = { role: response.data.data.role, username: params.email }
+        const tempUserData = { id: response.data.data.id, role: response.data.data.role, username: params.email }
 
         // setUser(tempUserData)
         params.rememberMe
