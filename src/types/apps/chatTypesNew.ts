@@ -74,8 +74,8 @@ export type SelectedChatType = null | {
 export type ChatStoreType = {
   chats: ChatsArrType[] | null
   contacts: ContactType[] | null
-  userProfile: ProfileUserType | null
-  selectedChat: SelectedChatType
+  userProfile?: ProfileUserType | null
+  selectedChat?: SelectedChatType
 }
 
 export type SendMsgParamsType = {
@@ -89,12 +89,12 @@ export type ChatContentType = {
   mdAbove: boolean
   store: ChatStoreType
   sidebarWidth: number
-  dispatch: Dispatch<any>
+  dispatch?: Dispatch<any>
   statusObj: StatusObjType
   userProfileRightOpen: boolean
   handleLeftSidebarToggle: () => void
   getInitials: (val: string) => string
-  sendMsg: (params: SendMsgParamsType) => void
+  sendMsg?: (params: SendMsgParamsType) => void
   handleUserProfileRightSidebarToggle: () => void
 }
 
@@ -104,12 +104,12 @@ export type ChatSidebarLeftType = {
   store: ChatStoreType
   sidebarWidth: number
   userStatus: StatusType
-  dispatch: Dispatch<any>
+  dispatch?: Dispatch<any>
   leftSidebarOpen: boolean
   statusObj: StatusObjType
   userProfileLeftOpen: boolean
-  removeSelectedChat: () => void
-  selectChat: (id: number) => void
+  removeSelectedChat?: () => void
+  selectChat?: (id: number) => void
   handleLeftSidebarToggle: () => void
   getInitials: (val: string) => string
   setUserStatus: (status: StatusType) => void
@@ -119,7 +119,7 @@ export type ChatSidebarLeftType = {
 
 export type UserProfileLeftType = {
   hidden: boolean
-  store: ChatStoreType
+  store?: ChatStoreType
   sidebarWidth: number
   userStatus: StatusType
   statusObj: StatusObjType
@@ -150,7 +150,6 @@ export type ChatLogType = {
     chat: ChatsObj
     contact: ContactType
     userContact: ProfileUserType
-    chats: any[]
   }
 }
 

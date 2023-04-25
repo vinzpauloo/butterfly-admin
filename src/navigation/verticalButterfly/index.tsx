@@ -1,7 +1,10 @@
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
+import { useAuth } from '@/services/useAuth'
 
-const navigation = (): VerticalNavItemsType => {
+const Navigation = (): VerticalNavItemsType => {
+  const auth = useAuth()
+  
   return [
     {
       sectionTitle: 'Main'
@@ -16,7 +19,9 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Users',
       icon: 'mdi:user-circle',
-      path: '/user/list'
+      path: '/user/list',
+      action: 'read',
+      subject: 'shared-page'
     },
     {
       title: 'FQDN',
@@ -28,22 +33,25 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Transactions',
       icon: 'mdi:file-document-outline',
-      children: [
+      action: 'read',
+      subject: 'shared-page',
+      path: '/transactions',
+      children: auth?.user?.role === "AGENT" ? undefined : [
         {
           title: 'Donations',
-          path: '/transactions/donations'
+          path: '/transactions/donations',
         },
         {
           title: 'Commissions',
-          path: '/transactions/commissions'
+          path: '/transactions/commissions',
         },
         {
           title: 'Withdrawal',
-          path: '/transactions/withdrawal'
+          path: '/transactions/withdrawal',
         },
         {
           title: 'Security Funds',
-          path: '/transactions/security-funds'
+          path: '/transactions/security-funds',
         }
       ]
     },
@@ -149,4 +157,4 @@ const navigation = (): VerticalNavItemsType => {
   ]
 }
 
-export default navigation
+export default Navigation

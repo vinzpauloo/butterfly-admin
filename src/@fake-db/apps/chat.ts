@@ -7,7 +7,7 @@ import { ProfileUserType, ChatsObj, ContactType } from 'src/types/apps/chatTypes
 const previousDay = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
 const dayBeforePreviousDay = new Date(new Date().getTime() - 24 * 60 * 60 * 1000 * 2)
 
-const data: { chats: ChatsObj[]; contacts: ContactType[]; profileUser: ProfileUserType } = {
+export const data: { chats: ChatsObj[]; contacts: ContactType[]; profileUser: ProfileUserType } = {
   profileUser: {
     id: 11,
     avatar: '/images/avatars/1.png',
