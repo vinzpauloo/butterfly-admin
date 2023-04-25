@@ -7,6 +7,7 @@ import InformationCard from './components/InformationCard'
 import 'chart.js/auto'
 import VideoContentsBarChart from '@/pages/dashboard/components/VideoContentsBarChart'
 import VipAndGuestsData from '@/pages/dashboard/components/VipAndGuestsData'
+import { DashboardProvider } from '@/context/DashboardContext'
 
 // Vars
 const horizontalBarInfo = '#FFB84C'
@@ -20,25 +21,27 @@ const Dashboard = () => {
   const legendColor = theme.palette.text.secondary
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 10 }}>
-      <InformationCard />
-      <Box sx={{ width: '100%' }}>
-        <VideoContentsBarChart
-          labelColor={labelColor}
-          info={horizontalBarInfo}
-          borderColor={borderColor}
-          legendColor={legendColor}
-          warning={warningColorShade}
-        />
-        <VipAndGuestsData
-          labelColor={labelColor}
-          info={horizontalBarInfo}
-          borderColor={borderColor}
-          legendColor={legendColor}
-          warning={purpleColorShade}
-        />
+    <DashboardProvider>
+      <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 10 }}>
+        <InformationCard />
+        <Box sx={{ width: '100%' }}>
+          <VideoContentsBarChart
+            labelColor={labelColor}
+            info={horizontalBarInfo}
+            borderColor={borderColor}
+            legendColor={legendColor}
+            warning={warningColorShade}
+          />
+          <VipAndGuestsData
+            labelColor={labelColor}
+            info={horizontalBarInfo}
+            borderColor={borderColor}
+            legendColor={legendColor}
+            warning={purpleColorShade}
+          />
+        </Box>
       </Box>
-    </Box>
+    </DashboardProvider>
   )
 }
 
