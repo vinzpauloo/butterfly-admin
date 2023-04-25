@@ -113,4 +113,9 @@ const AppChat = () => {
 
 AppChat.contentHeightFixed = true
 
+AppChat.acl = {
+  action: 'read',
+  subject: 'sa-page'
+}
+
 export default AppChat

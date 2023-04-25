@@ -195,7 +195,7 @@ const VIPBundleModal = (props: Props) => {
           forever_vip: featuresList[5].isIncluded,
           download: featuresList[6].isIncluded,
           watch_ticket: featuresList[7].isIncluded,
-          offline_benefit: featuresList[8].isIncluded
+          offline_benefit: featuresList[8]?.isIncluded || false
         }
       })
     }
@@ -218,7 +218,7 @@ const VIPBundleModal = (props: Props) => {
           forever_vip: featuresList[5].isIncluded,
           download: featuresList[6].isIncluded,
           watch_ticket: featuresList[7].isIncluded,
-          offline_benefit: featuresList[8].isIncluded
+          offline_benefit: featuresList[8]?.isIncluded || false
         }
       })
     }
