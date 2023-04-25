@@ -15,6 +15,10 @@ import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 // ** Views
 import ExpandoForm from './views/ExpandoForm'
 
+// ** API queries
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import FQDNService from '@/services/api/FQDNService'
+
 // ** Styled PerfectScrollbar component
 const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   height: '80vh',
@@ -27,17 +31,46 @@ type FQDNProps = {}
 
 const FQDN = (props: FQDNProps) => {
 
+  // ** states
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [site, setSite] = React.useState<number>(3)
+  const [sort, setSort] = React.useState<'desc' | 'asc'>('desc')
+  const [sortBy, setSortBy] = React.useState('fqdn')
+  const [paginate, setPaginate] = React.useState<number>(2)
 
-  const handleAPISubmit = (data: any) => {
+  // ** apis
+  const { getFQDNList, getSuperAgentFQDNList, addFQDN } = FQDNService()
+  
+  const queryClient = useQueryClient()
+  const fqdnMutate = useMutation({
+    mutationFn : addFQDN,
+    onSuccess : (response) => { console.log('response from addFQDN', response) },
+    onMutate : () => {},
+    onSettled : () => {
+        queryClient.invalidateQueries(['fqdns']) 
+    }
+  }) 
+
+  const handleAPISubmit = async (data: any) => {
     const { expando: values } = data
     console.log('data submit from outside', values)
     // DO MUTATIONS
     setIsLoading(true)
-    setTimeout( () => {
-        setIsLoading(false)
-    }, 1300)
+
+    const promises = values.map( (value : { value : string }) => fqdnMutate.mutateAsync({ data : {
+      site : 2,
+      name : value.value,
+      type : 'API'
+    } }) )
+
+    await Promise.all(promises)
+    setIsLoading(false)
+    // handle setIsLoading false
   }
+
+  
+
+
 
   return (
     <PerfectScrollbar>
@@ -46,8 +79,8 @@ const FQDN = (props: FQDNProps) => {
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', gap: '5rem', flexDirection: 'column' }}>
             <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader="API's" isLoading={isLoading} />
-            <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader='STREAMING' isLoading={isLoading} />
-            <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader='PHOTOS' isLoading={isLoading} />
+            <ExpandoForm fileType='text' pageHeader='STREAMING' isLoading={isLoading} />
+            <ExpandoForm fileType='text' pageHeader='PHOTOS' isLoading={isLoading} />
           </Box>
         </Grid>
       </Grid>

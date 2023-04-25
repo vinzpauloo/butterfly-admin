@@ -1,84 +1,35 @@
 // ** React Imports
-import { useState, useRef } from 'react'
+import React,{ useState, useRef, SetStateAction } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
-import { Drawer, Button, TextField, IconButton, Typography, MenuItem, InputAdornment } from '@mui/material'
+import {
+  Drawer,
+  Button,
+  IconButton,
+  Typography,
+  Step,
+  Stepper,
+  StepLabel,
+  StepContent
+} from '@mui/material'
 
 // ** Style Imports
 import { styled } from '@mui/material/styles'
 
 // ** Third Party Imports
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import clsx from 'clsx'
+import toast from 'react-hot-toast'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** Other Imports
-import CreatedSuccessful from '../form/CreatedSuccessful'
+// ** Styled Component
+import StepperWrapper from 'src/@core/styles/mui/stepper'
 
-// ** TanStack Query
-import { useMutation, useQueryClient, useQueries } from '@tanstack/react-query'
-
-// ** Hooks
-import { CreateAccount } from '@/services/api/CreateAccount'
-
-interface FormValues {
-  [key: string]: string | number | File | null
-  role_id: string
-  username: string
-  password: string
-  password_confirmation: string
-  mobile: string
-  email: string
-  partner_name: string
-  partner_code: string
-  partner_note: string
-  currency_id: string
-  language_id: string
-  site_name: string // Name of Site
-  description: string
-  logo: File | null
-  amount: number
-  user_note: string
-  note: string
-}
-
-const schema = yup.object().shape({
-  username: yup.string().min(7, 'Username must be at least 7 characters').required('Username is required'),
-  password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
-  password_confirmation: yup
-    .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Password confirmation is required'),
-  mobile: yup
-    .string()
-    .matches(/^(09|\+639)\d{9}$/, 'Invalid Mobile Number, format should be (09/+639)')
-    .required('Mobile number is required'),
-  email: yup.string().email('Invalid email address').required('Email address is required'),
-  partner_name: yup
-    .string()
-    .min(3, 'Company Name must be at least 3 characters.')
-    .required('Company Name is required.'),
-  partner_code: yup
-    .string()
-    .min(3, 'Company Code must be at least 3 characters.')
-    .required('Company Code is required.'),
-  partner_note: yup
-    .string()
-    .min(3, 'Note must be at least 3 characters')
-    .required('Notes is required. (Company notes)'),
-  currency_id: yup.string().required('Please choose a currency.'),
-  language_id: yup.string().required('Please choose a language.'),
-  site_name: yup.string().min(3, 'Site Name must be at least 3 characters.').required('Site name is required.'),
-  description: yup.string().min(3, 'Description must be at least 3 characters').required('Description is required.'),
-  user_note: yup
-    .string()
-    .min(3, 'Notes(For Approval) must be at least 3 characters')
-    .required('Notes(For Approval) is required.')
-})
+// ** Custom Components Imports
+import StepperCustomDot from '@/layouts/components/shared-components/StepperCustomDot'
+import SAStepOne from './superagent/steps/StepOne'
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
@@ -92,160 +43,66 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundColor: theme.palette.background.default
 }))
 
+
+
 const SADrawer = (props: SidebarAddUserType) => {
-  const queryClient = useQueryClient()
+  
+  // ** State
+  const [activeStep, setActiveStep] = useState<number>(0)
+  const [fileName, setFileName] = useState('')
+  const [responseError, setResponseError] = useState<any>()
+  const [resetKey, setResetKey] = useState(0)
+
+  // ** References
+  const stepOneRef = React.useRef<any>()
 
   // ** Props
   const { open, toggle } = props
 
-  // ** State
-  const [submitted, setSubmitted] = useState<boolean>()
-
-  const fileInputRef: any = useRef(null)
-  const handleUploadBtnClick = () => {
-    fileInputRef.current.click()
-  }
-  const [fileName, setFileName] = useState('')
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema)
-  })
-
-  const resetForm = () => {
-    reset({
-      role_id: '4',
-      username: '',
-      password: '',
-      password_confirmation: '',
-      mobile: '',
-      email: '',
-      partner_name: '',
-      partner_code: '',
-      partner_note: '',
-      currency_id: '',
-      language_id: '',
-      site_name: '',
-      description: '',
-      logo: null,
-      amount: 0,
-      user_note: '',
-      note: ''
-    })
-  }
-
-  const { createUser, getLanguages, getCurrency } = CreateAccount()
-  const mutation = useMutation(createUser)
-  const [responseError, setResponseError] = useState<any>()
-
-  function isFile(value: any): value is File {
-    return value instanceof File
-  }
-
-  const handleFormSubmit = async (data: FormValues) => {
-    const formData = new FormData()
-
-    /* Iterates through 'formValue' to check if the key is 'logo' and if the value is a file. */
-    for (const key in data) {
-      const value = data[key]
-
-      /* If true, it appends the file to the 'FormData' object with the key and the file name. */
-      if (key === 'logo' && isFile(value)) {
-        formData.append(key, value, value.name)
-
-        /* If the key is 'amount', parse the value as a number and append it to the `FormData` object with the key. */
-      } else if (key === 'amount' && value) {
-        formData.append(key, Number(value).toString())
-
-        /* If the value is a string
-    or a number, it appends the value as a string to the `FormData` object with the key. */
-      } else if (typeof value === 'string' || typeof value === 'number') {
-        formData.append(key, value.toString())
-      }
-    }
-
-    //These are currently required by backend, not visible in UI
-    formData.append('role_id', '4')
-    formData.append('note', 'For approval')
-
-    const form: any = {
-      data: formData
-    }
-
-    try {
-      await mutation.mutateAsync(form)
-      setSubmitted(true)
-
-      setTimeout(() => {
-        toggle()
-        resetForm()
-        setFileName('')
-        setResponseError({})
-        setSubmitted(false)
-
-        // Re-fetches UserTable and CSV exportation
-        queryClient.invalidateQueries({ queryKey: ['allUsers'] })
-        queryClient.invalidateQueries({ queryKey: ['UsersTableCSV'] })
-      }, 1500)
-    } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      setResponseError(error)
-    }
-  }
-
-  useQueries({
-    queries: [
-      {
-        queryKey: ['Languages'],
-        queryFn: getLanguages,
-        onSuccess: (data: any) => {
-          setLanguages(data?.data)
-        }
-      },
-      {
-        queryKey: ['Currencies'],
-        queryFn: getCurrency,
-        onSuccess: (data: any) => {
-          setCurrencies(data?.data)
-        }
-      }
-    ]
-  })
-
-  const [languages, setLanguages] = useState([])
-  const [currencies, setCurrencies] = useState([])
-
-  const displayErrors = () => {
-    const errorElements: any = []
-
-    for (const key in responseError) {
-      responseError[key].forEach((value: any) => {
-        errorElements.push(
-          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
-            {value}
-          </Typography>
-        )
-      })
-    }
-
-    return errorElements
-  }
-
-  const [resetKey, setResetKey] = useState(0)
-
   const handleClose = () => {
     toggle()
-    resetForm()
+    stepOneRef?.current?.reset() // reference to the useForm
     setResetKey(prevKey => prevKey + 1)
     setFileName('')
     setResponseError({})
   }
+
+  // Handle Stepper
+  const handleBack = () => {
+    setActiveStep(prevActiveStep => prevActiveStep - 1)
+  }
+  const handleNext = () => {
+    setActiveStep(prevActiveStep => prevActiveStep + 1)
+    if (activeStep === 1) {
+      toast.success('Completed All Steps!!')
+    }
+  }
+  const handleReset = () => {
+    setActiveStep(0)
+  }
+
+  // ** SA Steps
+  const steps = [
+    {
+      title: 'Account Details',
+      subtitle: 'Enter your Account Details',
+      component: <SAStepOne 
+                    ref={stepOneRef}
+                    toggle={toggle} 
+                    resetKey={resetKey}
+                    handleClose={handleClose}
+                    responseError={responseError}
+                    setResponseError={setResponseError}
+                    fileName={fileName}
+                    setFileName={setFileName}
+                  />
+    },
+    {
+      title: 'FQDNS Info',
+      subtitle: 'Setup FQDNS',
+      component: <Box>FQDNS</Box>
+    }
+  ]
 
   return (
     <Drawer
@@ -263,374 +120,55 @@ const SADrawer = (props: SidebarAddUserType) => {
         </IconButton>
       </Header>
       <Box sx={{ p: 5 }}>
-        {!submitted ? (
-          <Box sx={styles.container}>
-            <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
-              <Box sx={styles.formContent}>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='partner_name'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Company Name'
+        <StepperWrapper>
+          <Stepper activeStep={activeStep} orientation='vertical'>
+            {steps.map((step, index) => {
+              return (
+                <Step key={index} className={clsx({ active: activeStep === index })}>
+                  <StepLabel StepIconComponent={StepperCustomDot}>
+                    <div className='step-label'>
+                      <Typography className='step-number'>{`0${index + 1}`}</Typography>
+                      <div>
+                        <Typography className='step-title'>{step.title}</Typography>
+                        <Typography className='step-subtitle'>{step.subtitle}</Typography>
+                      </div>
+                    </div>
+                  </StepLabel>
+                  <StepContent>
+                    { step.component }
+                    <div className='button-wrapper'>
+                      <Button
+                        size='small'
+                        color='secondary'
                         variant='outlined'
-                        fullWidth
-                        error={!!errors.partner_name}
-                        helperText={errors.partner_name?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='partner_name'
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='partner_code'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Company Code'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.partner_code}
-                        helperText={errors.partner_code?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='partner_code'
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='username'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Entire Desired Username'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.username}
-                        helperText={errors.username?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='username'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Entire Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='password'
-                        type='password'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password_confirmation'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Re-enter Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password_confirmation}
-                        helperText={errors.password_confirmation?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='password_confirmation'
-                        type='password'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='mobile'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Mobile No.'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.mobile}
-                        helperText={errors.mobile?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        onKeyPress={e => {
-                          // Allow only numbers and the '+' symbol
-                          if (!/[0-9+]/.test(e.key)) {
-                            e.preventDefault()
-                          }
-                        }}
-                        name='mobile'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='email'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Email Address'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='email'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='partner_note'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Notes'
-                        variant='outlined'
-                        fullWidth
-                        multiline
-                        rows={4}
-                        error={!!errors.partner_note}
-                        helperText={errors.partner_note?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='partner_note'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='site_name'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Please input site name'
-                        variant='outlined'
-                        fullWidth
-                        multiline
-                        rows={4}
-                        error={!!errors.site_name}
-                        helperText={errors.site_name?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='site_name'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='currency_id'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        select
-                        label='Choose Currency'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.currency_id}
-                        helperText={errors.currency_id?.message}
-                        value={field.value}
-                        onChange={field.onChange}
-                        name='currency_id'
+                        onClick={handleBack}
+                        disabled={activeStep === 0}
                       >
-                        {currencies.map((item: any, index) => (
-                          <MenuItem key={index} value={item?.id} sx={{ textTransform: 'uppercase' }}>
-                            <Typography sx={{ textTransform: 'uppercase' }}>{item?.name}</Typography>
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='language_id'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        select
-                        label='Choose Language'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.language_id}
-                        helperText={errors.language_id?.message}
-                        value={field.value}
-                        onChange={field.onChange}
-                        name='language_id'
-                      >
-                        {languages.map((item: any, index) => (
-                          <MenuItem key={index} value={item?.id} sx={{ textTransform: 'uppercase' }}>
-                            <Typography sx={{ textTransform: 'uppercase' }}>{item?.name}</Typography>
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='amount'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Add Security Funds'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.amount}
-                        helperText={errors.amount?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='amount'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='logo'
-                    control={control}
-                    render={({ field }) => (
-                      <>
-                        <input
-                          type='file'
-                          accept='.jpg, .jpeg, .png'
-                          style={{ display: 'none' }}
-                          name='logo'
-                          id='logo'
-                          onChange={e => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              setFileName(e.target.files[0].name)
-                              field.onChange(e.target.files[0])
-                            } else {
-                              field.onChange(null)
-                            }
-                          }}
-                          ref={fileInputRef}
-                        />
-                        <label htmlFor='logo'>
-                          <TextField
-                            value={fileName}
-                            placeholder='Select a file'
-                            variant='outlined'
-                            fullWidth
-                            onClick={handleUploadBtnClick}
-                            InputProps={{
-                              readOnly: true,
-                              endAdornment: (
-                                <InputAdornment position='end'>
-                                  <Box sx={styles.upload}>
-                                    <Typography sx={styles.white}>UPLOAD</Typography>
-                                  </Box>
-                                </InputAdornment>
-                              )
-                            }}
-                          />
-                        </label>
-                      </>
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='description'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Description(Mandatory)'
-                        variant='outlined'
-                        fullWidth
-                        multiline
-                        rows={4}
-                        error={!!errors.description}
-                        helperText={errors.description?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='description'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='user_note'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Notes'
-                        variant='outlined'
-                        fullWidth
-                        multiline
-                        rows={4}
-                        error={!!errors.user_note}
-                        helperText={errors.user_note?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='user_note'
-                      />
-                    )}
-                  />
-                </Box>
-
-                {displayErrors()}
-                <Box sx={styles.formButtonContainer}>
-                  <Box>
-                    <Button sx={styles.cancelButton} onClick={handleClose}>
-                      <Typography sx={styles.text}>Cancel</Typography>
-                    </Button>
-                  </Box>
-
-                  <Box>
-                    <Button type='submit' sx={styles.continueButton}>
-                      <Typography sx={styles.text}>Continue</Typography>
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-            </form>
+                        Back
+                      </Button>
+                      <Button size='small' variant='contained' onClick={handleNext} sx={{ ml: 4 }}>
+                        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                      </Button>
+                    </div>
+                  </StepContent>
+                </Step>
+              )
+            })}
+          </Stepper>
+        </StepperWrapper>
+        {activeStep === steps.length && (
+          <Box sx={{ mt: 2 }}>
+            <Typography>All steps are completed!</Typography>
+            <Button size='small' sx={{ mt: 2 }} variant='contained' onClick={handleReset}>
+              Reset
+            </Button>
           </Box>
-        ) : (
-          <CreatedSuccessful />
         )}
       </Box>
     </Drawer>
   )
 }
+
 
 const styles = {
   container: {},
