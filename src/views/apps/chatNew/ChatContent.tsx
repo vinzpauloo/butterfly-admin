@@ -15,11 +15,17 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Components Import
 import ChatLog from './ChatLog'
 import SendMsgForm from 'src/views/apps/chatNew/SendMsgForm'
-import CustomAvatar from 'src/@core/components/mui/avatar'
 import OptionsMenu from 'src/@core/components/option-menu'
+
+// ** Hooks
+import { useQuery } from '@tanstack/react-query'
+import { useAuth } from '@/services/useAuth'
 
 // ** Types
 import { ChatContentType } from 'src/types/apps/chatTypesNew'
+
+// ** Service
+import ChatService from '@/services/api/ChatService'
 
 // ** Styled Components
 const ChatWrapperStartChat = styled(Box)<BoxProps>(({ theme }) => ({
@@ -44,8 +50,29 @@ const ChatContent = (props: ChatContentType) => {
     statusObj,
     getInitials,
     sidebarWidth,
-    handleLeftSidebarToggle
+    handleLeftSidebarToggle,
+    activeChat
   } = props
+
+  // ** Hooks
+  const auth = useAuth()
+
+  // ** Contants
+  const channel = `${activeChat?._id}-${auth.user?.id}` || ''
+
+  // ** React Query
+  const { getSingleChat } = ChatService()
+  const { data: singleChatData } = useQuery({
+    queryKey: ['singleChat', channel],
+    queryFn: () => getSingleChat({ channel }),
+    onSuccess: data => {
+      console.log('getSingleChat success ...', data)
+    },
+    onError: error => {
+      console.log('getAllChats error', error)
+    },
+    enabled: !!activeChat?._id
+  })
 
   const handleStartConversation = () => {
     if (!mdAbove) {
@@ -54,153 +81,131 @@ const ChatContent = (props: ChatContentType) => {
   }
 
   const renderContent = () => {
-    if (store) {
-      console.log(store)
-      // const selectedChat = store.selectedChat
-      const selectedChat = { chats: store.chats, contact: { avatar: '', fullName: '' } }
-      if (!selectedChat) {
-        return (
-          <ChatWrapperStartChat
+    const selectedChat = activeChat
+    if (!selectedChat) {
+      return (
+        <ChatWrapperStartChat
+          sx={{
+            ...(mdAbove ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } : {})
+          }}
+        >
+          <MuiAvatar
             sx={{
-              ...(mdAbove ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } : {})
+              mb: 6,
+              pt: 8,
+              pb: 7,
+              px: 7.5,
+              width: 110,
+              height: 110,
+              boxShadow: 3,
+              backgroundColor: 'background.paper'
             }}
           >
-            <MuiAvatar
-              sx={{
-                mb: 6,
-                pt: 8,
-                pb: 7,
-                px: 7.5,
-                width: 110,
-                height: 110,
-                boxShadow: 3,
-                backgroundColor: 'background.paper'
-              }}
-            >
-              <Icon icon='mdi:message-outline' fontSize='3.125rem' />
-            </MuiAvatar>
-            <Box
-              onClick={handleStartConversation}
-              sx={{
-                py: 2,
-                px: 6,
-                boxShadow: 3,
-                borderRadius: 5,
-                backgroundColor: 'background.paper',
-                cursor: mdAbove ? 'default' : 'pointer'
-              }}
-            >
-              <Typography sx={{ fontWeight: 500, fontSize: '1.125rem', lineHeight: 'normal' }}>
-                Start Conversation
-              </Typography>
-            </Box>
-          </ChatWrapperStartChat>
-        )
-      } else {
-        return (
+            <Icon icon='mdi:message-outline' fontSize='3.125rem' />
+          </MuiAvatar>
           <Box
+            onClick={handleStartConversation}
             sx={{
-              flexGrow: 1,
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'action.hover'
+              py: 2,
+              px: 6,
+              boxShadow: 3,
+              borderRadius: 5,
+              backgroundColor: 'background.paper',
+              cursor: mdAbove ? 'default' : 'pointer'
             }}
           >
-            <Box
-              sx={{
-                py: 3,
-                px: 5,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                borderBottom: theme => `1px solid ${theme.palette.divider}`
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                {mdAbove ? null : (
-                  <IconButton onClick={handleLeftSidebarToggle} sx={{ mr: 2 }}>
-                    <Icon icon='mdi:menu' />
-                  </IconButton>
-                )}
-                <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <Badge
-                    overlap='circular'
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right'
-                    }}
-                    sx={{ mr: 3 }}
-                  >
-                    {selectedChat.contact.avatar ? (
-                      <MuiAvatar
-                        src={selectedChat.contact.avatar}
-                        alt={selectedChat.contact.fullName}
-                        sx={{ width: '2.375rem', height: '2.375rem' }}
-                      />
-                    ) : (
-                      <CustomAvatar
-                        skin='light'
-                        // color={selectedChat.contact.avatarColor}
-                        sx={{ width: '2.375rem', height: '2.375rem', fontSize: '1rem' }}
-                      >
-                        {/* {getInitials(selectedChat.contact.fullName)} */}
-                        FR
-                      </CustomAvatar>
-                    )}
-                  </Badge>
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography sx={{ fontWeight: 500, fontSize: '0.875rem' }}>Felecia Rower</Typography>
-                    <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                      Frontend Developer
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
+            <Typography sx={{ fontWeight: 500, fontSize: '1.125rem', lineHeight: 'normal' }}>
+              Start Conversation
+            </Typography>
+          </Box>
+        </ChatWrapperStartChat>
+      )
+    }
 
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                {mdAbove ? (
-                  <Fragment>
-                    <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                      <Icon icon='mdi:phone-outline' fontSize='1.25rem' />
-                    </IconButton>
-                    <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                      <Icon icon='mdi:video-outline' fontSize='1.5rem' />
-                    </IconButton>
-                    <IconButton size='small' sx={{ color: 'text.secondary' }}>
-                      <Icon icon='mdi:magnify' fontSize='1.25rem' />
-                    </IconButton>
-                  </Fragment>
-                ) : null}
-
-                <OptionsMenu
-                  menuProps={{ sx: { mt: 2 } }}
-                  icon={<Icon icon='mdi:dots-vertical' fontSize='1.25rem' />}
-                  iconButtonProps={{ size: 'small', sx: { color: 'text.secondary' } }}
-                  options={['View Contact', 'Mute Notifications', 'Block Contact', 'Clear Chat', 'Report']}
+    return (
+      <Box
+        sx={{
+          flexGrow: 1,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'action.hover'
+        }}
+      >
+        <Box
+          sx={{
+            py: 3,
+            px: 5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: theme => `1px solid ${theme.palette.divider}`
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {mdAbove ? null : (
+              <IconButton onClick={handleLeftSidebarToggle} sx={{ mr: 2 }}>
+                <Icon icon='mdi:menu' />
+              </IconButton>
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+              <Badge
+                overlap='circular'
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right'
+                }}
+                sx={{ mr: 3 }}
+              >
+                <MuiAvatar
+                  src={selectedChat.photo}
+                  alt={selectedChat.username}
+                  sx={{ width: '2.375rem', height: '2.375rem' }}
                 />
+              </Badge>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography sx={{ fontWeight: 500, fontSize: '0.875rem' }}>{selectedChat.username}</Typography>
+                <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+                  {selectedChat._id}
+                </Typography>
               </Box>
             </Box>
+          </Box>
 
-            {selectedChat && store.userProfile ? (
-              // @ts-ignore
-              <ChatLog hidden={hidden} data={{ ...selectedChat, userContact: store.profileUser }} />
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {mdAbove ? (
+              <Fragment>
+                <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                  <Icon icon='mdi:phone-outline' fontSize='1.25rem' />
+                </IconButton>
+                <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                  <Icon icon='mdi:video-outline' fontSize='1.5rem' />
+                </IconButton>
+                <IconButton size='small' sx={{ color: 'text.secondary' }}>
+                  <Icon icon='mdi:magnify' fontSize='1.25rem' />
+                </IconButton>
+              </Fragment>
             ) : null}
 
-            {/* @ts-ignore */}
-            <ChatLog hidden={hidden} data={{ ...selectedChat, userContact: store.profileUser }} />
-
-            <SendMsgForm
-              // @ts-ignore
-              store={store}
-              //  dispatch={dispatch}
-              //  sendMsg={sendMsg}
+            <OptionsMenu
+              menuProps={{ sx: { mt: 2 } }}
+              icon={<Icon icon='mdi:dots-vertical' fontSize='1.25rem' />}
+              iconButtonProps={{ size: 'small', sx: { color: 'text.secondary' } }}
+              options={['View Contact', 'Mute Notifications', 'Block Contact', 'Clear Chat', 'Report']}
             />
           </Box>
-        )
-      }
-    } else {
-      return null
-    }
+        </Box>
+
+        {/* @ts-ignore */}
+        <ChatLog hidden={hidden} userProfile={selectedChat} chat={singleChatData?.data || []} />
+
+        <SendMsgForm
+          // @ts-ignore
+          store={store}
+          //  dispatch={dispatch}
+          //  sendMsg={sendMsg}
+        />
+      </Box>
+    )
   }
 
   return renderContent()

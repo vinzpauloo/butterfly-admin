@@ -96,6 +96,15 @@ export type ChatContentType = {
   getInitials: (val: string) => string
   sendMsg?: (params: SendMsgParamsType) => void
   handleUserProfileRightSidebarToggle: () => void
+  activeChat: IChatsList | null
+}
+
+export interface IChatsList {
+  _id: string
+  created_at: string
+  latest_message: string
+  photo: string
+  username: string
 }
 
 export type ChatSidebarLeftType = {
@@ -115,6 +124,9 @@ export type ChatSidebarLeftType = {
   setUserStatus: (status: StatusType) => void
   handleUserProfileLeftSidebarToggle: () => void
   formatDateToMonthShort: (value: string, toTimeForCurrentDay: boolean) => void
+  chatsList: IChatsList[]
+  activeChat: IChatsList | null
+  setActiveChat: (activeChat: IChatsList | null) => void
 }
 
 export type UserProfileLeftType = {
@@ -146,32 +158,33 @@ export type SendMsgComponentType = {
 
 export type ChatLogType = {
   hidden: boolean
-  data: {
-    chat: ChatsObj
-    contact: ContactType
-    userContact: ProfileUserType
-  }
+  userProfile: IChatsList
+  chat: MessageType[]
 }
 
 export type MessageType = {
-  time: string | Date
+  // time: string | Date
+  // message: string
+  // senderId: number
+  // feedback: MsgFeedbackType
+  _id: string
+  created_at: string
   message: string
-  senderId: number
-  feedback: MsgFeedbackType
+  from_id: string
+  to_id: string
 }
 
 export type ChatLogChatType = {
   msg: string
   time: string | Date
-  feedback: MsgFeedbackType
 }
 
 export type FormattedChatsType = {
-  senderId: number
+  senderId: number | string
   messages: ChatLogChatType[]
 }
 
 export type MessageGroupType = {
-  senderId: number
+  senderId: number | string
   messages: ChatLogChatType[]
 }
