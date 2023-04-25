@@ -26,6 +26,8 @@ type ExpandoFormProps = {
   fileType: string
   handleExpandoSubmit?: (data: FormInputs) => void
   isLoading?: boolean
+  disableSaveButton? : boolean
+  getData? : () => any
 }
 
 type FormInputs = {
@@ -34,9 +36,16 @@ type FormInputs = {
   }[]
 }
 
-const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = false }: ExpandoFormProps) => {
+const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = false, disableSaveButton = false, getData }: ExpandoFormProps, ref : any) => {
+
+  // forward to parent the resetForm function by calling reset
+  React.useImperativeHandle(ref, () => {
+    return { getFormData : () => getFormData() }
+  }, [])
+
   // ** UseForm
   const {
+    getValues,
     control,
     register,
     handleSubmit,
@@ -61,6 +70,13 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
     console.log(`SUBMIT ${pageHeader}`, data)
     {
       handleExpandoSubmit && handleExpandoSubmit(data)
+    }
+  }
+
+  const getFormData = () => {
+    const getFormValueData = getValues('expando')
+    {
+      return getFormValueData ? getFormValueData : {}
     }
   }
 
@@ -109,9 +125,13 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
                   >
                     Add More
                   </Button>
-                  <Button disabled={isLoading ? true : false} type='submit' variant='contained' color='primary'>
+                  {
+                    !disableSaveButton && 
+                    <Button disabled={isLoading ? true : false} type='submit' variant='contained' color='primary'>
                     {isLoading ? <CircularProgress size={12} sx={{ mr: 2 }} /> : null} Save
                   </Button>
+                  }
+                  
                 </Box>
               </Grid>
             </Grid>
@@ -122,4 +142,4 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
   )
 }
 
-export default ExpandoForm
+export default React.forwardRef(ExpandoForm)

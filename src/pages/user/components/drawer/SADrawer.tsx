@@ -29,7 +29,11 @@ import StepperWrapper from 'src/@core/styles/mui/stepper'
 
 // ** Custom Components Imports
 import StepperCustomDot from '@/layouts/components/shared-components/StepperCustomDot'
+
+// ** Steps
 import SAStepOne from './superagent/steps/StepOne'
+import SAStepTwo from './superagent/steps/StepTwo'
+
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
@@ -43,18 +47,25 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundColor: theme.palette.background.default
 }))
 
-
-
 const SADrawer = (props: SidebarAddUserType) => {
   
   // ** State
-  const [activeStep, setActiveStep] = useState<number>(0)
+  const defaultStateValues = { 
+    step: 1,
+    siteID : 1
+  }
+  const [activeStep, setActiveStep] = useState<number>(defaultStateValues.step)
+  const [ siteID, setSiteID ] = useState<number | null>(defaultStateValues.siteID)
+
   const [fileName, setFileName] = useState('')
   const [responseError, setResponseError] = useState<any>()
   const [resetKey, setResetKey] = useState(0)
+  
 
-  // ** References
+  // ** References to multisteps
   const stepOneRef = React.useRef<any>()
+  const stepTwoRef = React.useRef<any>()
+  console.log('stepTwoRef',stepTwoRef)
 
   // ** Props
   const { open, toggle } = props
@@ -68,17 +79,23 @@ const SADrawer = (props: SidebarAddUserType) => {
   }
 
   // Handle Stepper
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1)
-  }
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1)
     if (activeStep === 1) {
+
+      // call last submit form
+      handleFinishForm()
+
       toast.success('Completed All Steps!!')
     }
   }
   const handleReset = () => {
     setActiveStep(0)
+  }
+
+  const handleFinishForm = () => {
+    console.log('data from SADRAWER')
+    stepTwoRef?.current?.handleFinish()
   }
 
   // ** SA Steps
@@ -95,12 +112,14 @@ const SADrawer = (props: SidebarAddUserType) => {
                     setResponseError={setResponseError}
                     fileName={fileName}
                     setFileName={setFileName}
+                    setSiteID={setSiteID}
+                    handleNext={handleNext}
                   />
     },
     {
       title: 'FQDNS Info',
       subtitle: 'Setup FQDNS',
-      component: <Box>FQDNS</Box>
+      component: <SAStepTwo siteID={siteID} ref={stepTwoRef} />
     }
   ]
 
@@ -136,8 +155,10 @@ const SADrawer = (props: SidebarAddUserType) => {
                   </StepLabel>
                   <StepContent>
                     { step.component }
-                    <div className='button-wrapper'>
-                      <Button
+                    {
+                      index > 0 &&
+                      <div className='button-wrapper' style={{ borderTop: '1px solid black', paddingTop:'1rem', textAlign: 'center' }}>
+                      {/* <Button
                         size='small'
                         color='secondary'
                         variant='outlined'
@@ -145,11 +166,13 @@ const SADrawer = (props: SidebarAddUserType) => {
                         disabled={activeStep === 0}
                       >
                         Back
-                      </Button>
-                      <Button size='small' variant='contained' onClick={handleNext} sx={{ ml: 4 }}>
+                      </Button> */}
+                      <Button style={styles.cancelButton} size='large' variant='contained' onClick={handleNext} sx={{ ml: 4 }}>
                         {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                       </Button>
                     </div>
+                    }
+                    
                   </StepContent>
                 </Step>
               )
@@ -157,9 +180,9 @@ const SADrawer = (props: SidebarAddUserType) => {
           </Stepper>
         </StepperWrapper>
         {activeStep === steps.length && (
-          <Box sx={{ mt: 2 }}>
+          <Box sx={{ mt: 2, textAlign:'center' }}>
             <Typography>All steps are completed!</Typography>
-            <Button size='small' sx={{ mt: 2 }} variant='contained' onClick={handleReset}>
+            <Button style={styles.cancelButton} size='small' sx={{ mt: 2 }} variant='contained' onClick={handleReset}>
               Reset
             </Button>
           </Box>

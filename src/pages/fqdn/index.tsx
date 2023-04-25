@@ -65,7 +65,7 @@ const FQDN = (props: FQDNProps) => {
 
     await Promise.all(promises)
     setIsLoading(false)
-    // handle setIsLoading false
+
   }
 
   

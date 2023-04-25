@@ -26,6 +26,8 @@ type StepOneProps = {
   setResponseError: React.Dispatch<any>
   fileName: any
   setFileName: React.Dispatch<React.SetStateAction<string>>
+  setSiteID : React.Dispatch<React.SetStateAction<number | null>>
+  handleNext : () => void
 }
 
 interface FormValues {
@@ -83,7 +85,7 @@ const schema = yup.object().shape({
     .required('Notes(For Approval) is required.')
 })
 
-const SAStepOne = ({ toggle, resetKey, handleClose, responseError, setResponseError, fileName, setFileName }: StepOneProps,
+const SAStepOne = ({ toggle, resetKey, handleClose, responseError, setResponseError, fileName, setFileName, setSiteID, handleNext }: StepOneProps,
   ref: any) => {
 
   const queryClient = useQueryClient()
@@ -170,15 +172,21 @@ const SAStepOne = ({ toggle, resetKey, handleClose, responseError, setResponseEr
     }
 
     try {
-      await mutation.mutateAsync(form)
+      await mutation.mutateAsync(form, {
+        onSuccess : (response) => {
+          console.log('response', response)
+          setSiteID(response?.partner?.site?.id)
+        }
+      })
       setSubmitted(true)
 
       setTimeout(() => {
-        toggle()
+        //toggle()
         resetForm()
         setFileName('')
         setResponseError({})
-        setSubmitted(false)
+        //setSubmitted(false)
+        handleNext()
 
         // Re-fetches UserTable and CSV exportation
         queryClient.invalidateQueries({ queryKey: ['allUsers'] })
