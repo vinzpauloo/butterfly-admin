@@ -7,6 +7,7 @@ import InformationCard from './components/InformationCard'
 import 'chart.js/auto'
 import VideoContentsBarChart from '@/pages/dashboard/components/VideoContentsBarChart'
 import VipAndGuestsData from '@/pages/dashboard/components/VipAndGuestsData'
+import { DashboardProvider } from '@/context/DashboardContext'
 import { useAuth } from '@/services/useAuth'
 
 // Vars
@@ -26,6 +27,7 @@ const Dashboard = () => {
   else if (auth?.user?.role === "SA") return <>SA DASHBOARD</>
 
   else return (
+    <DashboardProvider>
     <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 10 }}>
       <InformationCard />
       <Box sx={{ width: '100%' }}>
@@ -45,6 +47,7 @@ const Dashboard = () => {
         />
       </Box>
     </Box>
+    </DashboardProvider>
   )
 }
 
