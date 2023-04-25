@@ -86,7 +86,7 @@ const UserDropdown = (props: Props) => {
 
   // DIFFRENT USER TYPES HAS DIFFERENT DROPDOWN MENUS
   useEffect(() => {
-    if (auth?.user?.role === "AGENT" || auth?.user?.role === "SA") {
+    if (auth?.user?.role === "AGENT" || auth?.user?.role === "SA" || auth?.user?.role === "CC") {
       setMenuItems([
         { name: "Profile", icon: "mdi:account-outline", route: "/pages/user-profile" },
       ])

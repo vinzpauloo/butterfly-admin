@@ -1,7 +1,10 @@
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
+import { useAuth } from '@/services/useAuth'
 
-const navigation = (): VerticalNavItemsType => {
+const Navigation = (): VerticalNavItemsType => {
+  const auth = useAuth()
+  
   return [
     {
       sectionTitle: 'Main'
@@ -33,7 +36,7 @@ const navigation = (): VerticalNavItemsType => {
       action: 'read',
       subject: 'shared-page',
       path: '/transactions',
-      children: [
+      children: auth?.user?.role === "AGENT" ? undefined : [
         {
           title: 'Donations',
           path: '/transactions/donations',
@@ -154,4 +157,4 @@ const navigation = (): VerticalNavItemsType => {
   ]
 }
 
-export default navigation
+export default Navigation

@@ -22,8 +22,10 @@ const Dashboard = () => {
 
   const auth = useAuth()
 
-  return (
-    auth?.user?.role === "AGENT" ? <>AGENT DASHBOARD</> :
+  if (auth?.user?.role === "AGENT") return <>AGENT DASHBOARD</>
+  else if (auth?.user?.role === "SA") return <>SA DASHBOARD</>
+
+  else return (
     <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 10 }}>
       <InformationCard />
       <Box sx={{ width: '100%' }}>
