@@ -3,7 +3,7 @@ import React, { useState, useRef, SetStateAction } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
-import { Drawer, Button, IconButton, Typography, Step, Stepper, StepLabel, StepContent } from '@mui/material'
+import { Drawer, Button, IconButton, Typography, Step, Stepper, StepLabel, StepContent, LinearProgress } from '@mui/material'
 
 // ** Style Imports
 import { styled } from '@mui/material/styles'
@@ -52,6 +52,7 @@ const SADrawer = (props: SidebarAddUserType) => {
     step: 0,
     siteID: null
   }
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [activeStep, setActiveStep] = useState<number>(defaultStateValues.step)
   const [siteID, setSiteID] = useState<number | null>(defaultStateValues.siteID)
 
@@ -115,22 +116,25 @@ const SADrawer = (props: SidebarAddUserType) => {
       //handleDataSubmit
       let promiseArray: any[] = []
       allFQDNData.map((data: FQDNData) => {
-        let type = data.name as 'API' | 'Photos' | 'Streaming'
-        data.values.forEach((value) => {
-          promiseArray.push({ site: siteID,
-                              name: value.value,
-                              type: type
-                            })
+        let type = data.name as 'API' | 'Photo' | 'Streaming'
+        data.values.forEach(value => {
+          promiseArray.push({ site: siteID, name: value.value, type: type })
         })
       })
 
-      const promises = promiseArray.map( (data : { name : string, site : number, type : string } ) => fqdnM.mutateAsync({ data : {
-        site : data.site,
-        name : data.name,
-        type : data.type as 'API' | 'Photos' | 'Streaming'
-      } }) )
+      setIsLoading(true)
+      const promises = promiseArray.map((data: { name: string; site: number; type: string }) =>
+        fqdnM.mutateAsync({
+          data: {
+            site: data.site,
+            name: data.name,
+            type: data.type as 'API' | 'Photo' | 'Streaming'
+          }
+        })
+      )
       await Promise.all(promises)
-
+      
+      setIsLoading(false)
       setActiveStep(prevActiveStep => prevActiveStep + 1)
       setTimeout(() => {
         handleStepsReset()
@@ -156,6 +160,7 @@ const SADrawer = (props: SidebarAddUserType) => {
           setFileName={setFileName}
           setSiteID={setSiteID}
           handleNext={handleNext}
+          setIsLoading={setIsLoading}
         />
       )
     },
@@ -197,20 +202,24 @@ const SADrawer = (props: SidebarAddUserType) => {
                     </div>
                   </StepLabel>
                   <StepContent>
-                    {step.component}
-                    {index > 0 && (
-                      <div className='button-wrapper' style={{ paddingTop: '1rem', textAlign: 'center' }}>
-                        <Button
-                          style={styles.cancelButton}
-                          size='large'
-                          variant='contained'
-                          onClick={handleNext}
-                          sx={{ ml: 4 }}
-                        >
-                          {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                        </Button>
-                      </div>
-                    )}
+                    {!isLoading ? (
+                      <>
+                        {step.component}
+                        {index > 0 && (
+                          <div className='button-wrapper' style={{ paddingTop: '1rem', textAlign: 'center' }}>
+                            <Button
+                              style={styles.cancelButton}
+                              size='large'
+                              variant='contained'
+                              onClick={handleNext}
+                              sx={{ ml: 4 }}
+                            >
+                              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    ) : <LinearProgress /> }
                   </StepContent>
                 </Step>
               )

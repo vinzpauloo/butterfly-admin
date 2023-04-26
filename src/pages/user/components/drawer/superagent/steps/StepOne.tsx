@@ -28,6 +28,7 @@ type StepOneProps = {
   setFileName: React.Dispatch<React.SetStateAction<string>>
   setSiteID : React.Dispatch<React.SetStateAction<number | null>>
   handleNext : () => void
+  setIsLoading : React.Dispatch<React.SetStateAction<boolean>>
 }
 
 interface FormValues {
@@ -85,7 +86,7 @@ const schema = yup.object().shape({
     .required('Notes(For Approval) is required.')
 })
 
-const SAStepOne = ({ toggle, resetKey, handleClose, responseError, setResponseError, fileName, setFileName, setSiteID, handleNext }: StepOneProps,
+const SAStepOne = ({ toggle, resetKey, handleClose, responseError, setResponseError, fileName, setFileName, setSiteID, handleNext, setIsLoading }: StepOneProps,
   ref: any) => {
 
   const queryClient = useQueryClient()
@@ -170,12 +171,17 @@ const SAStepOne = ({ toggle, resetKey, handleClose, responseError, setResponseEr
     const form: any = {
       data: formData
     }
+    
+    setIsLoading(true)
 
     try {
       await mutation.mutateAsync(form, {
         onSuccess : (response) => {
           console.log('response', response)
           setSiteID(response?.partner?.site?.id)
+        },
+        onSettled : () => {
+          setIsLoading(false)
         }
       })
       setSubmitted(true)

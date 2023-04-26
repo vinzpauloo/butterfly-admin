@@ -18,6 +18,7 @@ import ExpandoForm from './views/ExpandoForm'
 // ** API queries
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import FQDNService from '@/services/api/FQDNService'
+import SitesService from '@/services/api/SitesService'
 
 // ** Styled PerfectScrollbar component
 const PerfectScrollbar = styled(PerfectScrollbarComponent)({
@@ -33,13 +34,26 @@ const FQDN = (props: FQDNProps) => {
 
   // ** states
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [site, setSite] = React.useState<number>(3)
+  const [site, setSite] = React.useState<number>(2)
   const [sort, setSort] = React.useState<'desc' | 'asc'>('desc')
   const [sortBy, setSortBy] = React.useState('fqdn')
-  const [paginate, setPaginate] = React.useState<number>(2)
+  const [paginate, setPaginate] = React.useState<number>(20)
 
   // ** apis
   const { getFQDNList, getSuperAgentFQDNList, addFQDN } = FQDNService()
+  const { getSitesList } = SitesService()
+
+
+  const myQ = useQuery({
+    queryKey : ['fqdn',site,sort,sortBy,paginate],
+    queryFn : () => getSuperAgentFQDNList({ 
+      site : site,
+      sort : sort,
+      sort_by : sortBy,
+      paginate : paginate
+     }),
+    onSuccess : (res) => { console.log('res',res) }
+  })
   
   const queryClient = useQueryClient()
   const fqdnMutate = useMutation({
@@ -68,6 +82,7 @@ const FQDN = (props: FQDNProps) => {
 
   }
 
+  console.log('myQ', myQ)
   
   return (
     <PerfectScrollbar>

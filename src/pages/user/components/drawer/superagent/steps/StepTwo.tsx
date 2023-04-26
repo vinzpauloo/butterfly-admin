@@ -46,7 +46,7 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref : any) => {
     if (noEmptyvalues) return []
 
     allDataArray.push({ name : 'API', values :  formAPIRef.current.getFormData()})
-    allDataArray.push({ name : 'Photos', values :  formPhotosRef.current.getFormData()})
+    allDataArray.push({ name : 'Photo', values :  formPhotosRef.current.getFormData()})
     allDataArray.push({ name : 'Streaming', values :  formStreamRef.current.getFormData()})
 
     return allDataArray

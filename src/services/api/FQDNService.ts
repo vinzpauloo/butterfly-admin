@@ -22,7 +22,7 @@ interface IAddFQDNParams {
     data : {
         site : number,
         name : string,
-        type : 'API' | 'Streaming' | 'Photos'
+        type : 'API' | 'Streaming' | 'Photo'
     }
 }
 
