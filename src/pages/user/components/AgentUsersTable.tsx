@@ -106,12 +106,12 @@ const  AgentUsersTable = () => {
   return (
     <>
       <Drawer anchor='right' open={openDrawer} onClose={() => setOpenDrawer(false)}>
-        <Stack p={6} gap={2}>
+        <Stack p={6} gap={2} maxWidth={350}>
           <Stack boxShadow={4} bgcolor="white" px={12} py={6} alignItems="center" gap={2}>
             <Typography variant='h6' textTransform="uppercase">User Profile</Typography>
             <Avatar sx={{ width: 150, height: 150 }} />
             <Typography fontWeight={500}>Xinggan Yeshou</Typography>
-            <Typography variant='subtitle1'>Followed Content Creators: 100</Typography>
+            <Typography variant='subtitle1' textAlign="center">Followed Content Creators: 100</Typography>
           </Stack>
           <Stack boxShadow={4} px={12} py={6} alignItems="center">
             <Typography variant='subtitle1'>VIP Membership Type</Typography>
@@ -129,6 +129,7 @@ const  AgentUsersTable = () => {
             <Typography variant='subtitle1'>Last Login</Typography>
             <Typography variant='subtitle1' fontWeight={500}>2023-03-18 08:22:24</Typography>
           </Stack>
+          <Button variant='outlined' sx={{ textTransform: 'uppercase' }} onClick={() => setOpenDrawer(false)}>Back</Button>
         </Stack>
       </Drawer>
       <Box sx={{ height: 400, width: '100%' }}>
