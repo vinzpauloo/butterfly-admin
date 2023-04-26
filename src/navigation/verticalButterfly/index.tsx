@@ -36,7 +36,7 @@ const Navigation = (): VerticalNavItemsType => {
       action: 'read',
       subject: 'shared-page',
       path: '/transactions',
-      children: auth?.user?.role === "AGENT" ? undefined : [
+      children: auth?.user?.role === "GOD"  ? [
         {
           title: 'Donations',
           path: '/transactions/donations',
@@ -53,7 +53,7 @@ const Navigation = (): VerticalNavItemsType => {
           title: 'Security Funds',
           path: '/transactions/security-funds',
         }
-      ]
+      ] : undefined
     },
     {
       title: 'Reports',
