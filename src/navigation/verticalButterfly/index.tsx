@@ -57,7 +57,26 @@ const Navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Reports',
-      icon: 'mdi:grid-large'
+      icon: 'mdi:grid-large',
+      path: '/reports',
+      children: [
+        {
+          title: 'All',
+          path: '/reports/all'
+        },
+        {
+          title: 'Commissions',
+          path: '/reports/commissions'
+        },
+        {
+          title: 'Balance History',
+          path: '/reports/balanceHistory'
+        },
+        {
+          title: 'Security Funds',
+          path: '/reports/securityFunds'
+        },
+      ]
     },
     {
       title: 'Studio',
