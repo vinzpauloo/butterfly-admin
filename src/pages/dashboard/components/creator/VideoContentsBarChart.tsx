@@ -277,7 +277,7 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
   return (
     <Card>
       <CardHeader
-        title='Active Users'
+        title='Statistics'
         subheader={
           showLoadingText
             ? 'Loading...'
