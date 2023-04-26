@@ -10,7 +10,7 @@ import Image from 'next/image'
 // ** Custom Components Imports
 import { ThemeColor } from 'src/@core/layouts/types'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import { useDashboardContext } from '@/context/DashboardContext'
+import { useSuperAgentDashboardContext } from '@/context/SuperAgentDashboardContext'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -38,44 +38,42 @@ const salesData = (props: SalesDataProps): DataType[] => {
   return [
     {
       stats: mostActiveContentCreatorCount || '0',
-      title: 'Content Creators',
+      title: 'Latest Deposit',
       color: 'info',
       icon: <Image src='/images/icons/content-creators.png' width={30} height={30} alt='Content Creators' />
     },
     {
       stats: mostActiveUsers || '0',
-      title: 'Most Active Users',
+      title: 'Income (VIP and Gold Coins)',
+      color: 'warning',
+      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
+    },
+    {
+      stats: mostActiveUsers || '0',
+      title: 'Total Donations',
+      color: 'warning',
+      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
+    },
+    {
+      stats: mostActiveUsers || '0',
+      title: 'New Users',
       color: 'warning',
       icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
     },
     {
       stats: '',
-      color: 'error',
-      title: 'Top Downloaded Videos',
-      icon: <Image src='/images/icons/top-downloaded-videos.png' width={30} height={30} alt='Top Downloaded' />,
-      details: ['#1 饥渴的情妇', '#2 继妹在小屋做爱', '#3 户外冒险性', '#4 在公共汽车内口交', '#5 女佣三人行']
-    },
-    {
-      stats: '',
       color: 'success',
-      title: 'Top Followed Content Creators',
+      title: 'Top Agents',
       icon: <Image src='/images/icons/top-followed.png' width={30} height={30} alt='Top Followed' />,
       details:
         topFollowedContentCreators.map((creator, index) => `#${index + 1} ${creator.name}`) ||
         'List is currently empty.'
-    },
-    {
-      stats: '',
-      color: 'info',
-      title: 'Top Most Shared Videos',
-      icon: <Image src='/images/icons/top-shared.png' width={30} height={30} alt='Top Shared' />,
-      details: ['#1 睡眠射精', '#2 性感野兽', '#3 性或巧克力', '#4 他妈的在角落里', '#5 狗的风格版本']
     }
   ]
 }
 
 const RenderStats = () => {
-  const { mostActiveContentCreatorCount, mostActiveUsers, topFollowedContentCreators } = useDashboardContext()
+  const { mostActiveContentCreatorCount, mostActiveUsers, topFollowedContentCreators } = useSuperAgentDashboardContext()
   const data = salesData({ mostActiveContentCreatorCount, mostActiveUsers, topFollowedContentCreators })
 
   return (
@@ -115,7 +113,8 @@ const RenderStats = () => {
 
 const InformationCard = () => {
   const { getMostActiveContentCreatorCount, getMostActiveUsers, getMostFollowedCreator } = DashboardService()
-  const { setMostActiveContentCreatorCount, setMostActiveUsers, setTopFollowedContentCreators } = useDashboardContext()
+  const { setMostActiveContentCreatorCount, setMostActiveUsers, setTopFollowedContentCreators } =
+    useSuperAgentDashboardContext()
 
   useQuery({
     queryKey: [`mostActiveCreatorCount`],
@@ -162,9 +161,9 @@ const InformationCard = () => {
 
   return (
     <Card sx={styles.card}>
-      <CardHeader title='Transactions' titleTypographyProps={{ sx: styles.title }} />
+      <CardHeader title='Super Agent Dashboard' titleTypographyProps={{ sx: styles.title }} />
       <CardContent sx={{ pt: theme => `${theme.spacing(3)} !important` }}>
-        <Grid container direction='column' spacing={[5, 15]}>
+        <Grid container direction='column' spacing={[5, 20]}>
           <RenderStats />
         </Grid>
       </CardContent>

@@ -149,7 +149,7 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
     <DatePickerWrapper>
       <Card>
         <Box sx={styles.headerWrapper}>
-          <CardHeader title='VIP Members and Guests Data' />
+          <CardHeader title='Commission Data' />
           <Box sx={styles.datePicker}>
             <Box>
               <DatePicker
