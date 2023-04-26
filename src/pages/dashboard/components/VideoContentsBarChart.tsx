@@ -28,6 +28,20 @@ const subtractDays = (date: Date, days: number): Date => {
   return result
 }
 
+const getMonthName = (monthNumber: number) => {
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+  return monthNames[monthNumber - 1]
+}
+
+interface VideoContentDataProps {
+  total_watched: string
+  created_at: number
+  week: number
+  month: number
+  year: number
+}
+
 const VideoContentsBarChart = (props: VerticalBarProps) => {
   const { warning, labelColor, borderColor, legendColor } = props
 
@@ -35,20 +49,27 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
 
   const [fromDate, setFromDate] = useState<string | undefined>()
   const [toDate, setToDate] = useState<string | undefined>()
-  const [isWeekly, setIsWeekly] = useState<string | undefined>()
-  const [isDaily, setIsDaily] = useState<string | undefined>()
 
-  const [videoContentData, setVideoContentData] = useState<[]>([])
+  const [isDaily, setIsDaily] = useState<string | undefined>()
+  const [isWeekly, setIsWeekly] = useState<string | undefined>()
+  const [isMonthly, setIsMonthly] = useState<string | undefined>()
+  const [isYearly, setIsYearly] = useState<string | undefined>()
+
+  const [showLoadingText, setShowLoadingText] = useState(false)
+
+  const [videoContentData, setVideoContentData] = useState<VideoContentDataProps[]>([])
 
   useQuery({
-    queryKey: [`VideoBarChart`, fromDate, toDate, isWeekly],
+    queryKey: [`VideoBarChart`, fromDate, toDate, isDaily, isWeekly, isMonthly, isYearly],
     queryFn: () =>
       getVideoBarChart({
         data: {
           from: fromDate,
           to: toDate,
           weekly: isWeekly,
-          daily: isDaily
+          daily: isDaily,
+          monthly: isMonthly,
+          yearly: isYearly
         }
       }),
     onSuccess: (data: any) => {
@@ -95,46 +116,95 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         const dailyStartDate = subtractDays(today, 7)
         setIsDaily('true')
         setIsWeekly(undefined)
+        setIsMonthly(undefined)
+        setIsYearly(undefined)
         setFromDate(dailyStartDate?.toISOString().slice(0, 10))
         setToDate(new Date().toISOString().slice(0, 10))
         const dayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' })
         const dateFormatter = new Intl.DateTimeFormat(['ban', 'id'])
 
-        console.log(`TODATE`, toDate)
+        const isValidDate = (dateString: any) => {
+          const timestamp = Date.parse(dateString)
 
-        newData.labels = videoContentData?.map((item: any) => {
-          const date = new Date(item?.created_at)
+          return !isNaN(timestamp)
+        }
 
-          return dateFormatter.format(date) + ' ' + dayFormatter.format(date)
-        })
+        if (videoContentData.length > 0 && isValidDate(videoContentData[0]?.created_at)) {
+          newData.labels = videoContentData.map((item: VideoContentDataProps) => {
+            const date = new Date(item?.created_at)
 
-        newData.datasets[0].data = videoContentData?.map((item: any) => item?.total_watched)
-
-        console.log(`DAILY`, videoContentData)
+            return dateFormatter.format(date) + ' ' + dayFormatter.format(date)
+          })
+          newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
+            parseFloat(item?.total_watched)
+          )
+        }
 
         break
 
       case 'weekly':
         setFromDate(undefined)
         setToDate(undefined)
-        setIsWeekly('true')
         setIsDaily(undefined)
+        setIsWeekly('true')
+        setIsMonthly(undefined)
+        setIsYearly(undefined)
 
-        console.log(`WEEKLY`, videoContentData)
+        newData.labels = videoContentData.map((item: VideoContentDataProps) => {
+          return `Week` + ` ` + item.week
+        })
+
+        newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
+          parseFloat(item?.total_watched)
+        )
 
         break
 
       case 'monthly':
-        newData.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
-        newData.datasets[0].data = [500, 700, 900, 1100, 500, 700, 900, 1100, 500, 700, 900, 1100]
+        setFromDate(undefined)
+        setToDate(undefined)
+        setIsDaily(undefined)
+        setIsWeekly(undefined)
+        setIsMonthly('true')
+        setIsYearly(undefined)
+
+        newData.labels = videoContentData.map((item: VideoContentDataProps) => getMonthName(item?.month))
+
+        newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
+          parseFloat(item?.total_watched)
+        )
+
         break
 
       case 'yearly':
-        newData.datasets[0].data = [2000, 2500, 3000, 3500]
+        setFromDate(undefined)
+        setToDate(undefined)
+        setIsDaily(undefined)
+        setIsWeekly(undefined)
+        setIsMonthly(undefined)
+        setIsYearly('true')
+
+        newData.labels = videoContentData.map((item: VideoContentDataProps) => item?.year)
+
+        newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
+          parseFloat(item?.total_watched)
+        )
+
         break
     }
     setData(newData)
-  }, [active, toDate, videoContentData])
+
+    // Set a loader for the title
+    setShowLoadingText(true)
+    const timer = setTimeout(() => {
+      setShowLoadingText(false)
+    }, 600)
+
+    // Cleanup
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [active, toDate, videoContentData, warning])
 
   const options: ChartOptions<'bar'> = {
     indexAxis: 'x',
@@ -172,11 +242,39 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
     }
   }
 
+  const weeklyTitle =
+    videoContentData.length > 0
+      ? [`Week ${videoContentData[0]?.week} - Week ${videoContentData[videoContentData.length - 1]?.week}`]
+      : []
+  const monthlyTitle =
+    videoContentData.length > 0
+      ? [
+          `${getMonthName(videoContentData[0]?.month)} - ${getMonthName(
+            videoContentData[videoContentData.length - 1]?.month
+          )}`
+        ]
+      : []
+
+  const yearlyTitle =
+    videoContentData.length > 0
+      ? [`${videoContentData[0]?.year} - ${videoContentData[videoContentData.length - 1]?.year}`]
+      : []
+
   return (
     <Card>
       <CardHeader
         title='Video Contents Total Views'
-        subheader={`${fromDate} - ${toDate}`}
+        subheader={
+          showLoadingText
+            ? 'Loading...'
+            : active === 'daily'
+            ? `${fromDate} - ${toDate}`
+            : active === 'weekly'
+            ? `${weeklyTitle}`
+            : active === 'monthly'
+            ? `${monthlyTitle}`
+            : `${yearlyTitle}`
+        }
         action={
           <ToggleButtonGroup exclusive value={active} onChange={handleActive} sx={styles.toggle}>
             <ToggleButton value='daily'>Daily</ToggleButton>

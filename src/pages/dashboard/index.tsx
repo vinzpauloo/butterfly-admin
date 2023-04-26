@@ -26,28 +26,27 @@ const Dashboard = () => {
 
   if (auth?.user?.role === "AGENT") return <AgentDashboard/>
   else if (auth?.user?.role === "SA") return <>SA DASHBOARD</>
-
   else return (
     <DashboardProvider>
-    <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 10 }}>
-      <InformationCard />
-      <Box sx={{ width: '100%' }}>
-        <VideoContentsBarChart
-          labelColor={labelColor}
-          info={horizontalBarInfo}
-          borderColor={borderColor}
-          legendColor={legendColor}
-          warning={warningColorShade}
-        />
-        <VipAndGuestsData
-          labelColor={labelColor}
-          info={horizontalBarInfo}
-          borderColor={borderColor}
-          legendColor={legendColor}
-          warning={purpleColorShade}
-        />
+      <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 10 }}>
+        <InformationCard />
+        <Box sx={{ width: '100%' }}>
+          <VideoContentsBarChart
+            labelColor={labelColor}
+            info={horizontalBarInfo}
+            borderColor={borderColor}
+            legendColor={legendColor}
+            warning={warningColorShade}
+          />
+          <VipAndGuestsData
+            labelColor={labelColor}
+            info={horizontalBarInfo}
+            borderColor={borderColor}
+            legendColor={legendColor}
+            warning={purpleColorShade}
+          />
+        </Box>
       </Box>
-    </Box>
     </DashboardProvider>
   )
 }
