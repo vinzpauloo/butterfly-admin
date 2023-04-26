@@ -71,7 +71,8 @@ const AuthProvider = ({ children }: Props) => {
           id: response.data.data.id,
           role: response.data.data.role,
           username: params.email,
-          photo: response.data.data.photo
+          photo: response.data.data.photo,
+          site: response.data.data.site || null
         }
 
         // setUser(tempUserData)

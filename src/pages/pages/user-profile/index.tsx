@@ -1,8 +1,8 @@
 import React from 'react'
 import { useAuth } from '@/services/useAuth'
-import AgentProfile from './components/AgentProfile'
-import SuperAgentProfile from './components/SuperAgentProfile'
-import ContentCreatorProfile from './components/ContentCreatorProfile'
+import AgentProfile from './profiles/AgentProfile'
+import SuperAgentProfile from './profiles/SuperAgentProfile'
+import ContentCreatorProfile from './profiles/ContentCreatorProfile'
 
 const UserProfile = () => {
   const auth = useAuth()

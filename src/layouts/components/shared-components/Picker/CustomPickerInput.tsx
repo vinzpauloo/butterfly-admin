@@ -9,12 +9,12 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 interface PickerProps {
   label?: string
   readOnly?: boolean
-  customWidth?: string
+  customwidth?: string
 }
 
 const PickersComponent = forwardRef(({ ...props }: PickerProps, ref) => {
   // ** Props
-  const { label, readOnly, customWidth } = props
+  const { label, readOnly, customwidth } = props
 
   return (
     <TextField
@@ -22,7 +22,7 @@ const PickersComponent = forwardRef(({ ...props }: PickerProps, ref) => {
       {...props}
       label={label || ''}
       {...(readOnly && { inputProps: { readOnly: true } })}
-      sx={{ width: customWidth }}
+      sx={{ width: customwidth }}
       // ** Input Props being used in Settings
       InputProps={{
         endAdornment: (

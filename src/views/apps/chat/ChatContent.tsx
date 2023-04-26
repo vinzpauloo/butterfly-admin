@@ -200,6 +200,7 @@ const ChatContent = (props: ChatContentType) => {
             </Box>
 
             {selectedChat && store.userProfile ? (
+              // @ts-ignore
               <ChatLog hidden={hidden} data={{ ...selectedChat, userContact: store.userProfile }} />
             ) : null}
 
