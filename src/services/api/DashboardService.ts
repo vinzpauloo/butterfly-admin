@@ -16,6 +16,15 @@ interface VideoBarChartProps {
         to?: string;
         weekly?: string;
         daily?: string;
+        monthly?: string;
+        yearly?: string;
+    }
+}
+
+interface VIPandGuestChartProps {
+    data: {
+        from?: string;
+        to?: string;
     }
 }
 
@@ -81,11 +90,28 @@ export const DashboardService = () => {
         })
     }
 
+     // VIP Members and Guest Chart
+    const getVIPandGuestChart = (params: VIPandGuestChartProps) => {
+    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+        return request({
+            headers: {
+                ...getHeaders(),
+                 'ngrok-skip-browser-warning': '69420', // only for dev
+                Authorization: `Bearer ${accessToken}`
+            },
+            url: '/admin/customers',
+            method: 'GET',
+            params: params.data
+        })
+    }
+
 
     return {
         getMostActiveContentCreatorCount,
         getMostActiveUsers,
         getMostFollowedCreator,
-        getVideoBarChart
+        getVideoBarChart,
+        getVIPandGuestChart
   }
 }

@@ -1,14 +1,27 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, CircularProgress, Checkbox, Stack, FormControlLabel, styled } from '@mui/material'
+import {
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Button,
+  TextField,
+  Typography,
+  CircularProgress,
+  Checkbox,
+  Stack,
+  FormControlLabel,
+  styled
+} from '@mui/material'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import format from 'date-fns/format'
 import DatePicker from 'react-datepicker'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
-import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
+import { adsGlobalStore } from '../../../../zustand/adsGlobalStore'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import AdvertisementService from '@/services/api/AdvertisementService';
+import AdvertisementService from '@/services/api/AdvertisementService'
 import Translations from '@/layouts/components/Translations'
 
 interface ModalProps {
@@ -17,7 +30,6 @@ interface ModalProps {
 }
 
 const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
-
   // subscribe to ads global store
   const [
     adsCategory,
@@ -31,7 +43,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     adsID,
     isCreatingNewAds,
     setAdsPhotoURL
-  ] = adsGlobalStore((state) => [
+  ] = adsGlobalStore(state => [
     state.adsCategory,
     state.adsWidth,
     state.adsHeight,
@@ -43,28 +55,28 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     state.adsID,
     state.isCreatingNewAds,
     state.setAdsPhotoURL
-  ]);
+  ])
 
   // if creating new ads used this value, if editing use global store
   const [newAdsStartDate, setNewAdsStartDate] = useState<Date>(new Date())
   const [newAdsEndDate, setNewAdsEndDate] = useState<Date>(new Date())
-  const [newURLLink, setnewURLLink] = useState("");
+  const [newURLLink, setnewURLLink] = useState('')
 
-  const [selectedFile, setSelectedFile] = useState("");
-  const [preview, setPreview] = useState("");
+  const [selectedFile, setSelectedFile] = useState('')
+  const [preview, setPreview] = useState('')
 
   // input errors for validation
-  const [URLInputError, setURLInputError] = useState(false);
-  const [ImageInputError, setImageInputError] = useState(false);
-  
-  const [isDurationForever, setIsDurationForever] = useState(false);
+  const [URLInputError, setURLInputError] = useState(false)
+  const [ImageInputError, setImageInputError] = useState(false)
+
+  const [isDurationForever, setIsDurationForever] = useState(false)
 
   useEffect(() => {
     if (isCreatingNewAds) {
-      setSelectedFile("")
-      setPreview("")
-      setAdsPhotoURL("")
-      setnewURLLink("")
+      setSelectedFile('')
+      setPreview('')
+      setAdsPhotoURL('')
+      setnewURLLink('')
       setNewAdsStartDate(new Date())
       setNewAdsEndDate(new Date())
       setIsDurationForever(false)
@@ -74,8 +86,8 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
 
     // if editing existing ads
     if (!isCreatingNewAds) {
-      setSelectedFile("")
-      setPreview("")
+      setSelectedFile('')
+      setPreview('')
       setIsDurationForever(false)
       setURLInputError(false)
       setImageInputError(false)
@@ -88,37 +100,38 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
   }, [isCreatingNewAds, setAdsPhotoURL, adsEndDate, adsStartDate, adsLink])
 
   const handleFileInputChange = (e: any) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
-      setSelectedFile(file);
-      previewImage(file);
+      setSelectedFile(file)
+      previewImage(file)
       setImageInputError(false)
     }
-  };
+  }
 
   const previewImage = (file: any) => {
-    const reader: any = new FileReader();
-    reader.readAsDataURL(file);
+    const reader: any = new FileReader()
+    reader.readAsDataURL(file)
     reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-  };
+      setPreview(reader.result)
+    }
+  }
 
   const validateInput = () => {
-    if (selectedFile === "") {
+    if (selectedFile === '') {
       setImageInputError(true)
 
       return false
     }
 
     const isValidUrl = (string: string) => {
-      try { 
-        new URL(string);
+      try {
+        new URL(string)
 
-        return true;
-      } catch (err) { return false; }
+        return true
+      } catch (err) {
+        return false
+      }
     }
-
 
     if (!isValidUrl(newURLLink)) {
       setURLInputError(true)
@@ -130,72 +143,72 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
   }
 
   // Get QueryClient from the context
-  const queryClient = useQueryClient();
-  const { createNewAds, updateAds, deleteAds } = AdvertisementService();
+  const queryClient = useQueryClient()
+  const { createNewAds, updateAds, deleteAds } = AdvertisementService()
 
   const { mutate: mutateCreateNewBannerAds, isLoading: addedLoading } = useMutation(createNewAds, {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: data => {
+      console.log(data)
       queryClient.invalidateQueries({
-        queryKey: ["allAdvertisement"],
-      });
+        queryKey: ['allAdvertisement']
+      })
       props.onClose()
-      setSelectedFile("")
-      setPreview("")
-      setAdsPhotoURL("")
+      setSelectedFile('')
+      setPreview('')
+      setAdsPhotoURL('')
     },
-    onError: (error) => {
-      alert(error);
-    },
-  });
+    onError: error => {
+      alert(error)
+    }
+  })
 
   const { mutate: mutateUpdateBannerAds, isLoading: updateLoading } = useMutation(updateAds, {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: data => {
+      console.log(data)
       queryClient.invalidateQueries({
-        queryKey: ["allAdvertisement"],
-      });
+        queryKey: ['allAdvertisement']
+      })
       props.onClose()
-      setSelectedFile("")
-      setPreview("")
-      setAdsPhotoURL("")
+      setSelectedFile('')
+      setPreview('')
+      setAdsPhotoURL('')
     },
-    onError: (error) => {
-      alert(error);
-    },
-  });
+    onError: error => {
+      alert(error)
+    }
+  })
 
   const { mutate: mutateDeleteBannerAds, isLoading: deleteLoading } = useMutation(deleteAds, {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: data => {
+      console.log(data)
       queryClient.invalidateQueries({
-        queryKey: ["allAdvertisement"],
-      });
+        queryKey: ['allAdvertisement']
+      })
       props.onClose()
-      setSelectedFile("")
-      setPreview("")
-      setAdsPhotoURL("")
+      setSelectedFile('')
+      setPreview('')
+      setAdsPhotoURL('')
     },
-    onError: (error) => {
-      alert(error);
-    },
-  });
+    onError: error => {
+      alert(error)
+    }
+  })
 
   const publishAdvertisement = () => {
     if (validateInput()) {
       // POST data to back-end
       mutateCreateNewBannerAds({
         id: containerID,
-        relation: adsCategory === "Video-Grid" ? "gif" : "banner",
+        relation: adsCategory === 'Video-Grid' ? 'gif' : 'banner',
         data: {
           photo: selectedFile,
           url: newURLLink,
-          
+
           start_date: format(newAdsStartDate, 'yyyy-MM-dd'),
-          end_date: isDurationForever ? "" : format(newAdsEndDate, 'yyyy-MM-dd'),
+          end_date: isDurationForever ? '' : format(newAdsEndDate, 'yyyy-MM-dd'),
           active: 1
-        },
-      });
+        }
+      })
     }
   }
 
@@ -204,17 +217,17 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     mutateUpdateBannerAds({
       id: containerID,
       banner_id: adsID,
-      relation: adsCategory === "Video-Grid" ? "gif" : "banner",
+      relation: adsCategory === 'Video-Grid' ? 'gif' : 'banner',
       data: {
         // if something is selected, if none selected dont send
-        photo: selectedFile === "" ? null : selectedFile,
+        photo: selectedFile === '' ? null : selectedFile,
         url: newURLLink,
         start_date: format(newAdsStartDate, 'yyyy-MM-dd'),
-        end_date: isDurationForever ? "" : format(newAdsEndDate, 'yyyy-MM-dd'),
+        end_date: isDurationForever ? '' : format(newAdsEndDate, 'yyyy-MM-dd'),
         active: 1,
-        _method: "put"
-      },
-    });
+        _method: 'put'
+      }
+    })
   }
 
   const deleteAdvertisement = () => {
@@ -222,14 +235,14 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     mutateDeleteBannerAds({
       id: containerID,
       banner_id: adsID,
-      relation: adsCategory === "Video-Grid" ? "gif" : "banner",
+      relation: adsCategory === 'Video-Grid' ? 'gif' : 'banner'
     })
   }
 
   const Img = styled('img')({
     height: adsHeight,
     width: adsWidth,
-    objectFit: "cover"
+    objectFit: 'cover'
   })
 
   const isBeingAddedUpdatedDelete = addedLoading || updateLoading || deleteLoading
@@ -238,82 +251,135 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     <DatePickerWrapper>
       <Dialog open={props.isOpen} onClose={props.onClose}>
         <DialogContent sx={styles.dialogContent}>
-          <DialogTitle sx={styles.title}><Translations text={adsCategory}/> <Translations text='Advertisement'/></DialogTitle>
-            {isBeingAddedUpdatedDelete ? <CircularProgress sx={styles.loaderStyle} color="primary" size={64} /> : null}
-            <Box sx={styles.container} style={isBeingAddedUpdatedDelete? {opacity:0.5, cursor:"not-allowed"} : undefined}>
-              <Box sx={styles.left}>
-                {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={isBeingAddedUpdatedDelete} /> : null} */}
-                <Box
-                  sx={styles.uploadContainer}
-                  width={{ sm: "100%", md: adsWidth }}
-                  height={adsHeight}
-                  border={ImageInputError ? "1px solid red" : undefined}
-                >
-                  <Box sx={styles.imgWrapper}>                      
-                    {adsPhotoURL && !preview ?
-                    <Img src={adsPhotoURL} alt='template icon'/> :
-                      <Image
-                        src={preview ? preview : '/images/icons/butterfly-template-icon.png'}
-                        width={preview ? adsWidth : 50}
-                        height={preview ? adsHeight : 50}
-                        alt='template icon'
-                        style={{ objectFit: "fill" }}
+          <DialogTitle sx={styles.title}>
+            <Translations text={adsCategory} /> <Translations text='Advertisement' />
+          </DialogTitle>
+          {isBeingAddedUpdatedDelete ? <CircularProgress sx={styles.loaderStyle} color='primary' size={64} /> : null}
+          <Box
+            sx={styles.container}
+            style={isBeingAddedUpdatedDelete ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+          >
+            <Box sx={styles.left}>
+              {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={isBeingAddedUpdatedDelete} /> : null} */}
+              <Box
+                sx={styles.uploadContainer}
+                width={{ sm: '100%', md: adsWidth }}
+                height={adsHeight}
+                border={ImageInputError ? '1px solid red' : undefined}
+              >
+                <Box sx={styles.imgWrapper}>
+                  {adsPhotoURL && !preview ? (
+                    <Img src={adsPhotoURL} alt='template icon' />
+                  ) : (
+                    <Image
+                      src={preview ? preview : '/images/icons/butterfly-template-icon.png'}
+                      width={preview ? adsWidth : 50}
+                      height={preview ? adsHeight : 50}
+                      alt='template icon'
+                      style={{ objectFit: 'fill' }}
+                    />
+                  )}
+                </Box>
+              </Box>
+              <Stack>
+                <Typography textAlign='center'>
+                  {' '}
+                  <Translations text='Recommended Size' />: {adsWidth * 1.25}x{adsHeight * 1.25}
+                </Typography>
+                <Stack flexDirection='row' justifyContent='center' gap={{ xs: 4, md: 12 }} mt={4}>
+                  {!isCreatingNewAds ? (
+                    <Button
+                      variant='contained'
+                      color='error'
+                      disabled={isBeingAddedUpdatedDelete}
+                      sx={{ width: 150, textTransform: 'uppercase' }}
+                      onClick={deleteAdvertisement}
+                    >
+                      <Translations text='Delete' />
+                    </Button>
+                  ) : null}
+                  <Button
+                    variant='contained'
+                    disabled={isBeingAddedUpdatedDelete}
+                    component='label'
+                    sx={styles.uploadBtn}
+                  >
+                    <Translations text={preview || adsPhotoURL ? 'Change' : 'Select'} /> <Translations text='Image' />
+                    <input onChange={handleFileInputChange} type='file' hidden />
+                  </Button>
+                </Stack>
+              </Stack>
+            </Box>
+            <Box sx={styles.right}>
+              <Box>
+                <Typography>
+                  <Translations text='Start Date' />
+                </Typography>
+                <DatePicker
+                  dateFormat='dd/MM/yyyy'
+                  disabled={isBeingAddedUpdatedDelete}
+                  selected={newAdsStartDate}
+                  onChange={(date: Date) => setNewAdsStartDate(date)}
+                  placeholderText='Click to select a date'
+                  customInput={<CustomInput customwidth='100%' />}
+                  minDate={new Date()}
+                />
+              </Box>
+              <Box>
+                <Typography sx={isDurationForever ? { color: '#999' } : null}>
+                  {' '}
+                  <Translations text='End Date' />
+                </Typography>
+                <DatePicker
+                  dateFormat='dd/MM/yyyy'
+                  disabled={isBeingAddedUpdatedDelete || isDurationForever}
+                  selected={newAdsEndDate}
+                  onChange={(date: Date) => setNewAdsEndDate(date)}
+                  placeholderText='Click to select a date'
+                  customInput={<CustomInput customwidth='100%' />}
+                  minDate={new Date()}
+                />
+                <Stack>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={isDurationForever}
+                        onChange={event => setIsDurationForever(event.target.checked)}
                       />
                     }
-                  </Box>
-                </Box>
-                <Stack>
-                <Typography textAlign="center"> <Translations text='Recommended Size'/>: {adsWidth * 1.25}x{adsHeight * 1.25}</Typography>
-                  <Stack flexDirection="row" justifyContent="center" gap={{xs:4, md:12}} mt={4}>
-                    {!isCreatingNewAds ? 
-                    <Button variant="contained" color="error" disabled={isBeingAddedUpdatedDelete} sx={{ width: 150, textTransform: "uppercase" }} onClick={deleteAdvertisement}>
-                      <Translations text='Delete' />
-                    </Button> : null}
-                    <Button variant="contained" disabled={isBeingAddedUpdatedDelete} component="label" sx={styles.uploadBtn}>
-                    <Translations text={preview || adsPhotoURL ? "Change" : "Select"} /> <Translations text='Image' />
-                      <input onChange={handleFileInputChange} type="file" hidden/>
-                    </Button>
-                  </Stack>
+                    label={<Translations text='Duration: Forever' />}
+                  />
                 </Stack>
               </Box>
-              <Box sx={styles.right}>
-                <Box>
-                <Typography><Translations text='Start Date'/></Typography>
-                  <DatePicker
-                    dateFormat="dd/MM/yyyy"
-                    disabled={isBeingAddedUpdatedDelete}
-                    selected={newAdsStartDate}
-                    onChange={(date: Date) => setNewAdsStartDate(date)}
-                    placeholderText='Click to select a date'
-                    customInput={<CustomInput customWidth='100%' />}
-                    minDate={new Date()}
-                  />
-                </Box>
-                <Box>
-                <Typography sx={isDurationForever ? { color: "#999" } : null}> <Translations text='End Date'/></Typography>
-                   <DatePicker
-                    dateFormat="dd/MM/yyyy"
-                    disabled={isBeingAddedUpdatedDelete || isDurationForever}                    
-                    selected={newAdsEndDate}
-                    onChange={(date: Date) => setNewAdsEndDate(date)}
-                    placeholderText='Click to select a date'
-                    customInput={<CustomInput customWidth='100%' />}
-                    minDate={new Date()}
-                  />
-                <Stack>
-                  <FormControlLabel control={<Checkbox checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label={<Translations text='Duration: Forever'/>} />
-                </Stack>
-                </Box>
-                <Box>
-                <Typography><Translations text='URL Link'/></Typography>
-                <TextField fullWidth error={URLInputError} disabled={isBeingAddedUpdatedDelete} value={newURLLink} onChange={(event) => { setnewURLLink(event.target.value);  setURLInputError(false)}}/>
-                </Box>
-                <Box sx={styles.bottomBtnWrapper}>
-                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={props.onClose}><Translations text='Cancel'/></Button>
-                  <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={isCreatingNewAds? publishAdvertisement : editAdvertisement}><Translations text='Publish'/></Button>
-                </Box>
+              <Box>
+                <Typography>
+                  <Translations text='URL Link' />
+                </Typography>
+                <TextField
+                  fullWidth
+                  error={URLInputError}
+                  disabled={isBeingAddedUpdatedDelete}
+                  value={newURLLink}
+                  onChange={event => {
+                    setnewURLLink(event.target.value)
+                    setURLInputError(false)
+                  }}
+                />
+              </Box>
+              <Box sx={styles.bottomBtnWrapper}>
+                <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={props.onClose}>
+                  <Translations text='Cancel' />
+                </Button>
+                <Button
+                  sx={styles.bottomBtns}
+                  disabled={isBeingAddedUpdatedDelete}
+                  onClick={isCreatingNewAds ? publishAdvertisement : editAdvertisement}
+                >
+                  <Translations text='Publish' />
+                </Button>
               </Box>
             </Box>
+          </Box>
         </DialogContent>
       </Dialog>
     </DatePickerWrapper>
@@ -338,10 +404,10 @@ const styles = {
     fontSize: 12,
     '&:hover': {
       backgroundColor: '#7B0BB0'
-    },
+    }
   },
   dialogContent: {
-    padding: 10,
+    padding: 10
   },
   title: {
     padding: 0,
@@ -358,7 +424,7 @@ const styles = {
       sm: 'column',
       md: 'row',
       lg: 'row'
-    },
+    }
   },
   left: {
     display: 'flex',
@@ -377,7 +443,7 @@ const styles = {
     height: '3dvh',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   adsText: {
     fontSize: 11,
@@ -422,12 +488,12 @@ const styles = {
     }
   },
   loaderStyle: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
-    margin: "auto",
+    margin: 'auto',
     zIndex: 1
   }
 }
