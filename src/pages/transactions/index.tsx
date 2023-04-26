@@ -9,6 +9,8 @@ import Table from '@/pages/transactions/components/Table'
 import TabLists from '@/pages/transactions/components/TabLists'
 
 import { useAuth } from '@/services/useAuth'
+import AgentTransactions from './agentTransactions'
+
 
 function index({
   isLoading,
@@ -33,10 +35,8 @@ function index({
 
   const auth = useAuth()
 
-  return (
-    auth?.user?.role === "AGENT" ?
-      <>AGENT TRANSACTIONS</>
-    :
+  if (auth?.user?.role === "AGENT") return <AgentTransactions/>
+  else return (
     <Container>
       <Header />
       {children}

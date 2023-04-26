@@ -25,6 +25,8 @@ interface VIPandGuestChartProps {
     data: {
         from?: string;
         to?: string;
+        sort?: any;
+        sort_by?: string;
     }
 }
 

@@ -171,14 +171,6 @@ const InformationCard = () => {
             iconButtonProps={{ size: 'small', sx: { color: 'text.primary' } }}
           />
         }
-        // subheader={
-        //   <Typography variant='body2'>
-        //     <Box component='span' sx={styles.subHead}>
-        //       Total 48.5% growth
-        //     </Box>{' '}
-        //     😎 this month
-        //   </Typography>
-        // }
         titleTypographyProps={{ sx: styles.title }}
       />
       <CardContent sx={{ pt: theme => `${theme.spacing(3)} !important` }}>
