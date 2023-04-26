@@ -29,6 +29,7 @@ import Icon from 'src/@core/components/icon'
 import { useForm, Controller } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
+import Dropzone from 'dropzone'
 
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
@@ -40,6 +41,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Auth
 import { useAuth } from '@/services/useAuth'
+import VideoService from '@/services/api/VideoService'
 
 interface ModalProps {
   isOpen: boolean
@@ -67,6 +69,59 @@ const CustomSelect = styled(Select)(({ theme }) => ({
 const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const auth = useAuth()
 
+  // useEffect(() => {
+  //   if (dropzoneRef.current) {
+  //     Dropzone.autoDiscover = false
+
+  //     const myDropzone = new Dropzone(dropzoneRef.current, {
+  //       url: 'http://192.168.50.9:8000/api/videos/upload?reference_media_id=9905dccc-c56a-462b-b4f4-2a7100f36b30',
+  //       chunking: true,
+  //       forceChunking: true,
+  //       parallelChunkUploads: true,
+  //       chunkSize: 5 * 1024 * 1024, // 5MB
+  //       retryChunks: true,
+  //       retryChunksLimit: 3,
+  //       maxFilesize: 500000000, // 500MB
+  //       timeout: 180000, // 3 minutes
+  //       init: function () {
+  //         this.on('totaluploadprogress', function (progress) {
+  //           const progressBar = document.querySelector('#progress-bar .progress') as HTMLElement
+  //           if (progressBar) {
+  //             progressBar.style.width = progress + '%'
+  //           }
+  //         })
+
+  //         this.on('sending', function (file: CustomDropzoneFile, xhr) {
+  //           xhr.ontimeout = () => {
+  //             let retries = file.retries || 0
+  //             if (retries < 3) {
+  //               setTimeout(() => {
+  //                 this.processFile(file)
+  //               }, 5000)
+  //               retries += 1
+  //               file.retries = retries
+  //             } else {
+  //               this._errorProcessing([file], 'Upload timeout.')
+  //             }
+  //           }
+  //         })
+
+  //         this.on('complete', function (file: any) {
+  //           if (file.xhr.status === 200) {
+  //             alert('Upload successful!')
+  //           } else {
+  //             alert('Upload failed!')
+  //           }
+  //         })
+  //       }
+  //     })
+
+  //     return () => {
+  //       myDropzone.destroy()
+  //     }
+  //   }
+  // }, [])
+
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
   const [feedVideo, setFeedVideo] = React.useState<File[]>([])
@@ -88,6 +143,9 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     control,
     formState: { errors }
   } = useForm<Inputs>()
+
+  // ** References
+  const videoRef = React.useRef()
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 9,
@@ -126,13 +184,13 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   //use api service
   const { uploadFeed } = FeedsService()
+  const { uploadVideoURL } = VideoService()
 
   const handleCancel = () => {
     onClose()
   }
 
   const handlePublish = () => {
-
     let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
     const { video } = getValues()
@@ -146,40 +204,37 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         video_type: 'feed_video'
       }
 
-      const customOnProgress = (str: string) => {
-        console.log('string', str)
-      }
-      const customOnAfterResponse = (req: any, res: any) => {
-        console.log('response', res)
-        let xmlhttpreq = req.getUnderlyingObject()
-        console.log('xml', xmlhttpreq)
-        console.log('xmlhttpreq get all', xmlhttpreq.getAllResponseHeaders())
+      uploadVideoURL({ formData: feedHeaderData }).then(res => {
+        console.log('res', res)
+        const { uploadUrl } = res
 
-        if (xmlhttpreq.getAllResponseHeaders().indexOf('feed_id') != -1) {
-          // save to feed with video
-          console.log('SAVE HERE!!!!!!!!')
+        console.log('videoRef', videoRef)
 
-          let data = JSON.parse(res.getHeader('works'))
-          console.log('data from feed header', data)
-          const { feed_id } = data.data
-
-          //Append to formData
-          formData.append('feed_id', feed_id)
-
-          // upload the Feed With Video
-          uploadFeed({ formData: formData }).then(data => {
-            console.log('data from with video', data)
-            toast.success('Successfully Upload Newsfeed WITH VIDEO!', { position: 'top-center' })
-            onClose()
-            setIsLoading(false)
-            reset()
-          }) //end uploadFeed
-        }
-      }
-
-      //Start TUS Uplaod
-      const { upload } = TUSService(video, { customOnProgress, customOnAfterResponse }, feedHeaderData as any)
-      upload.start()
+        const myDropzone = new Dropzone(videoRef.current, {
+          url: uploadUrl,
+          chunking: true,
+          forceChunking: true,
+          parallelChunkUploads: true,
+          chunkSize: 5 * 1024 * 1024, // 5MB
+          retryChunks: true,
+          retryChunksLimit: 3,
+          retryChunksInterval: 5000,
+          maxFilesize: 500000000, // 500MB
+          timeout: 180000, // 3 minutes
+          init: function () {
+            this.on('totaluploadprogress', function (progress) {
+              console.log(progress + '%')
+            })
+            this.on('complete', function (file) {
+              if (file.xhr.status === 200) {
+                alert('Upload successful!')
+              } else {
+                alert('Upload failed!')
+              }
+            })
+          }
+        })
+      }) // end uploadURL
     } else {
       // HAS NO VIDEO - continue upload Feed
 
@@ -281,7 +336,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                   rules={{ required: true }}
                   render={({ field: { value, onChange, onBlur } }) => (
                     <>
-                      { getCCsQuery?.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+                      {getCCsQuery?.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
                       {getCCsQuery?.data && (
                         <CustomSelect
                           displayEmpty
@@ -298,7 +353,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                             Select Content Creator
                           </MenuItem>
                           {getCCsQuery?.data &&
-                            getCCsQuery?.data.map((cc : any) => (
+                            getCCsQuery?.data.map((cc: any) => (
                               <MenuItem key={cc.id} value={cc.id}>
                                 {cc.username}
                               </MenuItem>
@@ -335,7 +390,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             </Box>
 
             <Box sx={styles.buttonContainer}>
-              <div {...getVidRootProps({ className: 'dropzone' })}>
+              <div ref={videoRef} id='videodz' {...getVidRootProps({ className: 'dropzone' })}>
                 <input {...getVidInputProps()} />
                 <Box sx={styles.button}>
                   <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />

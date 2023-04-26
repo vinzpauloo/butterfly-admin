@@ -48,7 +48,20 @@ const VideoService = () => {
     })
   }
 
-  return { getAllVideos, updateVideoByWorkId }
+  const uploadVideoURL = (params : any) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/videos/upload-url',
+      method: 'POST',
+      data: params.formData
+    })
+  }
+
+  return { getAllVideos, updateVideoByWorkId, uploadVideoURL }
 }
 
 export default VideoService
