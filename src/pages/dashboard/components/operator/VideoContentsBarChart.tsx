@@ -29,7 +29,20 @@ const subtractDays = (date: Date, days: number): Date => {
 }
 
 const getMonthName = (monthNumber: number) => {
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ]
 
   return monthNames[monthNumber - 1]
 }
@@ -246,12 +259,13 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
     videoContentData.length > 0
       ? [`Week ${videoContentData[0]?.week} - Week ${videoContentData[videoContentData.length - 1]?.week}`]
       : []
+
   const monthlyTitle =
     videoContentData.length > 0
       ? [
           `${getMonthName(videoContentData[0]?.month)} - ${getMonthName(
             videoContentData[videoContentData.length - 1]?.month
-          )}`
+          )} of ${videoContentData[0]?.year}`
         ]
       : []
 

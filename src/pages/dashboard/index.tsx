@@ -1,54 +1,16 @@
-// ** Material UI Imports
-import { Box } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
-
-// ** Custom Components Imports
-import InformationCard from './components/InformationCard'
-import 'chart.js/auto'
-import VideoContentsBarChart from '@/pages/dashboard/components/VideoContentsBarChart'
-import VipAndGuestsData from '@/pages/dashboard/components/VipAndGuestsData'
-import { DashboardProvider } from '@/context/DashboardContext'
+// ** Services/Hooks Imports
 import { useAuth } from '@/services/useAuth'
 
-// Vars
-const horizontalBarInfo = '#FFB84C'
-const warningColorShade = '#9747FF'
-const purpleColorShade = '#A459D1'
+// ** Project/Other Imports
+import OperatorDashboard from './components/operator/Operator'
 
 const Dashboard = () => {
-  const theme = useTheme()
-  const borderColor = theme.palette.divider
-  const labelColor = theme.palette.text.disabled
-  const legendColor = theme.palette.text.secondary
-
   const auth = useAuth()
 
   if (auth?.user?.role === 'AGENT') return <>AGENT DASHBOARD</>
   else if (auth?.user?.role === 'SA') return <>SA DASHBOARD</>
-  else
-    return (
-      <DashboardProvider>
-        <Box sx={{ display: 'flex', flexDirection: ['column', 'column', 'row'], gap: 10 }}>
-          <InformationCard />
-          <Box sx={{ width: '100%' }}>
-            <VideoContentsBarChart
-              labelColor={labelColor}
-              info={horizontalBarInfo}
-              borderColor={borderColor}
-              legendColor={legendColor}
-              warning={warningColorShade}
-            />
-            <VipAndGuestsData
-              labelColor={labelColor}
-              info={horizontalBarInfo}
-              borderColor={borderColor}
-              legendColor={legendColor}
-              warning={purpleColorShade}
-            />
-          </Box>
-        </Box>
-      </DashboardProvider>
-    )
+  else if (auth?.user?.role === 'CC') return <>CC DASHBOARD</>
+  else return <OperatorDashboard />
 }
 
 Dashboard.acl = {

@@ -25,21 +25,23 @@ interface VerticalBarProps {
   legendColor: string
 }
 
-const generateChartData = (startDate: Date, endDate: Date, warning: string, info: string) => {
-  const monthsBetween = Math.abs(
-    startDate.getMonth() - endDate.getMonth() + 12 * (startDate.getFullYear() - endDate.getFullYear())
-  )
+const generateChartData = (
+  startDate: Date,
+  endDate: Date,
+  warning: string,
+  info: string,
+  date: string[] = [],
+  guest: number[] = [],
+  vip: number[] = []
+) => {
+  const labels = date?.map(d => {
+    const currentMonth = new Date(d)
+    const month = currentMonth.toLocaleString('default', { month: 'long' })
+    const year = currentMonth.getFullYear()
+    const day = currentMonth.getDate()
 
-  const labels = Array.from({ length: monthsBetween + 1 }, (_, i) => {
-    const currentMonth = new Date(startDate).setMonth(startDate.getMonth() + i)
-    const month = new Date(currentMonth).toLocaleString('default', { month: 'long' })
-    const year = new Date(currentMonth).getFullYear()
-
-    return `${month} ${year}`
+    return `${month} ${day} ${year}`
   })
-
-  const vipData = Array.from({ length: monthsBetween + 1 }, () => Math.floor(Math.random() * 1000))
-  const guestsData = Array.from({ length: monthsBetween + 1 }, () => Math.floor(Math.random() * 1000))
 
   return {
     labels,
@@ -49,18 +51,20 @@ const generateChartData = (startDate: Date, endDate: Date, warning: string, info
         label: 'VIP Member',
         backgroundColor: warning,
         borderColor: 'transparent',
-        data: vipData
+        data: vip
       },
       {
         maxBarThickness: 45,
         backgroundColor: info,
         label: 'Guests',
         borderColor: 'transparent',
-        data: guestsData
+        data: guest
       }
     ]
   }
 }
+
+type SortType = 'asc' | 'desc' | undefined | null
 
 const VipAndGuestsData = (props: VerticalBarProps) => {
   const { info, warning, labelColor, borderColor } = props
@@ -72,15 +76,26 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
 
+  const [sort] = useState<SortType>('asc')
+  const [sortName] = useState<string>('created_at')
+
   useQuery({
-    queryKey: [`VIPandGuest`, fromDate, toDate],
+    queryKey: [`VIPandGuest`, fromDate, toDate, sort, sortName],
     queryFn: () =>
       getVIPandGuestChart({
         data: {
           from: fromDate,
-          to: toDate
+          to: toDate,
+          sort: sort,
+          sort_by: sortName
         }
-      })
+      }),
+    onSuccess: (data: any) => {
+      const date = data?.map((item: any) => item?.created_at)
+      const guest = data?.map((item: any) => item?.total_new_guest)
+      const vip = data?.map((item: any) => item?.total_new_vip)
+      setChartData(generateChartData(startDate, endDate, warning, info, date, guest, vip))
+    }
   })
 
   const updateDates = (from: Date, to: Date) => {
