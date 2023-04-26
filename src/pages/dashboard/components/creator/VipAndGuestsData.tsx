@@ -48,7 +48,7 @@ const generateChartData = (
     datasets: [
       {
         maxBarThickness: 45,
-        label: 'VIP Member',
+        label: 'Downloads',
         backgroundColor: warning,
         borderColor: 'transparent',
         data: vip
@@ -56,7 +56,7 @@ const generateChartData = (
       {
         maxBarThickness: 45,
         backgroundColor: info,
-        label: 'Guests',
+        label: 'Likes',
         borderColor: 'transparent',
         data: guest
       }
@@ -149,7 +149,7 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
     <DatePickerWrapper>
       <Card>
         <Box sx={styles.headerWrapper}>
-          <CardHeader title='Commission Data' />
+          <CardHeader title='Videos - Downloads - Likes' />
           <Box sx={styles.datePicker}>
             <Box>
               <DatePicker
