@@ -8,17 +8,18 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 // ** Store & Actions Imports
 // import { useDispatch, useSelector } from 'react-redux'
-// import { sendMsg, selectChat, fetchUserProfile, fetchChatsContacts, removeSelectedChat } from 'src/store/apps/chat'
+// import { sendMsg, selectChat, fetchUserProfile, fetchChatsContacts } from 'src/store/apps/chat'
 
 // ** Types
 import { RootState, AppDispatch } from 'src/store'
-import { StatusObjType, StatusType, ChatStoreType } from 'src/types/apps/chatTypesNew'
+import { StatusObjType, StatusType, ChatStoreType, IChatsList } from 'src/types/apps/chatTypesNew'
 
 // ** Sample Data
 import { data } from 'src/@fake-db/apps/chat'
 
 // ** Hooks
 import { useSettings } from 'src/@core/hooks/useSettings'
+import { useQuery } from '@tanstack/react-query'
 
 // ** Utils Imports
 import { getInitials } from 'src/@core/utils/get-initials'
@@ -28,13 +29,16 @@ import { formatDateToMonthShort } from 'src/@core/utils/format'
 import SidebarLeft from 'src/views/apps/chatNew/SidebarLeft'
 import ChatContent from 'src/views/apps/chatNew/ChatContent'
 
+// ** Service
+import ChatService from '@/services/api/ChatService'
+
 const AppChat = () => {
-  console.log('data', data)
   // ** States
   const [userStatus, setUserStatus] = useState<StatusType>('online')
   const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(false)
   const [userProfileLeftOpen, setUserProfileLeftOpen] = useState<boolean>(false)
   const [userProfileRightOpen, setUserProfileRightOpen] = useState<boolean>(false)
+  const [activeChat, setActiveChat] = useState<IChatsList | null>(null)
 
   // ** Hooks
   const theme = useTheme()
@@ -56,6 +60,19 @@ const AppChat = () => {
     online: 'success',
     offline: 'secondary'
   }
+
+  // ** React Query
+  const { getAllChats } = ChatService()
+  const { data: chatsList } = useQuery({
+    queryKey: ['chats'],
+    queryFn: () => getAllChats({ page: 1, paginate: 25 }),
+    onSuccess: data => {
+      console.log('getAllChats success', data)
+    },
+    onError: error => {
+      console.log('getAllChats error', error)
+    }
+  })
 
   // useEffect(() => {
   //   dispatch(fetchUserProfile())
@@ -87,13 +104,14 @@ const AppChat = () => {
         statusObj={statusObj}
         userStatus={userStatus}
         // selectChat={selectChat}
-        getInitials={getInitials}
         sidebarWidth={sidebarWidth}
         setUserStatus={setUserStatus}
         leftSidebarOpen={leftSidebarOpen}
-        // removeSelectedChat={removeSelectedChat}
         formatDateToMonthShort={formatDateToMonthShort}
         handleLeftSidebarToggle={handleLeftSidebarToggle}
+        chatsList={chatsList?.data}
+        activeChat={activeChat}
+        setActiveChat={setActiveChat}
       />
       {/* @ts-ignore */}
       <ChatContent
@@ -106,6 +124,7 @@ const AppChat = () => {
         getInitials={getInitials}
         sidebarWidth={sidebarWidth}
         handleLeftSidebarToggle={handleLeftSidebarToggle}
+        activeChat={activeChat}
       />
     </Box>
   )

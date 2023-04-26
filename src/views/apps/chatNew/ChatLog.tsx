@@ -18,6 +18,9 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 // ** Utils Imports
 import { getInitials } from 'src/@core/utils/get-initials'
 
+// ** Hooks
+import { useAuth } from '@/services/useAuth'
+
 // ** Types Imports
 import {
   ChatLogType,
@@ -26,7 +29,7 @@ import {
   ChatLogChatType,
   MessageGroupType,
   FormattedChatsType
-} from 'src/types/apps/chatTypes'
+} from 'src/types/apps/chatTypesNew'
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)<ScrollBarProps & { ref: Ref<unknown> }>(({ theme }) => ({
   padding: theme.spacing(5)
@@ -34,7 +37,14 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)<ScrollBarProps & { re
 
 const ChatLog = (props: ChatLogType) => {
   // ** Props
-  const { data, hidden } = props
+  const { hidden, userProfile, chat } = props
+
+  console.log('userProfile', userProfile)
+  console.log('chat', chat)
+
+  // ** Hooks
+  const auth = useAuth()
+  console.log('auth', auth)
 
   // ** Ref
   const chatArea = useRef(null)
@@ -54,37 +64,30 @@ const ChatLog = (props: ChatLogType) => {
 
   // ** Formats chat data based on sender
   const formattedChatData = () => {
-    let chatLog: MessageType[] | [] = []
-    // if (data.chat) {
-    //   chatLog = data.chat.chat
-    // }
-    chatLog = data.chats ? data.chats[0].chat : []
-    console.log('dataaaaaa', data)
-
+    const chatLog = chat
     const formattedChatLog: FormattedChatsType[] = []
-    let chatMessageSenderId = chatLog[0] ? chatLog[0].senderId : 11
+
+    let chatMessageSenderId = userProfile?._id
     let msgGroup: MessageGroupType = {
       senderId: chatMessageSenderId,
       messages: []
     }
     chatLog.forEach((msg: MessageType, index: number) => {
-      if (chatMessageSenderId === msg.senderId) {
+      if (chatMessageSenderId === msg.from_id) {
         msgGroup.messages.push({
-          time: msg.time,
-          msg: msg.message,
-          feedback: msg.feedback
+          time: msg.created_at,
+          msg: msg.message
         })
       } else {
-        chatMessageSenderId = msg.senderId
+        chatMessageSenderId = msg.from_id
 
         formattedChatLog.push(msgGroup)
         msgGroup = {
-          senderId: msg.senderId,
+          senderId: msg.from_id,
           messages: [
             {
-              time: msg.time,
-              msg: msg.message,
-              feedback: msg.feedback
+              time: msg.created_at,
+              msg: msg.message
             }
           ]
         }
@@ -96,43 +99,18 @@ const ChatLog = (props: ChatLogType) => {
     return formattedChatLog
   }
 
-  const renderMsgFeedback = (isSender: boolean, feedback: MsgFeedbackType) => {
-    if (isSender) {
-      if (feedback.isSent && !feedback.isDelivered) {
-        return (
-          <Box component='span' sx={{ display: 'inline-flex', '& svg': { mr: 2, color: 'text.secondary' } }}>
-            <Icon icon='mdi:check' fontSize='1rem' />
-          </Box>
-        )
-      } else if (feedback.isSent && feedback.isDelivered) {
-        return (
-          <Box
-            component='span'
-            sx={{
-              display: 'inline-flex',
-              '& svg': { mr: 2, color: feedback.isSeen ? 'success.main' : 'text.secondary' }
-            }}
-          >
-            <Icon icon='mdi:check-all' fontSize='1rem' />
-          </Box>
-        )
-      } else {
-        return null
-      }
-    }
-  }
-
   useEffect(() => {
-    if (data && data.chat && data.chat.chat.length) {
+    if (chat && chat.length) {
       scrollToBottom()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [chat])
 
   // ** Renders user chat
   const renderChats = () => {
     return formattedChatData().map((item: FormattedChatsType, index: number) => {
-      const isSender = item.senderId === data.userContact.id
+      // const isSender = item.senderId === data.userContact.id
+      const isSender = item.senderId === auth.user?.id
 
       return (
         <Box
@@ -146,7 +124,7 @@ const ChatLog = (props: ChatLogType) => {
           <div>
             <CustomAvatar
               skin='light'
-              color={data.contact.avatarColor ? data.contact.avatarColor : undefined}
+              // color={data.contact.avatarColor ? data.contact.avatarColor : undefined}
               sx={{
                 width: '2rem',
                 height: '2rem',
@@ -154,20 +132,20 @@ const ChatLog = (props: ChatLogType) => {
                 ml: isSender ? 3.5 : undefined,
                 mr: !isSender ? 3.5 : undefined
               }}
-              {...(data.contact.avatar && !isSender
+              {...(userProfile.photo && !isSender
                 ? {
-                    src: data.contact.avatar,
-                    alt: data.contact.fullName
+                    src: userProfile.photo,
+                    alt: userProfile.username
                   }
                 : {})}
               {...(isSender
                 ? {
-                    src: data.userContact.avatar,
-                    alt: data.userContact.fullName
+                    src: userProfile.photo,
+                    alt: auth.user?.username
                   }
                 : {})}
             >
-              {data.contact.avatarColor ? getInitials(data.contact.fullName) : null}
+              {/* {data.contact.avatarColor ? getInitials(data.contact.fullName) : null} */}
             </CustomAvatar>
           </div>
 
@@ -204,7 +182,6 @@ const ChatLog = (props: ChatLogType) => {
                         justifyContent: isSender ? 'flex-end' : 'flex-start'
                       }}
                     >
-                      {renderMsgFeedback(isSender, chat.feedback)}
                       <Typography variant='caption'>
                         {time
                           ? new Date(time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })

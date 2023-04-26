@@ -7,7 +7,6 @@ import { useRouter } from 'next/router'
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
-import Chip from '@mui/material/Chip'
 import Badge from '@mui/material/Badge'
 import Drawer from '@mui/material/Drawer'
 import MuiAvatar from '@mui/material/Avatar'
@@ -27,18 +26,22 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import Icon from 'src/@core/components/icon'
 
 // ** Types
-import { ContactType, ChatSidebarLeftType, ChatsArrType } from 'src/types/apps/chatTypesNew'
-
-// ** Custom Components Import
-import CustomAvatar from 'src/@core/components/mui/avatar'
-
-// ** Chat App Components Imports
+import { ContactType, ChatSidebarLeftType, ChatsArrType, IChatsList } from 'src/types/apps/chatTypesNew'
 
 const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: boolean }) => {
   if (hidden) {
     return <Box sx={{ height: '100%', overflow: 'auto' }}>{children}</Box>
   } else {
-    return <PerfectScrollbar options={{ wheelPropagation: false }}>{children}</PerfectScrollbar>
+    return (
+      <PerfectScrollbar
+        options={{ wheelPropagation: false }}
+        onYReachEnd={() => {
+          console.log('Infinite scrolling logic here')
+        }}
+      >
+        {children}
+      </PerfectScrollbar>
+    )
   }
 }
 
@@ -52,61 +55,44 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
     statusObj,
     userStatus,
     selectChat,
-    getInitials,
     sidebarWidth,
     setUserStatus,
     leftSidebarOpen,
-    removeSelectedChat,
     formatDateToMonthShort,
-    handleLeftSidebarToggle
+    handleLeftSidebarToggle,
+    chatsList,
+    activeChat,
+    setActiveChat
   } = props
 
   // ** States
   const [query, setQuery] = useState<string>('')
   const [filteredChat, setFilteredChat] = useState<ChatsArrType[]>([])
   const [filteredContacts, setFilteredContacts] = useState<ContactType[]>([])
-  const [active, setActive] = useState<null | { type: string; id: string | number }>(null)
+  // const [active, setActive] = useState<null | { id: string | number }>(null)
 
   // ** Hooks
   const router = useRouter()
 
-  const handleChatClick = (type: 'chat' | 'contact', id: number) => {
-    // dispatch(selectChat(id))
-    setActive({ type, id })
+  const handleChatClick = (chat: IChatsList) => {
+    setActiveChat(chat)
     if (!mdAbove) {
       handleLeftSidebarToggle()
     }
   }
 
   useEffect(() => {
-    if (store && store.chats) {
-      if (active !== null) {
-        if (active.type === 'contact' && active.id === store.chats[0].id) {
-          setActive({ type: 'chat', id: active.id })
-        }
-      }
-    }
-  }, [store, active])
-
-  useEffect(() => {
     router.events.on('routeChangeComplete', () => {
-      setActive(null)
+      setActiveChat(null)
       // dispatch(removeSelectedChat())
     })
 
     return () => {
-      setActive(null)
+      setActiveChat(null)
       // dispatch(removeSelectedChat())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const hasActiveId = (id: number | string) => {
-    if (store.chats !== null) {
-      const arr = store.chats.filter(i => i.id === id)
-      return !!arr.length
-    }
-  }
 
   const renderChats = () => {
     if (store && store.chats && store.chats.length) {
@@ -117,17 +103,14 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
           </ListItem>
         )
       } else {
-        const arrToMap = query.length && filteredChat.length ? filteredChat : store.chats
-        console.log('arrToMap', arrToMap)
-        return arrToMap.map((chat: ChatsArrType, index: number) => {
-          // const { lastMessage } = chat.chat
-          const lastMessage = null
-          const activeCondition = active !== null && active.id === chat.id && active.type === 'chat'
+        const arrToMap = chatsList || []
+        return arrToMap.map((chat: IChatsList, index: number) => {
+          const activeCondition = activeChat !== null && activeChat._id === chat._id
           return (
             <ListItem key={index} disablePadding sx={{ '&:not(:last-child)': { mb: 1.5 } }}>
               <ListItemButton
                 disableRipple
-                onClick={() => handleChatClick('chat', chat.id)}
+                onClick={() => handleChatClick(chat)}
                 sx={{
                   px: 3,
                   py: 2.5,
@@ -147,49 +130,17 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                       vertical: 'bottom',
                       horizontal: 'right'
                     }}
-                    badgeContent={
-                      <Box
-                        component='span'
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          // color: `${statusObj[chat.status]}.main`,
-                          // backgroundColor: `${statusObj[chat.status]}.main`,
-                          color: `${statusObj['online']}.main`,
-                          backgroundColor: `${statusObj['online']}.main`,
-                          boxShadow: theme =>
-                            `0 0 0 2px ${
-                              !activeCondition ? theme.palette.background.paper : theme.palette.common.white
-                            }`
-                        }}
-                      />
-                    }
                   >
-                    {chat.avatar ? (
+                    {chat.photo && (
                       <MuiAvatar
-                        src={chat.avatar}
-                        alt={chat.fullName}
+                        src={chat.photo}
+                        alt={chat.username}
                         sx={{
                           width: 38,
                           height: 38,
                           ...(activeCondition && { border: theme => `2px solid ${theme.palette.common.white}` })
                         }}
                       />
-                    ) : (
-                      <CustomAvatar
-                        color={chat.avatarColor}
-                        skin={activeCondition ? 'light-static' : 'light'}
-                        sx={{
-                          width: 38,
-                          height: 38,
-                          fontSize: '1rem',
-                          ...(activeCondition && { border: theme => `2px solid ${theme.palette.common.white}` })
-                        }}
-                      >
-                        {/* {getInitials(chat.fullName)} */}
-                        FR
-                      </CustomAvatar>
                     )}
                   </Badge>
                 </ListItemAvatar>
@@ -202,13 +153,12 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                   }}
                   primary={
                     <Typography noWrap sx={{ fontWeight: 500, fontSize: '0.875rem' }}>
-                      {chat.fullName}
-                      Felecia Rower
+                      {chat.username}
                     </Typography>
                   }
                   secondary={
                     <Typography noWrap variant='body2' sx={{ ...(!activeCondition && { color: 'text.disabled' }) }}>
-                      {/* {lastMessage ? lastMessage.message : null} */}I will purchase it for sure. 👍
+                      {chat.latest_message}
                     </Typography>
                   }
                 />
@@ -224,10 +174,9 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                     variant='body2'
                     sx={{ whiteSpace: 'nowrap', color: activeCondition ? 'common.white' : 'text.disabled' }}
                   >
-                    {/* <>{lastMessage ? formatDateToMonthShort(lastMessage.time as string, true) : new Date()}</> */}
-                    {<>{formatDateToMonthShort('April 20, 2023', true)}</>}
+                    {<>{formatDateToMonthShort(chat.created_at, true)}</>}
                   </Typography>
-                  {chat.chat.unseenMsgs && chat.chat.unseenMsgs > 0 ? (
+                  {/* {chat.chat.unseenMsgs && chat.chat.unseenMsgs > 0 ? (
                     <Chip
                       color='error'
                       label={chat.chat.unseenMsgs}
@@ -239,7 +188,7 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                         '& .MuiChip-label': { pt: 0.25, px: 1.655 }
                       }}
                     />
-                  ) : null}
+                  ) : null} */}
                 </Box>
               </ListItemButton>
             </ListItem>

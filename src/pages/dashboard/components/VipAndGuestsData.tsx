@@ -1,8 +1,8 @@
 // ** React Imports
-import React from "react";
+import React from 'react'
 
 // ** MUI Imports
-import { Card, CardHeader, CardContent} from '@mui/material'
+import { Card, CardHeader, CardContent } from '@mui/material'
 
 // ** Third Party Imports
 import { Bar } from 'react-chartjs-2'
@@ -25,7 +25,7 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
     maintainAspectRatio: false,
     animation: { duration: 500 },
     layout: {
-      padding: { top: -4 },
+      padding: { top: -4 }
     },
     scales: {
       x: {
@@ -33,26 +33,26 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
         grid: {
           drawTicks: false,
           drawBorder: false,
-          color: borderColor,
+          color: borderColor
         },
-        ticks: { color: labelColor },
+        ticks: { color: labelColor }
       },
       y: {
         grid: {
           borderColor,
           display: false,
-          drawBorder: false,
+          drawBorder: false
         },
-        ticks: { color: labelColor },
-      },
+        ticks: { color: labelColor }
+      }
     },
     plugins: {
       legend: {
         align: 'end',
         position: 'top',
-        labels: { color: legendColor },
-      },
-    },
+        labels: { color: legendColor }
+      }
+    }
   }
 
   const data: ChartData<'bar'> = {
@@ -77,9 +77,7 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
 
   return (
     <Card>
-      <CardHeader
-        title='VIP Members and Guests Data'
-      />
+      <CardHeader title='VIP Members and Guests Data' />
       <CardContent>
         <Bar data={data} height={400} options={options} />
       </CardContent>

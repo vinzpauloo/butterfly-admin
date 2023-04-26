@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, SyntheticEvent, Fragment, useEffect } from 'react'
+import { useState, SyntheticEvent, Fragment } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -45,7 +45,7 @@ const UserDropdown = (props: Props) => {
 
   // ** Hooks
   const router = useRouter()
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
 
   // ** Vars
   const { direction } = settings
@@ -81,47 +81,18 @@ const UserDropdown = (props: Props) => {
     handleDropdownClose()
   }
 
-  const auth = useAuth()
-  const [menuItems, setMenuItems] = useState<any>([])
-
-  // DIFFRENT USER TYPES HAS DIFFERENT DROPDOWN MENUS
-  useEffect(() => {
-    if (auth?.user?.role === "AGENT" || auth?.user?.role === "SA" || auth?.user?.role === "CC") {
-      setMenuItems([
-        { name: "Profile", icon: "mdi:account-outline", route: "/pages/user-profile" },
-      ])
-    }
-
-    else if (auth?.user?.role === "GOD") {
-      setMenuItems([
-        { name: "Profile", icon: "mdi:account-outline", route: "/pages/user-profile" },
-        { name: "Inbox", icon: "mdi:email-outline", route: "/apps/email" },
-        { name: "Chat", icon: "mdi:message-outline", route: "/apps/chat" },
-        { name: "Settings", icon: "mdi:cog-outline", route: "/pages/account-settings/account" },
-        { name: "Pricing", icon: "mdi:currency-usd", route: "/pages/pricing" },
-        { name: "FAQ", icon: "mdi:help-circle-outline", route: "/pages/faq" },
-      ])
-    }
-  }, [auth?.user?.role])
-  
   return (
     <Fragment>
       <Badge
         overlap='circular'
         onClick={handleDropdownOpen}
         sx={{ ml: 2, cursor: 'pointer' }}
-        badgeContent={<BadgeContentSpan />}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'right'
         }}
       >
-        <Avatar
-          alt='John Doe'
-          onClick={handleDropdownOpen}
-          sx={{ width: 40, height: 40 }}
-          src='/images/avatars/1.png'
-        />
+        <Avatar alt='John Doe' onClick={handleDropdownOpen} sx={{ width: 40, height: 40 }} src={user?.photo} />
       </Badge>
       <Menu
         anchorEl={anchorEl}
@@ -135,32 +106,36 @@ const UserDropdown = (props: Props) => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Badge
               overlap='circular'
-              badgeContent={<BadgeContentSpan />}
               anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
               }}
             >
-              <Avatar alt='John Doe' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
+              <Avatar alt={user?.username} src={user?.photo} sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
             <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 600 }}>{auth?.user?.username}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>{user?.username}</Typography>
               <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-                {auth?.user?.role}
+                {user?.role}
               </Typography>
             </Box>
           </Box>
         </Box>
         <Divider sx={{ mt: '0 !important' }} />
-        {menuItems.map((item: any, index: any) => 
-          <MenuItem key={index} sx={{ p: 0 }} onClick={() => handleDropdownClose(item.route)}>
-            <Box sx={styles}>
-              <Icon icon={item.icon} />
-              {item.name}
-            </Box>
-          </MenuItem>
-        )}
+        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/pages/user-profile/profile')}>
+          <Box sx={styles}>
+            <Icon icon='mdi:account-outline' />
+            Profile
+          </Box>
+        </MenuItem>
+        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/apps/chatNew')}>
+          <Box sx={styles}>
+            <Icon icon='mdi:message-outline' />
+            Chat
+          </Box>
+        </MenuItem>
         <Divider />
+
         <MenuItem
           onClick={handleLogout}
           sx={{ py: 2, '& svg': { mr: 2, fontSize: '1.375rem', color: 'text.primary' } }}
