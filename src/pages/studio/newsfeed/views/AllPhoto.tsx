@@ -17,6 +17,8 @@ import formatDate from '@/utils/formatDate'
 // ** Types
 import { IFeedStory } from '@/context/types'
 
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
 type Props = {
   data?: any
   handleFeedParams?: any
@@ -60,7 +62,7 @@ const AllPhoto = ({ data, handleFeedParams }: Props) => {
                       <PhotoGridCard>
                         {
                           story && story?.images && story?.images.map( image =>  {
-                            return <img key={image._id} src={image.url.replace('http://localhost/', 'http://192.168.50.9/')} />// TBR
+                            return <img key={image._id} src={FILE_SERVER_URL + image.url} alt='photo' />// TBR
                           })
                         }
                       </PhotoGridCard>

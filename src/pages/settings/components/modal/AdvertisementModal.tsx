@@ -23,6 +23,7 @@ import { adsGlobalStore } from '../../../../zustand/adsGlobalStore'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import AdvertisementService from '@/services/api/AdvertisementService'
 import Translations from '@/layouts/components/Translations'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 interface ModalProps {
   isOpen: boolean
@@ -269,7 +270,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
               >
                 <Box sx={styles.imgWrapper}>
                   {adsPhotoURL && !preview ? (
-                    <Img src={adsPhotoURL} alt='template icon' />
+                    <Img src={FILE_SERVER_URL + adsPhotoURL} alt='template icon' />
                   ) : (
                     <Image
                       src={preview ? preview : '/images/icons/butterfly-template-icon.png'}

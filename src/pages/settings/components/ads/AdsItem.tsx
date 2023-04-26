@@ -4,6 +4,7 @@ import { adsGlobalStore } from "../../../../zustand/adsGlobalStore";
 import Image from 'next/image'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AdvertisementService from '@/services/api/AdvertisementService';
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const AdsItem = ({ containerID, adsID, openModal, photoURL, adsURL, startDate, endDate, isActive, itemWidth, itemHeight, itemName }: any) => {
 	// subscribe to ads global store
@@ -93,7 +94,7 @@ const AdsItem = ({ containerID, adsID, openModal, photoURL, adsURL, startDate, e
 						height={50}
 						alt='butterfly icon'
 						style={{ objectFit: "fill" }}
-					/> : <Img sx={isActive ? { opacity: 1 } : { opacity: 0.25 }} src={photoURL} alt='ads image' />}
+					/> : <Img sx={isActive ? { opacity: 1 } : { opacity: 0.25 }} src={FILE_SERVER_URL + photoURL} alt='ads image' />}
 			</ImageListItem>
 		</Stack>
 	)

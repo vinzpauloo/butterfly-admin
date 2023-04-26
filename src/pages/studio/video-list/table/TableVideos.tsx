@@ -20,6 +20,7 @@ import Icon from 'src/@core/components/icon'
 import { IVideoRow } from '@/context/types'
 import useDebounce from '@/hooks/useDebounce'
 import { useTranslateString } from '@/utils/TranslateString';
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const navData = [
   {
@@ -163,7 +164,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <CustomAvatar
-                src={params.row.thumbnail_url}
+                src={FILE_SERVER_URL + params.row.thumbnail_url}
                 sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
               />
             </Box>
