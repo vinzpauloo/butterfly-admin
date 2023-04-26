@@ -1,18 +1,9 @@
 // ** React Imports
-import React,{ useState, useRef, SetStateAction } from 'react'
+import React, { useState, useRef, SetStateAction } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
-import {
-  Drawer,
-  Button,
-  IconButton,
-  Typography,
-  Step,
-  Stepper,
-  StepLabel,
-  StepContent
-} from '@mui/material'
+import { Drawer, Button, IconButton, Typography, Step, Stepper, StepLabel, StepContent } from '@mui/material'
 
 // ** Style Imports
 import { styled } from '@mui/material/styles'
@@ -29,10 +20,18 @@ import StepperWrapper from 'src/@core/styles/mui/stepper'
 
 // ** Custom Components Imports
 import StepperCustomDot from '@/layouts/components/shared-components/StepperCustomDot'
+import CreatedSuccessful from '../form/CreatedSuccessful'
 
 // ** Steps
 import SAStepOne from './superagent/steps/StepOne'
 import SAStepTwo from './superagent/steps/StepTwo'
+
+// ** Types
+import { FQDNData } from './superagent/steps/StepTwo'
+
+// ** Services
+import FQDNService from '@/services/api/FQDNService'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface SidebarAddUserType {
   open: boolean
@@ -48,24 +47,35 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 }))
 
 const SADrawer = (props: SidebarAddUserType) => {
-  
   // ** State
-  const defaultStateValues = { 
-    step: 1,
-    siteID : 1
+  const defaultStateValues = {
+    step: 0,
+    siteID: null
   }
   const [activeStep, setActiveStep] = useState<number>(defaultStateValues.step)
-  const [ siteID, setSiteID ] = useState<number | null>(defaultStateValues.siteID)
+  const [siteID, setSiteID] = useState<number | null>(defaultStateValues.siteID)
 
   const [fileName, setFileName] = useState('')
   const [responseError, setResponseError] = useState<any>()
   const [resetKey, setResetKey] = useState(0)
-  
+
+  // ** Tanstack and services
+  const { addFQDN } = FQDNService()
+  const queryClient = useQueryClient()
+  const fqdnM = useMutation({
+    mutationFn: addFQDN,
+    onSuccess: response => {
+      console.log('response from addFQDN', response)
+    },
+    onMutate: () => {},
+    onSettled: () => {
+      queryClient.invalidateQueries(['fqdns'])
+    }
+  })
 
   // ** References to multisteps
   const stepOneRef = React.useRef<any>()
   const stepTwoRef = React.useRef<any>()
-  console.log('stepTwoRef',stepTwoRef)
 
   // ** Props
   const { open, toggle } = props
@@ -80,22 +90,53 @@ const SADrawer = (props: SidebarAddUserType) => {
 
   // Handle Stepper
   const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1)
-    if (activeStep === 1) {
-
+    if (activeStep === steps.length - 1) {
       // call last submit form
       handleFinishForm()
-
-      toast.success('Completed All Steps!!')
+    } else {
+      setActiveStep(prevActiveStep => prevActiveStep + 1)
     }
   }
-  const handleReset = () => {
+  const handleStepsReset = () => {
     setActiveStep(0)
   }
 
-  const handleFinishForm = () => {
-    console.log('data from SADRAWER')
-    stepTwoRef?.current?.handleFinish()
+  const handleFinishForm = async () => {
+    console.log('data from SADRAWER', stepTwoRef)
+    //call stepTwoReference handle Finish
+    let allFQDNData = stepTwoRef?.current?.handleFinish()
+
+    if (allFQDNData.length == 0) {
+      toast.error('FQDN Values Must at least be 3 characters')
+      return
+    } else {
+      console.log('allFQDNData', allFQDNData)
+
+      //handleDataSubmit
+      let promiseArray: any[] = []
+      allFQDNData.map((data: FQDNData) => {
+        let type = data.name as 'API' | 'Photos' | 'Streaming'
+        data.values.forEach((value) => {
+          promiseArray.push({ site: siteID,
+                              name: value.value,
+                              type: type
+                            })
+        })
+      })
+
+      const promises = promiseArray.map( (data : { name : string, site : number, type : string } ) => fqdnM.mutateAsync({ data : {
+        site : data.site,
+        name : data.name,
+        type : data.type as 'API' | 'Photos' | 'Streaming'
+      } }) )
+      await Promise.all(promises)
+
+      setActiveStep(prevActiveStep => prevActiveStep + 1)
+      setTimeout(() => {
+        handleStepsReset()
+        handleClose()
+      }, 1500)
+    }
   }
 
   // ** SA Steps
@@ -103,18 +144,20 @@ const SADrawer = (props: SidebarAddUserType) => {
     {
       title: 'Account Details',
       subtitle: 'Enter your Account Details',
-      component: <SAStepOne 
-                    ref={stepOneRef}
-                    toggle={toggle} 
-                    resetKey={resetKey}
-                    handleClose={handleClose}
-                    responseError={responseError}
-                    setResponseError={setResponseError}
-                    fileName={fileName}
-                    setFileName={setFileName}
-                    setSiteID={setSiteID}
-                    handleNext={handleNext}
-                  />
+      component: (
+        <SAStepOne
+          ref={stepOneRef}
+          toggle={toggle}
+          resetKey={resetKey}
+          handleClose={handleClose}
+          responseError={responseError}
+          setResponseError={setResponseError}
+          fileName={fileName}
+          setFileName={setFileName}
+          setSiteID={setSiteID}
+          handleNext={handleNext}
+        />
+      )
     },
     {
       title: 'FQDNS Info',
@@ -154,44 +197,31 @@ const SADrawer = (props: SidebarAddUserType) => {
                     </div>
                   </StepLabel>
                   <StepContent>
-                    { step.component }
-                    {
-                      index > 0 &&
-                      <div className='button-wrapper' style={{ borderTop: '1px solid black', paddingTop:'1rem', textAlign: 'center' }}>
-                      {/* <Button
-                        size='small'
-                        color='secondary'
-                        variant='outlined'
-                        onClick={handleBack}
-                        disabled={activeStep === 0}
-                      >
-                        Back
-                      </Button> */}
-                      <Button style={styles.cancelButton} size='large' variant='contained' onClick={handleNext} sx={{ ml: 4 }}>
-                        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                      </Button>
-                    </div>
-                    }
-                    
+                    {step.component}
+                    {index > 0 && (
+                      <div className='button-wrapper' style={{ paddingTop: '1rem', textAlign: 'center' }}>
+                        <Button
+                          style={styles.cancelButton}
+                          size='large'
+                          variant='contained'
+                          onClick={handleNext}
+                          sx={{ ml: 4 }}
+                        >
+                          {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                        </Button>
+                      </div>
+                    )}
                   </StepContent>
                 </Step>
               )
             })}
           </Stepper>
         </StepperWrapper>
-        {activeStep === steps.length && (
-          <Box sx={{ mt: 2, textAlign:'center' }}>
-            <Typography>All steps are completed!</Typography>
-            <Button style={styles.cancelButton} size='small' sx={{ mt: 2 }} variant='contained' onClick={handleReset}>
-              Reset
-            </Button>
-          </Box>
-        )}
+        {activeStep === steps.length && <CreatedSuccessful />}
       </Box>
     </Drawer>
   )
 }
-
 
 const styles = {
   container: {},

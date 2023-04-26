@@ -88,7 +88,7 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
             {pageHeader}
           </Typography>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container spacing={5}>
+            <Grid className='expandoGrid' container spacing={5}>
               {fields.map((field, index) => (
                 <Grid key={field.id} item xs={12}>
                   <FormControl 
@@ -96,6 +96,7 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
                     fullWidth
                   >
                     <OutlinedInput
+                      className='expandoInput'
                       {...register(`expando.${index}.value`, {required : true})} 
                       error={Boolean(errors.expando)}
                       placeholder={`Option ${index + 1}`}

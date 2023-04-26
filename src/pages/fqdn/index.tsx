@@ -69,9 +69,6 @@ const FQDN = (props: FQDNProps) => {
   }
 
   
-
-
-
   return (
     <PerfectScrollbar>
       <Grid maxWidth='sm' container spacing={6}>

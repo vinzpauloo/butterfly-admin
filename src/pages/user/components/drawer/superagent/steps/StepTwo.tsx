@@ -7,20 +7,22 @@ import { Box, Button } from '@mui/material'
 import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
 
 // ** API queries
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import FQDNService from '@/services/api/FQDNService'
 
 type SAStepTwoProps = {
   siteID: number | null
 }
 
+export type FQDNData = {
+  name : string
+  values : [{ value : string }]
+} 
+
 const SAStepTwo = ({ siteID }: SAStepTwoProps, ref : any) => {
 
   // ** State
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-
-  // ** Tanstack api calls
-  const { addFQDN } = FQDNService()
 
   // References
   const formAPIRef = React.useRef<any>()
@@ -32,27 +34,22 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref : any) => {
     return { handleFinish : () => handleFinish() }
   }, [])
 
-  const queryClient = useQueryClient()
-  const fqdnMutate = useMutation({
-    mutationFn: addFQDN,
-    onSuccess: response => {
-      console.log('response from addFQDN', response)
-    },
-    onMutate: () => {},
-    onSettled: () => {
-      queryClient.invalidateQueries(['fqdns'])
-    }
-  })
-
-
   const handleFinish = () => {
     const allDataArray = []
 
-    //handleVALIDATIONS
-    allDataArray.push(formAPIRef.current.getFormData())
-    allDataArray.push(formPhotosRef.current.getFormData())
-    allDataArray.push(formStreamRef.current.getFormData())
-    console.log('alLDataarray', allDataArray )
+    // check for empty values handleVALIDATIONS
+    let noEmptyvalues : boolean = false
+    noEmptyvalues = formAPIRef.current.getFormData().some( (item : {value : string} ) => { return item.value.length < 3 }) ? true : false
+    noEmptyvalues = formStreamRef.current.getFormData().some( (item : {value : string} ) => { return item.value.length < 3 }) ? true : false
+    noEmptyvalues = formPhotosRef.current.getFormData().some( (item : {value : string} ) => { return item.value.length < 3 }) ? true : false
+
+    if (noEmptyvalues) return []
+
+    allDataArray.push({ name : 'API', values :  formAPIRef.current.getFormData()})
+    allDataArray.push({ name : 'Photos', values :  formPhotosRef.current.getFormData()})
+    allDataArray.push({ name : 'Streaming', values :  formStreamRef.current.getFormData()})
+
+    return allDataArray
   }
 
   const handleAPISubmit = async (data: any) => {
@@ -80,6 +77,12 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref : any) => {
             },
             '& .MuiCardContent-root': {
               paddingTop: '0'
+            },
+            '& .expandoGrid .MuiGrid-item' : {
+              paddingLeft: 0
+            },
+            '& .expandoGrid .expandoInput input' : {
+              height:'8px'
             }
           }}
         >
