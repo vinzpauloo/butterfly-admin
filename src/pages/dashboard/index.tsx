@@ -9,6 +9,7 @@ import VideoContentsBarChart from '@/pages/dashboard/components/VideoContentsBar
 import VipAndGuestsData from '@/pages/dashboard/components/VipAndGuestsData'
 import { DashboardProvider } from '@/context/DashboardContext'
 import { useAuth } from '@/services/useAuth'
+import AgentDashboard from './agentDashboard'
 
 // Vars
 const horizontalBarInfo = '#FFB84C'
@@ -23,7 +24,7 @@ const Dashboard = () => {
 
   const auth = useAuth()
 
-  if (auth?.user?.role === "AGENT") return <>AGENT DASHBOARD</>
+  if (auth?.user?.role === "AGENT") return <AgentDashboard/>
   else if (auth?.user?.role === "SA") return <>SA DASHBOARD</>
 
   else return (
