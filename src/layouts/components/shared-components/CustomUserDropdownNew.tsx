@@ -22,6 +22,7 @@ import { useAuth } from '@/services/useAuth'
 
 // ** Type Imports
 import { Settings } from 'src/@core/context/settingsContext'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 interface Props {
   settings: Settings
@@ -92,7 +93,12 @@ const UserDropdown = (props: Props) => {
           horizontal: 'right'
         }}
       >
-        <Avatar alt='John Doe' onClick={handleDropdownOpen} sx={{ width: 40, height: 40 }} src={user?.photo} />
+        <Avatar
+          alt='John Doe'
+          onClick={handleDropdownOpen}
+          sx={{ width: 40, height: 40 }}
+          src={FILE_SERVER_URL + user?.photo}
+        />
       </Badge>
       <Menu
         anchorEl={anchorEl}
@@ -111,7 +117,11 @@ const UserDropdown = (props: Props) => {
                 horizontal: 'right'
               }}
             >
-              <Avatar alt={user?.username} src={user?.photo} sx={{ width: '2.5rem', height: '2.5rem' }} />
+              <Avatar
+                alt={user?.username}
+                src={FILE_SERVER_URL + user?.photo}
+                sx={{ width: '2.5rem', height: '2.5rem' }}
+              />
             </Badge>
             <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
               <Typography sx={{ fontWeight: 600 }}>{user?.username}</Typography>
