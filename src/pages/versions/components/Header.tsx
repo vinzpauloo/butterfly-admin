@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 interface SiteNameProps {
   name: string
@@ -74,7 +75,7 @@ const Header = () => {
               siteName?.map((item, index) => (
                 <MenuItem key={index} value={item.id}>
                   {item.logo ? (
-                    <img src={item.logo} alt='Logo' width={40} />
+                    <img src={FILE_SERVER_URL + item.logo} alt='Logo' width={40} />
                   ) : (
                     <img src='/images/studio/butterfly_file_upload.png' alt='Placeholder Logo' width={40} />
                   )}

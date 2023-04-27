@@ -1,9 +1,21 @@
 import React, { useState } from 'react'
-import { Box, Button, Menu, MenuItem, Stack, TextField, Avatar, CircularProgress } from '@mui/material'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import { Box, Button, Stack, TextField, Avatar, CircularProgress, Tabs, Tab } from '@mui/material'
 import UserService from '@/services/api/UserService'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import CCFollowersTab from '../components/CCFollowersTab'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import { useAuth } from '@/services/useAuth'
+import CCVideosTab from '../components/CCVideosTab'
+import CCNewsfeedsTab from '../components/CCNewsfeedsTab'
+import CCActiveDonatorsTab from '../components/CCActiveDonatorsTab'
+
+const TabPanel = ({ children, index, value }: any) => {
+  return (
+    <>
+      {value === index && <Stack>{children}</Stack>}
+    </>
+  )
+}
 
 const ContentCreatorProfile = () => {
   const [isProfileSelected, setIsProfileSelected] = useState<boolean>(true)
@@ -13,14 +25,12 @@ const ContentCreatorProfile = () => {
   const [username, setUsername] = useState<string>("")
   const [email, setEmail] = useState<string>("")
   const [bio, setBio] = useState<string>("")
-  const [viewBy, setViewTab] = useState<string>("Followers")
-  const [searchString, setSearchString] = useState<string>("")
 
-  // VIEW BY MENU UNDER OVERVIEW
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const isMenuOpen = Boolean(anchorEl)
-  const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget)
-  const closeMenu = () => setAnchorEl(null)
+  // TABS
+  const [tabIndex, setTabIndex] = useState<number>(0);
+  const onTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
 
   const viewProfile = () => {
     setIsProfileSelected(true)
@@ -32,47 +42,137 @@ const ContentCreatorProfile = () => {
     setIsOverviewSelected(true)
   }
 
+  const auth = useAuth()
+
   const viewByOptions = [
-    { sortName: "Followers", sortFunction: () => console.log("SORT: AF")},
-    { sortName: "Most Liked Video", sortFunction: () => console.log("SORT: MLV") },
-    { sortName: "Most Liked Newsfeed", sortFunction: () => console.log("SORT: MLN") },
-    { sortName: "Active Donators", sortFunction: () => console.log("SORT: MAD") },
+    { sortName: "Followers", component: <CCFollowersTab/>},
+    { sortName: "Most Liked Video", component: <CCVideosTab/> },
+    { sortName: "Most Liked Newsfeed", component: <CCNewsfeedsTab/> },
+    { sortName: "Active Donators", component: <CCActiveDonatorsTab/> },
   ]
   
   // get specific content creators data based on bearer token
-  const { getSpecificContentCreator } = UserService();
+  const { getSpecificContentCreator, updateContentCreator } = UserService();
   const { isLoading } = useQuery({
     queryKey: ["contentCreatorData"],
-    queryFn: () => getSpecificContentCreator(),
+    queryFn: () => getSpecificContentCreator({
+      data: {
+        user_id: auth?.user?.id,
+      }
+    }),
     onSuccess: (data) => {
       console.log(data)
       setProfilePhoto(data?.photo)
       setCoverPhotoURL(data?.cover_photo)
       setUsername(data?.username)
       setEmail(data?.email)
-      setBio(data?.note)
+      setBio(data?.biography)
     },
     onError: (error) => {
       console.log(error);
     },
   });
 
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+  const { mutate: mutateUpdate, isLoading: updateLoading } = useMutation(updateContentCreator, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["contentCreatorData"],
+      });
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
+
+  //file to be send to back end
+  const [selectedProfPic, setSelectedProfPic] = useState('')
+  const [selectedCoverPhoto, setSelectedCoverPhoto] = useState('')
+  const [photoPreview, setPhotoPreview] = useState('')
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState('')
+
+  const selectProfilePicture = (e: any) => {
+    const file = e.target.files[0]
+    if (file) {
+      setSelectedProfPic(file)
+      previewProfilePicture(file)
+    }
+  }
+
+  const selectCoverPhoto = (e: any) => {
+    const file = e.target.files[0]
+    if (file) {
+      setSelectedCoverPhoto(file)
+      previewCoverPhoto(file)
+    }
+  }
+
+  const previewProfilePicture = (file: any) => {
+    const reader: any = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result)
+    }
+  }
+
+  const previewCoverPhoto = (file: any) => {
+    const reader: any = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = () => {
+      setCoverPhotoPreview(reader.result)
+    }
+  }
+
+  const UpdateProfile = () => {
+    console.log(selectedProfPic)
+    console.log(selectedCoverPhoto)
+    console.log(username)
+    console.log(email)
+    console.log(bio)
+
+    mutateUpdate({
+      data: {
+        _method: 'put',
+        user_id: auth?.user?.id,
+        username: username,
+        email: email,
+        biography: bio,
+      }
+    });
+  }
+
+  const isLoadingOrUpdated = isLoading || updateLoading
+
   return (
     <Box>
-      <Box height={300} position="relative" bgcolor="#bfbfbf" sx={{ backgroundImage: `url(${coverPhotoURL})`, backgroundSize: "100% 100%", }}>
-        {isLoading ? 
+      <Box height={300} position="relative" bgcolor="#bfbfbf"
+        sx={{
+          backgroundSize: "100% 100%",
+          backgroundImage: isLoadingOrUpdated ? null : `url(${coverPhotoPreview !== '' ? coverPhotoPreview : FILE_SERVER_URL + coverPhotoURL})`,
+        }}>
+        {isLoadingOrUpdated ? 
           <CircularProgress sx={{ position: "absolute", margin: "auto", top: 0, left: 0, right: 0, bottom: 0 }} />
           :
           <>
-            <Avatar sx={{ width: 150, height: 150, backgroundSize: "contain", position: "absolute", top: 24, left: 24 }} src={profilePhoto}/>
-            <Button variant="contained" color="secondary" sx={{ position: "absolute", bottom: 24, right: 24 }}>
+            <Stack position='absolute' top={24} left={24} gap={2} alignItems='center'>
+              <Avatar sx={{ width: 150, height: 150, backgroundSize: "contain" }} src={photoPreview !== '' ? photoPreview : FILE_SERVER_URL + profilePhoto }/>
+              <Button variant='contained' size='small' color='secondary' component='label'>
+                <input onChange={selectProfilePicture} type='file' hidden />
+                {profilePhoto === null ? "Upload" : "Change"}
+              </Button>
+            </Stack>
+            <Button variant="contained" color="secondary" size='small' sx={{ position: "absolute", bottom: 24, right: 24 }} component='label'>
               {coverPhotoURL === null ? "Upload" : "Change"} Cover Photo
+              <input onChange={selectCoverPhoto} type='file' hidden />
             </Button>
           </>
         }
       </Box>
-      <Stack pt={6} gap={6} alignItems={isLoading ? "center" : undefined} justifyContent={isLoading ? "center" : undefined} height={isLoading ? 300 : "max-content"}>
-        {isLoading ? 
+      <Stack pt={6} gap={6} alignItems={isLoadingOrUpdated ? "center" : undefined} justifyContent={isLoadingOrUpdated ? "center" : undefined} height={isLoadingOrUpdated ? 300 : "max-content"}>
+        {isLoadingOrUpdated ? 
           <CircularProgress />
           : 
           <>
@@ -80,7 +180,7 @@ const ContentCreatorProfile = () => {
               <Button variant={isProfileSelected ? "contained" : "outlined"} onClick={viewProfile}>Profile</Button>
               <Button variant={isOverviewSelected ? "contained" : "outlined"} onClick={viewOverview}>Overview</Button>
             </Stack>
-            {isProfileSelected && !isLoading && 
+            {isProfileSelected && !isLoadingOrUpdated && 
               <>
                 <Stack direction={["column", "row"]} justifyContent="space-between" gap={6}>
                   <TextField 
@@ -106,29 +206,21 @@ const ContentCreatorProfile = () => {
                     setBio(event.target.value);
                   }}
                 />
-                <Button variant="contained" sx={{ width: "max-content", alignSelf: "center", textTransform: "uppercase" }}>Update</Button>
+                <Button variant="contained" sx={{ width: "max-content", alignSelf: "center", textTransform: "uppercase" }} onClick={UpdateProfile}>Update</Button>
               </>
             }
-            {isOverviewSelected && !isLoading &&
+            {isOverviewSelected && !isLoadingOrUpdated &&
               <Stack bgcolor="white" boxShadow={4} borderRadius={1} p={4} gap={4}>
-                <Stack direction={["column", "row"]} justifyContent="space-between" alignItems="center" gap={4}>
-                  <Box>
-                    <Button variant="outlined" color="secondary" onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>{viewBy}</Button>
-                    <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={closeMenu}>
-                      {viewByOptions.map((item, index) =>
-                        <MenuItem key={index} onClick={() => {item.sortFunction(); setViewTab(item.sortName); closeMenu()}}>{item.sortName}</MenuItem>
-                      )}
-                    </Menu>
-                  </Box>
-                  <TextField
-                    label="Search" variant="outlined" size="small" value={searchString}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      setSearchString(event.target.value);
-                    }}
-                  />
-                </Stack>
-                {/* MAKE THIS INTO TABS BETTER! */}
-                <CCFollowersTab />
+                <Tabs value={tabIndex} onChange={onTabChange} variant='scrollable' centered allowScrollButtonsMobile>
+                  {viewByOptions.map((item, index) => 
+                    <Tab key={index} label={item.sortName} />
+                  )}
+                </Tabs>
+                {viewByOptions.map((item, index) =>
+                  <TabPanel value={tabIndex} index={index} key={index}>
+                    {item.component}
+                  </TabPanel>
+                )}
               </Stack>
             }
           </>

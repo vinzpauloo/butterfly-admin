@@ -59,7 +59,7 @@ const fakeFollowers = [
   { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
 ]
 
-const CCFollowersTab = () => {
+const CCActiveDonatorsTab = () => {
   return (
     <Stack maxHeight={400} gap={4} direction="row" flexWrap="wrap" sx={{ overflowY: "scroll" }} px={6}>
       {fakeFollowers.map((item, index) =>
@@ -72,4 +72,4 @@ const CCFollowersTab = () => {
   )
 }
 
-export default CCFollowersTab
+export default CCActiveDonatorsTab
