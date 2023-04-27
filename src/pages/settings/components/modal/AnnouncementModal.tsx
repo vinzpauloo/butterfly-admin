@@ -172,7 +172,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                   selected={startDate}
                   onChange={(date: Date) => setStartDate(date)}
                   placeholderText='Click to select a date'
-                  customInput={<CustomInput customWidth='100%' />}
+                  customInput={<CustomInput customwidth='100%' />}
                   minDate={new Date()}
                 />
               </Box>
@@ -184,7 +184,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                   selected={endDate}
                   onChange={(date: Date) => setEndDate(date)}
                   placeholderText='Click to select a date'
-                  customInput={<CustomInput customWidth='100%' />}
+                  customInput={<CustomInput customwidth='100%' />}
                   minDate={new Date()}
                 />
                 <FormControlLabel sx={{ mt: 2 }} control={<Checkbox disabled={isBeingAddedUpdated} checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label={<Translations text="Duration: Forever" />} />
