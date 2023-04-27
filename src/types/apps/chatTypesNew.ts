@@ -97,6 +97,7 @@ export type ChatContentType = {
   sendMsg?: (params: SendMsgParamsType) => void
   handleUserProfileRightSidebarToggle: () => void
   activeChat: IChatsList | null
+  activeChannel: string
 }
 
 export interface IChatsList {
@@ -127,6 +128,7 @@ export type ChatSidebarLeftType = {
   chatsList: IChatsList[]
   activeChat: IChatsList | null
   setActiveChat: (activeChat: IChatsList | null) => void
+  setActiveChannel: (activeChannel: string) => void
 }
 
 export type UserProfileLeftType = {
@@ -152,14 +154,18 @@ export type UserProfileRightType = {
 
 export type SendMsgComponentType = {
   store: ChatStoreType
-  dispatch: Dispatch<any>
-  sendMsg: (params: SendMsgParamsType) => void
+  // dispatch: Dispatch<any>
+  // sendMsg: (params: SendMsgParamsType) => void
+  activeChat: IChatsList | null
+  activeChannel: string
 }
 
 export type ChatLogType = {
   hidden: boolean
   userProfile: IChatsList
   chat: MessageType[]
+  isLoading: boolean
+  isRefetching: boolean
 }
 
 export type MessageType = {

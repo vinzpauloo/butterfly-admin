@@ -19,7 +19,8 @@ import { data } from 'src/@fake-db/apps/chat'
 
 // ** Hooks
 import { useSettings } from 'src/@core/hooks/useSettings'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '@/services/useAuth'
 
 // ** Utils Imports
 import { getInitials } from 'src/@core/utils/get-initials'
@@ -31,6 +32,7 @@ import ChatContent from 'src/views/apps/chatNew/ChatContent'
 
 // ** Service
 import ChatService from '@/services/api/ChatService'
+import { subscribeToChannel } from '@/services/pusher'
 
 const AppChat = () => {
   // ** States
@@ -39,6 +41,7 @@ const AppChat = () => {
   const [userProfileLeftOpen, setUserProfileLeftOpen] = useState<boolean>(false)
   const [userProfileRightOpen, setUserProfileRightOpen] = useState<boolean>(false)
   const [activeChat, setActiveChat] = useState<IChatsList | null>(null)
+  const [activeChannel, setActiveChannel] = useState<string>('')
 
   // ** Hooks
   const theme = useTheme()
@@ -48,6 +51,8 @@ const AppChat = () => {
   // const store = useSelector((state: RootState) => state.chat)
   // @ts-ignore
   const store: ChatStoreType = data
+  const auth = useAuth()
+  const queryClient = useQueryClient()
 
   // ** Vars
   const { skin } = settings
@@ -65,7 +70,7 @@ const AppChat = () => {
   const { getAllChats } = ChatService()
   const { data: chatsList } = useQuery({
     queryKey: ['chats'],
-    queryFn: () => getAllChats({ page: 1, paginate: 25 }),
+    queryFn: () => getAllChats({ page: 1, paginate: 1000 }),
     onSuccess: data => {
       console.log('getAllChats success', data)
     },
@@ -80,6 +85,27 @@ const AppChat = () => {
   // }, [dispatch])
 
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen)
+
+  useEffect(() => {
+    initializeNotificationChannel()
+  }, [])
+
+  const initializeNotificationChannel = () => {
+    const channel = auth.user && auth.user.id ? auth.user.id.toString() : ''
+
+    console.log('initializeNotificationChannel')
+    console.log('channel', channel)
+
+    const eventName = 'notification'
+    const callback = (data: any) => {
+      const callbackData = JSON.parse(data.message)
+      queryClient.invalidateQueries({ queryKey: ['chats'] })
+
+      console.log(`Callback for channel ${channel}`, callbackData)
+    }
+
+    subscribeToChannel(channel, eventName, callback)
+  }
 
   return (
     <Box
@@ -112,6 +138,7 @@ const AppChat = () => {
         chatsList={chatsList?.data}
         activeChat={activeChat}
         setActiveChat={setActiveChat}
+        setActiveChannel={setActiveChannel}
       />
       {/* @ts-ignore */}
       <ChatContent
@@ -125,6 +152,7 @@ const AppChat = () => {
         sidebarWidth={sidebarWidth}
         handleLeftSidebarToggle={handleLeftSidebarToggle}
         activeChat={activeChat}
+        activeChannel={activeChannel}
       />
     </Box>
   )

@@ -15,6 +15,8 @@ import PhotoGridCard from '../../shared-component/feed/PhotoGridCard'
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
 type videoPhotosProps = {
   data?: any
   handleFeedParams?: any
@@ -70,7 +72,8 @@ const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
                             return (
                               <img
                                 key={image._id}
-                                src={image.url.replace('http://localhost/', 'http://192.168.50.9/')}
+                                src={FILE_SERVER_URL + image.url}
+                                alt='photo'
                               />
                             )
                           })}

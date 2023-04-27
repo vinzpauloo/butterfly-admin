@@ -5,6 +5,7 @@ import { useRef, useEffect, Ref, ReactNode } from 'react'
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
+import { CircularProgress, Stack } from '@mui/material'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -30,6 +31,7 @@ import {
   MessageGroupType,
   FormattedChatsType
 } from 'src/types/apps/chatTypesNew'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)<ScrollBarProps & { ref: Ref<unknown> }>(({ theme }) => ({
   padding: theme.spacing(5)
@@ -37,14 +39,10 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)<ScrollBarProps & { re
 
 const ChatLog = (props: ChatLogType) => {
   // ** Props
-  const { hidden, userProfile, chat } = props
-
-  console.log('userProfile', userProfile)
-  console.log('chat', chat)
+  const { hidden, userProfile, chat, isLoading, isRefetching } = props
 
   // ** Hooks
   const auth = useAuth()
-  console.log('auth', auth)
 
   // ** Ref
   const chatArea = useRef(null)
@@ -104,7 +102,7 @@ const ChatLog = (props: ChatLogType) => {
       scrollToBottom()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chat])
+  }, [chat, isRefetching])
 
   // ** Renders user chat
   const renderChats = () => {
@@ -134,13 +132,13 @@ const ChatLog = (props: ChatLogType) => {
               }}
               {...(userProfile.photo && !isSender
                 ? {
-                    src: userProfile.photo,
+                    src: FILE_SERVER_URL + userProfile.photo,
                     alt: userProfile.username
                   }
                 : {})}
               {...(isSender
                 ? {
-                    src: userProfile.photo,
+                    src: FILE_SERVER_URL + auth.user?.photo,
                     alt: auth.user?.username
                   }
                 : {})}
@@ -216,7 +214,14 @@ const ChatLog = (props: ChatLogType) => {
 
   return (
     <Box sx={{ height: 'calc(100% - 8.4375rem)' }}>
-      <ScrollWrapper>{renderChats()}</ScrollWrapper>
+      {isLoading ? (
+        <Stack alignItems='center' height={'100%'} justifyContent='center'>
+          <CircularProgress size={48} sx={{ mr: 2 }} />
+        </Stack>
+      ) : (
+        <ScrollWrapper>{renderChats()}</ScrollWrapper>
+      )}
+      {/* <ScrollWrapper>{renderChats()}</ScrollWrapper> */}
     </Box>
   )
 }

@@ -33,6 +33,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
 import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const navData = [
   {
@@ -117,7 +118,7 @@ const columns = [
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <CustomAvatar
-              src={params.row.thumbnail_url}
+              src={FILE_SERVER_URL + params.row.thumbnail_url}
               sx={{ borderRadius: '5px', mr: 3, width: '4.875rem', height: '3rem' }}
             />
           </Box>

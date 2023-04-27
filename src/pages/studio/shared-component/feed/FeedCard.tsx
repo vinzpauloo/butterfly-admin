@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/system'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** Import Custom Components
 import FeedAttachments from './FeedAttachments'
@@ -52,7 +53,7 @@ const FeedCard = ({ string_story, user, children, datePublished }: FeedCardProps
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
             <Avatar
-              src={user && user?.photo?.replace('http://localhost/', `${baseURL}`)} // TBR
+              src={FILE_SERVER_URL + user && FILE_SERVER_URL + user?.photo} // TBR
               sx={{
                 width: 55,
                 height: 55,

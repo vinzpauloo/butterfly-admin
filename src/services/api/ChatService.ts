@@ -12,6 +12,7 @@ interface IChats {
 interface ISingleChatParams {
   channel: string
   page?: number
+  paginate?: number
 }
 
 interface INewChatParams {
@@ -40,12 +41,12 @@ const ChatService = () => {
     })
   }
 
-  const postChat = (body: INewChatParams) => {
+  const postChat = (data: INewChatParams) => {
     return request({
       headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}`, ...getHeaders() },
       url: '/web/chats',
       method: 'POST',
-      body
+      data
     })
   }
 
