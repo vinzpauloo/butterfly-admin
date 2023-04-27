@@ -10,19 +10,86 @@ import SalesAndAddedUsers from './components/SalesAndAddedUsers'
 import MonthlyProgressBarChart from './components/MonthlyProgress'
 import UsersGrowthDonutChart from './components/UsersGrowth'
 import CommissionDataBarChart from './components/CommissionData'
-import TopDonatorsLinearProgress from './components/TopDonatorsLinearProgress'
 
 // FAKE DATA
 const Donators = [
-  { name: 'Xiaomi Meng', amount: 100 },
-  { name: 'Xiaomi Meng', amount: 80 },
-  { name: 'Xiaomi Meng', amount: 70 },
-  { name: 'Xiaomi Meng', amount: 60 },
-  { name: 'Xiaomi Meng', amount: 50 },
-  { name: 'Xiaomi Meng', amount: 40 },
-  { name: 'Xiaomi Meng', amount: 30 },
-  { name: 'Xiaomi Meng', amount: 20 },
-  { name: 'Xiaomi Meng', amount: 10 }
+  {
+    name: 'Agent 1',
+    amount: 100,
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbAXJHDeDHZpin2Ipp-bYGUusSYtdNYSfnC2SR-Ccs&s'
+  },
+  {
+    name: 'Agent 2',
+    amount: 80,
+    image:
+      'https://e0.pxfuel.com/wallpapers/520/939/desktop-wallpaper-tzuyu-pics-on-twitter-korean-girl-groups-beautiful-girl-kpop-girls-chou-tzuyu.jpg'
+  },
+  {
+    name: 'Agent 3',
+    amount: 70,
+    image:
+      'https://lh3.googleusercontent.com/VuORb5_LMqVjM3yOCUXR-3Qaj2BMYquGH3U8zUr-8vAMxh0pTo74XA6YeFFJwnVQoFNWfR00kYgQzaUbki3kJzvAky5t8-cF=w960-rj-nu-e365'
+  },
+  {
+    name: 'Agent 4',
+    amount: 60,
+    image: 'https://t4.ftcdn.net/jpg/05/09/77/43/360_F_509774386_cluUI2zke6KYaiyWpQcyWYb2YUly6BD3.jpg'
+  },
+  {
+    name: 'Agent 5',
+    amount: 50,
+    image:
+      'https://media.istockphoto.com/id/544960416/photo/portrait-of-young-successful-woman-at-home-in-seoul.jpg?s=612x612&w=0&k=20&c=GnrI_vynkMl_hUgxwPj_h0NqjUFQEP46DTVwe71m9OU='
+  },
+  {
+    name: 'Agent 6',
+    amount: 40,
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVLfhxsHCNs2L94X6X9z77-p7Rb9URSxxVMg&usqp=CAU'
+  },
+  {
+    name: 'Agent 7',
+    amount: 30,
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQjGo6Z2XwBaL9oOJ9mj9RITz4dfr10ouX9w&usqp=CAU'
+  },
+  {
+    name: 'Agent 8',
+    amount: 20,
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlDmFNOStpnBAWj1wNpNq-2Zqx6pk-HOqrjy5RnTjFehF8iwmmTHCJM5JXET0M1qB9EA8&usqp=CAU'
+  },
+  {
+    name: 'Agent 9',
+    amount: 10,
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfi1lHNrGyVIsGDamFWEhdLoOHMlr8Bi83dA&usqp=CAU'
+  },
+  {
+    name: 'Agent 10',
+    amount: 20,
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS36nmFXBhuGdMXr5IS4nDNlspxF-XWdYkmZA&usqp=CAU'
+  },
+  {
+    name: 'Agent 11',
+    amount: 20,
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTExBHyg3upymaEIHfbi3zotS2d1L3FxD-r1Q&usqp=CAU'
+  },
+  {
+    name: 'Agent 12',
+    amount: 20,
+    image:
+      'https://media.herworld.com/public/2020/07/kbeauty-korean-beauty-hack-hair-parting-768x768.jpg?compress=true&quality=80&w=480&dpr=2.6'
+  },
+  {
+    name: 'Agent 13',
+    amount: 20,
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvSQvywDf_ApoJc4W9bn6ZNku1aRrBel7nCeNpk5eFdPHSbe-ep8KMD0o8h6DU8xEV9rs&usqp=CAU'
+  },
+  {
+    name: 'Agent 14',
+    amount: 20,
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-hxY4Vwo3czP2bnzFcBmqmo_nShaoTI4OMfO25LQoAx3m3Hgw8pUN8uh8YepJvKaLp4g&usqp=CAU'
+  }
 ]
 
 const AgentDashboard = () => {
@@ -34,11 +101,10 @@ const AgentDashboard = () => {
         <Stack sx={styles.leftWrap} gap={styles.gap244}>
           <SalesAndAddedUsers />
           <CommissionDataBarChart />
-          {/* <MonthlyProgressBarChart /> */}
-          <Stack>
+          <Stack sx={styles.linearProgressWrapper}>
             {Donators.map((item, index) => (
               <Stack key={index} direction='row' gap={4}>
-                <Avatar />
+                <Avatar src={item?.image} />
                 <Box width='100%'>
                   <Typography>{item.name}</Typography>
                   <LinearProgress
@@ -104,6 +170,10 @@ const styles = {
       lg: '30%'
     }
   },
+  linearProgressWrapper: {
+    overflowY: 'auto',
+    maxHeight: '40dvh'
+  },
 
   linearProgress: {
     height: 12,
@@ -114,7 +184,6 @@ const styles = {
       lg: '0px'
     }
   },
-  //
 
   containers: {
     width: {
