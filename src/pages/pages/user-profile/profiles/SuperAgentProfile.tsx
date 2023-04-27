@@ -1,18 +1,46 @@
 import React, { useState } from 'react'
 import { Box, Stack, Typography, TextField, Button, Avatar, CircularProgress } from '@mui/material'
 import UserService from '@/services/api/UserService'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '@/services/useAuth'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const SuperAgentProfile = () => {
   const [profilePhoto, setProfilePhoto] = useState<string>("")
   const [username, setUsername] = useState<string>("")
   const [email, setEmail] = useState<string>("")
 
+  //file to be send to back end - WIP
+  const [selectedProfPic, setSelectedProfPic] = useState('')
+  const [photoPreview, setPhotoPreview] = useState('')
+
+  const selectProfilePicture = (e: any) => {
+    const file = e.target.files[0]
+    if (file) {
+      setSelectedProfPic(file)
+      previewProfilePicture(file)
+    }
+  }
+
+  const previewProfilePicture = (file: any) => {
+    const reader: any = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result)
+    }
+  }
+
+  const auth = useAuth()
+
   // get super agent data based on bearer token
-  const { getSpecificContentCreator } = UserService();
+  const { getUser, updateUser } = UserService();
   const { isLoading } = useQuery({
-    queryKey: ["contentCreatorData"],
-    queryFn: () => getSpecificContentCreator(),
+    queryKey: ["superAgentData"],
+    queryFn: () => getUser({
+      data: {
+        user_id: auth?.user?.id,
+      }
+    }),
     onSuccess: (data) => {
       console.log(data)
       setProfilePhoto(data?.photo)
@@ -24,9 +52,36 @@ const SuperAgentProfile = () => {
     },
   });
 
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+  const { mutate: mutateUpdate, isLoading: updateLoading } = useMutation(updateUser, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["superAgentData"],
+      });
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
+  const UpdateProfile = () => {
+    mutateUpdate({
+      data: {
+        _method: 'put',
+        user_id: auth?.user?.id,
+        username: username,
+        email: email,
+      }
+    });
+  }
+
+  const isLoadingOrUpdated = isLoading || updateLoading
+
   return (
     <Box>
-      {isLoading ?
+      {isLoadingOrUpdated ?
         <Box height={400} position="relative">
           <CircularProgress sx={{ position: "absolute", margin: "auto", top: 0, left: 0, right: 0, bottom: 0 }} />
         </Box>
@@ -38,18 +93,22 @@ const SuperAgentProfile = () => {
           </Stack>
           <Stack direction={["column", "column", "row"]} gap={[10, 10, "10%"]}>
             <Stack width={["100%", "100%", "60%"]} gap={6}>
-              <Avatar sx={{ width: 200, height: 200 }} src={profilePhoto} />
+              <Avatar sx={{ width: 200, height: 200 }} src={photoPreview !== '' ? photoPreview : FILE_SERVER_URL + profilePhoto} />
+              <Button variant='contained' size='small' color='secondary' component='label' sx={{width:'max-content', marginLeft:14}}>
+                <input onChange={selectProfilePicture} type='file' hidden />
+                {profilePhoto === null ? "Upload" : "Change"}
+              </Button>
               <TextField
                 label="Username" variant="outlined" fullWidth value={username}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setUsername(event.target.value);
                 }}
               />
-              <Box display="flex" justifyContent="space-between" gap={[2, 6, 6]}>
+              <Box display="flex" flexDirection={['column', 'row']} justifyContent="space-between" gap={6}>
                 <TextField label="Password" type="password" variant="outlined" fullWidth />
                 <TextField label="Re-enter password" type="password" variant="outlined" fullWidth />
               </Box>
-              <Box display="flex" justifyContent="space-between" gap={[2, 6, 6]}>
+              <Box display="flex" flexDirection={['column', 'row']} justifyContent="space-between" gap={6}>
                 <TextField label="Name of Site" variant="outlined" fullWidth />
                 <TextField
                   label="Email Adress" type="email" variant="outlined" fullWidth value={email}
@@ -58,13 +117,13 @@ const SuperAgentProfile = () => {
                   }}
                 />
               </Box>
-              <Box display="flex" justifyContent="space-between" gap={[2, 6, 6]}>
+              <Box display="flex" flexDirection={['column', 'row']} justifyContent="space-between" gap={6}>
                 <TextField label="Company Name" variant="outlined" fullWidth />
                 <TextField label="Company Code" variant="outlined" fullWidth />
               </Box>
-              <Stack justifyContent="center" alignItems="center" direction="row" gap={[2, 6, 6]}>
-                <Button variant="outlined" color="error" sx={{ textTransform: "uppercase" }}>Cancel</Button>
-                <Button variant="outlined" color="primary" sx={{ textTransform: "uppercase" }}>Update</Button>
+              <Stack justifyContent="center" alignItems="center" direction="row" gap={6}>
+                {/* <Button variant="outlined" color="error" sx={{ textTransform: "uppercase" }}>Cancel</Button> */}
+                <Button variant="outlined" color="primary" sx={{ textTransform: "uppercase" }} onClick={UpdateProfile}>Update</Button>
               </Stack>
             </Stack>
             <Stack width={["100%", "100%", "30%"]} gap={6}>

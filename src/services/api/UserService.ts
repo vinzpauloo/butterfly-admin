@@ -9,10 +9,11 @@ interface IUserParams {
     page?: number;
     _method?: 'put'
 
-    //updating CC
+    //updating user
     username?: string
     email?: string
     biography?: string
+    mobile?: string
   };
   token?: string;
 }
@@ -20,7 +21,7 @@ interface IUserParams {
 const UserService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const getSpecificContentCreator = (params: IUserParams) => {
+  const getUser = (params: IUserParams) => {
     return request({
       headers: {
         ...getHeaders(),
@@ -33,7 +34,7 @@ const UserService = () => {
     });
   };
 
-  const updateContentCreator = (params: IUserParams) => {
+  const updateUser = (params: IUserParams) => {
     return request({
       headers: {
         ...getHeaders(),
@@ -49,7 +50,7 @@ const UserService = () => {
   };
 
 
-  return { getSpecificContentCreator, updateContentCreator }
+  return { getUser, updateUser }
 }
 
 export default UserService
