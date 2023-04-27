@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import { Box, Stack, Typography, Button, Avatar, TextField, CircularProgress } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download';
 import UserService from '@/services/api/UserService';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import formatDate from '@/utils/formatDate'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import { useAuth } from '@/services/useAuth';
 
 const AgentProfile = () => {
   const [agentID, setAgentID] = useState<number>()
@@ -12,6 +14,26 @@ const AgentProfile = () => {
   const [email, setEmail] = useState<string>("")
   const [mobileNo, setMobileNo] = useState<string>("")
   const [lastUpdate, setLastUpdate] = useState<string>("")
+
+  //file to be send to back end - WIP
+  const [selectedProfPic, setSelectedProfPic] = useState('')
+  const [photoPreview, setPhotoPreview] = useState('')
+
+  const selectProfilePicture = (e: any) => {
+    const file = e.target.files[0]
+    if (file) {
+      setSelectedProfPic(file)
+      previewProfilePicture(file)
+    }
+  }
+
+  const previewProfilePicture = (file: any) => {
+    const reader: any = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result)
+    }
+  }
   
   // AGENT FAKE DATA
   const agentFakeData = [
@@ -21,11 +43,17 @@ const AgentProfile = () => {
     { name: "Daily Active Users", amount: "200" },
   ]
 
+  const auth = useAuth()
+
   // get agent data based on bearer token
-  const { getSpecificContentCreator } = UserService();
+  const { getUser, updateUser } = UserService();
   const { isLoading } = useQuery({
-    queryKey: ["contentCreatorData"],
-    queryFn: () => getSpecificContentCreator(),
+    queryKey: ["agentData"],
+    queryFn: () => getUser({
+      data: {
+        user_id: auth?.user?.id
+      }
+    }),
     onSuccess: (data) => {
       console.log(data)
       setAgentID(data?.id)
@@ -40,9 +68,37 @@ const AgentProfile = () => {
     },
   });
 
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+  const { mutate: mutateUpdate, isLoading: updateLoading } = useMutation(updateUser, {
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["agentData"],
+      });
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
+
+  const UpdateProfile = () => {
+    mutateUpdate({
+      data: {
+        _method: 'put',
+        user_id: auth?.user?.id,
+        username: username,
+        email: email,
+        mobile: mobileNo
+      }
+    });
+  }
+
+  const isLoadingOrUpdated = isLoading || updateLoading
+
   return (
     <Box>
-      {isLoading ?
+      {isLoadingOrUpdated ?
         <Box height={400} position="relative">
           <CircularProgress sx={{ position: "absolute", margin: "auto", top: 0, left: 0, right: 0, bottom: 0 }} />
         </Box>
@@ -55,8 +111,11 @@ const AgentProfile = () => {
           <Stack direction={["column", "column", "row"]} gap={10}>
             <Stack width={["100%", "100%", "30%"]} flexDirection="column" gap={3}>
               <Box bgcolor="white" boxShadow={4} borderRadius={1} justifyContent="center" display="flex" flexDirection="column" alignItems="center" py={6} gap={2}>
-                <Avatar alt="Remy Sharp" sx={{ width: 200, height: 200 }} src={profilePhoto} />
-                <Button variant="contained" color="secondary" size="small">Upload Image</Button>
+                <Avatar alt="Remy Sharp" sx={{ width: 200, height: 200 }} src={photoPreview !== '' ? photoPreview : FILE_SERVER_URL + profilePhoto} />
+                <Button variant="contained" color="secondary" size="small" component='label'>
+                  Upload Image
+                  <input onChange={selectProfilePicture} type='file' hidden />
+                </Button>
                 <Typography fontWeight={500}>Agent Code: {agentID}</Typography>
               </Box>
               {agentFakeData.map((item, index) =>
@@ -84,7 +143,7 @@ const AgentProfile = () => {
                 </Box>
                 <Box display="flex" justifyContent="space-between" gap={[2, 6, 6]}>
                   <TextField
-                    label="Mobile Number" type="number" variant="outlined" fullWidth sx={textFieldStyle} value={mobileNo}
+                    label="Mobile Number" variant="outlined" fullWidth sx={textFieldStyle} value={mobileNo}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                       setMobileNo(event.target.value);
                     }}
@@ -98,8 +157,8 @@ const AgentProfile = () => {
                 </Box>
               </Stack>
               <Stack justifyContent="center" alignItems="center" direction="row" gap={[2, 6, 6]}>
-                <Button variant="outlined" color="error" sx={{ textTransform: "uppercase" }}>Cancel</Button>
-                <Button variant="outlined" color="primary" sx={{ textTransform: "uppercase" }}>Update</Button>
+                {/* <Button variant="outlined" color="error" sx={{ textTransform: "uppercase" }}>Cancel</Button> */}
+                <Button variant="outlined" color="primary" sx={{ textTransform: "uppercase" }} onClick={UpdateProfile}>Update</Button>
               </Stack>
             </Stack>
           </Stack>

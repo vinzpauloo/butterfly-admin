@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
+import { useAuth } from '@/services/useAuth'
 
 type SortType = 'asc' | 'desc' | undefined | null
 
@@ -22,13 +23,17 @@ const VersionsTable = () => {
   const { columns } = MenuItemData()
 
   const [rowData, setRowData] = useState<[]>([])
-  const [siteId, setSiteId] = useState<string | undefined>()
+  const [siteId, setSiteId] = useState<string | undefined>('')
 
   const [sort] = useState<SortType>('desc')
   const [sortName] = useState<string>('created_at')
 
+  const { user } = useAuth()
+
   useEffect(() => {
-    setSiteId(selectedSite)
+    if (user?.role === 'GOD') {
+      setSiteId(selectedSite)
+    }
   }, [selectedSite])
 
   const { isLoading, isRefetching } = useQuery({

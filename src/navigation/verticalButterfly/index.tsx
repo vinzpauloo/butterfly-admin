@@ -3,8 +3,8 @@ import { VerticalNavItemsType } from 'src/@core/layouts/types'
 import { useAuth } from '@/services/useAuth'
 
 const Navigation = (): VerticalNavItemsType => {
-  const auth = useAuth()
-  
+  const { user } = useAuth()
+
   return [
     {
       sectionTitle: 'Main'
@@ -36,24 +36,27 @@ const Navigation = (): VerticalNavItemsType => {
       action: 'read',
       subject: 'shared-page',
       path: '/transactions',
-      children: auth?.user?.role === "GOD"  ? [
-        {
-          title: 'Donations',
-          path: '/transactions/donations',
-        },
-        {
-          title: 'Commissions',
-          path: '/transactions/commissions',
-        },
-        {
-          title: 'Withdrawal',
-          path: '/transactions/withdrawal',
-        },
-        {
-          title: 'Security Funds',
-          path: '/transactions/security-funds',
-        }
-      ] : undefined
+      children:
+        user?.role === 'GOD'
+          ? [
+              {
+                title: 'Donations',
+                path: '/transactions/donations'
+              },
+              {
+                title: 'Commissions',
+                path: '/transactions/commissions'
+              },
+              {
+                title: 'Withdrawal',
+                path: '/transactions/withdrawal'
+              },
+              {
+                title: 'Security Funds',
+                path: '/transactions/security-funds'
+              }
+            ]
+          : undefined
     },
     {
       title: 'Reports',
@@ -75,7 +78,7 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Security Funds',
           path: '/reports/securityFunds'
-        },
+        }
       ]
     },
     {
@@ -134,11 +137,15 @@ const Navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'Advertisement',
-          path: '/settings/pages/ads'
+          path: '/settings/pages/ads',
+          action: 'read',
+          subject: 'sa-page'
         },
         {
           title: 'Announcement',
-          path: '/settings/pages/announcements'
+          path: '/settings/pages/announcements',
+          action: 'read',
+          subject: 'sa-page'
         },
         {
           title: 'Privacy Policy',
@@ -171,7 +178,9 @@ const Navigation = (): VerticalNavItemsType => {
     {
       title: 'Versions',
       icon: 'mdi:source-branch',
-      path: '/versions'
+      path: '/versions',
+      action: 'read',
+      subject: 'sa-page'
     }
   ]
 }

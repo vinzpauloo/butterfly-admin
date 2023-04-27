@@ -6,7 +6,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import Translations from '../../../layouts/components/Translations'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import AnnoucementsService from "../../../services/api/AnnoucementsService";
+import AnnoucementsService from '../../../services/api/AnnoucementsService'
 
 const Announcements = () => {
   // in case pagination is added on backend
@@ -17,45 +17,54 @@ const Announcements = () => {
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [data, setData] = useState([])
-  const [announcementID, setAnnouncementID] = useState<string>("")
+  const [announcementID, setAnnouncementID] = useState<string>('')
   const [modalInfo, setModalInfo] = useState({
-    parentID: "",
-    id: "",
-    title: "",
-    description: "",
-    start_date: "",
-    end_date: "",
+    parentID: '',
+    id: '',
+    title: '',
+    description: '',
+    start_date: '',
+    end_date: '',
     active: true
   })
 
   // FETCH ALL ADMIN ANNOUNCEMENT
   const { getAllAnnouncement, updateAnnouncement } = AnnoucementsService()
   const { isLoading } = useQuery({
-    queryKey: ["allAnnouncement"],
-    queryFn: () => getAllAnnouncement({ data: { with: "introductions", site_id: 0 } }),
-    onSuccess: (data) => {
+    queryKey: ['allAnnouncement'],
+    queryFn: () => getAllAnnouncement({ data: { with: 'introductions', site_id: 0 } }),
+    onSuccess: data => {
       setAnnouncementID(data?._id)
       setData(data?.introductions)
     },
-    onError: (error) => { console.log(error) }
+    onError: error => {
+      console.log(error)
+    }
   })
 
   // Get QueryClient from the context
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const { mutate: mutateUpdateAnnouncement, isLoading: updateLoading } = useMutation(updateAnnouncement, {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: data => {
+      console.log(data)
       queryClient.invalidateQueries({
-        queryKey: ["allAnnouncement"],
-      });
+        queryKey: ['allAnnouncement']
+      })
     },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+    onError: error => {
+      console.log(error)
+    }
+  })
 
-  const openEditModal = (id: string, title: string, description: string, start_date: string, end_date: any, active: boolean) => {
+  const openEditModal = (
+    id: string,
+    title: string,
+    description: string,
+    start_date: string,
+    end_date: any,
+    active: boolean
+  ) => {
     setIsEditing(true)
     setOpenModal(true)
 
@@ -68,7 +77,7 @@ const Announcements = () => {
       start_date: start_date,
       end_date: end_date,
       active: active
-    })    
+    })
   }
 
   const handleOpen = () => {
@@ -86,54 +95,62 @@ const Announcements = () => {
       announcementID: id,
       data: {
         active: active === true ? 1 : 0,
-        _method: "put"
-      },
+        _method: 'put'
+      }
     })
   }
 
   const columns = [
-    { field: 'title', renderHeader: () => <Translations text="Title" />, minWidth: 100, flex: 0.05, },
-    { field: 'description', renderHeader: () => <Translations text="Description" />, minWidth: 200, flex: 0.15, },
+    { field: 'title', renderHeader: () => <Translations text='Title' />, minWidth: 100, flex: 0.05 },
+    { field: 'description', renderHeader: () => <Translations text='Description' />, minWidth: 200, flex: 0.15 },
     {
       field: 'start_date',
-      renderHeader: () => <Translations text="Start Date" />,
+      renderHeader: () => <Translations text='Start Date' />,
       minWidth: 120,
       flex: 0.03,
-      renderCell: (params: GridRenderCellParams) => params.row.start_date.split("T")[0]
+      renderCell: (params: GridRenderCellParams) => params.row.start_date.split('T')[0]
     },
     {
       field: 'end_date',
-      renderHeader: () => <Translations text="End Date" />,
+      renderHeader: () => <Translations text='End Date' />,
       minWidth: 120,
       flex: 0.03,
-      renderCell: (params: GridRenderCellParams) => params.row.end_date === null ? "None" : params.row.end_date.split("T")[0]
+      renderCell: (params: GridRenderCellParams) =>
+        params.row.end_date === null ? 'None' : params.row.end_date.split('T')[0]
     },
     {
       field: 'active',
-      renderHeader: () => <Translations text="Active" />,
+      renderHeader: () => <Translations text='Active' />,
       minWidth: 85,
       flex: 0.02,
-      renderCell: (params: GridRenderCellParams) =>
+      renderCell: (params: GridRenderCellParams) => (
         <Switch checked={params.value} onClick={() => activateDeactivateAnnouncement(params.row._id, !params.value)} />
+      )
     },
     {
       field: 'action',
-      renderHeader: () => <Translations text="Action" />,
+      renderHeader: () => <Translations text='Action' />,
       minWidth: 85,
       flex: 0.02,
-      renderCell: (params: GridRenderCellParams) => 
+      renderCell: (params: GridRenderCellParams) => (
         <Box>
-          <Button onClick={() => openEditModal(
-              params.row._id,
-              params.row.title,
-              params.row.description,
-              params.row.start_date,
-              params.row.end_date,
-              params.row.active)}>
+          <Button
+            onClick={() =>
+              openEditModal(
+                params.row._id,
+                params.row.title,
+                params.row.description,
+                params.row.start_date,
+                params.row.end_date,
+                params.row.active
+              )
+            }
+          >
             <EditOutlinedIcon sx={styles.icon} />
           </Button>
         </Box>
-    },
+      )
+    }
   ]
 
   return (
@@ -142,9 +159,13 @@ const Announcements = () => {
         <Card>
           <Box sx={styles.header}>
             <Box sx={styles.announcements}>
-              <Typography sx={styles.announceText}><Translations text={"Announcement"} /></Typography>
+              <Typography sx={styles.announceText}>
+                <Translations text={'Announcement'} />
+              </Typography>
             </Box>
-            <Button variant="contained" onClick={handleOpen}>+ <Translations text="Add New Announcements"/></Button>
+            <Button variant='contained' onClick={handleOpen}>
+              + <Translations text='Add New Announcements' />
+            </Button>
           </Box>
           <Divider />
           <DataGrid
@@ -157,7 +178,7 @@ const Announcements = () => {
             loading={isLoading || updateLoading}
             getRowId={row => row._id}
             rowsPerPageOptions={[5, 10, 15]}
-            
+
             // in case pagination is added on backend
             // pagination
             // pageSize={pageSize}
@@ -239,6 +260,11 @@ const styles = {
     color: '#98A9BC',
     fontSize: 30
   }
+}
+
+Announcements.acl = {
+  action: 'read',
+  subject: 'sa-page'
 }
 
 export default Announcements

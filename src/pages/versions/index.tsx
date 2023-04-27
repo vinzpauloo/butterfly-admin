@@ -18,4 +18,9 @@ const Versions = () => {
   )
 }
 
+Versions.acl = {
+  action: 'read',
+  subject: 'sa-page'
+}
+
 export default Versions
