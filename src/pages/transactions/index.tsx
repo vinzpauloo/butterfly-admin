@@ -8,8 +8,6 @@ import Header from '@/pages/transactions/components/Header'
 import Table from '@/pages/transactions/components/Table'
 import TabLists from '@/pages/transactions/components/TabLists'
 
-import { useAuth } from '@/services/useAuth'
-import AgentTransactions from './agentTransactions'
 
 
 function index({
@@ -33,10 +31,7 @@ function index({
     setActiveTab(pathName)
   }, [router.pathname])
 
-  const auth = useAuth()
-
-  if (auth?.user?.role === "AGENT") return <AgentTransactions/>
-  else return (
+  return (
     <Container>
       <Header />
       {children}
@@ -53,11 +48,6 @@ function index({
       />
     </Container>
   )
-}
-
-index.acl = {
-  action: 'read',
-  subject: 'shared-page'
 }
 
 export default index

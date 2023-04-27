@@ -178,4 +178,9 @@ function index() {
   )
 }
 
+index.acl = {
+  action: 'read',
+  subject: 'shared-page'
+}
+
 export default index

@@ -36,27 +36,34 @@ const Navigation = (): VerticalNavItemsType => {
       action: 'read',
       subject: 'shared-page',
       path: '/transactions',
-      children:
-        user?.role === 'GOD'
-          ? [
-              {
-                title: 'Donations',
-                path: '/transactions/donations'
-              },
-              {
-                title: 'Commissions',
-                path: '/transactions/commissions'
-              },
-              {
-                title: 'Withdrawal',
-                path: '/transactions/withdrawal'
-              },
-              {
-                title: 'Security Funds',
-                path: '/transactions/security-funds'
-              }
-            ]
-          : undefined
+
+      // ONLY SOME DROPDOWNS ARE AVAILABLE TO CERTAIN USERS - WIP
+      children: [
+        {
+          title: 'Donations',
+          path: '/transactions/donations',
+          action: 'read',
+          subject: 'shared-page',
+        },
+        {
+          title: 'Commissions',
+          path: '/transactions/commissions',
+          action: 'read',
+          subject: 'shared-page',
+        },
+        {
+          title: 'Withdrawal',
+          path: '/transactions/withdrawal',
+          action: 'read',
+          subject: 'shared-page',
+        },
+        {
+          title: 'Security Funds',
+          path: '/transactions/security-funds',
+          action: 'read',
+          subject: 'shared-page',
+        }
+      ]
     },
     {
       title: 'Reports',
