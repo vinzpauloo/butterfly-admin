@@ -11,6 +11,7 @@ import { GridRenderCellParams } from '@mui/x-data-grid'
 // ** Project Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import Icon from 'src/@core/components/icon'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** Utils Imports
 import formatDate from '@/utils/formatDate'
@@ -68,7 +69,9 @@ export const AlbumColumns = () => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <CustomAvatar
-                src={params?.row.cover.cover_photo || params?.row.cover[0].cover_photo}
+                src={
+                  FILE_SERVER_URL + params?.row.cover.cover_photo || FILE_SERVER_URL + params?.row.cover[0].cover_photo
+                }
                 sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
               />
             </Box>
