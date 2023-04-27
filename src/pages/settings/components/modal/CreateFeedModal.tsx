@@ -29,11 +29,9 @@ import Icon from 'src/@core/components/icon'
 import { useForm, Controller } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
-import Dropzone from 'dropzone'
 
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
-import TUSService from '@/services/api/TusService'
 import { useUsersTable } from '@/services/api/useUsersTable'
 import { useQuery } from '@tanstack/react-query'
 
@@ -43,9 +41,21 @@ import { useTranslateString } from '@/utils/TranslateString'
 import { useAuth } from '@/services/useAuth'
 import VideoService from '@/services/api/VideoService'
 
+// ** Uploady
+import { useUploady, useItemProgressListener, useItemStartListener, useItemFinishListener } from '@rpldy/uploady'
+import { asUploadButton } from '@rpldy/upload-button'
+import { StudioContextType } from '@/pages/studio/upload'
+
+// ** Base Links
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+
+// Reuse
+import ProgressCircularWithLabel from '@/layouts/components/shared-components/ProgressCircular'
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
+  context?: StudioContextType | null
 }
 
 type Inputs = {
@@ -66,65 +76,48 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   '& .MuiSelect-select': {}
 }))
 
-const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+// ** Custom Upload Button Component
+const UploadVideoButton = asUploadButton(
+  React.forwardRef((props, ref) => (
+    <Box {...props} sx={styles.button}>
+      <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
+      <Button sx={styles.upload}>Upload Video</Button>
+    </Box>
+  ))
+)
+
+const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => {
   const auth = useAuth()
 
-  // useEffect(() => {
-  //   if (dropzoneRef.current) {
-  //     Dropzone.autoDiscover = false
-
-  //     const myDropzone = new Dropzone(dropzoneRef.current, {
-  //       url: 'http://192.168.50.9:8000/api/videos/upload?reference_media_id=9905dccc-c56a-462b-b4f4-2a7100f36b30',
-  //       chunking: true,
-  //       forceChunking: true,
-  //       parallelChunkUploads: true,
-  //       chunkSize: 5 * 1024 * 1024, // 5MB
-  //       retryChunks: true,
-  //       retryChunksLimit: 3,
-  //       maxFilesize: 500000000, // 500MB
-  //       timeout: 180000, // 3 minutes
-  //       init: function () {
-  //         this.on('totaluploadprogress', function (progress) {
-  //           const progressBar = document.querySelector('#progress-bar .progress') as HTMLElement
-  //           if (progressBar) {
-  //             progressBar.style.width = progress + '%'
-  //           }
-  //         })
-
-  //         this.on('sending', function (file: CustomDropzoneFile, xhr) {
-  //           xhr.ontimeout = () => {
-  //             let retries = file.retries || 0
-  //             if (retries < 3) {
-  //               setTimeout(() => {
-  //                 this.processFile(file)
-  //               }, 5000)
-  //               retries += 1
-  //               file.retries = retries
-  //             } else {
-  //               this._errorProcessing([file], 'Upload timeout.')
-  //             }
-  //           }
-  //         })
-
-  //         this.on('complete', function (file: any) {
-  //           if (file.xhr.status === 200) {
-  //             alert('Upload successful!')
-  //           } else {
-  //             alert('Upload failed!')
-  //           }
-  //         })
-  //       }
-  //     })
-
-  //     return () => {
-  //       myDropzone.destroy()
-  //     }
-  //   }
-  // }, [])
-
+  // ** STATES
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
   const [feedVideo, setFeedVideo] = React.useState<File[]>([])
+  const [videoUploading, setVideoUploading] = React.useState<boolean>(false)
+
+  // ** Uploady PROGRESS
+  const [progress, setProgess] = React.useState<number>(0)
+
+  const progressData = useItemProgressListener()
+
+  if (progressData && progressData.completed > progress) {
+    setProgess(() => progressData.completed)
+  }
+
+  useItemStartListener(item => {
+    setVideoUploading(true)
+  })
+
+  useItemFinishListener((item) => {
+    console.log(`item ${item.id} finished uploading, response was: `, item.uploadResponse, item.uploadStatus);  
+    reset({
+      string_story : '',
+      tags :'',
+    })
+    setVideoUploading(false)
+    setIsLoading(false)
+    onClose()
+  });
 
   // ** APIs and Tanstacks
   const { getAllDataFromCreator } = useUsersTable()
@@ -144,9 +137,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     formState: { errors }
   } = useForm<Inputs>()
 
-  // ** References
-  const videoRef = React.useRef()
-
+  // ** React-Dropzone Image
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 9,
     accept: {
@@ -164,25 +155,9 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
   })
 
-  //upload video
-  const { getRootProps: getVidRootProps, getInputProps: getVidInputProps } = useDropzone({
-    multiple: false,
-    accept: {
-      'video/*': ['.mp4', '.avi']
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      let videoFile = acceptedFiles.map((file: File) => Object.assign(file))
-      setFeedVideo(videoFile)
-      setValue('video', videoFile[0])
-    },
-    onDropRejected: () => {
-      toast.error(`You can only upload ${limitFiles} images`, {
-        duration: 2000
-      })
-    }
-  })
+  // ** React-Dropzone Video
 
-  //use api service
+  // ** Use api service
   const { uploadFeed } = FeedsService()
   const { uploadVideoURL } = VideoService()
 
@@ -190,64 +165,59 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     onClose()
   }
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
+
+    setIsLoading(true)
+
     let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
-    const { video } = getValues()
+    const hasVideoFile = (uploady.getInternalFileInput()?.current?.value == '') ? false : true
 
-    if (video != undefined) {
+    if (hasVideoFile) {
       console.log('there is a video')
+
+      let videoName = ''
+
+      // CORRECT THIS TYPESCRIPT NULL
+      if ( uploady.getInternalFileInput()?.current == null || uploady.getInternalFileInput()?.current == undefined ) {
+        videoName = ''
+      } else {
+        // @ts-ignore: Object is possibly 'null'.
+        videoName = uploady.getInternalFileInput()?.current?.files[0].name
+      }
 
       const feedHeaderData = {
         ...(hasUserID && { user_id: getValues()?.user_id }),
-        video_name: video.name,
+        video_name: videoName,
         video_type: 'feed_video'
       }
-
       uploadVideoURL({ formData: feedHeaderData }).then(res => {
         console.log('res', res)
         const { uploadUrl } = res
 
-        console.log('videoRef', videoRef)
+        // Choose PION upload
+        context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
 
-        const myDropzone = new Dropzone(videoRef.current, {
-          url: uploadUrl,
-          chunking: true,
-          forceChunking: true,
-          parallelChunkUploads: true,
-          chunkSize: 5 * 1024 * 1024, // 5MB
-          retryChunks: true,
-          retryChunksLimit: 3,
-          retryChunksInterval: 5000,
-          maxFilesize: 500000000, // 500MB
-          timeout: 180000, // 3 minutes
-          init: function () {
-            this.on('totaluploadprogress', function (progress) {
-              console.log(progress + '%')
-            })
-            this.on('complete', function (file) {
-              if (file.xhr.status === 200) {
-                alert('Upload successful!')
-              } else {
-                alert('Upload failed!')
-              }
-            })
+        uploady.processPending({
+          destination: {
+            url : STREAMING_SERVER_URL + uploadUrl
           }
         })
+
       }) // end uploadURL
     } else {
+      
       // HAS NO VIDEO - continue upload Feed
 
       uploadFeed({ formData: formData }).then(data => {
         console.log('data', data)
         toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
         onClose()
+        // TURN OF LOADING
         setIsLoading(false)
         reset()
       })
     }
-
-    setIsLoading(true)
   }
 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
@@ -313,19 +283,28 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   const TranslateString = useTranslateString()
 
+  // ** Uploady
+  const uploady = useUploady()
+
+  const uploadyStartUpload = () => {
+    let pendingFiles = uploady.getInternalFileInput()?.current?.files
+    if (!pendingFiles) {
+      console.log('NO FILE YET')
+      return
+    }
+    //start upload
+    uploady.processPending()
+  }
+
   return (
-    <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'sm'}>
+    <Dialog open={isOpen} fullWidth={true} maxWidth={'sm'}>
       <DialogContent sx={{ ...styles.dialogContent, bgcolor: theme => theme.customBflyColors.primary }}>
         <Box>
           <DialogTitle color={theme => theme.customBflyColors.primaryTextContrast} sx={styles.title}>
             {TranslateString('Upload NewsFeeds')}
           </DialogTitle>
         </Box>
-        {isLoading ? (
-          <Box sx={{ textAlign: 'center' }}>
-            <CircularProgress color='success' />
-          </Box>
-        ) : (
+        
           <>
             {auth?.user?.role != 'CC' && (
               <Box sx={{ ...styles.textContainer, marginBlock: '1rem' }}>
@@ -390,20 +369,23 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             </Box>
 
             <Box sx={styles.buttonContainer}>
-              <div ref={videoRef} id='videodz' {...getVidRootProps({ className: 'dropzone' })}>
-                <input {...getVidInputProps()} />
-                <Box sx={styles.button}>
-                  <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>{TranslateString('Upload Video')}</Button>
-                  {feedVideo.length != 0 ? <p>Selected 1 video</p> : null}
-                </Box>
-              </div>
+              <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
+                {!videoUploading ? (
+                  <UploadVideoButton />
+                ) : (
+                  <Box sx={{ textAlign: 'center' }}>
+                    <ProgressCircularWithLabel progress={progress} />
+                  </Box>
+                )}
+              </Box>
 
               <div {...getRootProps({ className: 'dropzone' })}>
                 <input {...getInputProps()} />
                 <Box sx={styles.button}>
                   <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>{TranslateString('Upload Photo')}</Button>
+                  <Button 
+                    disabled={ isLoading ? true : false }
+                    sx={styles.upload}>{TranslateString('Upload Photo')}</Button>
                 </Box>
               </div>
 
@@ -427,10 +409,14 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             </Box>
 
             <Box sx={styles.bottomBtnContainer}>
-              <Button onClick={handleCancel} sx={styles.bottomBtn}>
+              <Button 
+                disabled={ isLoading ? true : false }
+                onClick={handleCancel} 
+                sx={styles.bottomBtn}>
                 {TranslateString('Cancel')}
               </Button>
               <Button
+                disabled={ isLoading ? true : false }
                 onClick={() => {
                   handlePublish()
                 }}
@@ -440,7 +426,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
               </Button>
             </Box>
           </>
-        )}
+        
       </DialogContent>
     </Dialog>
   )
