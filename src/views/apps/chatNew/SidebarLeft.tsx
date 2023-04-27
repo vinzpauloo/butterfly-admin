@@ -4,6 +4,9 @@ import { useState, useEffect, ChangeEvent, ReactNode } from 'react'
 // ** Next Imports
 import { useRouter } from 'next/router'
 
+// ** Hooks
+import { useAuth } from '@/services/useAuth'
+
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
@@ -27,6 +30,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Types
 import { ContactType, ChatSidebarLeftType, ChatsArrType, IChatsList } from 'src/types/apps/chatTypesNew'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: boolean }) => {
   if (hidden) {
@@ -62,7 +66,8 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
     handleLeftSidebarToggle,
     chatsList,
     activeChat,
-    setActiveChat
+    setActiveChat,
+    setActiveChannel
   } = props
 
   // ** States
@@ -73,9 +78,13 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
 
   // ** Hooks
   const router = useRouter()
+  const auth = useAuth()
 
   const handleChatClick = (chat: IChatsList) => {
+    const channel = `${chat?._id}-${auth.user?.id}` || ''
+
     setActiveChat(chat)
+    setActiveChannel(channel)
     if (!mdAbove) {
       handleLeftSidebarToggle()
     }
@@ -84,11 +93,13 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
   useEffect(() => {
     router.events.on('routeChangeComplete', () => {
       setActiveChat(null)
+      setActiveChannel('')
       // dispatch(removeSelectedChat())
     })
 
     return () => {
       setActiveChat(null)
+      setActiveChannel('')
       // dispatch(removeSelectedChat())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,7 +144,7 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                   >
                     {chat.photo && (
                       <MuiAvatar
-                        src={chat.photo}
+                        src={FILE_SERVER_URL + chat.photo}
                         alt={chat.username}
                         sx={{
                           width: 38,

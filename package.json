@@ -61,6 +61,7 @@
     "nprogress": "0.2.0",
     "payment": "2.4.6",
     "prismjs": "1.29.0",
+    "pusher-js": "^8.0.2",
     "react": "18.2.0",
     "react-apexcharts": "1.4.0",
     "react-beautiful-dnd": "^13.1.1",

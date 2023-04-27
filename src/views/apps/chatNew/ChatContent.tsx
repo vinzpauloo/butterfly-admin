@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 
 // ** MUI Imports
 import Badge from '@mui/material/Badge'
@@ -18,7 +18,7 @@ import SendMsgForm from 'src/views/apps/chatNew/SendMsgForm'
 import OptionsMenu from 'src/@core/components/option-menu'
 
 // ** Hooks
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/services/useAuth'
 
 // ** Types
@@ -26,6 +26,8 @@ import { ChatContentType } from 'src/types/apps/chatTypesNew'
 
 // ** Service
 import ChatService from '@/services/api/ChatService'
+import { subscribeToChannel } from '@/services/pusher'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** Styled Components
 const ChatWrapperStartChat = styled(Box)<BoxProps>(({ theme }) => ({
@@ -51,20 +53,23 @@ const ChatContent = (props: ChatContentType) => {
     getInitials,
     sidebarWidth,
     handleLeftSidebarToggle,
-    activeChat
+    activeChat,
+    activeChannel
   } = props
 
   // ** Hooks
   const auth = useAuth()
-
-  // ** Contants
-  const channel = `${activeChat?._id}-${auth.user?.id}` || ''
+  const queryClient = useQueryClient()
 
   // ** React Query
   const { getSingleChat } = ChatService()
-  const { data: singleChatData } = useQuery({
-    queryKey: ['singleChat', channel],
-    queryFn: () => getSingleChat({ channel }),
+  const {
+    data: singleChatData,
+    isLoading,
+    isRefetching
+  } = useQuery({
+    queryKey: ['singleChat', activeChannel],
+    queryFn: () => getSingleChat({ channel: activeChannel, paginate: 1000 }),
     onSuccess: data => {
       console.log('getSingleChat success ...', data)
     },
@@ -73,6 +78,27 @@ const ChatContent = (props: ChatContentType) => {
     },
     enabled: !!activeChat?._id
   })
+
+  useEffect(() => {
+    if (activeChannel) initializeChatChannel()
+    console.log('useEffect activeChannel', activeChannel)
+  }, [activeChannel])
+
+  const initializeChatChannel = () => {
+    console.log('initializeChatChannel')
+    console.log('activeChannel', activeChannel)
+
+    const eventName = 'message'
+    const callback = (data: any) => {
+      const callbackData = JSON.parse(data.message)
+      // queryClient.invalidateQueries({ queryKey: ['singleChat', activeChannel] })
+      queryClient.invalidateQueries({ queryKey: ['chats'] })
+
+      console.log(`Callback for channel ${activeChannel}`, callbackData)
+    }
+
+    subscribeToChannel(activeChannel, eventName, callback)
+  }
 
   const handleStartConversation = () => {
     if (!mdAbove) {
@@ -157,7 +183,7 @@ const ChatContent = (props: ChatContentType) => {
                 sx={{ mr: 3 }}
               >
                 <MuiAvatar
-                  src={selectedChat.photo}
+                  src={FILE_SERVER_URL + selectedChat.photo}
                   alt={selectedChat.username}
                   sx={{ width: '2.375rem', height: '2.375rem' }}
                 />
@@ -171,7 +197,7 @@ const ChatContent = (props: ChatContentType) => {
             </Box>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {mdAbove ? (
               <Fragment>
                 <IconButton size='small' sx={{ color: 'text.secondary' }}>
@@ -192,17 +218,25 @@ const ChatContent = (props: ChatContentType) => {
               iconButtonProps={{ size: 'small', sx: { color: 'text.secondary' } }}
               options={['View Contact', 'Mute Notifications', 'Block Contact', 'Clear Chat', 'Report']}
             />
-          </Box>
+          </Box> */}
         </Box>
 
         {/* @ts-ignore */}
-        <ChatLog hidden={hidden} userProfile={selectedChat} chat={singleChatData?.data || []} />
+        <ChatLog
+          hidden={hidden}
+          userProfile={selectedChat}
+          chat={singleChatData?.data || []}
+          isLoading={isLoading}
+          isRefetching={isRefetching}
+        />
 
         <SendMsgForm
           // @ts-ignore
           store={store}
           //  dispatch={dispatch}
           //  sendMsg={sendMsg}
+          activeChat={activeChat}
+          activeChannel={activeChannel}
         />
       </Box>
     )

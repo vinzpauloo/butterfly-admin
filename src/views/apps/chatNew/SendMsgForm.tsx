@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField'
 import Box, { BoxProps } from '@mui/material/Box'
 
 // ** Types
-import { SendMsgComponentType } from 'src/types/apps/chatTypes'
+import { SendMsgComponentType } from 'src/types/apps/chatTypesNew'
 
 // ** Hooks
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -33,7 +33,7 @@ const Form = styled('form')(({ theme }) => ({
 
 const SendMsgForm = (props: SendMsgComponentType) => {
   // ** Props
-  const { store, dispatch, sendMsg } = props
+  const { store, activeChat, activeChannel } = props
 
   // ** State
   const [msg, setMsg] = useState<string>('')
@@ -41,17 +41,27 @@ const SendMsgForm = (props: SendMsgComponentType) => {
   const { postChat } = ChatService()
 
   // ** use to PUT or update the workgroup
-  const { mutate: mutatePostChat } = useMutation(postChat, {
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['search-workgroup'] })
+  const { mutate: mutatePostChat, isLoading } = useMutation(postChat, {
+    onSuccess: data => {
+      console.log('mutatePostChat success', data)
+      queryClient.invalidateQueries({ queryKey: ['singleChat', activeChannel] })
+      queryClient.invalidateQueries({ queryKey: ['chats'] })
+      setMsg('')
+    },
+    onError: error => {
+      console.log('mutatePostChat error', error)
+    }
   })
 
   const handleSendMsg = (e: SyntheticEvent) => {
     e.preventDefault()
-    if (store && store.selectedChat && msg.trim().length) {
-      dispatch(sendMsg({ ...store.selectedChat, message: msg }))
+
+    if (activeChat?._id && activeChannel && msg.trim().length) {
+      mutatePostChat({
+        message: msg,
+        to_id: activeChat._id
+      })
     }
-    setMsg('')
-    console.log('msg', msg)
   }
 
   return (
@@ -65,6 +75,7 @@ const SendMsgForm = (props: SendMsgComponentType) => {
             placeholder='Type your message here…'
             onChange={e => setMsg(e.target.value)}
             sx={{ '& .MuiOutlinedInput-input': { pl: 0 }, '& fieldset': { border: '0 !important' } }}
+            disabled={isLoading}
           />
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -75,7 +86,7 @@ const SendMsgForm = (props: SendMsgComponentType) => {
             <Icon icon='mdi:attachment' fontSize='1.375rem' />
             <input hidden type='file' id='upload-img' />
           </IconButton> */}
-          <Button type='submit' variant='contained'>
+          <Button type='submit' variant='contained' disabled={isLoading}>
             Send
           </Button>
         </Box>
