@@ -9,7 +9,7 @@ import CircularProgress, { CircularProgressProps } from '@mui/material/CircularP
 const Progress = (props: CircularProgressProps) => {
   return (
     <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress variant='determinate' {...props} size={50} />
+      <CircularProgress color={ Math.round(props.value as number) > 99 ? 'success' : 'primary' } variant='determinate' {...props} size={50} />
       <Box
         sx={{
           top: 0,
@@ -22,7 +22,7 @@ const Progress = (props: CircularProgressProps) => {
           justifyContent: 'center'
         }}
       >
-        <Typography variant='caption' component='div' color='text.secondary'>
+        <Typography variant='caption' component='div' color={theme => theme.customBflyColors.primaryTextContrast}>
           {Math.round(props.value as number)}%
         </Typography>
       </Box>

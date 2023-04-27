@@ -14,9 +14,9 @@ import {
   DialogTitle,
   LinearProgress,
   Select,
-  MenuItem
+  MenuItem,
+  Skeleton
 } from '@mui/material'
-import CircularProgress from '@mui/material/CircularProgress'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import IconButton from '@mui/material/IconButton'
@@ -32,7 +32,6 @@ import { useDropzone } from 'react-dropzone'
 
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
-import TUSService from '@/services/api/TusService'
 import { useUsersTable } from '@/services/api/useUsersTable'
 import { useQuery } from '@tanstack/react-query'
 
@@ -40,10 +39,23 @@ import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Auth
 import { useAuth } from '@/services/useAuth'
+import VideoService from '@/services/api/VideoService'
+
+// ** Uploady
+import { useUploady, useItemProgressListener, useItemStartListener, useItemFinishListener } from '@rpldy/uploady'
+import { asUploadButton } from '@rpldy/upload-button'
+import { StudioContextType } from '@/pages/studio/upload'
+
+// ** Base Links
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+
+// Reuse
+import ProgressCircularWithLabel from '@/layouts/components/shared-components/ProgressCircular'
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
+  context?: StudioContextType | null
 }
 
 type Inputs = {
@@ -64,12 +76,53 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   '& .MuiSelect-select': {}
 }))
 
-const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+// ** Custom Upload Button Component
+const UploadVideoButton = asUploadButton(
+  React.forwardRef((props, ref) => (
+    <Box {...props} sx={styles.button}>
+      <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
+      <Button sx={styles.upload}>Upload Video</Button>
+    </Box>
+  ))
+)
+
+const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => {
   const auth = useAuth()
 
+  // ** STATES
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
   const [feedVideo, setFeedVideo] = React.useState<File[]>([])
+  const [videoUploading, setVideoUploading] = React.useState<boolean>(false)
+
+  // ** Uploady PROGRESS
+  const [progress, setProgess] = React.useState<number>(0)
+
+  const progressData = useItemProgressListener()
+
+  if (progressData && progressData.completed > progress) {
+    setProgess(() => progressData.completed)
+  }
+
+  useItemStartListener(item => {
+    setVideoUploading(true)
+  })
+
+  useItemFinishListener(item => {
+    setProgess(0)
+    console.log(`item ${item.id} finished uploading, response was: `, item.uploadResponse, item.uploadStatus)
+    reset({
+      string_story: '',
+      tags: ''
+    })
+    toast.success('Successfully Upload Newsfeed with Video!', { position: 'top-center' })
+    setVideoUploading(false)
+
+    setTimeout(() => {
+      setIsLoading(false)
+      onClose()
+    }, 1500)
+  })
 
   // ** APIs and Tanstacks
   const { getAllDataFromCreator } = useUsersTable()
@@ -89,6 +142,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     formState: { errors }
   } = useForm<Inputs>()
 
+  // ** React-Dropzone Image
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 9,
     accept: {
@@ -106,80 +160,64 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
   })
 
-  //upload video
-  const { getRootProps: getVidRootProps, getInputProps: getVidInputProps } = useDropzone({
-    multiple: false,
-    accept: {
-      'video/*': ['.mp4', '.avi']
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      let videoFile = acceptedFiles.map((file: File) => Object.assign(file))
-      setFeedVideo(videoFile)
-      setValue('video', videoFile[0])
-    },
-    onDropRejected: () => {
-      toast.error(`You can only upload ${limitFiles} images`, {
-        duration: 2000
-      })
-    }
-  })
+  // ** React-Dropzone Video
 
-  //use api service
+  // ** Use api service
   const { uploadFeed } = FeedsService()
+  const { uploadVideoURL } = VideoService()
 
   const handleCancel = () => {
     onClose()
   }
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
+    setIsLoading(true)
 
     let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
-    const { video } = getValues()
+    const hasVideoFile = uploady.getInternalFileInput()?.current?.value == '' ? false : true
 
-    if (video != undefined) {
+    if (hasVideoFile) {
       console.log('there is a video')
+
+      let videoName = ''
+
+      // CORRECT THIS TYPESCRIPT NULL
+      if (uploady.getInternalFileInput()?.current == null || uploady.getInternalFileInput()?.current == undefined) {
+        videoName = ''
+      } else {
+        // @ts-ignore: Object is possibly 'null'.
+        videoName = uploady.getInternalFileInput()?.current?.files[0].name
+      }
 
       const feedHeaderData = {
         ...(hasUserID && { user_id: getValues()?.user_id }),
-        video_name: video.name,
+        video_name: videoName,
         video_type: 'feed_video'
       }
+      uploadVideoURL({ formData: feedHeaderData }).then(res => {
+        const { uploadUrl } = res
+        const { feed_id } = res
 
-      const customOnProgress = (str: string) => {
-        console.log('string', str)
-      }
-      const customOnAfterResponse = (req: any, res: any) => {
-        console.log('response', res)
-        let xmlhttpreq = req.getUnderlyingObject()
-        console.log('xml', xmlhttpreq)
-        console.log('xmlhttpreq get all', xmlhttpreq.getAllResponseHeaders())
+        //feedid
+        formData.append('feed_id', feed_id)
+        formData.append('video', 'true')
 
-        if (xmlhttpreq.getAllResponseHeaders().indexOf('feed_id') != -1) {
-          // save to feed with video
-          console.log('SAVE HERE!!!!!!!!')
+        // Choose PION upload
+        context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
 
-          let data = JSON.parse(res.getHeader('works'))
-          console.log('data from feed header', data)
-          const { feed_id } = data.data
+        // need to refactor this to wait for both upload to end
+        // upload the Feed With Video
+        uploadFeed({ formData: formData }).then(data => {
+          console.log('data from with video', data)
 
-          //Append to formData
-          formData.append('feed_id', feed_id)
-
-          // upload the Feed With Video
-          uploadFeed({ formData: formData }).then(data => {
-            console.log('data from with video', data)
-            toast.success('Successfully Upload Newsfeed WITH VIDEO!', { position: 'top-center' })
-            onClose()
-            setIsLoading(false)
-            reset()
-          }) //end uploadFeed
-        }
-      }
-
-      //Start TUS Uplaod
-      const { upload } = TUSService(video, { customOnProgress, customOnAfterResponse }, feedHeaderData as any)
-      upload.start()
+          uploady.processPending({
+            destination: {
+              url: STREAMING_SERVER_URL + uploadUrl
+            }
+          })
+        })
+      })
     } else {
       // HAS NO VIDEO - continue upload Feed
 
@@ -187,18 +225,16 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         console.log('data', data)
         toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
         onClose()
+        // TURN OF LOADING
         setIsLoading(false)
         reset()
       })
     }
-
-    setIsLoading(true)
   }
 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
     let formData = new FormData()
     // ** DUMMY VALUES
-    formData.append('user_id', '25') // should be content creator ID
     formData.append('is_Service', 'true')
 
     Object.keys(newsfeedFormData).forEach(key => {
@@ -258,30 +294,41 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   const TranslateString = useTranslateString()
 
+  // ** Uploady
+  const uploady = useUploady()
+
+  const uploadyStartUpload = () => {
+    let pendingFiles = uploady.getInternalFileInput()?.current?.files
+    if (!pendingFiles) {
+      console.log('NO FILE YET')
+      return
+    }
+    //start upload
+    uploady.processPending()
+  }
+
   return (
-    <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'sm'}>
+    <Dialog open={isOpen} fullWidth={true} maxWidth={'sm'}>
       <DialogContent sx={{ ...styles.dialogContent, bgcolor: theme => theme.customBflyColors.primary }}>
         <Box>
           <DialogTitle color={theme => theme.customBflyColors.primaryTextContrast} sx={styles.title}>
             {TranslateString('Upload NewsFeeds')}
           </DialogTitle>
         </Box>
-        {isLoading ? (
-          <Box sx={{ textAlign: 'center' }}>
-            <CircularProgress color='success' />
-          </Box>
-        ) : (
-          <>
-            {auth?.user?.role != 'CC' && (
-              <Box sx={{ ...styles.textContainer, marginBlock: '1rem' }}>
-                {getCCsQuery.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+
+        <>
+          {auth?.user?.role != 'CC' && (
+            <Box sx={{ ...styles.textContainer, marginBlock: '1rem' }}>
+              {getCCsQuery.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+
+              {!isLoading && (
                 <Controller
                   name='user_id'
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange, onBlur } }) => (
                     <>
-                      { getCCsQuery?.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+                      {getCCsQuery?.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
                       {getCCsQuery?.data && (
                         <CustomSelect
                           displayEmpty
@@ -298,7 +345,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                             Select Content Creator
                           </MenuItem>
                           {getCCsQuery?.data &&
-                            getCCsQuery?.data.map((cc : any) => (
+                            getCCsQuery?.data.map((cc: any) => (
                               <MenuItem key={cc.id} value={cc.id}>
                                 {cc.username}
                               </MenuItem>
@@ -308,9 +355,26 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                     </>
                   )}
                 />
-              </Box>
-            )}
+              )}
+            </Box>
+          )}
 
+          {isLoading ? (
+            <Box sx={{ gap: '1rem', display: 'flex', flexDirection: 'column' }}>
+              <Skeleton
+                sx={{ backgroundColor: theme => theme.palette.background.paper }}
+                variant='rectangular'
+                width='100%'
+                height={50}
+              />
+              <Skeleton
+                sx={{ backgroundColor: theme => theme.palette.background.paper }}
+                variant='rectangular'
+                width='100%'
+                height={50}
+              />
+            </Box>
+          ) : (
             <Box sx={styles.textContainer}>
               <TextField
                 label={TranslateString('Story')}
@@ -333,59 +397,63 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                 {...register('tags')}
               />
             </Box>
+          )}
 
-            <Box sx={styles.buttonContainer}>
-              <div {...getVidRootProps({ className: 'dropzone' })}>
-                <input {...getVidInputProps()} />
-                <Box sx={styles.button}>
-                  <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>{TranslateString('Upload Video')}</Button>
-                  {feedVideo.length != 0 ? <p>Selected 1 video</p> : null}
+          <Box sx={styles.buttonContainer}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
+              {!videoUploading ? (
+                <UploadVideoButton />
+              ) : (
+                <Box sx={{ textAlign: 'center', minWidth: '145px' }}>
+                  <ProgressCircularWithLabel progress={progress} />
                 </Box>
-              </div>
+              )}
+            </Box>
 
-              <div {...getRootProps({ className: 'dropzone' })}>
-                <input {...getInputProps()} />
-                <Box sx={styles.button}>
-                  <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>{TranslateString('Upload Photo')}</Button>
-                </Box>
-              </div>
-
-              <Box>
-                {multipleImages.length ? (
-                  <>
-                    <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
-                    <div className='buttons' style={{ textAlign: 'center' }}>
-                      <Button
-                        sx={{ marginInline: 'auto' }}
-                        color='error'
-                        variant='outlined'
-                        onClick={handleRemoveAllFiles}
-                      >
-                        {TranslateString('Remove All')}
-                      </Button>
-                    </div>
-                  </>
-                ) : null}
+            <div {...getRootProps({ className: 'dropzone' })}>
+              <input {...getInputProps()} />
+              <Box sx={styles.button}>
+                <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
+                <Button disabled={isLoading ? true : false} sx={styles.upload}>
+                  {TranslateString('Upload Photo')}
+                </Button>
               </Box>
-            </Box>
+            </div>
 
-            <Box sx={styles.bottomBtnContainer}>
-              <Button onClick={handleCancel} sx={styles.bottomBtn}>
-                {TranslateString('Cancel')}
-              </Button>
-              <Button
-                onClick={() => {
-                  handlePublish()
-                }}
-                sx={styles.bottomBtn}
-              >
-                {TranslateString('Publish')}
-              </Button>
+            <Box>
+              {multipleImages.length ? (
+                <>
+                  <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
+                  <div className='buttons' style={{ textAlign: 'center' }}>
+                    <Button
+                      sx={{ marginInline: 'auto' }}
+                      color='error'
+                      variant='outlined'
+                      onClick={handleRemoveAllFiles}
+                    >
+                      {TranslateString('Remove All')}
+                    </Button>
+                  </div>
+                </>
+              ) : null}
             </Box>
-          </>
-        )}
+          </Box>
+
+          <Box sx={styles.bottomBtnContainer}>
+            <Button disabled={isLoading ? true : false} onClick={handleCancel} sx={styles.bottomBtn}>
+              {TranslateString('Cancel')}
+            </Button>
+            <Button
+              disabled={isLoading ? true : false}
+              onClick={() => {
+                handlePublish()
+              }}
+              sx={styles.bottomBtn}
+            >
+              {TranslateString('Publish')}
+            </Button>
+          </Box>
+        </>
       </DialogContent>
     </Dialog>
   )

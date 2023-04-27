@@ -15,7 +15,9 @@ import PhotoGridCard from '../../shared-component/feed/PhotoGridCard'
 // ** Utils
 import formatDate from '@/utils/formatDate'
 
+// ** Base URLS
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
 
 type videoPhotosProps = {
   data?: any
@@ -61,7 +63,7 @@ const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
                     )}
                     {story && story?.videos && (
                       <FeedAttachments>
-                        <FeedVideoCard source={story.videos.url} />
+                        <FeedVideoCard source={ STREAMING_SERVER_URL + story.videos.url} />
                       </FeedAttachments>
                     )}
                     <FeedAttachments>

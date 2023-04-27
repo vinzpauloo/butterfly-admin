@@ -17,6 +17,9 @@ import UploadVideoPublish from './views/UploadVideoPublish'
 import VideosListTable from './views/VideosList'
 import UploadAlbum from './views/UploadAlbum'
 
+// ** Uploady
+import ChunkedUploady from "@rpldy/chunked-uploady";
+
 // ** Styled Components
 const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundImage: `url("${bgPath}")`,
@@ -98,6 +101,8 @@ export type StudioContextType = {
   setTrialProgress: React.Dispatch<React.SetStateAction<number>>
   workId: number | null
   setWorkId: React.Dispatch<React.SetStateAction<number | null>>
+  uploadURL : string,
+  setUploadURL : React.Dispatch<React.SetStateAction<string>>
 }
 
 //** DATA */
@@ -120,6 +125,7 @@ const UploadContent = () => {
   const [workProgress, setWorkProgress] = React.useState<number>(0)
   const [trialProgress, setTrialProgress] = React.useState<number>(0)
   const [workId, setWorkId] = React.useState<number | null>(null)
+  const [uploadURL, setUploadURL] = React.useState<string>('')
 
   React.useEffect(() => {
     // console.log('call useEffect workProgress')
@@ -167,10 +173,22 @@ const UploadContent = () => {
         trialProgress,
         setTrialProgress,
         workId,
-        setWorkId
+        setWorkId,
+        uploadURL,
+        setUploadURL
       }}
     >
-      <BoxBG>{PageDisplay()}</BoxBG>
+      <ChunkedUploady
+        autoUpload={false}
+        multiple={false}
+        method='POST'        
+        destination={{ 
+          url: uploadURL, //uploadURL 
+          headers: { 'x-custom': '123' } }
+        }
+      >
+        <BoxBG>{PageDisplay()}</BoxBG>
+      </ChunkedUploady>
     </StudioContext.Provider>
   )
 }

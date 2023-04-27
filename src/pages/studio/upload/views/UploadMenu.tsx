@@ -126,7 +126,7 @@ const UploadMenu = (props: Props) => {
               <CustomButton onClick={handleNewsfeedsButtonClick}>
                 <Translations text='Upload NEWSFEEDS' />
               </CustomButton>
-              <CreateFeedModal isOpen={feedModal} onClose={() => setFeedModal(false)} />
+              <CreateFeedModal context={studioContext} isOpen={feedModal} onClose={() => setFeedModal(false)} />
             </UploadBoxContainer>
           </Grid>
           <Grid xs={12} item>
