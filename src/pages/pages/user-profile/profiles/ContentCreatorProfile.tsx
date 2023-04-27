@@ -52,10 +52,10 @@ const ContentCreatorProfile = () => {
   ]
   
   // get specific content creators data based on bearer token
-  const { getSpecificContentCreator, updateContentCreator } = UserService();
+  const { getUser, updateUser } = UserService();
   const { isLoading } = useQuery({
     queryKey: ["contentCreatorData"],
-    queryFn: () => getSpecificContentCreator({
+    queryFn: () => getUser({
       data: {
         user_id: auth?.user?.id,
       }
@@ -75,7 +75,7 @@ const ContentCreatorProfile = () => {
 
   // Get QueryClient from the context
   const queryClient = useQueryClient();
-  const { mutate: mutateUpdate, isLoading: updateLoading } = useMutation(updateContentCreator, {
+  const { mutate: mutateUpdate, isLoading: updateLoading } = useMutation(updateUser, {
     onSuccess: (data) => {
       console.log(data);
       queryClient.invalidateQueries({
@@ -88,7 +88,7 @@ const ContentCreatorProfile = () => {
   });
 
 
-  //file to be send to back end
+  //file to be send to back end - WIP
   const [selectedProfPic, setSelectedProfPic] = useState('')
   const [selectedCoverPhoto, setSelectedCoverPhoto] = useState('')
   const [photoPreview, setPhotoPreview] = useState('')
@@ -127,12 +127,6 @@ const ContentCreatorProfile = () => {
   }
 
   const UpdateProfile = () => {
-    console.log(selectedProfPic)
-    console.log(selectedCoverPhoto)
-    console.log(username)
-    console.log(email)
-    console.log(bio)
-
     mutateUpdate({
       data: {
         _method: 'put',
