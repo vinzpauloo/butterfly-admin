@@ -56,7 +56,6 @@ const FeedsService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
       url: '/admin/feeds',
@@ -69,7 +68,6 @@ const FeedsService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
       url: '/admin/feeds',
@@ -83,7 +81,6 @@ const FeedsService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         'Content-Type': 'multipart/form-data', // if POST is form-data
         "Accept": "application/json",
         Authorization: `Bearer ${accessToken}`
