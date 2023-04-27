@@ -201,6 +201,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
 
         //feedid
         formData.append('feed_id', feed_id)
+        formData.append('video', 'true')
 
         // Choose PION upload
         context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
