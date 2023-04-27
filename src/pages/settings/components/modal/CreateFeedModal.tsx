@@ -14,9 +14,9 @@ import {
   DialogTitle,
   LinearProgress,
   Select,
-  MenuItem
+  MenuItem,
+  Skeleton
 } from '@mui/material'
-import CircularProgress from '@mui/material/CircularProgress'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import IconButton from '@mui/material/IconButton'
@@ -108,16 +108,21 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     setVideoUploading(true)
   })
 
-  useItemFinishListener((item) => {
-    console.log(`item ${item.id} finished uploading, response was: `, item.uploadResponse, item.uploadStatus);  
+  useItemFinishListener(item => {
+    setProgess(0)
+    console.log(`item ${item.id} finished uploading, response was: `, item.uploadResponse, item.uploadStatus)
     reset({
-      string_story : '',
-      tags :'',
+      string_story: '',
+      tags: ''
     })
+    toast.success('Successfully Upload Newsfeed with Video!', { position: 'top-center' })
     setVideoUploading(false)
-    setIsLoading(false)
-    onClose()
-  });
+
+    setTimeout(() => {
+      setIsLoading(false)
+      onClose()
+    }, 1500)
+  })
 
   // ** APIs and Tanstacks
   const { getAllDataFromCreator } = useUsersTable()
@@ -166,12 +171,11 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   }
 
   const handlePublish = async () => {
-
     setIsLoading(true)
 
     let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
-    const hasVideoFile = (uploady.getInternalFileInput()?.current?.value == '') ? false : true
+    const hasVideoFile = uploady.getInternalFileInput()?.current?.value == '' ? false : true
 
     if (hasVideoFile) {
       console.log('there is a video')
@@ -179,7 +183,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
       let videoName = ''
 
       // CORRECT THIS TYPESCRIPT NULL
-      if ( uploady.getInternalFileInput()?.current == null || uploady.getInternalFileInput()?.current == undefined ) {
+      if (uploady.getInternalFileInput()?.current == null || uploady.getInternalFileInput()?.current == undefined) {
         videoName = ''
       } else {
         // @ts-ignore: Object is possibly 'null'.
@@ -192,21 +196,28 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
         video_type: 'feed_video'
       }
       uploadVideoURL({ formData: feedHeaderData }).then(res => {
-        console.log('res', res)
         const { uploadUrl } = res
+        const { feed_id } = res
+
+        //feedid
+        formData.append('feed_id', feed_id)
 
         // Choose PION upload
         context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
 
-        uploady.processPending({
-          destination: {
-            url : STREAMING_SERVER_URL + uploadUrl
-          }
-        })
+        // need to refactor this to wait for both upload to end
+        // upload the Feed With Video
+        uploadFeed({ formData: formData }).then(data => {
+          console.log('data from with video', data)
 
-      }) // end uploadURL
+          uploady.processPending({
+            destination: {
+              url: STREAMING_SERVER_URL + uploadUrl
+            }
+          })
+        })
+      })
     } else {
-      
       // HAS NO VIDEO - continue upload Feed
 
       uploadFeed({ formData: formData }).then(data => {
@@ -223,7 +234,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
     let formData = new FormData()
     // ** DUMMY VALUES
-    formData.append('user_id', '25') // should be content creator ID
     formData.append('is_Service', 'true')
 
     Object.keys(newsfeedFormData).forEach(key => {
@@ -304,11 +314,13 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
             {TranslateString('Upload NewsFeeds')}
           </DialogTitle>
         </Box>
-        
-          <>
-            {auth?.user?.role != 'CC' && (
-              <Box sx={{ ...styles.textContainer, marginBlock: '1rem' }}>
-                {getCCsQuery.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+
+        <>
+          {auth?.user?.role != 'CC' && (
+            <Box sx={{ ...styles.textContainer, marginBlock: '1rem' }}>
+              {getCCsQuery.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+
+              {!isLoading && (
                 <Controller
                   name='user_id'
                   control={control}
@@ -342,9 +354,26 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
                     </>
                   )}
                 />
-              </Box>
-            )}
+              )}
+            </Box>
+          )}
 
+          {isLoading ? (
+            <Box sx={{ gap: '1rem', display: 'flex', flexDirection: 'column' }}>
+              <Skeleton
+                sx={{ backgroundColor: theme => theme.palette.background.paper }}
+                variant='rectangular'
+                width='100%'
+                height={50}
+              />
+              <Skeleton
+                sx={{ backgroundColor: theme => theme.palette.background.paper }}
+                variant='rectangular'
+                width='100%'
+                height={50}
+              />
+            </Box>
+          ) : (
             <Box sx={styles.textContainer}>
               <TextField
                 label={TranslateString('Story')}
@@ -367,66 +396,63 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
                 {...register('tags')}
               />
             </Box>
+          )}
 
-            <Box sx={styles.buttonContainer}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
-                {!videoUploading ? (
-                  <UploadVideoButton />
-                ) : (
-                  <Box sx={{ textAlign: 'center' }}>
-                    <ProgressCircularWithLabel progress={progress} />
-                  </Box>
-                )}
-              </Box>
-
-              <div {...getRootProps({ className: 'dropzone' })}>
-                <input {...getInputProps()} />
-                <Box sx={styles.button}>
-                  <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
-                  <Button 
-                    disabled={ isLoading ? true : false }
-                    sx={styles.upload}>{TranslateString('Upload Photo')}</Button>
+          <Box sx={styles.buttonContainer}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
+              {!videoUploading ? (
+                <UploadVideoButton />
+              ) : (
+                <Box sx={{ textAlign: 'center', minWidth: '145px' }}>
+                  <ProgressCircularWithLabel progress={progress} />
                 </Box>
-              </div>
+              )}
+            </Box>
 
-              <Box>
-                {multipleImages.length ? (
-                  <>
-                    <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
-                    <div className='buttons' style={{ textAlign: 'center' }}>
-                      <Button
-                        sx={{ marginInline: 'auto' }}
-                        color='error'
-                        variant='outlined'
-                        onClick={handleRemoveAllFiles}
-                      >
-                        {TranslateString('Remove All')}
-                      </Button>
-                    </div>
-                  </>
-                ) : null}
+            <div {...getRootProps({ className: 'dropzone' })}>
+              <input {...getInputProps()} />
+              <Box sx={styles.button}>
+                <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
+                <Button disabled={isLoading ? true : false} sx={styles.upload}>
+                  {TranslateString('Upload Photo')}
+                </Button>
               </Box>
-            </Box>
+            </div>
 
-            <Box sx={styles.bottomBtnContainer}>
-              <Button 
-                disabled={ isLoading ? true : false }
-                onClick={handleCancel} 
-                sx={styles.bottomBtn}>
-                {TranslateString('Cancel')}
-              </Button>
-              <Button
-                disabled={ isLoading ? true : false }
-                onClick={() => {
-                  handlePublish()
-                }}
-                sx={styles.bottomBtn}
-              >
-                {TranslateString('Publish')}
-              </Button>
+            <Box>
+              {multipleImages.length ? (
+                <>
+                  <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
+                  <div className='buttons' style={{ textAlign: 'center' }}>
+                    <Button
+                      sx={{ marginInline: 'auto' }}
+                      color='error'
+                      variant='outlined'
+                      onClick={handleRemoveAllFiles}
+                    >
+                      {TranslateString('Remove All')}
+                    </Button>
+                  </div>
+                </>
+              ) : null}
             </Box>
-          </>
-        
+          </Box>
+
+          <Box sx={styles.bottomBtnContainer}>
+            <Button disabled={isLoading ? true : false} onClick={handleCancel} sx={styles.bottomBtn}>
+              {TranslateString('Cancel')}
+            </Button>
+            <Button
+              disabled={isLoading ? true : false}
+              onClick={() => {
+                handlePublish()
+              }}
+              sx={styles.bottomBtn}
+            >
+              {TranslateString('Publish')}
+            </Button>
+          </Box>
+        </>
       </DialogContent>
     </Dialog>
   )

@@ -17,6 +17,9 @@ import formatDate from '@/utils/formatDate'
 // ** Types
 import { IFeedStory } from '@/context/types'
 
+// ** Base URLS
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+
 type AllVideoProps = {
   data?: any
   handleFeedParams?: any
@@ -57,10 +60,11 @@ const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
                     )}
                     {story && story?.videos && (
                       <FeedAttachments>
-                        <FeedVideoCard source={story.videos.url} />
+                        <FeedVideoCard source={ STREAMING_SERVER_URL + story.videos.url} />
                       </FeedAttachments>
                     )}
                   </FeedCard>
+
                 </Grid>
               ))}
           </Grid>
