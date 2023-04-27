@@ -19,6 +19,7 @@ import { useDropzone } from 'react-dropzone'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** TanStack Query
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -133,7 +134,11 @@ const FileUploaderSingle: React.FC<FileUploaderSingleProps> = ({ onFilesChange, 
               height: '100%'
             }}
           >
-            {files.length > 0 ? img : <img src={albumData?.cover.cover_photo} width='100%' height='100%' alt='test' />}
+            {files.length > 0 ? (
+              img
+            ) : (
+              <img src={FILE_SERVER_URL + albumData?.cover.cover_photo} width='100%' height='100%' alt='test' />
+            )}
           </Box>
         )}
       </Box>
@@ -273,7 +278,7 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
             responseMultiple.map((item: any, index: any) => {
               return (
                 <Box key={index} sx={{ display: 'flex' }}>
-                  <img src={item.photo} alt='test2' width='250' height='250' />
+                  <img src={FILE_SERVER_URL + item.photo} alt='test2' width='250' height='250' />
                   <IconButton onClick={() => handlePhotoDelete(item.photo_id)}>
                     <Icon icon='mdi:close' fontSize={20} />
                   </IconButton>
