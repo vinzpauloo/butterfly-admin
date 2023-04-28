@@ -131,21 +131,29 @@ const UserDropdown = (props: Props) => {
             </Box>
           </Box>
         </Box>
-        <Divider sx={{ mt: '0 !important' }} />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/pages/user-profile')}>
-          <Box sx={styles}>
-            <Icon icon='mdi:account-outline' />
-            Profile
-          </Box>
-        </MenuItem>
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/apps/chatNew')}>
-          <Box sx={styles}>
-            <Icon icon='mdi:message-outline' />
-            Chat
-          </Box>
-        </MenuItem>
-        <Divider />
 
+        {user?.role != 'GOD' && (
+          <>
+            <Divider sx={{ mt: '0 !important' }} />
+            <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/pages/user-profile')}>
+              <Box sx={styles}>
+                <Icon icon='mdi:account-outline' />
+                Profile
+              </Box>
+            </MenuItem>
+          </>
+        )}
+
+        {(user?.role === 'CC' || user?.role === 'SA') && (
+          <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/apps/chatNew')}>
+            <Box sx={styles}>
+              <Icon icon='mdi:message-outline' />
+              Chat
+            </Box>
+          </MenuItem>
+        )}
+
+        <Divider />
         <MenuItem
           onClick={handleLogout}
           sx={{ py: 2, '& svg': { mr: 2, fontSize: '1.375rem', color: 'text.primary' } }}
