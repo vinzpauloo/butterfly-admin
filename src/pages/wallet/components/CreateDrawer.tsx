@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 // ** MUI Imports
-import { Drawer, Button, TextField, IconButton, Typography, MenuItem } from '@mui/material'
+import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -24,26 +24,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { ApkService } from '@/services/api/ApkService'
+import FileUploaderSingle from './FileUploader'
 
 interface FormValues {
   [key: string]: any
-  // download_link: string
-  // os: 'android' | 'ios' | ''
-  // version: string
-  // patch_note: string
-  // name: string
+  provider: string
+  merchant_name: string
+  logo: File | null
 }
 
-const schema = yup.object().shape({
-  // download_link: yup
-  //   .string()
-  //   .url('Link must be a valid URL. e.g.: https://www.example.com')
-  //   .required('Download link is required.'),
-  // os: yup.string().required('Please choose an operating system.'),
-  // version: yup.string().required('Please input a version.'),
-  // name: yup.string().required('Please enter your name.'),
-  // patch_note: yup.string().required('Please input your patch notes.')
-})
+const schema = yup.object().shape({})
 
 interface SidebarAddUserType {
   open: boolean
@@ -77,19 +67,27 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
   })
 
   const resetForm = () => {
-    reset({
-      // download_link: '',
-      // os: '',
-      // version: '',
-      // patch_notes: '',
-      // name: ''
-    })
+    reset({})
   }
 
   const { postAPK } = ApkService()
   const mutation = useMutation(postAPK)
 
   const { selectedSite } = useSiteContext()
+
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+
+  const handleLogoChange = (files: File[]) => {
+    const maxFileSize = 2 * 1024 * 1024 // 2MB in bytes
+
+    if (files[0].size > maxFileSize) {
+      alert('Error: Logo size exceeds the 2MB limit.')
+
+      return
+    }
+
+    setUploadedFile(files[0])
+  }
 
   const handleFormSubmit = async (data: FormValues) => {
     const formData = new FormData()
@@ -101,6 +99,10 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
     }
 
     formData.append('site_id', `${selectedSite}`)
+
+    if (uploadedFile) {
+      formData.append(`logo`, uploadedFile)
+    }
 
     const apkData: any = {
       data: formData
@@ -155,22 +157,46 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
           <Box sx={styles.container}>
             <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
               <Controller
-                name='download_link'
+                name='provider'
                 control={control}
                 render={({ field }) => (
                   <TextField
                     label={TranslateString('Provider')}
                     variant='outlined'
                     fullWidth
-                    error={!!errors.download_link}
-                    helperText={errors.download_link?.message}
+                    error={!!errors.provider}
+                    helperText={errors.provider?.message}
                     defaultValue={field.value}
                     onChange={field.onChange}
-                    name='download_link'
-                    type='url'
+                    name='provider'
                   />
                 )}
               />
+
+              <Box sx={styles.formContent}>
+                <Box sx={styles.fullWidth}>
+                  <FileUploaderSingle onFilesChange={handleLogoChange} />
+                </Box>
+
+                <Box sx={styles.fullWidth}>
+                  <Controller
+                    name='merchant_name'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label={TranslateString('Merchant Name')}
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.merchant_name}
+                        helperText={errors.merchant_name?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        name='merchant_name'
+                      />
+                    )}
+                  />
+                </Box>
+              </Box>
               <Box sx={styles.formButtonContainer}>
                 <Box>
                   <Button sx={styles.cancelButton} onClick={handleClose}>
@@ -180,7 +206,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
 
                 <Box>
                   <Button type='submit' sx={styles.continueButton}>
-                    <Typography sx={styles.text}>{TranslateString('Continue')}</Typography>
+                    <Typography sx={styles.text}>{TranslateString('Submit')}</Typography>
                   </Button>
                 </Box>
               </Box>
