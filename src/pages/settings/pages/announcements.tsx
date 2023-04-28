@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
-import { Box, Card, Grid, Divider, Typography, Button, Switch } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { Box, Card, Grid, Divider, Typography, Button, Switch, Stack, IconButton } from '@mui/material'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import AnnouncementModal from '../components/modal/AnnouncementModal'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import Translations from '../../../layouts/components/Translations'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import AnnoucementsService from '../../../services/api/AnnoucementsService'
+import AnnouncementsService from '../../../services/api/AnnouncementsService'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const Announcements = () => {
   // in case pagination is added on backend
@@ -17,9 +18,8 @@ const Announcements = () => {
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [data, setData] = useState([])
-  const [announcementID, setAnnouncementID] = useState<string>('')
   const [modalInfo, setModalInfo] = useState({
-    parentID: '',
+    site_id: 0,
     id: '',
     title: '',
     description: '',
@@ -28,14 +28,13 @@ const Announcements = () => {
     active: true
   })
 
-  // FETCH ALL ADMIN ANNOUNCEMENT
-  const { getAllAnnouncement, updateAnnouncement } = AnnoucementsService()
+  // FETCH ALL ADMIN ANNOUNCEMENT FROM ALL SITES
+  const { getAllAnnouncement, updateAnnouncement, deleteAnnouncement } = AnnouncementsService()
   const { isLoading } = useQuery({
     queryKey: ['allAnnouncement'],
-    queryFn: () => getAllAnnouncement({ data: { with: 'introductions', site_id: 0 } }),
+    queryFn: () => getAllAnnouncement({ data: {} }),
     onSuccess: data => {
-      setAnnouncementID(data?._id)
-      setData(data?.introductions)
+      setData(data?.data)
     },
     onError: error => {
       console.log(error)
@@ -48,16 +47,21 @@ const Announcements = () => {
   const { mutate: mutateUpdateAnnouncement, isLoading: updateLoading } = useMutation(updateAnnouncement, {
     onSuccess: data => {
       console.log(data)
-      queryClient.invalidateQueries({
-        queryKey: ['allAnnouncement']
-      })
+      queryClient.invalidateQueries({queryKey: ['allAnnouncement']})
     },
-    onError: error => {
-      console.log(error)
-    }
+    onError: error => {console.log(error)}
+  })
+
+  const { mutate: mutateDeleteAnnouncement, isLoading: deleteLoading } = useMutation(deleteAnnouncement, {
+    onSuccess: data => {
+      console.log(data)
+      queryClient.invalidateQueries({queryKey: ['allAnnouncement']})
+    },
+    onError: error => {console.log(error)}
   })
 
   const openEditModal = (
+    site_id: number,
     id: string,
     title: string,
     description: string,
@@ -70,7 +74,7 @@ const Announcements = () => {
 
     // PASS THIS DATA TO THE MODAL
     setModalInfo({
-      parentID: announcementID,
+      site_id: site_id,
       id: id,
       title: title,
       description: description,
@@ -91,7 +95,6 @@ const Announcements = () => {
 
   const activateDeactivateAnnouncement = (id: string, active: boolean) => {
     mutateUpdateAnnouncement({
-      parentID: announcementID,
       announcementID: id,
       data: {
         active: active === true ? 1 : 0,
@@ -100,15 +103,20 @@ const Announcements = () => {
     })
   }
 
-  const columns = [
-    { field: 'title', renderHeader: () => <Translations text='Title' />, minWidth: 100, flex: 0.05 },
+  const deleteSpecificAnnouncement = (id: string) => {
+    mutateDeleteAnnouncement({announcementID: id,})
+  }
+
+  const columns: GridColDef[] = [
+    { field: 'site_id', headerName: 'Site ID', minWidth: 100, flex: 0.03 },
+    { field: 'title', renderHeader: () => <Translations text='Title' />, minWidth: 150, flex: 0.08 },
     { field: 'description', renderHeader: () => <Translations text='Description' />, minWidth: 200, flex: 0.15 },
     {
       field: 'start_date',
       renderHeader: () => <Translations text='Start Date' />,
       minWidth: 120,
       flex: 0.03,
-      renderCell: (params: GridRenderCellParams) => params.row.start_date.split('T')[0]
+      renderCell: (params: GridRenderCellParams) => params.row.start_date?.split('T')[0]
     },
     {
       field: 'end_date',
@@ -116,13 +124,14 @@ const Announcements = () => {
       minWidth: 120,
       flex: 0.03,
       renderCell: (params: GridRenderCellParams) =>
-        params.row.end_date === null ? 'None' : params.row.end_date.split('T')[0]
+        params.row.end_date === null ? 'None' : params.row.end_date?.split('T')[0]
     },
     {
       field: 'active',
       renderHeader: () => <Translations text='Active' />,
       minWidth: 85,
       flex: 0.02,
+      disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams) => (
         <Switch checked={params.value} onClick={() => activateDeactivateAnnouncement(params.row._id, !params.value)} />
       )
@@ -130,25 +139,27 @@ const Announcements = () => {
     {
       field: 'action',
       renderHeader: () => <Translations text='Action' />,
-      minWidth: 85,
-      flex: 0.02,
+      minWidth: 90,
+      flex: 0.025,
+      disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams) => (
-        <Box>
-          <Button
-            onClick={() =>
-              openEditModal(
-                params.row._id,
-                params.row.title,
-                params.row.description,
-                params.row.start_date,
-                params.row.end_date,
-                params.row.active
-              )
-            }
-          >
-            <EditOutlinedIcon sx={styles.icon} />
-          </Button>
-        </Box>
+        <Stack direction='row'>
+          <IconButton onClick={() =>
+            openEditModal(
+              params.row.site_id,
+              params.row._id,
+              params.row.title,
+              params.row.description,
+              params.row.start_date,
+              params.row.end_date,
+              params.row.active
+            )}>
+            <EditOutlinedIcon color='secondary' />
+          </IconButton>
+          <IconButton onClick={() => deleteSpecificAnnouncement(params.row._id)}>
+            <DeleteOutlineIcon color='secondary' />
+          </IconButton>
+        </Stack>
       )
     }
   ]
@@ -175,7 +186,7 @@ const Announcements = () => {
             disableSelectionOnClick
             checkboxSelection={false}
             sx={styles.dataGrid}
-            loading={isLoading || updateLoading}
+            loading={isLoading || updateLoading || deleteLoading}
             getRowId={row => row._id}
             rowsPerPageOptions={[5, 10, 15]}
 
