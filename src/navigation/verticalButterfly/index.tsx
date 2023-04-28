@@ -28,7 +28,7 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:web',
       path: '/fqdn',
       action: 'read',
-      subject: 'sa-page'
+      subject: 'fqdn-page'
     },
     {
       title: 'Transactions',
@@ -43,25 +43,25 @@ const Navigation = (): VerticalNavItemsType => {
           title: 'Donations',
           path: '/transactions/donations',
           action: 'read',
-          subject: 'shared-page',
+          subject: 'shared-page'
         },
         {
           title: 'Commissions',
           path: '/transactions/commissions',
           action: 'read',
-          subject: 'shared-page',
+          subject: 'shared-page'
         },
         {
           title: 'Withdrawal',
           path: '/transactions/withdrawal',
           action: 'read',
-          subject: 'shared-page',
+          subject: 'shared-page'
         },
         {
           title: 'Security Funds',
           path: '/transactions/security-funds',
           action: 'read',
-          subject: 'shared-page',
+          subject: 'shared-page'
         }
       ]
     },
@@ -188,6 +188,12 @@ const Navigation = (): VerticalNavItemsType => {
       path: '/versions',
       action: 'read',
       subject: 'sa-page'
+    },
+    {
+      title: 'Wallet',
+      icon: 'mdi:wallet',
+      path: '/wallet',
+      action: 'read'
     }
   ]
 }

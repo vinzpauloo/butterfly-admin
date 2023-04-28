@@ -29,11 +29,16 @@ const defineRulesFor = (role: string, subject: string) => {
   if (role === 'admin' || role === 'GOD' || role === 'SUPERVISOR') {
     can('manage', 'all')
     cannot('manage', 'cc-post-status')
+    cannot('manage', 'chat-page')
+    cannot('manage', 'fqdn-page')
   } else if (role === 'CC') {
     can(allActions, 'cc-page')
     can(allActions, 'cc-post-status')
+    can(allActions, 'chat-page')
   } else if (role === 'SA') {
     can(allActions, 'sa-page')
+    can(allActions, 'chat-page')
+    can('manage', 'fqdn-page')
   } else if (role === 'AGENT') {
     can(allActions, 'agent-page')
   } else {

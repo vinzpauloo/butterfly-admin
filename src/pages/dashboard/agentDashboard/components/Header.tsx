@@ -14,9 +14,9 @@ const Header = () => {
         </Typography>
         <Typography variant='subtitle1'>Welcome back, nice to see you again!</Typography>
       </Box>
-      <Button variant='outlined' endIcon={<DownloadIcon />}>
+      {/* <Button variant='outlined' endIcon={<DownloadIcon />}>
         Download Report
-      </Button>
+      </Button> */}
     </Stack>
   )
 }
