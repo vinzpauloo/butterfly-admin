@@ -188,6 +188,12 @@ const Navigation = (): VerticalNavItemsType => {
       path: '/versions',
       action: 'read',
       subject: 'sa-page'
+    },
+    {
+      title: 'Wallet',
+      icon: 'mdi:wallet',
+      path: '/wallet',
+      action: 'read'
     }
   ]
 }
