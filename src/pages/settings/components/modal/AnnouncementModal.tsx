@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, FormControlLabel, Checkbox, CircularProgress, } from '@mui/material'
+import { Box, Dialog, DialogTitle, DialogContent, Button, TextField, Typography, FormControlLabel, Checkbox, CircularProgress, Menu, MenuItem, Chip, } from '@mui/material'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import DatePicker from 'react-datepicker'
 import format from 'date-fns/format'
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
 import Translations from '../../../../layouts/components/Translations'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import AnnoucementsService from '@/services/api/AnnoucementsService'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import AnnouncementsService from '@/services/api/AnnouncementsService'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import SitesService from '@/services/api/SitesService'
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
   isEditing?: boolean
   modalInfo: {
-    parentID: string,
+    site_id: number,
     id: string,
     title: string,
     description: string,
@@ -29,6 +31,14 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
   const [startDate, setStartDate] = useState<Date>(new Date())
   const [endDate, setEndDate] = useState<Date>(new Date())
   const [isDurationForever, setIsDurationForever] = useState<boolean>(false);
+  const [uniqueSites, setUniqueSites] = useState<any>([])
+  const [selectedSiteID, setSelectedSiteID] = useState<number>(0)
+
+  // MENU
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const isMenuOpen = Boolean(anchorEl)
+  const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget)
+  const closeMenu = () => setAnchorEl(null)
 
   // input errors for validation
   const [titleInputError, setTitleInputError] = useState<boolean>(false);
@@ -84,9 +94,18 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
     return true
   }
 
+  // AS GOD USER, WE FETCH THE UNIQUE SITE IDs
+  const { getSitesList } = SitesService()
+  const { } = useQuery({
+    queryKey: ["allSitesList"],
+    queryFn: () => getSitesList({}),
+    onSuccess: (data) => { console.log("SITES LIST:", data?.data); setUniqueSites(data?.data) },
+    onError: (error) => { console.log(error) }
+  })
+
   // Get QueryClient from the context
   const queryClient = useQueryClient();
-  const { createAnnouncement, updateAnnouncement } = AnnoucementsService();
+  const { createAnnouncement, updateAnnouncement } = AnnouncementsService();
   
   const { mutate: mutateCreateNewAnnouncement, isLoading: addedLoading } = useMutation(createAnnouncement, {
     onSuccess: (data) => {
@@ -119,6 +138,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
       // POST data to back-end
       mutateCreateNewAnnouncement({
         data: {
+          site_id: selectedSiteID,
           type: "introduction",
           style: "text",
           title: title,
@@ -134,10 +154,10 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
     if (validateInput()) {
       // PUT data to back-end
       mutateUpdateAnnouncement({
-        parentID: modalInfo.parentID,
         announcementID: modalInfo.id,
         data: {
           style: "text",
+          type: "introduction",
           title: title,
           description: description,
           start_date: format(startDate, 'yyyy-MM-dd'),
@@ -149,7 +169,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
   }
 
   const isBeingAddedUpdated = addedLoading || updateLoading
-  
+
   return (
     <DatePickerWrapper>
       <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'lg'}>
@@ -164,6 +184,22 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
               <TextField disabled={isBeingAddedUpdated} label={<Translations text="Description" />} value={description} onChange={(e) => {setDescription(e.target.value); setDescriptionInputError(false)}} multiline={true} minRows={20} error={descriptionInputError} />
             </Box>
             <Box sx={styles.datePickerContainer}>
+              {isEditing ?
+                <Chip
+                  label={modalInfo.site_id === 0 ? "0: Default" : modalInfo.site_id + ": " + uniqueSites.find((item: any) => item.id === modalInfo.site_id)?.name} variant='outlined' color='secondary' sx={{ width: "max-content" }} /> :
+                <Box>
+                  <Button variant='contained' color='primary' onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>
+                    {selectedSiteID === 0 ? "Default" : null}
+                    {uniqueSites.find((item: any) => item.id === selectedSiteID)?.name}
+                  </Button>
+                  <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={closeMenu}>
+                    <MenuItem onClick={() => { setSelectedSiteID(0); closeMenu() }}>0: Default</MenuItem>
+                    {uniqueSites.map((item: any) =>
+                      <MenuItem key={item} onClick={() => { setSelectedSiteID(item?.id); closeMenu() }}>{item?.id}: {item?.name}</MenuItem>
+                    )}
+                  </Menu>
+                  </Box>
+              }
               <Box>
                 <Typography><Translations text="Start Date"/></Typography>
                 <DatePicker
@@ -190,8 +226,8 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                 <FormControlLabel sx={{ mt: 2 }} control={<Checkbox disabled={isBeingAddedUpdated} checked={isDurationForever} onChange={(event) => setIsDurationForever(event.target.checked)} />} label={<Translations text="Duration: Forever" />} />
               </Box>
               <Box sx={{ display: 'flex', flexDirection: { xs: "column", md: "row"}, gap: 6, justifyContent:"center", alignItems:"center"}}>
-                <Button disabled={isBeingAddedUpdated} sx={styles.buttons} onClick={onClose}><Translations text="Cancel" /></Button>
-                <Button disabled={isBeingAddedUpdated} sx={styles.buttons} onClick={isEditing ? editAnnouncement : publishNewAnnouncement}><Translations text="Publish" /></Button>
+                <Button disabled={isBeingAddedUpdated} sx={styles.buttons} variant='outlined' color='error' onClick={onClose}><Translations text="Cancel" /></Button>
+                <Button disabled={isBeingAddedUpdated} sx={styles.buttons} variant='outlined' onClick={isEditing ? editAnnouncement : publishNewAnnouncement}><Translations text="Publish" /></Button>
               </Box>
               <Box sx={styles.disclaimer}>
                 <Typography sx={{ textAlign: 'center' }}>
@@ -211,15 +247,7 @@ export default AnnouncementModal
 
 const styles = {
   buttons: {
-    backgroundColor: '#FFF',
-    border: '1px solid black',
     textTransform: 'uppercase',
-    color: '#000',
-    width: 120,
-    '&:hover': {
-      backgroundColor: '#9747FF',
-      color: '#FFF'
-    }
   },
   dialogTitle: {
     padding: 0,
@@ -231,8 +259,8 @@ const styles = {
     width: { xs: '100%', sm: '40%' },
     display: 'flex',
     flexDirection: 'column',
-    gap: 10,
-    justifyContent: 'center',
+    gap: 5,
+    justifyContent: 'flex-start',
   },
   mainContent: {
     display: 'flex',
