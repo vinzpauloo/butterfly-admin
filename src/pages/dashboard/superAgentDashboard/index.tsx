@@ -7,9 +7,9 @@ import { Box, Stack, Typography, LinearProgress, Avatar } from '@mui/material'
 // ** Project/Other Imports
 import Header from './components/Header'
 import SalesAndAddedUsers from './components/SalesAndAddedUsers'
-import MonthlyProgressBarChart from './components/MonthlyProgress'
 import UsersGrowthDonutChart from './components/UsersGrowth'
 import CommissionDataBarChart from './components/CommissionData'
+import RechartsAreaChart from './components/charts/AreaChart'
 
 // FAKE DATA
 const Donators = [
@@ -127,7 +127,7 @@ const AgentDashboard = () => {
             <Typography variant='h6'>New Users: 500</Typography>
             <Typography fontWeight={500}>Total Users: 2500</Typography>
           </Box>
-          <MonthlyProgressBarChart />
+          <RechartsAreaChart direction='ltr' />
           <UsersGrowthDonutChart />
         </Stack>
         {/* End of Second Column */}
@@ -172,7 +172,7 @@ const styles = {
   },
   linearProgressWrapper: {
     overflowY: 'auto',
-    maxHeight: '40dvh'
+    maxHeight: '45dvh'
   },
 
   linearProgress: {
