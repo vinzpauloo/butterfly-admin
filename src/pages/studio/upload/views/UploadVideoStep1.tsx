@@ -40,6 +40,10 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery } from '@tanstack/react-query'
 
+// ** Uploady
+import { useUploady, useItemProgressListener, useBatchAddListener, useBatchProgressListener, useBatchFinishListener } from '@rpldy/uploady'
+import { asUploadButton } from '@rpldy/upload-button'
+
 // ** Configs
 import authConfig from 'src/configs/auth'
 
@@ -126,8 +130,13 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
+
   // ** Translations
   const { t } = useTranslation()
+
+  // ** Uploady 
+   // ** Uploady Hooks
+  const uploady = useUploady()
 
   /* States */
   const [trialUploadSwitch, setTrialUploadSwitch] = React.useState<boolean>(false)
@@ -254,6 +263,12 @@ const UploadVideoStep1 = (props: Props) => {
   })
 
   // ** Component Functions
+
+  const handleUploady = () => {
+    
+
+  }
+
   const handleCancelButton = () => {
     //clear values
     reset()
@@ -788,6 +803,7 @@ const UploadVideoStep1 = (props: Props) => {
 
               {files?.length ? (
                 <Box className='uploadShortVidBox' sx={{ mt: 10 }}>
+                  {/* <Button sx={{marginBottom:'1rem'}} color='warning' variant='contained' onClick={ () => { handleUploady() }}>TEST</Button> */}
                   <Card>
                     <CardContent sx={{ paddingBlock: '1rem' }}>
                       <FormGroup sx={{ justifyContent: 'space-between', alignItems: 'center' }} row>

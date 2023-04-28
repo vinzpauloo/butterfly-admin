@@ -42,7 +42,7 @@ import { useAuth } from '@/services/useAuth'
 import VideoService from '@/services/api/VideoService'
 
 // ** Uploady
-import { useUploady, useItemProgressListener, useItemStartListener, useItemFinishListener } from '@rpldy/uploady'
+import { useUploady, useItemProgressListener, useBatchAddListener, useBatchProgressListener, useBatchFinishListener } from '@rpldy/uploady'
 import { asUploadButton } from '@rpldy/upload-button'
 import { StudioContextType } from '@/pages/studio/upload'
 
@@ -95,35 +95,49 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   const [feedVideo, setFeedVideo] = React.useState<File[]>([])
   const [videoUploading, setVideoUploading] = React.useState<boolean>(false)
 
-  // ** Uploady PROGRESS
-  const [progress, setProgess] = React.useState<number>(0)
+  // ** Uploady Hooks
+  const uploady = useUploady()
+   
+  // ** Uploady Progress
+  const [progress, setProgress] = React.useState<number>(0)
 
   const progressData = useItemProgressListener()
+  const batch = useBatchProgressListener((batch) => {})
 
-  if (progressData && progressData.completed > progress) {
-    setProgess(() => progressData.completed)
+
+  if ( batch && batch.completed > progress && batch.completed < 100 ) {
+    console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
+    setProgress(() => batch.completed)
   }
 
-  useItemStartListener(item => {
-    setVideoUploading(true)
-  })
 
-  useItemFinishListener(item => {
-    setProgess(0)
-    console.log(`item ${item.id} finished uploading, response was: `, item.uploadResponse, item.uploadStatus)
-    reset({
-      string_story: '',
-      tags: ''
-    })
-    toast.success('Successfully Upload Newsfeed with Video!', { position: 'top-center' })
-    setVideoUploading(false)
+  useBatchAddListener((batch, options) => {
+    console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`);
+    setProgress(0)
+    console.log('Start setProgress', progress)
+    //return false to cancel the batch
+  });
 
-    setTimeout(() => {
+  useBatchFinishListener((batch) => {
+    console.log(`batch ${batch.id} finished uploading`);  
+    setProgress(100)
+    toast.success('Successfully Upload Newsfeed with Video!', 
+    { position: 'top-center', duration : 4000 })
+
+    setTimeout( () => {
+
+      reset({
+        string_story: '',
+        tags: ''
+      })
+      setVideoUploading(false)
       setIsLoading(false)
       onClose()
-    }, 1500)
-  })
 
+    },1500)
+    
+});
+  
   // ** APIs and Tanstacks
   const { getAllDataFromCreator } = useUsersTable()
 
@@ -172,6 +186,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
 
   const handlePublish = async () => {
     setIsLoading(true)
+    setVideoUploading(true)
 
     let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
@@ -195,6 +210,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
         video_name: videoName,
         video_type: 'feed_video'
       }
+
       uploadVideoURL({ formData: feedHeaderData }).then(res => {
         const { uploadUrl } = res
         const { feed_id } = res
@@ -206,7 +222,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
         // Choose PION upload
         context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
 
-        // need to refactor this to wait for both upload to end
         // upload the Feed With Video
         uploadFeed({ formData: formData }).then(data => {
           console.log('data from with video', data)
@@ -217,7 +232,17 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
             }
           })
         })
+
+
       })
+      .catch( (err) => {
+        toast.error('Error Uploading')
+        setIsLoading(false)
+        setVideoUploading(false)
+        reset()
+      })
+
+
     } else {
       // HAS NO VIDEO - continue upload Feed
 
@@ -294,9 +319,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
 
   const TranslateString = useTranslateString()
 
-  // ** Uploady
-  const uploady = useUploady()
-
   const uploadyStartUpload = () => {
     let pendingFiles = uploady.getInternalFileInput()?.current?.files
     if (!pendingFiles) {
@@ -365,13 +387,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
                 sx={{ backgroundColor: theme => theme.palette.background.paper }}
                 variant='rectangular'
                 width='100%'
-                height={50}
-              />
-              <Skeleton
-                sx={{ backgroundColor: theme => theme.palette.background.paper }}
-                variant='rectangular'
-                width='100%'
-                height={50}
+                height={20}
               />
             </Box>
           ) : (
@@ -402,7 +418,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
           <Box sx={styles.buttonContainer}>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
               {!videoUploading ? (
-                <UploadVideoButton />
+                <UploadVideoButton autoUpload={false} clearPendingOnAdd={true} />
               ) : (
                 <Box sx={{ textAlign: 'center', minWidth: '145px' }}>
                   <ProgressCircularWithLabel progress={progress} />
@@ -410,7 +426,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
               )}
             </Box>
 
-            <div {...getRootProps({ className: 'dropzone' })}>
+              <div {...getRootProps({ className: 'dropzone' })}>
               <input {...getInputProps()} />
               <Box sx={styles.button}>
                 <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
