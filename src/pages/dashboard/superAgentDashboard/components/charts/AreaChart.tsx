@@ -179,7 +179,7 @@ const RechartsAreaChart = ({ direction }: Props) => {
   return (
     <Card>
       <CardHeader
-        title={<Typography fontSize={14}>Monthly Monitoring</Typography>}
+        title='Monthly Monitoring'
         sx={{
           flexDirection: ['column', 'column'],
           alignItems: ['flex-start', 'flex-start'],

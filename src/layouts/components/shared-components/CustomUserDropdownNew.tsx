@@ -133,7 +133,7 @@ const UserDropdown = (props: Props) => {
         </Box>
 
         {user?.role != 'GOD' && (
-          <>
+          <div>
             <Divider sx={{ mt: '0 !important' }} />
             <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/pages/user-profile')}>
               <Box sx={styles}>
@@ -141,16 +141,18 @@ const UserDropdown = (props: Props) => {
                 Profile
               </Box>
             </MenuItem>
-          </>
+          </div>
         )}
 
         {(user?.role === 'CC' || user?.role === 'SA') && (
-          <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/apps/chatNew')}>
-            <Box sx={styles}>
-              <Icon icon='mdi:message-outline' />
-              Chat
-            </Box>
-          </MenuItem>
+          <div>
+            <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/apps/chatNew')}>
+              <Box sx={styles}>
+                <Icon icon='mdi:message-outline' />
+                Chat
+              </Box>
+            </MenuItem>
+          </div>
         )}
 
         <Divider />
