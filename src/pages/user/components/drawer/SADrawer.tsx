@@ -3,7 +3,17 @@ import React, { useState, useRef, SetStateAction } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
-import { Drawer, Button, IconButton, Typography, Step, Stepper, StepLabel, StepContent, LinearProgress } from '@mui/material'
+import {
+  Drawer,
+  Button,
+  IconButton,
+  Typography,
+  Step,
+  Stepper,
+  StepLabel,
+  StepContent,
+  LinearProgress
+} from '@mui/material'
 
 // ** Style Imports
 import { styled } from '@mui/material/styles'
@@ -116,7 +126,7 @@ const SADrawer = (props: SidebarAddUserType) => {
       //handleDataSubmit
       let promiseArray: any[] = []
       allFQDNData.map((data: FQDNData) => {
-        let type = data.name as 'API' | 'Photo' | 'Streaming'
+        let type = data.name as 'Api' | 'Photo' | 'Streaming'
         data.values.forEach(value => {
           promiseArray.push({ site: siteID, name: value.value, type: type })
         })
@@ -128,12 +138,12 @@ const SADrawer = (props: SidebarAddUserType) => {
           data: {
             site: data.site,
             name: data.name,
-            type: data.type as 'API' | 'Photo' | 'Streaming'
+            type: data.type as 'Api' | 'Photo' | 'Streaming'
           }
         })
       )
       await Promise.all(promises)
-      
+
       setIsLoading(false)
       setActiveStep(prevActiveStep => prevActiveStep + 1)
       setTimeout(() => {
@@ -219,7 +229,9 @@ const SADrawer = (props: SidebarAddUserType) => {
                           </div>
                         )}
                       </>
-                    ) : <LinearProgress /> }
+                    ) : (
+                      <LinearProgress />
+                    )}
                   </StepContent>
                 </Step>
               )
