@@ -5,25 +5,29 @@ import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
 interface IGetFQDNParams {
-    site : number
-    sort : 'desc' | 'asc' | string
-    sort_by : string //eg. name
-    paginate : number
+  site?: number
+  sort?: 'desc' | 'asc' | string
+  sort_by?: string //eg. name
+  paginate?: number
 }
 
 interface IGetSuperAgentFQDNParams {
-    site : number
-    sort : 'desc' | 'asc' | string
-    sort_by : 'fqdn' | string
-    paginate : number
+  site?: number
+  sort?: 'desc' | 'asc' | string
+  sort_by?: 'fqdn' | string
+  paginate?: number
 }
 
 interface IAddFQDNParams {
-    data : {
-        site : number,
-        name : string,
-        type : 'API' | 'Streaming' | 'Photo'
-    }
+  data?: {
+    site?: number,
+    name?: string,
+    type?: 'Api' | 'Streaming' | 'Photo'
+  }
+}
+
+interface IDeleteFQDNParams {
+  fqdnID?: number
 }
 
 const FQDNService = () => {
@@ -56,19 +60,32 @@ const FQDNService = () => {
 
   const addFQDN = (params : IAddFQDNParams) => {
     return request({
-        headers: {
-          ...getHeaders(),
-          'Content-Type': 'multipart/form-data', // if POST is form-data
-          "Accept": "application/json",
-          Authorization: `Bearer ${accessToken}`
-        },
-        url: '/fqdns',
-        method: 'POST',
-        data: params.data,
-      })
+      headers: {
+        ...getHeaders(),
+        'Content-Type': 'multipart/form-data', // if POST is form-data
+        "Accept": "application/json",
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/fqdns',
+      method: 'POST',
+      data: params.data,
+  })
   }
 
-  return { addFQDN, getFQDNList, getSuperAgentFQDNList }
+  const deleteFQDN = (params: IDeleteFQDNParams) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'Content-Type': 'multipart/form-data', // if POST is form-data
+        "Accept": "application/json",
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/fqdns/${params.fqdnID}`,
+      method: 'DELETE',
+    })
+  }
+
+  return { addFQDN, getFQDNList, getSuperAgentFQDNList, deleteFQDN }
 }
 
 export default FQDNService
