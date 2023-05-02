@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState, useRef, SetStateAction } from 'react'
+import React, { useState } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
@@ -35,6 +35,7 @@ import CreatedSuccessful from '../form/CreatedSuccessful'
 // ** Steps
 import SAStepOne from './superagent/steps/StepOne'
 import SAStepTwo from './superagent/steps/StepTwo'
+import SAStepThree from './superagent/steps/StepThree'
 
 // ** Types
 import { FQDNData } from './superagent/steps/StepTwo'
@@ -78,7 +79,6 @@ const SADrawer = (props: SidebarAddUserType) => {
     onSuccess: response => {
       console.log('response from addFQDN', response)
     },
-    onMutate: () => {},
     onSettled: () => {
       queryClient.invalidateQueries(['fqdns'])
     }
@@ -87,6 +87,7 @@ const SADrawer = (props: SidebarAddUserType) => {
   // ** References to multisteps
   const stepOneRef = React.useRef<any>()
   const stepTwoRef = React.useRef<any>()
+  const stepThreeRef = React.useRef<any>()
 
   // ** Props
   const { open, toggle } = props
@@ -114,19 +115,21 @@ const SADrawer = (props: SidebarAddUserType) => {
 
   const handleFinishForm = async () => {
     console.log('data from SADRAWER', stepTwoRef)
-    //call stepTwoReference handle Finish
-    let allFQDNData = stepTwoRef?.current?.handleFinish()
 
-    if (allFQDNData.length == 0) {
+    //call stepTwoReference handle Finish
+    const allFQDNData = stepTwoRef?.current?.handleFinish()
+
+    if (allFQDNData?.length == 0) {
       toast.error('FQDN Values Must at least be 3 characters')
+
       return
     } else {
       console.log('allFQDNData', allFQDNData)
 
       //handleDataSubmit
-      let promiseArray: any[] = []
-      allFQDNData.map((data: FQDNData) => {
-        let type = data.name as 'Api' | 'Photo' | 'Streaming'
+      const promiseArray: any[] = []
+      allFQDNData?.map((data: FQDNData) => {
+        const type = data.name as 'Api' | 'Photo' | 'Streaming'
         data.values.forEach(value => {
           promiseArray.push({ site: siteID, name: value.value, type: type })
         })
@@ -178,6 +181,25 @@ const SADrawer = (props: SidebarAddUserType) => {
       title: 'FQDNS Info',
       subtitle: 'Setup FQDNS',
       component: <SAStepTwo siteID={siteID} ref={stepTwoRef} />
+    },
+    {
+      title: 'Integration',
+      subtitle: 'Input Integration and RSA',
+      component: (
+        <SAStepThree
+          ref={stepThreeRef}
+          toggle={toggle}
+          resetKey={resetKey}
+          handleClose={handleClose}
+          responseError={responseError}
+          setResponseError={setResponseError}
+          fileName={fileName}
+          setFileName={setFileName}
+          setSiteID={setSiteID}
+          handleNext={handleNext}
+          setIsLoading={setIsLoading}
+        />
+      )
     }
   ]
 
