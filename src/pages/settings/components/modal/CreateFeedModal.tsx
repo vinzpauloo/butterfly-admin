@@ -32,6 +32,7 @@ import { useDropzone } from 'react-dropzone'
 
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
+import VideoService from '@/services/api/VideoService'
 import { useUsersTable } from '@/services/api/useUsersTable'
 import { useQuery } from '@tanstack/react-query'
 
@@ -39,7 +40,6 @@ import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Auth
 import { useAuth } from '@/services/useAuth'
-import VideoService from '@/services/api/VideoService'
 
 // ** Uploady
 import { useUploady, useItemProgressListener, useBatchAddListener, useBatchProgressListener, useBatchFinishListener } from '@rpldy/uploady'
@@ -101,7 +101,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   // ** Uploady Progress
   const [progress, setProgress] = React.useState<number>(0)
 
-  const progressData = useItemProgressListener()
   const batch = useBatchProgressListener((batch) => {})
 
 

@@ -41,7 +41,15 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery } from '@tanstack/react-query'
 
 // ** Uploady
-import { useUploady, useItemProgressListener, useBatchAddListener, useBatchProgressListener, useBatchFinishListener } from '@rpldy/uploady'
+import {
+  useUploady,
+  useRequestPreSend,
+  useBatchAddListener,
+  useAbortBatch,
+  useBatchStartListener,
+  useBatchProgressListener,
+  useBatchFinishListener
+} from '@rpldy/uploady'
 import { asUploadButton } from '@rpldy/upload-button'
 
 // ** Configs
@@ -53,6 +61,9 @@ import { StudioContext, DisplayPage } from '..'
 // ** 3rd party
 import Translations from '@/layouts/components/Translations'
 import { useTranslation } from 'react-i18next'
+
+// ** Import base link
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
 
 // Styled components
 const Img = styled('img')(({ theme }) => ({
@@ -107,6 +118,45 @@ const ThumbnailBox = styled(Box)(({ theme }) => ({
   }
 }))
 
+// ** Custom Styled Uploady Button
+const VideoUploady = asUploadButton((props: any) => {
+  return (
+    <Button
+      {...props}
+      sx={{
+        bgcolor: 'primary.main',
+        color: 'common.white',
+        mt: 5,
+        maxWidth: ['16rem'],
+        marginInline: 'auto',
+        display: 'block',
+        cursor: 'pointer'
+      }}
+    >
+      Upload Work Video!
+    </Button>
+  )
+})
+
+const VideoUploadyTrial = asUploadButton((props: any) => {
+  return (
+    <Button
+      {...props}
+      sx={{
+        bgcolor: 'primary.main',
+        color: 'common.white',
+        mt: 5,
+        maxWidth: ['16rem'],
+        marginInline: 'auto',
+        display: 'block',
+        cursor: 'pointer'
+      }}
+    >
+      Upload Trailer Video
+    </Button>
+  )
+})
+
 // ** Props and interfaces
 type Props = {}
 
@@ -131,16 +181,176 @@ const defaultValues = {
 
 const UploadVideoStep1 = (props: Props) => {
 
+  // ** Contexts
+  const studioContext = React.useContext(StudioContext)
+  const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
   // ** Translations
   const { t } = useTranslation()
 
-  // ** Uploady 
-   // ** Uploady Hooks
+  // ************ Uploady ****************************
+
+  // ** Uploady Hooks
   const uploady = useUploady()
+  const abortBatch = useAbortBatch()
+
+  // ** Batch Progress
+  const batch = useBatchProgressListener(batch => {})
+  console.log('THE BATCH', batch)
+  if (batch && batch.completed > studioContext!.workProgress && batch.completed < 100) {
+    console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
+    studioContext?.setWorkProgress(() => batch.completed)
+  }
+
+  useBatchAddListener((batch, options) => {
+    console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
+    studioContext?.setWorkProgress(0)
+    console.log('Start setProgress', studioContext?.workProgress)
+    //return false to cancel the batch
+  })
+
+  useBatchFinishListener(batch => {
+    console.log(`batch ${batch.id} finished uploading`)
+    studioContext?.setWorkProgress(100)
+    toast.success('Successfully Upload Video!', { position: 'top-center', duration: 4000 })
+
+    setTimeout(() => {
+      console.log('CALL SOME FINISH UPLOAD HANDLER')
+    }, 500)
+  })
+
+  useBatchAddListener((batch, options) => {
+    // console.log(`batch ${batch.id} was just added with ${batch.items.length} items`);
+    // console.log('batch OPTIONS', options)
+
+    const { params } = options
+
+    if (params?.video_type == 'full_video') {
+      // let's manually check full Video has already been selected because of batch upload issues
+      if (!hasFullVideo) {
+        setHasFullVideo(batch.id)
+      } else {
+        // remove this new full video if there is already one
+        abortBatch(hasFullVideo)
+        setHasFullVideo(batch.id)
+      }
+    }
+
+    // ** Check trial
+    if (params?.video_type == 'trial_video') {
+      studioContext?.setHasTrial(true)
+
+      // let's manually check trial has already been selected because of batch upload issues
+      if (!hasTrailerVideo) {
+        setHasTrailerVideo(batch.id)
+      } else {
+        // remove this new full video if there is already one
+        abortBatch(hasTrailerVideo)
+        setHasTrailerVideo(batch.id)
+      }
+    }
+  })
+
+  useBatchStartListener(batch => {
+    console.log(`batch ${batch.id} started uploading`)
+  })
+
+  useRequestPreSend(async ({ items, options }) => {
+    let hasTrialVideo = false
+
+    const { title, contentCreator } = getValues()
+
+    if (options?.params?.video_type == 'full_video') {
+      console.log('options full_video URL', options.destination)
+
+      const passFullVideoData = {
+        user_id: contentCreator,
+        video_type: 'full_video',
+        video_name: title
+      }
+      const result = await uploadVideoURL({ formData: passFullVideoData })
+      const { uploadUrl, work_id } = result
+      console.log('RESULT', result)
+      //set a work ID
+      setWorkVideo(work_id)
+
+      console.log('result', result)
+
+      // update the form
+      updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+
+      return uploadUrl
+        ? //set the new URL for this upload
+          { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+        : //not valid URL, cancel the upload
+          false
+    } // end if full video
+
+    if (options?.params?.video_type == 'trial_video') {
+      console.log('options trial_video URL', options.destination)
+      // we have a trial video
+      hasTrialVideo = true
+
+      const passTrailerVideoData = {
+        user_id: contentCreator,
+        video_type: 'trial_video',
+        video_name: title,
+        work_id: workVideo
+      }
+      const result = await uploadVideoURL({ formData: passTrailerVideoData })
+      console.log('result trailer', result)
+      const { uploadUrl } = result
+      // update the form
+      updateVideoByWorkId({ formData: handleFormData(workVideo as string, hasTrialVideo) })
+
+      return uploadUrl
+        ? //set the new URL for this upload
+          { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+        : //not valid URL, cancel the upload
+          false
+    }
+  })
+
+  // Handle Form Data Function
+  const handleFormData = (work_id: string, hasTrialCheck: boolean): FormData => {
+    // ** Update the table with the work_id -- Refactor this formData values
+    console.log('handleFormData getValues', getValues())
+
+    const { title, description, startTime } = getValues()
+
+    const formData = new FormData()
+
+    formData.append('work_id', work_id)
+    formData.append('title', title)
+    formData.append('description', description)
+    formData.append('orientation', 'landscape') // HardCoded
+    formData.append('startTimeSeconds', startTime)
+    formData.append('_method', 'put')
+
+    if (thumbnailFile?.length) {
+      formData.append('thumbnail', thumbnailFile[0])
+    }
+    formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
+
+    if (tags.length) {
+      tags.map(tag => formData.append('tags[]', tag))
+    }
+    if (groupings.length) {
+      groupings.map(group => formData.append('groups[]', group))
+    }
+
+    return formData
+  } // end handleFormData Fxn
+
+  // ** SERVICES CALLS
+  const { uploadVideoURL } = VideoService()
 
   /* States */
   const [trialUploadSwitch, setTrialUploadSwitch] = React.useState<boolean>(false)
   const [files, setFiles] = React.useState<File[] | null>([])
+  const [hasFullVideo, setHasFullVideo] = React.useState<string | null>(null)
+  const [hasTrailerVideo, setHasTrailerVideo] = React.useState<string | null>(null)
+  const [workVideo, setWorkVideo] = React.useState<string | null>(null)
   const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
   const [thumbnailFile, setThumbnailFile] = React.useState<File[]>([])
   const [tags, setTags] = React.useState<string[]>([])
@@ -158,10 +368,6 @@ const UploadVideoStep1 = (props: Props) => {
       ]
     | []
   >([])
-
-  const studioContext = React.useContext(StudioContext)
-
-  const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
   // ** UseForm
   const {
@@ -208,42 +414,6 @@ const UploadVideoStep1 = (props: Props) => {
   })
 
   // ** File Upload Dropzone
-  const { getRootProps: mainFileRootProps, getInputProps: mainFileInputProps } = useDropzone({
-    maxFiles: 1,
-    accept: {
-      'video/*': ['.mp4', '.avi']
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
-
-      if (!getValues().title) {
-        studioContext?.setTitle(acceptedFiles[0].name)
-        setValue('title', acceptedFiles[0].name)
-      }
-    },
-    onDropRejected: () => {
-      toast.error('You can only upload video files.', {
-        duration: 2000
-      })
-    }
-  })
-
-  const { getRootProps: trailerFileRootProps, getInputProps: trailerFileInputProps } = useDropzone({
-    maxFiles: 1,
-    maxSize: 41943040, //40mb
-    accept: {
-      'video/*': ['.mp4', '.avi']
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      setTrailerFile(acceptedFiles.map((file: File) => Object.assign(file)))
-      studioContext?.setHasTrial(true)
-    },
-    onDropRejected: () => {
-      toast.error('File size is too large.', {
-        duration: 2000
-      })
-    }
-  })
 
   const { getRootProps: thumbnailFileRootProps, getInputProps: thumbnailFileInputProps } = useDropzone({
     multiple: false,
@@ -263,11 +433,6 @@ const UploadVideoStep1 = (props: Props) => {
   })
 
   // ** Component Functions
-
-  const handleUploady = () => {
-    
-
-  }
 
   const handleCancelButton = () => {
     //clear values
@@ -298,182 +463,6 @@ const UploadVideoStep1 = (props: Props) => {
       //reset multiTags
       resetField('multiTags')
     }
-  }
-
-  const askToResumeUpload = (previousUploads: tus.PreviousUpload[]) => {
-    if (previousUploads.length === 0) return null
-
-    var text = 'You tried to upload this file previously at these times:\n\n'
-    previousUploads.forEach((previousUpload, index) => {
-      text += '[' + index + '] ' + previousUpload.creationTime + '\n'
-    })
-    text += '\nResume to continue upload or press Cancel to start a new upload'
-
-    var isConfirmed: boolean = confirm(text)
-
-    if (isConfirmed) {
-      return previousUploads[0]
-    }
-  }
-  const handleUpload = () => {
-    // call videos api
-    if (!files) {
-      return
-    }
-
-    var file = files[0]
-
-    //get fields from react hook form
-    const { title, contentCreator } = getValues()
-    console.log('groupings', groupings)
-
-    const upload = new tus.Upload(file, {
-      endpoint: `${UploadURL}`,
-      chunkSize: 5 * 1024 * 1024,
-      retryDelays: [0, 1000, 3000, 5000],
-      metadata: {
-        filename: file.name,
-        filetype: file.type,
-        user_id: contentCreator,
-        file_name: title,
-        video_type: 'full_video',
-        authorization: `${accessToken}`
-      },
-      removeFingerprintOnSuccess: true, // fingerprint in the URL storage will be removed
-      onError: error => {
-        console.error('Failed because:', error)
-      },
-      onProgress: (bytesUploaded, bytesTotal) => {
-        const progress = Math.round((bytesUploaded / bytesTotal) * 100)
-        //console.log('progress', progress)
-        studioContext?.setWorkProgress(progress)
-      },
-      onSuccess: () => {
-        console.log('Full Video Upload finished:', upload.url)
-      },
-      onAfterResponse: (req, res) => {
-        let xmlhttpreq = req.getUnderlyingObject()
-
-        if (xmlhttpreq.getAllResponseHeaders().indexOf('work_id') != -1) {
-          studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
-
-          let hasTrialCheck = false
-          let data = JSON.parse(res.getHeader('works'))
-          console.log('data from trial video header', data)
-          const { work_id } = data.data
-          studioContext?.setWorkId(work_id)
-
-          if (studioContext?.hasTrial) {
-            //start upload another TUS trial video
-            console.log('hasTrial')
-            hasTrialCheck = true
-
-            // call trial videos api
-            if (!trailerFile) {
-              console.log('trailerFile', trailerFile)
-              return
-            }
-
-            var tFile = trailerFile[0]
-
-            const uploadTrial = new tus.Upload(file, {
-              endpoint: `${UploadURL}`,
-              chunkSize: 5 * 1024 * 1024,
-              retryDelays: [0, 1000, 3000, 5000],
-
-              metadata: {
-                filename: tFile.name,
-                filetype: tFile.type,
-                user_id: contentCreator,
-                file_name: title,
-                video_type: 'trial_video',
-                work_id: work_id,
-                authorization: `${accessToken}`
-              },
-              removeFingerprintOnSuccess: true, // fingerprint in the URL storage will be removed
-              onError: error => {
-                console.error('Trial Failed because:', error)
-              },
-              onProgress: (bytesUploaded, bytesTotal) => {
-                const progress = Math.round((bytesUploaded / bytesTotal) * 100)
-                //console.log('Trial progress', progress)
-                studioContext?.setTrialProgress(progress)
-              },
-              onSuccess: () => {
-                console.log('Trial Upload finished:', uploadTrial.url)
-              },
-              onAfterResponse: (req, res) => {
-                console.log('response in TRIAL', res)
-              }
-            })
-
-            // Start the trial upload
-            uploadTrial.start()
-          } else {
-            console.log('no trial')
-            hasTrialCheck = false
-          }
-
-          //form update
-          updateVideoByWorkId({ formData: handleFormData(res, hasTrialCheck) })
-        } // End if check workID has been returned after uploading work video
-      }
-    })
-
-    //handle form Update data
-    const handleFormData = (res: tus.HttpResponse, hasTrialCheck: boolean): FormData => {
-      let trial_upload_url = ''
-      if (res.getHeader('location')) {
-        trial_upload_url = res.getHeader('location')
-      }
-
-      let data = JSON.parse(res.getHeader('works'))
-      console.log('data', data)
-      const { work_id } = data.data
-
-      // ** Update the table with the work_id -- Refactor this formData values
-      console.log('getValues', getValues())
-
-      const { title, description, startTime } = getValues()
-
-      const formData = new FormData()
-
-      formData.append('work_id', work_id)
-      formData.append('title', title)
-      formData.append('description', description)
-      formData.append('orientation', 'landscape') // HardCoded
-      formData.append('startTimeSeconds', startTime)
-      formData.append('_method', 'put')
-
-      if (thumbnailFile?.length) {
-        formData.append('thumbnail', thumbnailFile[0])
-      }
-      formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
-
-      if (tags.length) {
-        tags.map(tag => formData.append('tags[]', tag))
-      }
-      if (groupings.length) {
-        groupings.map(group => formData.append('groups[]', group))
-      }
-
-      return formData
-    }
-
-    // Check if there are any previous uploads to continue.
-    upload.findPreviousUploads().then(function (previousUploads) {
-      // Found previous uploads so we select the first one.
-      var chosenUpload = askToResumeUpload(previousUploads)
-
-      // If an upload has been chosen to be resumed, instruct the upload object to do so.
-      if (chosenUpload) {
-        upload.resumeFromPreviousUpload(chosenUpload)
-      }
-
-      // Start the upload
-      studioContext?.setDisplayPage(DisplayPage.LoadingScreen)
-      upload.start()
-    })
   }
 
   //temporary trailer video function for start time
@@ -513,7 +502,7 @@ const UploadVideoStep1 = (props: Props) => {
       toast.error('Title is required', { position: 'top-center' })
       return
     }
-    if (!files?.length) {
+    if (!hasFullVideo) {
       toast.error('Please upload a video', { position: 'top-center' })
       return
     }
@@ -525,9 +514,13 @@ const UploadVideoStep1 = (props: Props) => {
     studioContext?.setTitle(title)
     studioContext?.setContentCreator(contentCreator)
     studioContext?.setDescription(description)
+    studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
+    // UPLOADY UPLOAD
+    handleUploadyUpload()
+  }
 
-    //TUS Upload
-    handleUpload()
+  const handleUploadyUpload = () => {
+    uploady.processPending()
   }
 
   const setContextTags = () => {
@@ -760,8 +753,7 @@ const UploadVideoStep1 = (props: Props) => {
           <Grid pt={['0rem !important', '2.5rem']} item xs={12} sm={4}>
             <Box className='uploadBoxes'>
               <Box className='uploadWorkVidBox'>
-                <div {...mainFileRootProps({ className: 'dropzone' })}>
-                  <input {...mainFileInputProps()} />
+                <div>
                   <Box
                     sx={{
                       borderRadius: '15px',
@@ -786,24 +778,31 @@ const UploadVideoStep1 = (props: Props) => {
                       )}
                     </Box>
                   </Box>
-                  <CustomButton
-                    sx={{
-                      bgcolor: 'primary.main',
-                      color: 'common.white',
-                      mt: 5,
-                      maxWidth: ['16rem'],
-                      marginInline: 'auto',
-                      display: 'block'
+
+                  <VideoUploady
+                    destination={{
+                      url: 'https://webhook.site/946623c3-23ca-47e6-872f-13266345520e'
                     }}
-                  >
-                    <Translations text='Upload Work Video' />
-                  </CustomButton>
+                    clearPendingOnAdd={false}
+                    autoUpload={false}
+                    id='work'
+                    params={{ video_type: 'full_video' }}
+                  />
+
+                  <VideoUploadyTrial
+                    destination={{
+                      url: 'https://webhook.site/c5788191-fd80-42e3-9764-ff18dc23950d'
+                    }}
+                    clearPendingOnAdd={false}
+                    autoUpload={false}
+                    id='trial'
+                    params={{ video_type: 'trial_video' }}
+                  />
                 </div>
               </Box>
 
               {files?.length ? (
                 <Box className='uploadShortVidBox' sx={{ mt: 10 }}>
-                  {/* <Button sx={{marginBottom:'1rem'}} color='warning' variant='contained' onClick={ () => { handleUploady() }}>TEST</Button> */}
                   <Card>
                     <CardContent sx={{ paddingBlock: '1rem' }}>
                       <FormGroup sx={{ justifyContent: 'space-between', alignItems: 'center' }} row>
@@ -831,16 +830,6 @@ const UploadVideoStep1 = (props: Props) => {
                         </FormGroup>
                       )}
                     </CardContent>
-                    <CardActions sx={{ display: 'flex', justifyContent: 'center' }} className='card-action-dense'>
-                      {trialUploadSwitch && (
-                        <div {...trailerFileRootProps({ className: 'dropzone' })}>
-                          <input {...trailerFileInputProps()} />
-                          <Button variant='contained'>
-                            {trailerFile?.length ? 'Selected 1 file' : 'Upload Trailer Video'}
-                          </Button>
-                        </div>
-                      )}
-                    </CardActions>
                   </Card>
                 </Box>
               ) : null}
@@ -865,7 +854,7 @@ const UploadVideoStep1 = (props: Props) => {
                 </CustomButton>
               </Box>
               <Box>
-                {!files?.length ? (
+                {!hasFullVideo ? (
                   <Alert severity='error'>
                     <Translations text='Select a video' />
                   </Alert>
