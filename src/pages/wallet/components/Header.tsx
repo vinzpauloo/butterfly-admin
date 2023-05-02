@@ -55,7 +55,7 @@ const Header = () => {
         {TranslateString('Payment Method')}
       </Typography>
       <Box mt={5} sx={styles.wrapper}>
-        <FormControl size='small' sx={styles.formControl}>
+        {/* <FormControl size='small' sx={styles.formControl}>
           <InputLabel id='demo-simple-select-label'>{TranslateString('Select Provider')}</InputLabel>
           <Select
             labelId='demo-simple-select-label'
@@ -68,9 +68,6 @@ const Header = () => {
               sx: { ...styles.menuList }
             }}
           >
-            {/* <MenuItem value='' sx={{ ...styles.menuItem, fontWeight: '600', textTransform: 'uppercase' }}>
-              <em>None</em>
-            </MenuItem> */}
             {siteName &&
               siteName?.map((item, index) => (
                 <MenuItem key={index} value={item.id}>
@@ -83,8 +80,8 @@ const Header = () => {
                 </MenuItem>
               ))}
           </Select>
-        </FormControl>
-        <Box sx={styles.buttonWrapper}>
+        </FormControl> */}
+        {/* <Box sx={styles.buttonWrapper}>
           {selectedSite === '' ? (
             false
           ) : (
@@ -92,7 +89,7 @@ const Header = () => {
               {TranslateString('Add') + ' ' + TranslateString('New')}
             </Button>
           )}
-        </Box>
+        </Box> */}
         <VersionsDrawer open={openDrawer} toggle={handleDrawerToggle} />
       </Box>
     </Box>
@@ -102,13 +99,13 @@ const Header = () => {
 const styles = {
   wrapper: {
     display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: {
-      xs: 'column',
-      sm: 'column',
-      md: 'column',
-      lg: 'row'
-    }
+    justifyContent: 'flex-end'
+    // flexDirection: {
+    //   xs: 'column',
+    //   sm: 'column',
+    //   md: 'column',
+    //   lg: 'row'
+    // }
   },
   formControl: {
     width: {

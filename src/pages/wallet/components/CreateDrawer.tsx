@@ -24,12 +24,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { ApkService } from '@/services/api/ApkService'
+import { WalletService } from '@/services/api/WalletService'
 import FileUploaderSingle from './FileUploader'
 
 interface FormValues {
   [key: string]: any
-  provider: string
-  merchant_name: string
+  bank_code: string //Provider
+  name: string // Merchant name
+  active: string | number //0 = false; 1 = true
   logo: File | null
 }
 
@@ -48,7 +50,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundColor: theme.palette.background.default
 }))
 
-const VersionsDrawer = (props: SidebarAddUserType) => {
+const PaymentsDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
 
   // ** Props
@@ -67,13 +69,16 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
   })
 
   const resetForm = () => {
-    reset({})
+    reset({
+      bank_code: '',
+      name: '',
+      active: '',
+      logo: null
+    })
   }
 
-  const { postAPK } = ApkService()
-  const mutation = useMutation(postAPK)
-
-  const { selectedSite } = useSiteContext()
+  const { postWallet } = WalletService()
+  const mutation = useMutation(postWallet)
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
 
@@ -98,18 +103,16 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
       formData.append(key, value)
     }
 
-    formData.append('site_id', `${selectedSite}`)
-
     if (uploadedFile) {
       formData.append(`logo`, uploadedFile)
     }
 
-    const apkData: any = {
+    const paymentsData: any = {
       data: formData
     }
 
     try {
-      await mutation.mutateAsync(apkData)
+      await mutation.mutateAsync(paymentsData)
       setSubmitted(true)
 
       setTimeout(() => {
@@ -118,7 +121,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
         setSubmitted(false)
 
         // Re-fetches UserTable and CSV exportation
-        queryClient.invalidateQueries({ queryKey: ['allApk'] })
+        queryClient.invalidateQueries({ queryKey: ['allPayments'] })
       }, 1500)
     } catch (e) {
       console.log(`Error`, e)
@@ -157,18 +160,18 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
           <Box sx={styles.container}>
             <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
               <Controller
-                name='provider'
+                name='bank_code'
                 control={control}
                 render={({ field }) => (
                   <TextField
                     label={TranslateString('Provider')}
                     variant='outlined'
                     fullWidth
-                    error={!!errors.provider}
-                    helperText={errors.provider?.message}
+                    error={!!errors.bank_code}
+                    helperText={errors.bank_code?.message}
                     defaultValue={field.value}
                     onChange={field.onChange}
-                    name='provider'
+                    name='bank_code'
                   />
                 )}
               />
@@ -180,18 +183,18 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
 
                 <Box sx={styles.fullWidth}>
                   <Controller
-                    name='merchant_name'
+                    name='name'
                     control={control}
                     render={({ field }) => (
                       <TextField
                         label={TranslateString('Merchant Name')}
                         variant='outlined'
                         fullWidth
-                        error={!!errors.merchant_name}
-                        helperText={errors.merchant_name?.message}
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
                         defaultValue={field.value}
                         onChange={field.onChange}
-                        name='merchant_name'
+                        name='name'
                       />
                     )}
                   />
@@ -299,4 +302,4 @@ const styles = {
   }
 }
 
-export default VersionsDrawer
+export default PaymentsDrawer
