@@ -63,8 +63,6 @@ export const PaymentsColumns = () => {
       headerName: 'Action',
       width: 135,
       renderCell: (params: any) => {
-        console.log(`Payments Row`, params?.row)
-
         return <ToggleAction id={params?.row.id} value={params?.row.active} />
       }
     }
