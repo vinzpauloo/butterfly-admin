@@ -21,6 +21,8 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import LinearProgress from '@mui/material/LinearProgress'
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Services Import
 import useGroupingService from '@/services/useGroupings'
@@ -34,7 +36,6 @@ import CustomButton from '@/layouts/components/shared-components/CustomButton/Cu
 // ** Third Party Components
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
-import * as tus from 'tus-js-client'
 import * as yup from 'yup'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -210,7 +211,10 @@ const UploadVideoStep1 = (props: Props) => {
   useBatchFinishListener(batch => {
     console.log(`batch ${batch.id} finished uploading`)
     studioContext?.setWorkProgress(100)
-    toast.success('Successfully Uploaded the Video!', { position: 'top-center', duration: 4000 })
+    //toast.success('Successfully Uploaded the Video!', { position: 'top-center', duration: 4000 })
+
+    //close BD
+    setOpenBD(false)
 
     setTimeout(() => {
       console.log('CALL SOME FINISH UPLOAD HANDLER')
@@ -251,6 +255,9 @@ const UploadVideoStep1 = (props: Props) => {
 
   useBatchStartListener(batch => {
     console.log(`batch ${batch.id} started uploading`)
+
+    //open backdrop for loading video
+    setOpenBD(true)
   })
 
   useRequestPreSend(async ({ items, options }) => {
@@ -365,6 +372,7 @@ const UploadVideoStep1 = (props: Props) => {
       ]
     | []
   >([])
+  const [openBD, setOpenBD] = React.useState(false);
 
   // ** UseForm
   const {
@@ -908,6 +916,13 @@ const UploadVideoStep1 = (props: Props) => {
           </Grid>
         </Grid>
       </BasicCard>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openBD}
+        onClick={() => {}}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </>
   )
 }
