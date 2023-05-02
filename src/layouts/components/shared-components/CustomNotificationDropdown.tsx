@@ -162,14 +162,20 @@ const CustomNotificationDropdown = (props: Props) => {
 
   return (
     <Fragment>
-      <IconButton sx={{paddingBlock:0, marginInline: 3}} color='inherit' aria-haspopup='true' onClick={handleDropdownOpen} aria-controls='customized-menu'>
+      <IconButton
+        sx={{ paddingBlock: 0, marginInline: 3 }}
+        color='inherit'
+        aria-haspopup='true'
+        onClick={handleDropdownOpen}
+        aria-controls='customized-menu'
+      >
         <Badge
           invisible={!notifications.length}
           sx={{
             '& .MuiBadge-badge': { top: 4, right: 4, boxShadow: theme => `0 0 0 2px ${theme.palette.background.paper}` }
           }}
         >
-          <img width={25} src="/images/topbar/notif.png" />
+          <img width={25} src='/images/topbar/notif.png' />
         </Badge>
       </IconButton>
       <Menu

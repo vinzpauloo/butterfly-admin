@@ -30,6 +30,10 @@ const notifications = [
   {
     id: 1,
     label: 'Second notification'
+  },
+  {
+    id: 3,
+    label: 'Third Notification'
   }
 ]
 
