@@ -206,7 +206,7 @@ const UploadVideoStep1 = (props: Props) => {
     console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
     studioContext?.setWorkProgress(0)
     console.log('Start setProgress', studioContext?.workProgress)
-    //return false to cancel the batch
+    
   })
 
   useBatchFinishListener(batch => {
@@ -261,8 +261,6 @@ const UploadVideoStep1 = (props: Props) => {
     const { title, contentCreator } = getValues()
 
     if (options?.params?.video_type == 'full_video') {
-      console.log('options full_video URL', options.destination)
-
       const passFullVideoData = {
         user_id: contentCreator,
         video_type: 'full_video',
@@ -278,6 +276,8 @@ const UploadVideoStep1 = (props: Props) => {
 
       // update the form
       updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+      
+      // studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
 
       return uploadUrl
         ? //set the new URL for this upload
@@ -287,7 +287,6 @@ const UploadVideoStep1 = (props: Props) => {
     } // end if full video
 
     if (options?.params?.video_type == 'trial_video') {
-      console.log('options trial_video URL', options.destination)
       // we have a trial video
       hasTrialVideo = true
 
@@ -514,9 +513,10 @@ const UploadVideoStep1 = (props: Props) => {
     studioContext?.setTitle(title)
     studioContext?.setContentCreator(contentCreator)
     studioContext?.setDescription(description)
-    studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
+    
     // UPLOADY UPLOAD
     handleUploadyUpload()
+    
   }
 
   const handleUploadyUpload = () => {
