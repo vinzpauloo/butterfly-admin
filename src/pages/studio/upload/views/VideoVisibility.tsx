@@ -42,6 +42,17 @@ import { PublishSchedule } from '..'
 // ** Services Import
 import VideoService from '@/services/api/VideoService'
 
+// ** Uploady
+import {
+  useUploady,
+  useRequestPreSend,
+  useBatchAddListener,
+  useAbortBatch,
+  useBatchStartListener,
+  useBatchProgressListener,
+  useBatchFinishListener
+} from '@rpldy/uploady'
+
 // Styled components
 const HeaderBox = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -74,6 +85,11 @@ const CustomAccordion = styled(Accordion)(({ theme }) => ({
 }))
 
 const VideoVisibility = () => {
+
+  // ** Hooks
+  const uploady = useUploady()
+  const abortBatch = useAbortBatch()
+
   const router = useRouter()
   React.useEffect(() => {
     console.log('studioContext FINAL', studioContext)
@@ -102,6 +118,11 @@ const VideoVisibility = () => {
   }
   const dummyNavigate = () => {
     //studioContext?.setDisplayPage(DisplayPage.VideosList)
+
+    processUploady()
+    return false
+
+
     let isSchedule = selectedValue == 'publish' ? false : true
 
     let defaultWorkFormParams = {
@@ -136,11 +157,13 @@ const VideoVisibility = () => {
       formData: formData
     })
   }
+
+
   const dimOnTrue = (flag: boolean) => {
     return {
       opacity: flag ? 0.3 : 1,
       backgroundColor: 'black',
-      padding:'.3rem'
+      padding: '.3rem'
     }
   }
 
@@ -159,7 +182,40 @@ const VideoVisibility = () => {
     studioContext?.setPublishDate(publish)
   }
 
-  console.log('workProgress', studioContext?.workProgress)
+
+  // ** UPLOADY HOOKS
+  // ** Batch Progress
+  const batch = useBatchProgressListener(batch => {})
+  if (batch && batch.completed > studioContext!.workProgress && batch.completed < 100) {
+    console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
+    studioContext?.setWorkProgress(() => batch.completed)
+  }
+
+  useBatchAddListener((batch, options) => {
+    console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
+    studioContext?.setWorkProgress(0)
+    console.log('Start setProgress in Video Visibility', studioContext?.workProgress)
+    //return false to cancel the batch
+  })
+
+  useBatchFinishListener(batch => {
+    console.log(`batch ${batch.id} finished uploading`)
+    studioContext?.setWorkProgress(100)
+    //toast.success('Successfully Upload Video!', { position: 'top-center', duration: 4000 })
+
+    setTimeout(() => {
+      console.log('CALL SOME FINISH UPLOAD HANDLER INSIDE VIDEO VISIBILITY')
+    }, 500)
+  })
+
+  // ** Handle Presend
+  useRequestPreSend(async ({ items, options }) => {
+      console.log('VISIBILITY PRESEND', options)
+  })
+
+  const processUploady = () => {
+    uploady.processPending()
+  }
 
   return (
     <Box
@@ -179,7 +235,7 @@ const VideoVisibility = () => {
             textTransform: 'uppercase',
             fontSize: ['1rem', '1.5rem !important'],
             textAlign: 'left',
-            mt : ['1.5rem', '0']
+            mt: ['1.5rem', '0']
           }}
           color={theme => theme.customBflyColors.primaryText}
         >
@@ -391,10 +447,7 @@ const VideoVisibility = () => {
                 ) : (
                   <>
                     <Box>
-                      <Button
-                        disabled={studioContext?.workProgress != 100 ? true : false}
-                        onClick={handleCancelButton}
-                      >
+                      <Button disabled={studioContext?.workProgress != 100 ? true : false} onClick={handleCancelButton}>
                         Back
                       </Button>
                     </Box>
@@ -408,11 +461,7 @@ const VideoVisibility = () => {
                         }}
                         color='primary'
                         variant='contained'
-                        disabled={studioContext?.workProgress != 100 ? true : false}
                       >
-                        {studioContext?.workProgress != 100 ? (
-                          <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' />
-                        ) : null}{' '}
                         Save
                       </Button>
                     </Box>

@@ -114,7 +114,9 @@ export interface IVideoRow {
   description: string
   endTimeSeconds: number
   filename: string
+  has_own_trial : boolean
   full: {}
+  full_video_hls : string
   full_upload_url: string
   full_video_uid: string
   tags: string[]

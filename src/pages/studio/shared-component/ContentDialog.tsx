@@ -31,6 +31,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import ContentService from '../../../services/api/ContentService'
 import { useTranslateString } from '@/utils/TranslateString';
 
+// ** BASE APIS Import
+import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
   ref: Ref<unknown>
@@ -47,6 +50,8 @@ type ContentDialogType = {
     email: string
     tags: string[]
     trial_video_hls: string
+    full_video_hls : string
+    has_own_trial : boolean
     updated_at: string
     user: {
       username: string
@@ -239,7 +244,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                     width='100%'
                     height='100%'
                     controls={true}
-                    url={param.trial_video_hls}
+                    url={ param.has_own_trial ? STREAMING_SERVER_URL + param.trial_video_hls : STREAMING_SERVER_URL + param.full_video_hls }
                   />
                 </VideoBox>
               </Box>
@@ -269,7 +274,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
 
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '.5rem' }}>
-                <TextField disabled multiline rows={2} fullWidth defaultValue={param.tags.join(', ')} />
+                <TextField disabled multiline rows={2} fullWidth defaultValue={param?.tags?.join(', ')} />
               </FormControl>
             </Grid>
           </Grid>

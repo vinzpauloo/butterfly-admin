@@ -31,6 +31,9 @@ import { CircularProgress } from '@mui/material'
 
 import { useTranslateString } from '@/utils/TranslateString';
 
+// ** BASE APIS Import
+import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+
 interface SidebarEditVideoType {
   open: boolean
   toggle: () => void
@@ -195,7 +198,12 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
         </Header>
         <Box>
           <VideoBox>
-            <ReactPlayer className='reactPlayer' width='100%' height='100%' controls={true} url={row.trial_video_hls} />
+            <ReactPlayer 
+              className='reactPlayer' 
+              width='100%' 
+              height='100%' 
+              controls={true} 
+              url={ row.has_own_trial ? STREAMING_SERVER_URL + row.trial_video_hls : STREAMING_SERVER_URL + row.full_video_hls } />
           </VideoBox>
         </Box>
         <Box sx={{ p: 5 }}>
@@ -231,7 +239,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 }}
               />
 
-              <Stack flexWrap='wrap' direction='row' spacing={1} rowGap={2}>
+              <Stack sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding:'.5rem' }} flexWrap='wrap' direction='row' spacing={1} rowGap={2}>
                 {watch('tags') &&
                   getValues('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
               </Stack>

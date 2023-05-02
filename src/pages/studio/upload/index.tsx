@@ -179,8 +179,12 @@ const UploadContent = () => {
       }}
     >
       <ChunkedUploady
+        accept='video/*'
         autoUpload={false}
+        clearPendingOnAdd={true}
         multiple={false}
+        maxGroupSize={0}
+        grouped={false}
         method='POST'        
         destination={{ 
           url: uploadURL, //uploadURL 

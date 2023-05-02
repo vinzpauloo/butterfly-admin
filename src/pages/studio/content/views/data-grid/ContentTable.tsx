@@ -25,6 +25,8 @@ import ContentService from '@/services/api/ContentService'
 import Icon from 'src/@core/components/icon'
 import { useTranslateString } from '@/utils/TranslateString';
 
+// ** BASE APIS Import
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** renders client column
 const renderClient = (params: GridRenderCellParams) => {
@@ -33,10 +35,10 @@ const renderClient = (params: GridRenderCellParams) => {
   const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
   const color = states[stateNum]
 
-  if (row.thumbnail_url.length) {
+  if (row?.thumbnail_url?.length) {
     return (
       <CustomAvatar
-        src={`${row.thumbnail_url.replace('http://localhost/', 'http://192.168.50.9/')}`}
+        src={FILE_SERVER_URL + params.row.thumbnail_url}
         sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
       />
     )
@@ -157,7 +159,7 @@ const ContentTable = (props: IContentTable) => {
       headerName: TranslateString("Tags"),
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.tags.join(', ')}
+          {params?.row?.tags?.join(', ')}
         </Typography>
       )
     },
