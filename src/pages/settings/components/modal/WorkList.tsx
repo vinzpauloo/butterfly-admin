@@ -10,6 +10,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 // ** Utils import
 import formatDate from '@/utils/formatDate'
 import WorkgroupService from '@/services/api/Workgroup'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const CheckboxContent = ({ header, allId, setAllId, id, sectionID }: any) => {
   const [isCheck, setIsCheck] = useState(allId.includes(id))
@@ -187,7 +188,7 @@ function WorkList({
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <CustomAvatar
-                src={params.row.thumbnail_url}
+                src={FILE_SERVER_URL + params.row.thumbnail_url}
                 sx={{ borderRadius: '5px', mr: 3, width: '5.875rem', height: '3rem' }}
               />
             </Box>

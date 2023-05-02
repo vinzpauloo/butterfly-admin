@@ -4,7 +4,7 @@ import React from 'react'
 // ** Other Imports
 import Container from './components/Container'
 import Header from './components/Header'
-import VersionsTable from './table/VersionsTable'
+import PaymentsTable from './table/PaymentsTable'
 import { SiteProvider } from '../../context/SiteContext'
 
 const Wallet = () => {
@@ -12,7 +12,7 @@ const Wallet = () => {
     <SiteProvider>
       <Container>
         <Header />
-        <VersionsTable />
+        <PaymentsTable />
       </Container>
     </SiteProvider>
   )

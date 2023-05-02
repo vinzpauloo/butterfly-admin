@@ -31,7 +31,7 @@ import WorkList from '../modal/WorkList'
 import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 import Translations from '@/layouts/components/Translations'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
@@ -206,9 +206,13 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     enabled: header === 'Edit'
   })
 
-  const { refetch: refetchAll, isLoading } = useQuery({
+  const {
+    refetch: refetchAll,
+    isLoading,
+    isRefetching
+  } = useQuery({
     queryKey: ['edit-allworks', sectionID, page],
-    queryFn: () => getAllWorkgroup({ workgroup_id: sectionID }),
+    queryFn: () => getAllWorkgroup({ workgroup_id: sectionID, page }),
     onSuccess: data => {
       setData(data.data)
       setPageSize(data.per_page)
@@ -268,6 +272,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage + 1)
+    console.log('page change!', newPage + 1)
   }
 
   const onSubmit = (data: any) => {
@@ -423,7 +428,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 autoHeight
                 pagination
                 rows={data}
-                loading={header === 'Edit' ? isLoading : false}
+                loading={header === 'Edit' ? isLoading || isRefetching : false}
                 getRowId={row => row._id}
                 disableColumnMenu
               />

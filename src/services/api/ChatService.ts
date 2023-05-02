@@ -5,14 +5,18 @@ import { getHeaders } from '@/lib/cryptoJs'
 import authConfig from 'src/configs/auth'
 
 interface IChats {
-  page: number
-  paginate?: number
+  params: {
+    page: number
+    paginate?: number
+  }
 }
 
 interface ISingleChatParams {
-  channel: string
-  page?: number
-  paginate?: number
+  chatId: string
+  params: {
+    page?: number
+    paginate?: number
+  }
 }
 
 interface INewChatParams {
@@ -23,21 +27,21 @@ interface INewChatParams {
 const ChatService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const getAllChats = (params: IChats) => {
+  const getAllChats = (data: IChats) => {
     return request({
       headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}`, ...getHeaders() },
       url: '/web/chats/contacts',
       method: 'GET',
-      params
+      params: data.params
     })
   }
 
-  const getSingleChat = (params: ISingleChatParams) => {
+  const getSingleChat = (data: ISingleChatParams) => {
     return request({
       headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}`, ...getHeaders() },
-      url: '/web/chats',
+      url: `/web/chats/${data.chatId}`,
       method: 'GET',
-      params
+      params: data.params
     })
   }
 

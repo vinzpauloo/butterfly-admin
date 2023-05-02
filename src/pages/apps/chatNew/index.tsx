@@ -46,9 +46,8 @@ const AppChat = () => {
   // ** Hooks
   const theme = useTheme()
   const { settings } = useSettings()
-  // const dispatch = useDispatch<AppDispatch>()
   const hidden = useMediaQuery(theme.breakpoints.down('lg'))
-  // const store = useSelector((state: RootState) => state.chat)
+
   // @ts-ignore
   const store: ChatStoreType = data
   const auth = useAuth()
@@ -70,7 +69,7 @@ const AppChat = () => {
   const { getAllChats } = ChatService()
   const { data: chatsList } = useQuery({
     queryKey: ['chats'],
-    queryFn: () => getAllChats({ page: 1, paginate: 1000 }),
+    queryFn: () => getAllChats({ params: { page: 1, paginate: 1000 } }),
     onSuccess: data => {
       console.log('getAllChats success', data)
     },
@@ -78,11 +77,6 @@ const AppChat = () => {
       console.log('getAllChats error', error)
     }
   })
-
-  // useEffect(() => {
-  //   dispatch(fetchUserProfile())
-  //   dispatch(fetchChatsContacts())
-  // }, [dispatch])
 
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen)
 
