@@ -2,7 +2,7 @@ import React from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
-import { Button, TextField, Typography, MenuItem, InputAdornment } from '@mui/material'
+import { Button, TextField, Typography } from '@mui/material'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -16,7 +16,6 @@ import CreatedSuccessful from '../../../form/CreatedSuccessful'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services
-import { CreateAccount } from '@/services/api/CreateAccount'
 import { PaymentService } from '@/services/api/PaymentService'
 
 type StepOneProps = {
@@ -85,7 +84,6 @@ const SAStepThree = (
     []
   )
 
-  const { createUser } = CreateAccount()
   const { registerPayment } = PaymentService()
 
   const { mutate: mutateStepThree } = useMutation(registerPayment, {

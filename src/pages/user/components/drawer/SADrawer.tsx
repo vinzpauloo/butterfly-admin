@@ -187,6 +187,7 @@ const SADrawer = (props: SidebarAddUserType) => {
       subtitle: 'Input Integration and RSA',
       component: (
         <SAStepThree
+          siteID={siteID}
           ref={stepThreeRef}
           toggle={toggle}
           resetKey={resetKey}
