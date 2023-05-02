@@ -69,12 +69,12 @@ const ChatContent = (props: ChatContentType) => {
     isRefetching
   } = useQuery({
     queryKey: ['singleChat', activeChannel],
-    queryFn: () => getSingleChat({ channel: activeChannel, paginate: 1000 }),
+    queryFn: () => getSingleChat({ chatId: activeChat?._id || '', params: { paginate: 1000 } }),
     onSuccess: data => {
       console.log('getSingleChat success ...', data)
     },
     onError: error => {
-      console.log('getAllChats error', error)
+      console.log('getSingleChat error', error)
     },
     enabled: !!activeChat?._id
   })
@@ -82,6 +82,7 @@ const ChatContent = (props: ChatContentType) => {
   useEffect(() => {
     if (activeChannel) initializeChatChannel()
     console.log('useEffect activeChannel', activeChannel)
+    console.log('useEffect activeChat', activeChat)
   }, [activeChannel])
 
   const initializeChatChannel = () => {
