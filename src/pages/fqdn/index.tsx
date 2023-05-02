@@ -45,9 +45,9 @@ const FQDN = () => {
         <PageHeader title={<Typography variant='h5'>FQDN</Typography>} />
         <Grid item xs={12}>
           <Stack gap={20}>
-            <LinksContainer data={APIFQDNS} header="API's" isLoading={isLoading} />
-            <LinksContainer data={streamingFQDNS} header='STREAMING' isLoading={isLoading} />
-            <LinksContainer data={photosFQDNS} header='PHOTOS' isLoading={isLoading} />
+            <LinksContainer data={APIFQDNS} type='Api' isLoading={isLoading} />
+            <LinksContainer data={streamingFQDNS} type='Streaming' isLoading={isLoading} />
+            <LinksContainer data={photosFQDNS} type='Photo' isLoading={isLoading} />
           </Stack>
         </Grid>
       </Grid>

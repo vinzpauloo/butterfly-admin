@@ -1,105 +1,82 @@
-import { Box, Button, Typography, Card, CardContent, IconButton, CircularProgress, OutlinedInput, InputAdornment, Stack } from '@mui/material'
-import Icon from 'src/@core/components/icon'
+import { Box, Button, Typography, Card, CardContent, CircularProgress, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import FQDNService from '@/services/api/FQDNService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '@/services/useAuth'
+import NewFQDNLinkInput from './NewFQDNLinkInput'
+import ExistingFQDNLinkInput from './ExistingFQDNLinkInput'
 
 type Props = {
-  header: string
+  type: 'Api' | 'Streaming' | 'Photo'
   isLoading: boolean
   data: any[]
 }
 
 const LinksContainer = (props: Props) => {
-  const { header, isLoading, data } = props
-  const [newInput, setNewInput] = useState<any>([])
+  const { type, isLoading: getLoading, data } = props
+  const [newInputs, setNewInputs] = useState<any>([])
+  const auth = useAuth()
 
   const addMoreTextField = () => {
-    setNewInput((prev: any) => prev.concat([1]))
+    setNewInputs([...newInputs, ''])
   }
 
-  const { addFQDN, deleteFQDN } = FQDNService()
+  const { addFQDN } = FQDNService()
   const queryClient = useQueryClient()
   const { mutate: mutateAddFQDN, isLoading: addLoading } = useMutation(addFQDN, {
     onSuccess: data => {
-      console.log(data)
+      console.log(data)      
       queryClient.invalidateQueries({ queryKey: ['fqdns'] })
+      setNewInputs([])
     },
-    onError: error => { console.log(error) }
-  })
+    onError: error => { console.log(error) },
+  },)
 
-  const { mutate: mutateDeleteFQDN, isLoading: deleteLoading } = useMutation(deleteFQDN, {
-    onSuccess: data => {
-      console.log(data)
-      queryClient.invalidateQueries({ queryKey: ['fqdns'] })
-    },
-    onError: error => { console.log(error) }
-  })
+  // NEXT TIME - WIP
+  const isValidUrl = (string: string) => {
+    try { 
+      new URL(string)
+
+      return true
+    } catch (err) {
+      return false
+    }
+  }
 
   const addNewFQDNS = () => {
-    // ALL THE ADDS - WIP
-    mutateAddFQDN({
-      data: {
-        site: 1,
-        name: 'https://www.wowBataLakiDede.com/42069',
-        type: 'Api'
-      }
-    })
+    newInputs.map((item: string) =>
+      mutateAddFQDN({
+        data: {
+          site: auth?.user?.site,
+          name: item,
+          type: type
+        }
+      })
+    )
   }
-
-  const deleteSpecifcFQDN = (id: number) => {
-    mutateDeleteFQDN({
-      fqdnID: id
-    })
-  }
-
-  const isTrulyLoading = isLoading || addLoading || deleteLoading
 
   return (
     <Card>
       <CardContent>
-        <Typography variant='h6' component='h2' align='center' sx={{ marginBottom: '1rem' }}>{header}</Typography>
-        <Stack gap={4} position='relative'>
-          {isTrulyLoading && <CircularProgress sx={{position:'absolute', margin: 'auto' ,top:0, left: 0, right: 0, bottom: 0}} /> }
+        <Typography variant='h6' component='h2' align='center' mb={4} textTransform='uppercase'>{type}</Typography>
+        <Typography variant='subtitle2' color='primary' align='left' fontWeight={500} mb={4} textTransform='capitalize'>minimum 3 links</Typography>
+        
+        <Stack gap={4} position='relative' py={getLoading ? 12 : undefined}>
+          {getLoading && <CircularProgress sx={{position:'absolute', margin: 'auto' ,top:0, left: 0, right: 0, bottom: 0}} /> }
           {data.map((item: any, index: any) => 
-            <Stack key={index} position='relative' sx={isTrulyLoading? {opacity: 0.5}: undefined}>
-              <OutlinedInput
-                disabled={deleteLoading}
-                value={item?.name}
-                key={item?.id}
-                error={false}
-                placeholder='default'
-                endAdornment={index > 2 ?
-                  <InputAdornment position='end'>
-                    <IconButton edge='end' onClick={() => deleteSpecifcFQDN(item?.id)} sx={{'&:hover':{color: "red"}}}>
-                      <Icon fontSize={20} icon='mdi:delete-outline' />
-                    </IconButton>
-                  </InputAdornment>: undefined
-                }
-                />
-            </Stack>
+            <ExistingFQDNLinkInput key={item?.id} name={item?.name} id={item?.id} index={index} type={type} />           
           )}
-          {newInput.map((item: any, index: any) =>
-            <Stack key={index} position='relative'>
-              <OutlinedInput
-                error={false}
-                placeholder='new link'
-                endAdornment={
-                  <InputAdornment position='end'>
-                    <IconButton edge='end' onClick={() => {
-                      setNewInput((_: any) => _.filter((_: any, index: any) => index !== 0));
-                    }}>
-                      <Icon fontSize={20} icon='mdi:delete-outline' />
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
-            </Stack>
+          {newInputs.map((item: any, index: any) =>
+            <NewFQDNLinkInput key={item?.id} newInputs={newInputs} index={index} setNewInputs={setNewInputs} isLoading={addLoading} />
           )}
-          <Box display='flex' justifyContent='center' gap={6}>
-            <Button disabled={isLoading} variant='contained' color='info' onClick={addMoreTextField}>Add More</Button>
-            <Button disabled={isLoading} type='submit' variant='contained' color='primary' onClick={addNewFQDNS}>Save</Button>
-          </Box>
+          {!getLoading &&
+            <Box display='flex' justifyContent='center' gap={6}>
+              <Button disabled={getLoading} variant='contained' color='info' onClick={addMoreTextField}>Add More</Button>
+              {newInputs.length > 0 && 
+                <Button disabled={getLoading} type='submit' variant='contained' color='primary' onClick={addNewFQDNS}>Save</Button>
+              }
+            </Box>
+          }
         </Stack>
       </CardContent>
     </Card>

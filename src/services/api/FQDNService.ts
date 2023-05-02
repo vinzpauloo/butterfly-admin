@@ -30,6 +30,16 @@ interface IDeleteFQDNParams {
   fqdnID?: number
 }
 
+interface IUpdateFQDNParams {
+  fqdnID?: number
+  data?: {
+    _method?: 'put'
+    site?: number,
+    name?: string,
+    type?: 'Api' | 'Streaming' | 'Photo'
+  }
+}
+
 const FQDNService = () => {
 
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -72,6 +82,20 @@ const FQDNService = () => {
   })
   }
 
+  const updateFQDN = (params: IUpdateFQDNParams) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'Content-Type': 'multipart/form-data', // if POST is form-data
+        "Accept": "application/json",
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/fqdns/${params.fqdnID}`,
+      method: 'POST',
+      data: params.data, // if body is JSON
+    })
+  }
+
   const deleteFQDN = (params: IDeleteFQDNParams) => {
     return request({
       headers: {
@@ -85,7 +109,7 @@ const FQDNService = () => {
     })
   }
 
-  return { addFQDN, getFQDNList, getSuperAgentFQDNList, deleteFQDN }
+  return { addFQDN, getFQDNList, getSuperAgentFQDNList, deleteFQDN, updateFQDN }
 }
 
 export default FQDNService
