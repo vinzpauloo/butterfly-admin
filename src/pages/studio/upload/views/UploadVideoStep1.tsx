@@ -180,7 +180,6 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
-
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -206,13 +205,12 @@ const UploadVideoStep1 = (props: Props) => {
     console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
     studioContext?.setWorkProgress(0)
     console.log('Start setProgress', studioContext?.workProgress)
-    
   })
 
   useBatchFinishListener(batch => {
     console.log(`batch ${batch.id} finished uploading`)
     studioContext?.setWorkProgress(100)
-    toast.success('Successfully Upload Video!', { position: 'top-center', duration: 4000 })
+    toast.success('Successfully Uploaded the Video!', { position: 'top-center', duration: 4000 })
 
     setTimeout(() => {
       console.log('CALL SOME FINISH UPLOAD HANDLER')
@@ -276,7 +274,7 @@ const UploadVideoStep1 = (props: Props) => {
 
       // update the form
       updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
-      
+
       // studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
 
       return uploadUrl
@@ -513,10 +511,9 @@ const UploadVideoStep1 = (props: Props) => {
     studioContext?.setTitle(title)
     studioContext?.setContentCreator(contentCreator)
     studioContext?.setDescription(description)
-    
+
     // UPLOADY UPLOAD
     handleUploadyUpload()
-    
   }
 
   const handleUploadyUpload = () => {
@@ -771,7 +768,7 @@ const UploadVideoStep1 = (props: Props) => {
                         padding: '3em'
                       }}
                     >
-                      {files?.length ? (
+                      {hasFullVideo ? (
                         <Typography textAlign='center'>Selected 1 file</Typography>
                       ) : (
                         <Img src='/images/studio/butterfly_file_upload.png' />
@@ -789,15 +786,52 @@ const UploadVideoStep1 = (props: Props) => {
                     params={{ video_type: 'full_video' }}
                   />
 
-                  <VideoUploadyTrial
-                    destination={{
-                      url: 'https://webhook.site/c5788191-fd80-42e3-9764-ff18dc23950d'
-                    }}
-                    clearPendingOnAdd={false}
-                    autoUpload={false}
-                    id='trial'
-                    params={{ video_type: 'trial_video' }}
-                  />
+                  {hasFullVideo ? (
+                    <Box className='uploadShortVidBox' sx={{ mt: 10 }}>
+                      <Card>
+                        <CardContent sx={{ paddingBlock: '1rem' }}>
+                          <FormGroup sx={{ justifyContent: 'space-between', alignItems: 'center' }} row>
+                            <Typography fontSize={12}>Do you want to upload your own trailer video?</Typography>
+                            <Switch
+                              onClick={() => {
+                                setTrialUploadSwitch(!trialUploadSwitch)
+                              }}
+                              checked={trialUploadSwitch}
+                              color='error'
+                            />
+                          </FormGroup>
+                          {!trialUploadSwitch && (
+                            <FormGroup sx={{ rowGap: '1rem' }} row>
+                              <TextField
+                                onChange={event => {
+                                  checkStartTimeValidity(event)
+                                }}
+                                type='number'
+                                InputProps={{ inputProps: { min: 0, max: 10 } }}
+                                fullWidth
+                                id='start'
+                                placeholder='Start time'
+                              />
+                            </FormGroup>
+                          )}
+                        </CardContent>
+
+                        <CardActions sx={{ display: 'flex', justifyContent: 'center' }} className='card-action-dense'>
+                          {trialUploadSwitch && (
+                            <VideoUploadyTrial
+                              destination={{
+                                url: 'https://webhook.site/c5788191-fd80-42e3-9764-ff18dc23950d'
+                              }}
+                              clearPendingOnAdd={false}
+                              autoUpload={false}
+                              id='trial'
+                              params={{ video_type: 'trial_video' }}
+                            />
+                          )}
+                        </CardActions>
+                      </Card>
+                    </Box>
+                  ) : null}
                 </div>
               </Box>
 
