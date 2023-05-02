@@ -1,26 +1,15 @@
-import React from 'react'
-
-// ** MUI Imports
+import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import Box from '@mui/material/Box'
-
-// ** Custom Components Imports
 import PageHeader from 'src/@core/components/page-header'
-
-// ** Third Party Components
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
-
-// ** Views
-import ExpandoForm from './views/ExpandoForm'
-
-// ** API queries
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import FQDNService from '@/services/api/FQDNService'
-import SitesService from '@/services/api/SitesService'
+import { useAuth } from '@/services/useAuth'
+import { Stack } from '@mui/material'
+import LinksContainer from './components/LinksContainer'
 
-// ** Styled PerfectScrollbar component
 const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   height: '80vh',
   justifyContent: 'center',
@@ -28,72 +17,38 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   display: 'flex'
 })
 
-type FQDNProps = {}
+const FQDN = () => {
+  const [APIFQDNS, setAPIFQDNS] = useState<any>([])
+  const [streamingFQDNS, setStreamingFQDNS] = useState<any>([])
+  const [photosFQDNS, setPhotosFQDNS] = useState<any>([])
+  const auth = useAuth()
 
-const FQDN = (props: FQDNProps) => {
-
-  // ** states
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [site, setSite] = React.useState<number>(2)
-  const [sort, setSort] = React.useState<'desc' | 'asc'>('desc')
-  const [sortBy, setSortBy] = React.useState('fqdn')
-  const [paginate, setPaginate] = React.useState<number>(20)
-
-  // ** apis
-  const { getFQDNList, getSuperAgentFQDNList, addFQDN } = FQDNService()
-  const { getSitesList } = SitesService()
-
-
-  const myQ = useQuery({
-    queryKey : ['fqdn',site,sort,sortBy,paginate],
-    queryFn : () => getSuperAgentFQDNList({ 
-      site : site,
-      sort : sort,
-      sort_by : sortBy,
-      paginate : paginate
+  const { getFQDNList } = FQDNService()
+  const { isLoading } = useQuery({
+    queryKey : ['fqdns'],
+    queryFn: () => getFQDNList({
+      site: auth?.user?.site,
+      paginate : 1000
      }),
-    onSuccess : (res) => { console.log('res',res) }
+    onSuccess: data => {
+      console.log(data?.data)
+      setAPIFQDNS(data?.data?.filter((item: any) => item?.type === 'Api'))
+      setStreamingFQDNS(data?.data?.filter((item: any) => item?.type === 'Streaming'))
+      setPhotosFQDNS(data?.data?.filter((item: any) => item?.type === 'Photo'))
+    },
+    onError: error => { console.log(error) }
   })
-  
-  const queryClient = useQueryClient()
-  const fqdnMutate = useMutation({
-    mutationFn : addFQDN,
-    onSuccess : (response) => { console.log('response from addFQDN', response) },
-    onMutate : () => {},
-    onSettled : () => {
-        queryClient.invalidateQueries(['fqdns']) 
-    }
-  }) 
-
-  const handleAPISubmit = async (data: any) => {
-    const { expando: values } = data
-    console.log('data submit from outside', values)
-    // DO MUTATIONS
-    setIsLoading(true)
-
-    const promises = values.map( (value : { value : string }) => fqdnMutate.mutateAsync({ data : {
-      site : 2,
-      name : value.value,
-      type : 'API'
-    } }) )
-
-    await Promise.all(promises)
-    setIsLoading(false)
-
-  }
-
-  console.log('myQ', myQ)
   
   return (
     <PerfectScrollbar>
       <Grid maxWidth='sm' container spacing={6}>
         <PageHeader title={<Typography variant='h5'>FQDN</Typography>} />
         <Grid item xs={12}>
-          <Box sx={{ display: 'flex', gap: '5rem', flexDirection: 'column' }}>
-            <ExpandoForm handleExpandoSubmit={handleAPISubmit} fileType='text' pageHeader="API's" isLoading={isLoading} />
-            <ExpandoForm fileType='text' pageHeader='STREAMING' isLoading={isLoading} />
-            <ExpandoForm fileType='text' pageHeader='PHOTOS' isLoading={isLoading} />
-          </Box>
+          <Stack gap={20}>
+            <LinksContainer data={APIFQDNS} header="API's" isLoading={isLoading} />
+            <LinksContainer data={streamingFQDNS} header='STREAMING' isLoading={isLoading} />
+            <LinksContainer data={photosFQDNS} header='PHOTOS' isLoading={isLoading} />
+          </Stack>
         </Grid>
       </Grid>
     </PerfectScrollbar>

@@ -15,12 +15,11 @@ type SAStepTwoProps = {
 }
 
 export type FQDNData = {
-  name : string
-  values : [{ value : string }]
-} 
+  name: string
+  values: [{ value: string }]
+}
 
-const SAStepTwo = ({ siteID }: SAStepTwoProps, ref : any) => {
-
+const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
   // ** State
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
@@ -30,42 +29,53 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref : any) => {
   const formStreamRef = React.useRef<any>()
 
   // ** Use Imperative
-  React.useImperativeHandle(ref, () => {
-    return { handleFinish : () => handleFinish() }
-  }, [])
+  React.useImperativeHandle(
+    ref,
+    () => {
+      return { handleFinish: () => handleFinish() }
+    },
+    []
+  )
 
   const handleFinish = () => {
     const allDataArray = []
 
     // check for empty values handleVALIDATIONS
-    let noEmptyvalues : boolean = false
-    noEmptyvalues = formAPIRef.current.getFormData().some( (item : {value : string} ) => { return item.value.length < 3 }) ? true : false
-    noEmptyvalues = formStreamRef.current.getFormData().some( (item : {value : string} ) => { return item.value.length < 3 }) ? true : false
-    noEmptyvalues = formPhotosRef.current.getFormData().some( (item : {value : string} ) => { return item.value.length < 3 }) ? true : false
+    let noEmptyvalues: boolean = false
+    noEmptyvalues = formAPIRef.current.getFormData().some((item: { value: string }) => {
+      return item.value.length < 3
+    })
+      ? true
+      : false
+    noEmptyvalues = formStreamRef.current.getFormData().some((item: { value: string }) => {
+      return item.value.length < 3
+    })
+      ? true
+      : false
+    noEmptyvalues = formPhotosRef.current.getFormData().some((item: { value: string }) => {
+      return item.value.length < 3
+    })
+      ? true
+      : false
 
     if (noEmptyvalues) return []
 
-    allDataArray.push({ name : 'API', values :  formAPIRef.current.getFormData()})
-    allDataArray.push({ name : 'Photo', values :  formPhotosRef.current.getFormData()})
-    allDataArray.push({ name : 'Streaming', values :  formStreamRef.current.getFormData()})
+    allDataArray.push({ name: 'API', values: formAPIRef.current.getFormData() })
+    allDataArray.push({ name: 'Photo', values: formPhotosRef.current.getFormData() })
+    allDataArray.push({ name: 'Streaming', values: formStreamRef.current.getFormData() })
 
     return allDataArray
   }
 
-  const handleAPISubmit = async (data: any) => {
+  const handleAPISubmit = async (data: any) => {}
 
-  }
+  const handleStreamSubmit = async (data: any) => {}
 
-  const handleStreamSubmit = async (data: any) => {
-
-  }
-
-  const handlePhotoSubmit = async (data: any) => {
-
-  }
+  const handlePhotoSubmit = async (data: any) => {}
 
   return (
     <>
+      {siteID ? siteID : 'null'}
       {siteID && (
         <Box
           sx={{
@@ -78,17 +88,17 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref : any) => {
             '& .MuiCardContent-root': {
               paddingTop: '0'
             },
-            '& .expandoGrid .MuiGrid-item' : {
+            '& .expandoGrid .MuiGrid-item': {
               paddingLeft: 0
             },
-            '& .expandoGrid .expandoInput input' : {
-              height:'8px'
+            '& .expandoGrid .expandoInput input': {
+              height: '8px'
             }
           }}
         >
           <ExpandoForm
             ref={formAPIRef}
-            handleExpandoSubmit={ data => handleAPISubmit(data)}
+            handleExpandoSubmit={data => handleAPISubmit(data)}
             fileType='text'
             pageHeader="API's"
             isLoading={isLoading}

@@ -16,7 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Util Import
 import formatDate from '@/utils/formatDate'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Types
 import { IFeedStory } from '@/context/types'
@@ -35,6 +35,9 @@ import DialogNotes from '@/shared-components/DialogNotes'
 import FeedsService from '@/services/api/FeedsService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+// ** Base Links
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
   ref: Ref<unknown>
@@ -43,18 +46,17 @@ const Transition = forwardRef(function Transition(
 })
 
 interface INewsFeedDialogProps {
-    toggle : () => void
-    row : IFeedStory
-    open : boolean
+  toggle: () => void
+  row: IFeedStory
+  open: boolean
 }
 
-const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
-  
+const EditNewsFeedDialog = (props: INewsFeedDialogProps) => {
   const { toggle, row, open } = props
 
   // ** States
   const [openNote, setOpenNote] = useState<boolean>(false)
-  const [ noteLoader, setNoteLoader ] = useState<boolean>(false)
+  const [noteLoader, setNoteLoader] = useState<boolean>(false)
   const [disableActionButtons, setDisableActionButtons] = useState<boolean>(false)
 
   const toggleNote = () => {
@@ -65,27 +67,28 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
     setOpenNote(true)
   }
 
-  const { approveNewsFeedContent} = FeedsService()
+  const { approveNewsFeedContent } = FeedsService()
   const queryClient = useQueryClient()
   const feedM = useMutation({
-    mutationFn : approveNewsFeedContent,
-    onSuccess : (response) => { console.log('response from approve mutate', response) },
-    onMutate : () => {},
-    onSettled : () => {
-        queryClient.invalidateQueries(['getFeeds']) 
+    mutationFn: approveNewsFeedContent,
+    onSuccess: response => {
+      console.log('response from approve mutate', response)
+    },
+    onMutate: () => {},
+    onSettled: () => {
+      queryClient.invalidateQueries(['getFeeds'])
     }
   })
 
-  const handleNoteSubmit = async (data : { note : string }) => {
-
+  const handleNoteSubmit = async (data: { note: string }) => {
     setNoteLoader(true)
     const mutatedData = await feedM.mutateAsync({
-        data: {
-           foreign_id : row._id,
-           action : "Declined",
-           _method : 'put',
-           note : data.note
-        }
+      data: {
+        foreign_id: row._id,
+        action: 'Declined',
+        _method: 'put',
+        note: data.note
+      }
     })
 
     setNoteLoader(false)
@@ -95,45 +98,41 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
     return mutatedData
   }
 
-  const handleApproveFeed =  () => {
+  const handleApproveFeed = () => {
     setNoteLoader(true)
     setDisableActionButtons(true)
-    feedM.mutate({
+    feedM.mutate(
+      {
         data: {
-           foreign_id : row._id,
-           action : "Approved",
-           _method : 'put',
+          foreign_id: row._id,
+          action: 'Approved',
+          _method: 'put'
         }
-    }, { onSettled : () => {
-        setNoteLoader(false)
-        setDisableActionButtons(false)
-        toggle()
-    }})
-    
+      },
+      {
+        onSettled: () => {
+          setNoteLoader(false)
+          setDisableActionButtons(false)
+          toggle()
+        }
+      }
+    )
   }
 
   const TranslateString = useTranslateString()
 
   return (
     <Card>
-
-      <DialogNotes 
-        states={{ 
-            open : openNote,
-            toggle : toggleNote,
-            isLoading : noteLoader,
-            outterHandleSubmit : handleNoteSubmit
+      <DialogNotes
+        states={{
+          open: openNote,
+          toggle: toggleNote,
+          isLoading: noteLoader,
+          outterHandleSubmit: handleNoteSubmit
         }}
       />
 
-      <Dialog
-        fullWidth
-        open={open}
-        maxWidth='sm'
-        scroll='body'
-        onClose={toggle}
-        TransitionComponent={Transition}
-      >
+      <Dialog fullWidth open={open} maxWidth='sm' scroll='body' onClose={toggle} TransitionComponent={Transition}>
         <DialogContent sx={{ pb: 8, px: { xs: 8, sm: 15 }, pt: { xs: 8, sm: 12.5 }, position: 'relative' }}>
           <IconButton size='small' onClick={toggle} sx={{ position: 'absolute', right: '1rem', top: '1rem' }}>
             <Icon icon='mdi:close' />
@@ -146,61 +145,66 @@ const EditNewsFeedDialog = (props : INewsFeedDialogProps) => {
           </Box>
           <Grid container spacing={6}>
             <Grid item xs={12}>
-                    
-                    <FeedCard
-                        datePublished={formatDate(row.created_at)}
-                        string_story={row.string_story}
-                        {...(row.user && { user: row.user })}
-                    >   
-                        {row && row?.tags && (
-                            <FeedAttachments>
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
-                                <Typography fontSize={11} color='common.white'>
-                                    Taggings :
-                                </Typography>
-                                <Typography fontSize={11} color='#00C2FF'>
-                                    {row.tags.join(', ')}
-                                </Typography>
-                                </Box>
-                            </FeedAttachments>
-                        )}
+              <FeedCard
+                datePublished={formatDate(row.created_at)}
+                string_story={row.string_story}
+                {...(row.user && { user: row.user })}
+              >
+                {row && row?.tags && (
+                  <FeedAttachments>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: '.5rem' }}>
+                      <Typography fontSize={11} color='common.white'>
+                        Taggings :
+                      </Typography>
+                      <Typography fontSize={11} color='#00C2FF'>
+                        {row.tags.join(', ')}
+                      </Typography>
+                    </Box>
+                  </FeedAttachments>
+                )}
 
-                        {row && row?.videos && (
-                            <FeedAttachments>
-                                <FeedVideoCard source={row.videos.url} />
-                            </FeedAttachments>
-                        )}
-                        
-                        <FeedAttachments>
-                            <PhotoGridCard>
-                                {row &&
-                                row?.images &&
-                                row?.images.map(image => {
-                                    return (
-                                    <img
-                                        key={image._id}
-                                        src={image.url.replace('http://localhost/', 'http://192.168.50.9/')} //TBR
-                                    />
-                                    )
-                                })}
-                            </PhotoGridCard>
-                        </FeedAttachments>
-                        
-                  </FeedCard>
+                {row && row?.videos && (
+                  <FeedAttachments>
+                    <FeedVideoCard source={STREAMING_SERVER_URL + row.videos.url} />
+                  </FeedAttachments>
+                )}
 
+                <FeedAttachments>
+                  <PhotoGridCard>
+                    {row &&
+                      row?.images &&
+                      row?.images.map(image => {
+                        return (
+                          <img
+                            key={image._id}
+                            src={image.url.replace('http://localhost/', 'http://192.168.50.9/')} //TBR
+                          />
+                        )
+                      })}
+                  </PhotoGridCard>
+                </FeedAttachments>
+              </FeedCard>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'center' }}>
-          <Button 
+          <Button
             disabled={disableActionButtons ? true : false}
-            variant='contained' color='error' sx={{ mr: 1 }} onClick={ () => handleDecline() }>
+            variant='contained'
+            color='error'
+            sx={{ mr: 1 }}
+            onClick={() => handleDecline()}
+          >
             Decline
           </Button>
-          <Button 
+          <Button
             disabled={disableActionButtons ? true : false}
-            variant='contained' color='primary' onClick={ () => handleApproveFeed()}>
-            { disableActionButtons ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} {TranslateString("Approve") }
+            variant='contained'
+            color='primary'
+            onClick={() => handleApproveFeed()}
+          >
+            {disableActionButtons ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null}{' '}
+            {TranslateString('Approve')}
           </Button>
         </DialogActions>
       </Dialog>
