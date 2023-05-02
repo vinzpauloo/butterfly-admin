@@ -18,6 +18,7 @@ interface IGetSpecificWorkgroup {
 }
 interface IGetAllWorkgroup {
   workgroup_id: string
+  page: number
 }
 
 interface IPostWorkgroup {
@@ -104,7 +105,6 @@ const WorkgroupService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
       url: 'admin/works',
