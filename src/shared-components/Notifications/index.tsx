@@ -4,7 +4,7 @@ import { NotificationProps } from '@/types/notificationTypes'
 
 // ** MUI Imports
 import { Badge, IconButton, Tooltip } from '@mui/material'
-import NotificationsIcon from '@mui/icons-material/Notifications'
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 
 // ** Project/Other Imports
 import NotificationsDropdown from './components/Dropdown'
@@ -26,9 +26,9 @@ const Notifications = ({ notifications }: NotificationProps) => {
   return (
     <div>
       <Tooltip title={notifications.length > 0 ? newNotifications : noNotifications}>
-        <IconButton color='primary' onClick={notifications.length > 0 ? handleOpen : undefined}>
+        <IconButton color='inherit' onClick={notifications.length > 0 ? handleOpen : undefined}>
           <Badge badgeContent={notifications.length} color='error'>
-            <NotificationsIcon />
+            <NotificationsNoneIcon />
           </Badge>
         </IconButton>
       </Tooltip>
