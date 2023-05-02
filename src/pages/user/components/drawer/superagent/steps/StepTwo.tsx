@@ -21,7 +21,7 @@ export type FQDNData = {
 
 const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
   // ** State
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [isLoading] = React.useState<boolean>(false)
 
   // References
   const formAPIRef = React.useRef<any>()
@@ -41,7 +41,7 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
     const allDataArray = []
 
     // check for empty values handleVALIDATIONS
-    let noEmptyvalues: boolean = false
+    let noEmptyvalues = false
     noEmptyvalues = formAPIRef.current.getFormData().some((item: { value: string }) => {
       return item.value.length < 3
     })
@@ -75,7 +75,8 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
 
   return (
     <>
-      {siteID ? siteID : 'null'}
+      {/* Commented out siteID */}
+      {siteID ? `Site ID: ${siteID}` : 'null'}
       {siteID && (
         <Box
           sx={{
