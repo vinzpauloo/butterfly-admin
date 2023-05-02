@@ -14,6 +14,8 @@ import {
   Divider
 } from '@mui/material'
 
+import CustomAvatar from 'src/@core/components/mui/avatar'
+
 const notifications = [
   {
     id: 0,
@@ -41,8 +43,10 @@ const NotificationsPage = () => {
           <List>
             {notifications.map((notification, index) => (
               <React.Fragment key={notification.id}>
-                <ListItem alignItems='flex-start'>
+                <ListItem>
+                  <CustomAvatar color='primary' sx={{ mr: { xs: 4, sm: 4, md: 4, lg: 10 } }} />
                   <ListItemText primary={notification.label} secondary={`Received ${index + 1} hour ago`} />
+                  <Typography variant='caption'>{index + 1} hour ago</Typography>
                 </ListItem>
                 {index < notifications.length - 1 && <Divider />}
               </React.Fragment>
