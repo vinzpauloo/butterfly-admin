@@ -1,73 +1,60 @@
-import React from 'react'
-import { Stack, Box, Avatar, Typography } from '@mui/material'
-
-// CONTENT CREATOR FAKE DATA
-const fakeFollowers = [
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-  { photoURL: "https://i.pravatar.cc/42?img=1", name: "Ziranmei Lao Fang" },
-  { photoURL: "https://i.pravatar.cc/42?img=2", name: "Aura Margaret" },
-  { photoURL: "https://i.pravatar.cc/42?img=3", name: "Lee Jin" },
-  { photoURL: "https://i.pravatar.cc/42?img=4", name: "Shy Type Guy" },
-  { photoURL: "https://i.pravatar.cc/42?img=5", name: "Henry China Cavil" },
-  { photoURL: "https://i.pravatar.cc/42?img=6", name: "Ninang Meng" },
-]
+import React, { useState } from 'react'
+import { Stack, Box, Avatar, Typography, Button, Grid, CircularProgress } from '@mui/material'
+import UserService from '@/services/api/UserService';
+import { useQuery } from '@tanstack/react-query';
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const CCFollowersTab = () => {
+  const [followers, setFollowers] = useState<any>([])
+  const [page, setPage] = useState<number>(1)
+  const [hasNextPage, setHasNextPage] = useState<boolean>(false)
+
+  // get specific content creators followers
+  const { getUserFollowers } = UserService();
+  const { isLoading } = useQuery({
+    queryKey: ["contentCreatorFollowers", page],
+    queryFn: () => getUserFollowers({
+      data: {
+        select: 'username,photo',
+        page: page,
+      }
+    }),
+    onSuccess: (data) => {
+      console.log(data?.data)
+      setFollowers((prev: any) => prev.concat(data?.data))
+      setHasNextPage(data?.next_page_url !== null ? true : false)
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   return (
-    <Stack maxHeight={400} gap={4} direction="row" flexWrap="wrap" sx={{ overflowY: "scroll" }} px={6}>
-      {fakeFollowers.map((item, index) =>
-        <Box key={index} display="flex" alignItems="center" gap={2} width={200}>
-          <Avatar alt="Remy Sharp" src={item.photoURL} sx={{ width: 42, height: 42 }} />
-          <Typography sx={{ wordBreak: 'break-word' }}>{item.name}</Typography>
+    <Stack maxHeight={400} gap={12} sx={{ overflowY: "scroll" }} px={6}>
+      <Grid container spacing={2}>
+        {followers.map((item: any) =>
+          <Grid key={item?._id} item xs={12} sm={6} md={4} lg={3}>
+            <Stack gap={2} my={2}>
+              <Avatar alt={item?.username} src={FILE_SERVER_URL + item?.photo} sx={{ width: 42, height: 42 }} />
+              <Typography sx={{ wordBreak: 'break-word' }}>{item?.username}</Typography>
+            </Stack>
+          </Grid>
+        )}
+      </Grid>
+      {isLoading && 
+        <Box display='flex' alignItems='center' justifyContent='center' py={4}>
+          <CircularProgress />
         </Box>
-      )}
+      }
+      {hasNextPage && !isLoading &&
+        <Button
+          variant='contained'
+          size='small'
+          sx={{ width: 'max-content', alignSelf: 'center' }}
+          onClick={() => setPage(prev => prev + 1)}>
+          Load More
+        </Button>
+      }
     </Stack>
   )
 }

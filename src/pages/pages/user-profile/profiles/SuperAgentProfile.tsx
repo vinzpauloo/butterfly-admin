@@ -9,6 +9,9 @@ const SuperAgentProfile = () => {
   const [profilePhoto, setProfilePhoto] = useState<string>("")
   const [username, setUsername] = useState<string>("")
   const [email, setEmail] = useState<string>("")
+  const [companyName, setcompanyName] = useState<string>("")
+  const [companyCode, setcompanyCode] = useState<string>("")
+  const [siteName, setSiteName] = useState<string>("")
 
   //file to be send to back end - WIP
   const [selectedProfPic, setSelectedProfPic] = useState('')
@@ -37,8 +40,9 @@ const SuperAgentProfile = () => {
   const { isLoading } = useQuery({
     queryKey: ["superAgentData"],
     queryFn: () => getUser({
+      user_id: auth?.user?.id,
       data: {
-        user_id: auth?.user?.id,
+        with: 'partner,sites'
       }
     }),
     onSuccess: (data) => {
@@ -46,6 +50,9 @@ const SuperAgentProfile = () => {
       setProfilePhoto(data?.photo)
       setUsername(data?.username)
       setEmail(data?.email)
+      setSiteName(data?.sites[0]?.name) // temporarily assuming SA's only have 1 site for now
+      setcompanyName(data?.partner?.name)
+      setcompanyCode(data?.partner?.code)
     },
     onError: (error) => {
       console.log(error);
@@ -68,11 +75,12 @@ const SuperAgentProfile = () => {
 
   const UpdateProfile = () => {
     mutateUpdate({
+      user_id: auth?.user?.id,
       data: {
         _method: 'put',
-        user_id: auth?.user?.id,
         username: username,
         email: email,
+        photo: selectedProfPic !== '' ? selectedProfPic : null,
       }
     });
   }
@@ -105,11 +113,7 @@ const SuperAgentProfile = () => {
                 }}
               />
               <Box display="flex" flexDirection={['column', 'row']} justifyContent="space-between" gap={6}>
-                <TextField label="Password" type="password" variant="outlined" fullWidth />
-                <TextField label="Re-enter password" type="password" variant="outlined" fullWidth />
-              </Box>
-              <Box display="flex" flexDirection={['column', 'row']} justifyContent="space-between" gap={6}>
-                <TextField label="Name of Site" variant="outlined" fullWidth />
+                <TextField label="Name of Site" variant="outlined" fullWidth value={siteName} disabled />
                 <TextField
                   label="Email Adress" type="email" variant="outlined" fullWidth value={email}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,11 +122,10 @@ const SuperAgentProfile = () => {
                 />
               </Box>
               <Box display="flex" flexDirection={['column', 'row']} justifyContent="space-between" gap={6}>
-                <TextField label="Company Name" variant="outlined" fullWidth />
-                <TextField label="Company Code" variant="outlined" fullWidth />
+                <TextField label="Company Name" variant="outlined" fullWidth value={companyName} disabled />
+                <TextField label="Company Code" variant="outlined" fullWidth value={companyCode} disabled />
               </Box>
               <Stack justifyContent="center" alignItems="center" direction="row" gap={6}>
-                {/* <Button variant="outlined" color="error" sx={{ textTransform: "uppercase" }}>Cancel</Button> */}
                 <Button variant="outlined" color="primary" sx={{ textTransform: "uppercase" }} onClick={UpdateProfile}>Update</Button>
               </Stack>
             </Stack>
