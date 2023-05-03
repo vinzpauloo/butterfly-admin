@@ -20,11 +20,10 @@ import Icon from 'src/@core/components/icon'
 import CreatedSuccessful from '../form/CreatedSuccessful'
 
 // ** TanStack Query
-import { useMutation, useQueries, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 
-// ** Hooks
+// ** Hooks/ Services
 import { useUsersTable } from '@/services/api/useUsersTable'
-import { CreateAccount } from '@/services/api/CreateAccount'
 
 interface FormValues {
   [key: string]: string | number | File | null
@@ -48,9 +47,9 @@ interface FormValues {
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
-  // roleId: any
-  // userId: any
   data: any
+  languages: string[]
+  currencies: string[]
 }
 
 interface Partner {
@@ -100,10 +99,9 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
   // ** Hooks
   const { updateUser, getSpecificUser } = useUsersTable()
-  const { getLanguages, getCurrency } = CreateAccount()
 
   // ** Props
-  const { open, toggle } = props
+  const { open, toggle, languages, currencies } = props
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
@@ -121,6 +119,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
   console.log(props?.data)
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const SitesPartnerQuery = (_: any) => {
     return useQuery({
       queryKey: ['specificUserPartner', props?.data.id],
@@ -145,27 +144,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     SitesPartnerQuery(props?.data.id)
   }
 
-  const [languages, setLanguages] = useState([])
-  const [currencies, setCurrencies] = useState([])
-  useQueries({
-    queries: [
-      {
-        queryKey: ['Languages'],
-        queryFn: getLanguages,
-        onSuccess: (data: any) => {
-          setLanguages(data?.data)
-        }
-      },
-      {
-        queryKey: ['Currencies'],
-        queryFn: getCurrency,
-        onSuccess: (data: any) => {
-          setCurrencies(data?.data)
-        }
-      }
-    ]
-  })
-
   const {
     control,
     handleSubmit,
@@ -174,9 +152,6 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   } = useForm<FormValues>()
 
   const [originalValues, setOriginalValues] = useState<FormValues | null>(null)
-
-  console.log(`partner`, partner)
-  console.log(`siteData`, siteData[0])
 
   // ** Handles the defaultValues of the TextFields
   useEffect(() => {
@@ -220,6 +195,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
   // ** Filters out the empty values, and returns a new object with only the non-empty values
   const filterEmptyValues = (obj: FormValues) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return Object.fromEntries(Object.entries(obj).filter(([key, value]) => value !== '' && value !== null))
   }
 

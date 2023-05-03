@@ -47,6 +47,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
+  languages: string[]
+  currencies: string[]
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -90,7 +92,7 @@ const SADrawer = (props: SidebarAddUserType) => {
   const stepThreeRef = React.useRef<any>()
 
   // ** Props
-  const { open, toggle } = props
+  const { open, toggle, languages, currencies } = props
 
   const handleClose = () => {
     toggle()
@@ -174,6 +176,8 @@ const SADrawer = (props: SidebarAddUserType) => {
           setSiteID={setSiteID}
           handleNext={handleNext}
           setIsLoading={setIsLoading}
+          languages={languages}
+          currencies={currencies}
         />
       )
     },

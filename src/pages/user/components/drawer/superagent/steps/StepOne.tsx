@@ -1,3 +1,4 @@
+// ** React Imports
 import React from 'react'
 
 // ** MUI Imports
@@ -13,9 +14,9 @@ import { useForm, Controller } from 'react-hook-form'
 import CreatedSuccessful from '../../../form/CreatedSuccessful'
 
 // ** TanStack Query
-import { useMutation, useQueryClient, useQueries } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Hooks
+// ** Hooks/Services
 import { CreateAccount } from '@/services/api/CreateAccount'
 
 type StepOneProps = {
@@ -29,6 +30,8 @@ type StepOneProps = {
   setSiteID: React.Dispatch<React.SetStateAction<number | null>>
   handleNext: () => void
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  languages: string[]
+  currencies: string[]
 }
 
 interface FormValues {
@@ -88,7 +91,6 @@ const schema = yup.object().shape({
 
 const SAStepOne = (
   {
-    toggle,
     resetKey,
     handleClose,
     responseError,
@@ -97,7 +99,9 @@ const SAStepOne = (
     setFileName,
     setSiteID,
     handleNext,
-    setIsLoading
+    setIsLoading,
+    languages,
+    currencies
   }: StepOneProps,
   ref: any
 ) => {
@@ -151,21 +155,18 @@ const SAStepOne = (
     []
   )
 
-  const { createUser, getLanguages, getCurrency } = CreateAccount()
-  // const mutation = useMutation(createUser)
+  const { createUser } = CreateAccount()
 
-  const { mutate: mutateStepOne, isLoading } = useMutation(createUser, {
+  const { mutate: mutateStepOne } = useMutation(createUser, {
     onSuccess: response => {
       console.log('mutateStepOne onSuccess response', response)
       setSiteID(response?.partner?.site?.id)
 
       setTimeout(() => {
-        //toggle()
         resetForm()
         setFileName('')
         setResponseError({})
         setIsLoading(false)
-        //setSubmitted(false)
         handleNext()
 
         console.log('Insite setTimeout')
@@ -255,28 +256,6 @@ const SAStepOne = (
       setResponseError(error)
     }
   }
-
-  useQueries({
-    queries: [
-      {
-        queryKey: ['Languages'],
-        queryFn: getLanguages,
-        onSuccess: (data: any) => {
-          setLanguages(data?.data)
-        }
-      },
-      {
-        queryKey: ['Currencies'],
-        queryFn: getCurrency,
-        onSuccess: (data: any) => {
-          setCurrencies(data?.data)
-        }
-      }
-    ]
-  })
-
-  const [languages, setLanguages] = React.useState([])
-  const [currencies, setCurrencies] = React.useState([])
 
   const displayErrors = () => {
     const errorElements: any = []
