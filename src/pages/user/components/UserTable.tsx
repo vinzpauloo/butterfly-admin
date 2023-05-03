@@ -72,7 +72,7 @@ const UserTable = () => {
   const [page, setPage] = useState<number>()
   const [pageSize, setPageSize] = useState<number>()
   const [role, setRole] = useState('SUPERVISOR')
-  const [roleId, setRoleId] = useState<any>()
+  const [roleId] = useState<any>()
   const [columnType, setColumnType] = useState('SUPERVISOR')
   const [rowCount, setRowCount] = useState<any>()
 
@@ -89,6 +89,47 @@ const UserTable = () => {
   const debouncedUsername = useDebounce(searchValue, 1000)
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
   const debouncedMobile = useDebounce(mobileSearchValue, 1000)
+
+  const [initialLoad, setInitialLoad] = useState(true)
+
+  const [activeTab, setActiveTab] = useState<any>()
+  const handleChange = (event: any, value: string) => {
+    setActiveTab(value)
+  }
+
+  const handleRoleChange = useCallback((newRole: any) => {
+    setRole(newRole)
+
+    // Updates the row data based on the newRole
+    switch (newRole) {
+      case 'SUPERVISOR':
+        setColumnType('operators')
+        break
+      case 'SA':
+        setColumnType('superagent')
+        break
+      case 'CC':
+        setColumnType('contentcreators')
+        break
+      default:
+        break
+    }
+  }, [])
+
+  useEffect(() => {
+    if (initialLoad) {
+      setPage(1)
+      setRole('SUPERVISOR')
+      setColumnType('operators')
+      setActiveTab('SUPERVISOR')
+      setSort('desc')
+      setSortName('created_at')
+      handleRoleChange('SUPERVISOR')
+      setInitialLoad(false)
+    } else {
+      handleRoleChange(activeTab)
+    }
+  }, [initialLoad, activeTab, handleRoleChange])
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: [
@@ -125,27 +166,9 @@ const UserTable = () => {
       setRowData(data?.data)
       setPageSize(data?.per_page)
       setPage(data?.current_page)
-    }
+    },
+    enabled: !initialLoad
   })
-
-  const handleRoleChange = useCallback((newRole: any) => {
-    setRole(newRole)
-
-    // Updates the row data based on the newRole
-    switch (newRole) {
-      case 'SUPERVISOR':
-        setColumnType('operators')
-        break
-      case 'SA':
-        setColumnType('superagent')
-        break
-      case 'CC':
-        setColumnType('contentcreators')
-        break
-      default:
-        break
-    }
-  }, [])
 
   const [rowData, setRowData] = useState<any>()
 
@@ -160,13 +183,6 @@ const UserTable = () => {
   ])
 
   const filteredColumns: any = columnsMap.get(columnType) ?? []
-
-  useEffect(() => {
-    setRole('SUPERVISOR')
-    setColumnType('operators')
-    setActiveTab('SUPERVISOR')
-    setRoleId('2')
-  }, [])
 
   const handleSortModel = useCallback((newModel: GridSortModel) => {
     if (newModel.length) {
@@ -192,15 +208,6 @@ const UserTable = () => {
         break
     }
   }, [])
-
-  const [activeTab, setActiveTab] = useState<any>()
-  const handleChange = (event: any, value: string) => {
-    setActiveTab(value)
-  }
-
-  useEffect(() => {
-    handleRoleChange(activeTab)
-  })
 
   type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
   const [openDrawer, setOpenDrawer] = useState<DrawerType>(null)
