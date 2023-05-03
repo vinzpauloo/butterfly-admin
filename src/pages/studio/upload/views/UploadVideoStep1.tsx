@@ -49,7 +49,9 @@ import {
   useAbortBatch,
   useBatchStartListener,
   useBatchProgressListener,
-  useBatchFinishListener
+  useBatchFinishListener,
+  UploadyContext,
+  UPLOADER_EVENTS
 } from '@rpldy/uploady'
 import { asUploadButton } from '@rpldy/upload-button'
 
@@ -185,7 +187,8 @@ const UploadVideoStep1 = (props: Props) => {
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-  
+  const uploadyContext = React.useContext(UploadyContext)
+
   // ** Translations
   const { t } = useTranslation()
 
@@ -197,6 +200,24 @@ const UploadVideoStep1 = (props: Props) => {
   // ** Uploady Hooks
   const uploady = useUploady()
   const abortBatch = useAbortBatch()
+
+  // ** UseEffect
+  React.useEffect(() => {
+
+    const eventBatchStart = (batch : any, options : any ) => {
+      console.log('step 1 - EVENT BATCH START batch', batch)
+      console.log('step 1 - EVENT BATCH START options', options)
+      if (options?.params?.video_type == 'full_video') {
+        //TODO
+      } // end if full video
+    }
+
+    uploadyContext.on(UPLOADER_EVENTS.BATCH_START, eventBatchStart)
+
+    return () => {
+      uploadyContext.off(UPLOADER_EVENTS.BATCH_START, eventBatchStart)
+    }
+  }, [uploadyContext])
 
   // ** Batch Progress
   const batch = useBatchProgressListener(batch => {})
@@ -257,13 +278,6 @@ const UploadVideoStep1 = (props: Props) => {
     }
   })
 
-  useBatchStartListener(batch => {
-    console.log(`batch ${batch.id} started uploading`)
-
-    //open backdrop for loading video
-    setOpenBD(true)
-  })
-
   /* States */
   const [trialUploadSwitch, setTrialUploadSwitch] = React.useState<boolean>(false)
   const [files, setFiles] = React.useState<File[] | null>([])
@@ -291,7 +305,6 @@ const UploadVideoStep1 = (props: Props) => {
   const {
     reset,
     resetField,
-    setValue,
     formState: { errors }
   } = useForm({
     defaultValues,
@@ -299,7 +312,7 @@ const UploadVideoStep1 = (props: Props) => {
     resolver: yupResolver(schema)
   })
   // ** Context ReactHookForm
-  const { register, getValues, control, watch } = useFormContext()
+  const { register, getValues, control, watch, setValue, } = useFormContext()
 
   // ** react query / api services
   const { getGroupings } = useGroupingService()
@@ -339,7 +352,9 @@ const UploadVideoStep1 = (props: Props) => {
       'image/*': ['.jpeg', '.png', '.jpg']
     },
     onDrop: (acceptedFiles: File[]) => {
-      setThumbnailFile(acceptedFiles.map((file: File) => Object.assign(file)))
+      const thumbnailAcceptedFile = acceptedFiles.map((file: File) => Object.assign(file))
+      setThumbnailFile(thumbnailAcceptedFile)
+      setValue('thumbnailFile', thumbnailAcceptedFile)
     },
     onDropRejected: () => {
       toast.error('File type or size not accepted.', {
