@@ -66,9 +66,6 @@ import { useTranslation } from 'react-i18next'
 // ** Auth
 import { useAuth } from '@/services/useAuth'
 
-// ** Auth
-import { useAuth } from '@/services/useAuth'
-
 // Styled components
 const Img = styled('img')(({ theme }) => ({
   width: '100%',
@@ -184,11 +181,6 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
-<<<<<<< Updated upstream
-=======
-  // USE AUTH
-  const auth = useAuth()
->>>>>>> Stashed changes
 
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
