@@ -15,7 +15,7 @@ const AgentProfile = () => {
   const [mobileNo, setMobileNo] = useState<string>("")
   const [lastUpdate, setLastUpdate] = useState<string>("")
 
-  //file to be send to back end - WIP
+  //photo file to be send to back end
   const [selectedProfPic, setSelectedProfPic] = useState('')
   const [photoPreview, setPhotoPreview] = useState('')
 
@@ -47,7 +47,7 @@ const AgentProfile = () => {
 
   // get agent data based on bearer token
   const { getUser, updateUser } = UserService();
-  const { isLoading } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ["agentData"],
     queryFn: () => getUser({
       data: {
@@ -89,7 +89,8 @@ const AgentProfile = () => {
         user_id: auth?.user?.id,
         username: username,
         email: email,
-        mobile: mobileNo
+        mobile: data?.mobile !== mobileNo ? mobileNo : undefined,
+        photo: selectedProfPic !== '' ? selectedProfPic : null,
       }
     });
   }
@@ -131,16 +132,12 @@ const AgentProfile = () => {
                   <Typography variant="h6">Account Details</Typography>
                   <Typography color="secondary" display="flex">Last Update: {formatDate(lastUpdate)}</Typography>
                 </Stack>
-                <TextField label="Name" variant="outlined" />
-                <Box display="flex" justifyContent="space-between" gap={[2, 6, 6]}>
-                  <TextField
-                    label="Username" variant="outlined" fullWidth value={username}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      setUsername(event.target.value);
-                    }}
-                  />
-                  <TextField label="Password" type="password" variant="outlined" fullWidth />
-                </Box>
+                <TextField
+                  label="Username" variant="outlined" fullWidth value={username}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setUsername(event.target.value);
+                  }}
+                />
                 <Box display="flex" justifyContent="space-between" gap={[2, 6, 6]}>
                   <TextField
                     label="Mobile Number" variant="outlined" fullWidth sx={textFieldStyle} value={mobileNo}
