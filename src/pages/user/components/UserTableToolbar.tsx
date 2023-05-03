@@ -18,7 +18,10 @@ interface Props {
   usernameValue: string
   emailValue: string
   mobileValue: string
-  clearSearch: () => void
+  clearUsername: () => void
+  clearEmail: () => void
+  clearMobile: () => void
+  clearAll: () => void
   onUsernameChange: (e: ChangeEvent) => void
   onEmailChange: (e: ChangeEvent) => void
   onMobileChange: (e: ChangeEvent) => void
@@ -31,7 +34,7 @@ const UserTableToolbar = (props: Props) => {
   const TranslateString = useTranslateString()
 
   const handleClear = () => {
-    props.clearSearch()
+    props.clearAll()
   }
 
   return (
@@ -74,7 +77,7 @@ const UserTableToolbar = (props: Props) => {
                 </Box>
               ),
               endAdornment: props?.emailValue ? (
-                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearEmail}>
                   <Icon icon='mdi:close' fontSize={20} />
                 </IconButton>
               ) : (
@@ -104,7 +107,7 @@ const UserTableToolbar = (props: Props) => {
                 </Box>
               ),
               endAdornment: props?.mobileValue ? (
-                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearMobile}>
                   <Icon icon='mdi:close' fontSize={20} />
                 </IconButton>
               ) : (
@@ -132,7 +135,7 @@ const UserTableToolbar = (props: Props) => {
                 </Box>
               ),
               endAdornment: props?.usernameValue ? (
-                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearUsername}>
                   <Icon icon='mdi:close' fontSize={20} />
                 </IconButton>
               ) : (

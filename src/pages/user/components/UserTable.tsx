@@ -18,22 +18,22 @@ import UserTableToolbar from './UserTableToolbar'
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
-import { useTranslateString } from '@/utils/TranslateString'
-
-// ** Hooks
-import { useUsersTable } from '../../../services/api/useUsersTable'
-
-// ** TanStack Query
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
-// import { operatorColumns } from '@/data/OperatorColumns'
-// import { superAgentColumns } from '@/data/SuperAgentColumns'
-// import { contentCreatorColumns } from '@/data/ContentCreatorColumns'
-import ToggleButton from '@/pages/user/components/button/ToggleButton'
-import formatDate from '@/utils/formatDate'
 import EditBtn from './button/EditButton'
 import EditSupervisorDrawer from './drawer/EditSupervisorDrawer'
 import EditSuperAgentDrawer from './drawer/EditSuperAgentDrawer'
 import EditCreatorDrawer from './drawer/EditCreatorDrawer'
+import ToggleButton from '@/pages/user/components/button/ToggleButton'
+
+// ** Hooks/Services
+import { useUsersTable } from '../../../services/api/useUsersTable'
+import { CreateAccount } from '@/services/api/CreateAccount'
+
+// ** TanStack Query
+import { useQuery, useQueries, useQueryClient, useMutation } from '@tanstack/react-query'
+
+// ** Utils Imports
+import formatDate from '@/utils/formatDate'
+import { useTranslateString } from '@/utils/TranslateString'
 
 interface ToggleActionProps {
   value: string
@@ -57,6 +57,7 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
     }
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleToggle = async (newValue: boolean) => {
     // Determine the new status
     const newStatus = value === 'Applied' || value === 'Approved' ? 'Hold' : 'Approved'
@@ -110,6 +111,7 @@ type SortType = 'asc' | 'desc' | undefined | null
 
 const UserTable = () => {
   const { getUsers } = useUsersTable()
+  const { getLanguages, getCurrency } = CreateAccount()
   const [page, setPage] = useState<number>()
   const [pageSize, setPageSize] = useState<number>()
   const [role, setRole] = useState('SUPERVISOR')
@@ -209,6 +211,27 @@ const UserTable = () => {
       setPage(data?.current_page)
     },
     enabled: !initialLoad
+  })
+
+  const [languages, setLanguages] = useState([])
+  const [currencies, setCurrencies] = useState([])
+  useQueries({
+    queries: [
+      {
+        queryKey: ['Languages'],
+        queryFn: getLanguages,
+        onSuccess: (data: any) => {
+          setLanguages(data?.data)
+        }
+      },
+      {
+        queryKey: ['Currencies'],
+        queryFn: getCurrency,
+        onSuccess: (data: any) => {
+          setCurrencies(data?.data)
+        }
+      }
+    ]
   })
 
   const [rowData, setRowData] = useState<any>()
@@ -487,7 +510,10 @@ const UserTable = () => {
                 usernameValue: searchValue,
                 emailValue: emailSearchValue,
                 mobileValue: mobileSearchValue,
-                clearSearch: () => {
+                clearUsername: () => handleSearch('', 'username'),
+                clearEmail: () => handleSearch('', 'email'),
+                clearMobile: () => handleSearch('', 'mobile'),
+                clearAll: () => {
                   handleSearch('', 'username')
                   handleSearch('', 'email')
                   handleSearch('', 'mobile')
@@ -501,7 +527,12 @@ const UserTable = () => {
             sx={{ padding: 0 }}
           />
           <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
-          <SADrawer open={openDrawer === 'SA'} toggle={() => handleDrawerToggle('SA')} />
+          <SADrawer
+            open={openDrawer === 'SA'}
+            toggle={() => handleDrawerToggle('SA')}
+            languages={languages}
+            currencies={currencies}
+          />
           <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
           {drawerRole === 'SUPERVISOR' && (
             <EditSupervisorDrawer
@@ -511,7 +542,13 @@ const UserTable = () => {
             />
           )}
           {drawerRole === 'SA' && (
-            <EditSuperAgentDrawer data={drawerData} open={drawerRole === 'SA'} toggle={() => setDrawerRole(null)} />
+            <EditSuperAgentDrawer
+              data={drawerData}
+              open={drawerRole === 'SA'}
+              toggle={() => setDrawerRole(null)}
+              languages={languages}
+              currencies={currencies}
+            />
           )}
           {drawerRole === 'CC' && (
             <EditCreatorDrawer data={drawerData} open={drawerRole === 'CC'} toggle={() => setDrawerRole(null)} />
