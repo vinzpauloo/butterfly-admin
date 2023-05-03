@@ -9,7 +9,7 @@ interface IUserParams {
     page?: number;
     _method?: 'put'
     select?: 'username,photo'
-    with?: 'partner'
+    with?: string
 
     //updating user
     username?: string

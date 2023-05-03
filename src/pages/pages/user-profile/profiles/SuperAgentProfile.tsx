@@ -11,6 +11,7 @@ const SuperAgentProfile = () => {
   const [email, setEmail] = useState<string>("")
   const [companyName, setcompanyName] = useState<string>("")
   const [companyCode, setcompanyCode] = useState<string>("")
+  const [siteName, setSiteName] = useState<string>("")
 
   //file to be send to back end - WIP
   const [selectedProfPic, setSelectedProfPic] = useState('')
@@ -41,7 +42,7 @@ const SuperAgentProfile = () => {
     queryFn: () => getUser({
       user_id: auth?.user?.id,
       data: {
-        with: 'partner'
+        with: 'partner,sites'
       }
     }),
     onSuccess: (data) => {
@@ -49,6 +50,7 @@ const SuperAgentProfile = () => {
       setProfilePhoto(data?.photo)
       setUsername(data?.username)
       setEmail(data?.email)
+      setSiteName(data?.sites[0]?.name) // temporarily assuming SA's only have 1 site for now
       setcompanyName(data?.partner?.name)
       setcompanyCode(data?.partner?.code)
     },
@@ -111,7 +113,7 @@ const SuperAgentProfile = () => {
                 }}
               />
               <Box display="flex" flexDirection={['column', 'row']} justifyContent="space-between" gap={6}>
-                <TextField label="Name of Site" variant="outlined" fullWidth value={companyName} disabled />
+                <TextField label="Name of Site" variant="outlined" fullWidth value={siteName} disabled />
                 <TextField
                   label="Email Adress" type="email" variant="outlined" fullWidth value={email}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
