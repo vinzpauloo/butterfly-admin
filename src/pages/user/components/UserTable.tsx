@@ -24,10 +24,51 @@ import { useTranslateString } from '@/utils/TranslateString'
 import { useUsersTable } from '../../../services/api/useUsersTable'
 
 // ** TanStack Query
-import { useQuery } from '@tanstack/react-query'
-import { operatorColumns } from '@/data/OperatorColumns'
-import { superAgentColumns } from '@/data/SuperAgentColumns'
-import { contentCreatorColumns } from '@/data/ContentCreatorColumns'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+// import { operatorColumns } from '@/data/OperatorColumns'
+// import { superAgentColumns } from '@/data/SuperAgentColumns'
+// import { contentCreatorColumns } from '@/data/ContentCreatorColumns'
+import ToggleButton from '@/pages/user/components/button/ToggleButton'
+import formatDate from '@/utils/formatDate'
+import EditBtn from './button/EditButton'
+import EditSupervisorDrawer from './drawer/EditSupervisorDrawer'
+import EditSuperAgentDrawer from './drawer/EditSuperAgentDrawer'
+import EditCreatorDrawer from './drawer/EditCreatorDrawer'
+
+interface ToggleActionProps {
+  value: string
+  id: any
+}
+
+const ToggleAction = ({ value, id }: ToggleActionProps) => {
+  const queryClient = useQueryClient()
+  const { updateUser } = useUsersTable()
+  const mutation = useMutation(
+    async (data: { id: string; data: any }) => {
+      const response = await updateUser(data.id, data.data)
+      if (response.ok) {
+        await response.json()
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
+      }
+    }
+  )
+
+  const handleToggle = async (newValue: boolean) => {
+    // Determine the new status
+    const newStatus = value === 'Applied' || value === 'Approved' ? 'Hold' : 'Approved'
+
+    // Update the status in the backend
+    await mutation.mutateAsync({ id, data: { status: newStatus, _method: 'put' } })
+  }
+
+  return (
+    <ToggleButton checked={value === 'Approved' || value === 'Applied'} onToggle={newValue => handleToggle(newValue)} />
+  )
+}
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -176,6 +217,144 @@ const UserTable = () => {
     setPage(newPage + 1)
   }, [])
 
+  const operatorColumns = [
+    {
+      sortable: false,
+      field: 'role',
+      headerName: 'Role',
+      width: 150,
+      valueGetter: (params: any) => {
+        return params?.row.role ? params?.row.role.name : ''
+      }
+    },
+    { sortable: false, field: 'username', headerName: 'User Profile', width: 180 },
+    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 150 },
+    { sortable: false, field: 'email', headerName: 'Email', width: 250 },
+    {
+      sortable: false,
+      field: 'created_at',
+      headerName: 'Date Created',
+      width: 250,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      sortable: false,
+      field: 'updated_at',
+      headerName: 'Last Log In',
+      width: 250,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      sortable: false,
+      field: 'status',
+      headerName: 'Action',
+      width: 135,
+      renderCell: (params: any) => {
+        return (
+          <Box>
+            <ToggleAction id={params.row.id} value={params.value} />
+            <EditBtn
+              userId={params.row.id}
+              roleId={params.row.role_id}
+              data={params.row}
+              handleOpenDrawer={handleOpenDrawer}
+            />
+          </Box>
+        )
+      }
+    }
+  ]
+
+  const superAgentColumns = [
+    { sortable: false, field: 'username', headerName: 'Super Agent', width: 200 },
+    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 210 },
+    { sortable: false, field: 'email', headerName: 'Email', width: 250 },
+    {
+      sortable: false,
+      field: 'created_at',
+      headerName: 'Date Created',
+      width: 285,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      sortable: false,
+      field: 'updated_at',
+      headerName: 'Last Log In',
+      width: 285,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      sortable: false,
+      field: 'status',
+      headerName: 'Action',
+      width: 135,
+      renderCell: (params: any) => {
+        return (
+          <Box>
+            <ToggleAction id={params.row.id} value={params.value} />
+            <EditBtn
+              userId={params.row.id}
+              roleId={params.row.role_id}
+              data={params.row}
+              handleOpenDrawer={handleOpenDrawer}
+            />
+          </Box>
+        )
+      }
+    }
+  ]
+
+  const contentCreatorColumns = [
+    { sortable: false, field: 'username', headerName: 'User Name', width: 200 },
+    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 200 },
+    { sortable: false, field: 'email', headerName: 'Email', width: 255 },
+    {
+      sortable: false,
+      field: 'created_at',
+      headerName: 'Date Created',
+      width: 285,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      sortable: false,
+      field: 'updated_at',
+      headerName: 'Last Log In',
+      width: 285,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      sortable: false,
+      field: 'status',
+      headerName: 'Action',
+      width: 135,
+      renderCell: (params: any) => {
+        return (
+          <Box>
+            <ToggleAction id={params.row.id} value={params.value} />
+            <EditBtn
+              userId={params.row.id}
+              roleId={params.row.role_id}
+              data={params.row}
+              handleOpenDrawer={handleOpenDrawer}
+            />
+          </Box>
+        )
+      }
+    }
+  ]
+
   const columnsMap = new Map([
     ['operators', operatorColumns],
     ['superagent', superAgentColumns],
@@ -229,6 +408,14 @@ const UserTable = () => {
     }
     setOpenDrawer(prevDrawer => (prevDrawer === drawerType ? null : drawerType))
   }
+
+  const [drawerRole, setDrawerRole] = useState<DrawerType>(null)
+  const [drawerData, setDrawerData] = useState<any>(null)
+
+  const handleOpenDrawer = useCallback((role: DrawerType, data: any) => {
+    setDrawerRole(role)
+    setDrawerData(data)
+  }, [])
 
   const TranslateString = useTranslateString()
 
@@ -316,6 +503,19 @@ const UserTable = () => {
           <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
           <SADrawer open={openDrawer === 'SA'} toggle={() => handleDrawerToggle('SA')} />
           <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
+          {drawerRole === 'SUPERVISOR' && (
+            <EditSupervisorDrawer
+              data={drawerData}
+              open={drawerRole === 'SUPERVISOR'}
+              toggle={() => setDrawerRole(null)}
+            />
+          )}
+          {drawerRole === 'SA' && (
+            <EditSuperAgentDrawer data={drawerData} open={drawerRole === 'SA'} toggle={() => setDrawerRole(null)} />
+          )}
+          {drawerRole === 'CC' && (
+            <EditCreatorDrawer data={drawerData} open={drawerRole === 'CC'} toggle={() => setDrawerRole(null)} />
+          )}
         </Card>
       </Grid>
     </Grid>

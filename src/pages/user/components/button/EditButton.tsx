@@ -6,13 +6,8 @@ import { Button } from '@mui/material'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 
 // ** Custom Imports
-import EditSupervisorDrawer from '../drawer/EditSupervisorDrawer'
-import EditSuperAgentDrawer from '@/pages/user/components/drawer/EditSuperAgentDrawer'
-import EditCreatorDrawer from '../drawer/EditCreatorDrawer'
 
-type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
-
-const EditBtn = ({ roleId, userId, data }: any) => {
+const EditBtn = ({ roleId, data, handleOpenDrawer }: any) => {
   useEffect(() => {
     switch (true) {
       case roleId === 2:
@@ -35,58 +30,11 @@ const EditBtn = ({ roleId, userId, data }: any) => {
 
   const [newRole, setNewRole] = useState('')
 
-  const [openDrawer, setOpenDrawer] = useState<DrawerType>(null)
-  const handleDrawerToggle = (role: string | null) => {
-    let drawerType: DrawerType
-
-    switch (role) {
-      case 'SUPERVISOR':
-        drawerType = 'SUPERVISOR'
-        break
-      case 'SA':
-        drawerType = 'SA'
-        break
-      case 'CC':
-        drawerType = 'CC'
-        break
-      default:
-        drawerType = null
-    }
-    setOpenDrawer(prevDrawer => (prevDrawer === drawerType ? null : drawerType))
-  }
-
   return (
     <>
-      <Button style={styles.button} onClick={() => handleDrawerToggle(newRole)}>
+      <Button style={styles.button} onClick={() => handleOpenDrawer(newRole, data)}>
         <EditOutlinedIcon sx={styles.icon} />
       </Button>
-      {roleId === 2 && (
-        <EditSupervisorDrawer
-          data={data}
-          userId={userId}
-          roleId={roleId}
-          open={openDrawer === 'SUPERVISOR'}
-          toggle={() => handleDrawerToggle('SUPERVISOR')}
-        />
-      )}
-      {roleId === 4 && (
-        <EditSuperAgentDrawer
-          data={data}
-          userId={userId}
-          roleId={roleId}
-          open={openDrawer === 'SA'}
-          toggle={() => handleDrawerToggle('SA')}
-        />
-      )}
-      {roleId === 3 && (
-        <EditCreatorDrawer
-          data={data}
-          userId={userId}
-          roleId={roleId}
-          open={openDrawer === 'CC'}
-          toggle={() => handleDrawerToggle('CC')}
-        />
-      )}
     </>
   )
 }

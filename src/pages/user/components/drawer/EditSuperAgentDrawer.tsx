@@ -48,8 +48,8 @@ interface FormValues {
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
-  roleId: any
-  userId: any
+  // roleId: any
+  // userId: any
   data: any
 }
 
@@ -119,13 +119,15 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
 
   const [responseError, setResponseError] = useState<ResponseErrorProps>()
 
-  const SitesPartnerQuery = (userId: any) => {
+  console.log(props?.data)
+
+  const SitesPartnerQuery = (_: any) => {
     return useQuery({
-      queryKey: ['specificUserPartner', props.userId],
+      queryKey: ['specificUserPartner', props?.data.id],
       queryFn: () =>
         getSpecificUser({
           data: {
-            id: props.userId,
+            id: props?.data.id,
             with: 'partner,sites'
           }
         }),
@@ -139,8 +141,8 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
     })
   }
 
-  if (props.roleId && props.roleId === 4) {
-    SitesPartnerQuery(props.userId)
+  if (props?.data.role_id && props?.data.role_id === 4) {
+    SitesPartnerQuery(props?.data.id)
   }
 
   const [languages, setLanguages] = useState([])
@@ -172,6 +174,9 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   } = useForm<FormValues>()
 
   const [originalValues, setOriginalValues] = useState<FormValues | null>(null)
+
+  console.log(`partner`, partner)
+  console.log(`siteData`, siteData[0])
 
   // ** Handles the defaultValues of the TextFields
   useEffect(() => {
@@ -253,7 +258,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
       }
       try {
         await mutation.mutateAsync({
-          id: props.userId,
+          id: props?.data.id,
           data: formData
         })
         setSubmitted(true)

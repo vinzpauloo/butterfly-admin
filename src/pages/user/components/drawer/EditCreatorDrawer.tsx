@@ -42,8 +42,8 @@ const schema = yup.object().shape({
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
-  roleId: any
-  userId: any
+  // roleId: any
+  // userId: any
   data: any
 }
 
@@ -108,7 +108,7 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
     if (password === password_confirmation) {
       try {
         await mutation.mutateAsync({
-          id: props.userId,
+          id: props?.data.id,
           data: { password, password_confirmation, _method: 'put', user_note }
         })
         setSubmitted(true)
