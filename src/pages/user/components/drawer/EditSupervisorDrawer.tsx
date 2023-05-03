@@ -31,13 +31,7 @@ interface FormValues {
   user_note: string
 }
 
-const schema = yup.object().shape({
-  password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
-  password_confirmation: yup
-    .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Password confirmation is required')
-})
+const schema = yup.object().shape({})
 
 interface SidebarAddUserType {
   open: boolean
@@ -188,6 +182,10 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='password'
                         type='password'
+                        defaultValue={'********'}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
                       />
                     )}
                   />
@@ -206,6 +204,10 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='password_confirmation'
                         type='password'
+                        defaultValue={'********'}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
                       />
                     )}
                   />
@@ -245,6 +247,7 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
+                        label='Notes'
                         variant='outlined'
                         fullWidth
                         multiline
@@ -254,6 +257,9 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='user_note'
                         defaultValue={field.value}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
                       />
                     )}
                   />
