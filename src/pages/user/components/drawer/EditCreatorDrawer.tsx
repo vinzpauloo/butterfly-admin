@@ -31,19 +31,13 @@ interface FormValues {
   user_note: string
 }
 
-const schema = yup.object().shape({
-  password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
-  password_confirmation: yup
-    .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Password confirmation is required')
-})
+const schema = yup.object().shape({})
 
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
-  roleId: any
-  userId: any
+  // roleId: any
+  // userId: any
   data: any
 }
 
@@ -108,7 +102,7 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
     if (password === password_confirmation) {
       try {
         await mutation.mutateAsync({
-          id: props.userId,
+          id: props?.data.id,
           data: { password, password_confirmation, _method: 'put', user_note }
         })
         setSubmitted(true)
@@ -185,6 +179,10 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='password'
                         type='password'
+                        defaultValue={'********'}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
                       />
                     )}
                   />
@@ -203,6 +201,10 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='password_confirmation'
                         type='password'
+                        defaultValue={'********'}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
                       />
                     )}
                   />
@@ -242,6 +244,7 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
+                        label='Notes'
                         variant='outlined'
                         fullWidth
                         multiline
@@ -251,6 +254,9 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                         onChange={field.onChange}
                         name='user_note'
                         defaultValue={field.value}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
                       />
                     )}
                   />
