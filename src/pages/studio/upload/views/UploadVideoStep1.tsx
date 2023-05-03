@@ -21,7 +21,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import LinearProgress from '@mui/material/LinearProgress'
-import Backdrop from '@mui/material/Backdrop';
+import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Services Import
@@ -37,7 +37,7 @@ import CustomButton from '@/layouts/components/shared-components/CustomButton/Cu
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
 import * as yup from 'yup'
-import { useForm, Controller, useFormContext  } from 'react-hook-form'
+import { useForm, Controller, useFormContext } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery } from '@tanstack/react-query'
 
@@ -63,8 +63,8 @@ import { StudioContext, DisplayPage } from '..'
 import Translations from '@/layouts/components/Translations'
 import { useTranslation } from 'react-i18next'
 
-// ** Import base link
-import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+// ** Auth
+import { useAuth } from '@/services/useAuth'
 
 // ** Auth
 import { useAuth } from '@/services/useAuth'
@@ -173,7 +173,7 @@ const UploadURL: string = `${baseUrl}/videos/upload-url`
 const schema = yup.object().shape({
   title: yup.string().required('Title is a required field.'),
   description: yup.string(),
-  contentCreator: yup.string().required('Content creator is required')
+  contentCreator: yup.string()
 })
 const defaultValues = {
   title: '',
@@ -184,6 +184,11 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
+<<<<<<< Updated upstream
+=======
+  // USE AUTH
+  const auth = useAuth()
+>>>>>>> Stashed changes
 
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
@@ -267,102 +272,11 @@ const UploadVideoStep1 = (props: Props) => {
     setOpenBD(true)
   })
 
-  // useRequestPreSend(async ({ items, options }) => {
-  //   let hasTrialVideo = false
-
-  //   const { title, contentCreator } = getValues()
-
-  //   if (options?.params?.video_type == 'full_video') {
-  //     const passFullVideoData = {
-  //       user_id: contentCreator,
-  //       video_type: 'full_video',
-  //       video_name: title
-  //     }
-  //     const result = await uploadVideoURL({ formData: passFullVideoData })
-  //     const { uploadUrl, work_id } = result
-  //     console.log('RESULT', result)
-  //     //set a work ID
-  //     setWorkVideo(work_id)
-
-  //     console.log('result', result)
-
-  //     // update the form
-  //     updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
-
-  //     // studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
-
-  //     return uploadUrl
-  //       ? //set the new URL for this upload
-  //         { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-  //       : //not valid URL, cancel the upload
-  //         false
-  //   } // end if full video
-
-  //   if (options?.params?.video_type == 'trial_video') {
-  //     // we have a trial video
-  //     hasTrialVideo = true
-
-  //     const passTrailerVideoData = {
-  //       user_id: contentCreator,
-  //       video_type: 'trial_video',
-  //       video_name: title,
-  //       work_id: workVideo
-  //     }
-  //     const result = await uploadVideoURL({ formData: passTrailerVideoData })
-  //     console.log('result trailer', result)
-  //     const { uploadUrl } = result
-  //     // update the form
-  //     updateVideoByWorkId({ formData: handleFormData(workVideo as string, hasTrialVideo) })
-
-  //     return uploadUrl
-  //       ? //set the new URL for this upload
-  //         { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-  //       : //not valid URL, cancel the upload
-  //         false
-  //   }
-  // })
-
-  // Handle Form Data Function
-  const handleFormData = (work_id: string, hasTrialCheck: boolean): FormData => {
-    // ** Update the table with the work_id -- Refactor this formData values
-    console.log('handleFormData getValues', getValues())
-
-    const { title, description, startTime } = getValues()
-
-    const formData = new FormData()
-
-    formData.append('work_id', work_id)
-    formData.append('title', title)
-    formData.append('description', description)
-    formData.append('orientation', 'landscape') // HardCoded
-    formData.append('startTimeSeconds', startTime)
-    formData.append('_method', 'put')
-
-    if (thumbnailFile?.length) {
-      formData.append('thumbnail', thumbnailFile[0])
-    }
-    formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
-
-    if (tags.length) {
-      tags.map(tag => formData.append('tags[]', tag))
-    }
-    if (groupings.length) {
-      groupings.map(group => formData.append('groups[]', group))
-    }
-
-    return formData
-  } // end handleFormData Fxn
-
-  // ** SERVICES CALLS
-  const { uploadVideoURL } = VideoService()
-
   /* States */
   const [trialUploadSwitch, setTrialUploadSwitch] = React.useState<boolean>(false)
   const [files, setFiles] = React.useState<File[] | null>([])
   const [hasFullVideo, setHasFullVideo] = React.useState<string | null>(null)
   const [hasTrailerVideo, setHasTrailerVideo] = React.useState<string | null>(null)
-  const [workVideo, setWorkVideo] = React.useState<string | null>(null)
-  const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
   const [thumbnailFile, setThumbnailFile] = React.useState<File[]>([])
   const [tags, setTags] = React.useState<string[]>([])
   const [groupings, setGroupings] = React.useState<[]>([])
@@ -379,14 +293,12 @@ const UploadVideoStep1 = (props: Props) => {
       ]
     | []
   >([])
-  const [openBD, setOpenBD] = React.useState(false);
+  const [openBD, setOpenBD] = React.useState(false)
 
   // ** UseForm
   const {
     reset,
     resetField,
-    control,
-    watch,
     setValue,
     formState: { errors }
   } = useForm({
@@ -395,7 +307,7 @@ const UploadVideoStep1 = (props: Props) => {
     resolver: yupResolver(schema)
   })
   // ** Context ReactHookForm
-  const { register, getValues } = useFormContext()
+  const { register, getValues, control, watch } = useFormContext()
 
   // ** react query / api services
   const { getGroupings } = useGroupingService()
@@ -505,9 +417,6 @@ const UploadVideoStep1 = (props: Props) => {
     setContextTags()
     setContextGroups()
 
-    console.log('GETVALUESSZZ', getValues())
-    return
-
     // Validations
     if (auth?.user?.role == 'CC') {
       
@@ -605,7 +514,7 @@ const UploadVideoStep1 = (props: Props) => {
                             defaultValue=''
                             id='contentCreator'
                             labelId='cc-select-label'
-                            value={value}
+                            value={value || ''}
                             onBlur={onBlur}
                             onChange={onChange}
                             error={Boolean(errors.title)}
@@ -634,7 +543,7 @@ const UploadVideoStep1 = (props: Props) => {
                       <CustomTextField
                         fullWidth
                         id='title'
-                        value={value}
+                        value={value || ''}
                         onBlur={onBlur}
                         onChange={onChange}
                         error={Boolean(errors.title)}
@@ -933,12 +842,8 @@ const UploadVideoStep1 = (props: Props) => {
           </Grid>
         </Grid>
       </BasicCard>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBD}
-        onClick={() => {}}
-      >
-        <CircularProgress color="inherit" />
+      <Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={openBD} onClick={() => {}}>
+        <CircularProgress color='inherit' />
       </Backdrop>
     </>
   )

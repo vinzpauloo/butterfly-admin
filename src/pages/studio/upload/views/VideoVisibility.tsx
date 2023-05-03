@@ -20,7 +20,6 @@ import Icon from 'src/@core/components/icon'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
-import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
 
 //* Context Import
 import { StudioContext, DisplayPage } from '..'
@@ -42,15 +41,13 @@ import { PublishSchedule } from '..'
 // ** Services Import
 import VideoService from '@/services/api/VideoService'
 
+// ** react-hook-form
+import { useFormContext  } from 'react-hook-form'
+
 // ** Uploady
 import {
   useUploady,
-  useRequestPreSend,
-  useBatchAddListener,
   useAbortBatch,
-  useBatchStartListener,
-  useBatchProgressListener,
-  useBatchFinishListener,
   UploadyContext,
   UPLOADER_EVENTS
 } from '@rpldy/uploady'
@@ -94,9 +91,59 @@ const VideoVisibility = () => {
   const uploady = useUploady()
   const abortBatch = useAbortBatch()
 
+  // ** State
+  const [expanded, setExpanded] = React.useState<string | false>('panel1')
+  const [date, setDate] = React.useState<DateType>(new Date())
+  const [selectedValue, setSelectedValue] = React.useState<string>('publish')
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [workVideo, setWorkVideo] = React.useState<string | null>(null)
+  const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
+
+  // ** SERVICES CALLS
+  const { uploadVideoURL } = VideoService()
+
+  // ** Context ReactHookForm
+  const { getValues } = useFormContext()
+
+  // ** COMPONENT FUNCTIONS **/
+
+  const handleFormData = (work_id: string, hasTrialCheck: boolean): FormData => {
+    // ** Update the table with the work_id -- Refactor this formData values
+    console.log('handleFormData getValues', getValues())
+
+    const { title, description, startTime } = getValues()
+
+    const formData = new FormData()
+
+    formData.append('work_id', work_id)
+    formData.append('title', title)
+    formData.append('description', description)
+    formData.append('orientation', 'landscape') // HardCoded
+    formData.append('startTimeSeconds', startTime)
+    formData.append('_method', 'put')
+
+    // if (thumbnailFile?.length) {
+    //   formData.append('thumbnail', thumbnailFile[0])
+    // }
+
+    // formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
+
+    // if (tags.length) {
+    //   tags.map(tag => formData.append('tags[]', tag))
+    // }
+    // if (groupings.length) {
+    //   groupings.map(group => formData.append('groups[]', group))
+    // }
+
+    return formData
+  } // end handleFormData Fxn
+
+  
+
   // Context
   const uploadyContext = React.useContext(UploadyContext)
 
+  // Router
   const router = useRouter()
 
   // ** Use Effects
@@ -112,56 +159,60 @@ const VideoVisibility = () => {
 
     const eventPreSend = async (items: any, options: any) => {
       console.log('CALL PRESEND', options)
-      // let hasTrialVideo = false
+      let hasTrialVideo = false
 
-      // const { title, contentCreator } = getValues()
+      const { title, contentCreator } = getValues()
 
-      // if (options?.params?.video_type == 'full_video') {
-      //   const passFullVideoData = {
-      //     user_id: contentCreator,
-      //     video_type: 'full_video',
-      //     video_name: title
-      //   }
-      //   const result = await uploadVideoURL({ formData: passFullVideoData })
-      //   const { uploadUrl, work_id } = result
-      //   console.log('RESULT', result)
-      //   //set a work ID
-      //   setWorkVideo(work_id)
+      console.log('EVENTPRESEND VALUES', getValues())
 
-      //   console.log('result', result)
+      return false
 
-      //   // update the form
-      //   updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+      if (options?.params?.video_type == 'full_video') {
+        const passFullVideoData = {
+          user_id: contentCreator,
+          video_type: 'full_video',
+          video_name: title
+        }
+        const result = await uploadVideoURL({ formData: passFullVideoData })
+        const { uploadUrl, work_id } = result
+        console.log('RESULT', result)
+        //set a work ID
+        setWorkVideo(work_id)
 
-      //   return uploadUrl
-      //     ? //set the new URL for this upload
-      //       { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-      //     : //not valid URL, cancel the upload
-      //       false
-      // } // end if full video
+        console.log('result', result)
 
-      // if (options?.params?.video_type == 'trial_video') {
-      //   // we have a trial video
-      //   hasTrialVideo = true
+        // update the form
+        updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
 
-      //   const passTrailerVideoData = {
-      //     user_id: contentCreator,
-      //     video_type: 'trial_video',
-      //     video_name: title,
-      //     work_id: workVideo
-      //   }
-      //   const result = await uploadVideoURL({ formData: passTrailerVideoData })
-      //   console.log('result trailer', result)
-      //   const { uploadUrl } = result
-      //   // update the form
-      //   updateVideoByWorkId({ formData: handleFormData(workVideo as string, hasTrialVideo) })
+        return uploadUrl
+          ? //set the new URL for this upload
+            { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+          : //not valid URL, cancel the upload
+            false
+      } // end if full video
 
-      //   return uploadUrl
-      //     ? //set the new URL for this upload
-      //       { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-      //     : //not valid URL, cancel the upload
-      //       false
-      // }
+      if (options?.params?.video_type == 'trial_video') {
+        // we have a trial video
+        hasTrialVideo = true
+
+        const passTrailerVideoData = {
+          user_id: contentCreator,
+          video_type: 'trial_video',
+          video_name: title,
+          work_id: workVideo
+        }
+        const result = await uploadVideoURL({ formData: passTrailerVideoData })
+        console.log('result trailer', result)
+        const { uploadUrl } = result
+        // update the form
+        updateVideoByWorkId({ formData: handleFormData(workVideo as string, hasTrialVideo) })
+
+        return uploadUrl
+          ? //set the new URL for this upload
+            { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+          : //not valid URL, cancel the upload
+            false
+      }
 
     }
 
@@ -174,18 +225,9 @@ const VideoVisibility = () => {
     }
   }, [uploadyContext])
 
-  // ** Handle Presend
-  useRequestPreSend(async ({ items, options }) => {
-    console.log('VISIBILITY PRESEND', options)
-  })
 
   // ** Query apis
   const { updateVideoByWorkId } = VideoService()
-  // ** State
-  const [expanded, setExpanded] = React.useState<string | false>('panel1')
-  const [date, setDate] = React.useState<DateType>(new Date())
-  const [selectedValue, setSelectedValue] = React.useState<string>('publish')
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   //** Popper
   const popperPlacement = 'bottom-end'
