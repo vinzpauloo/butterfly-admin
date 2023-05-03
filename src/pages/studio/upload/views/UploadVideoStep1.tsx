@@ -66,6 +66,9 @@ import { useTranslation } from 'react-i18next'
 // ** Import base link
 import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
 
+// ** Auth
+import { useAuth } from '@/services/useAuth'
+
 // Styled components
 const Img = styled('img')(({ theme }) => ({
   width: '100%',
@@ -181,12 +184,16 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
+
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
+  
   // ** Translations
   const { t } = useTranslation()
+
+  // ** Auth Hook
+  const auth = useAuth()
 
   // ************ Uploady ****************************
 
@@ -499,10 +506,15 @@ const UploadVideoStep1 = (props: Props) => {
     setContextGroups()
 
     // Validations
-    if (!watch('contentCreator')) {
-      toast.error('Content Creator is required', { position: 'top-center' })
-      return
+    if (auth?.user?.role == 'CC') {
+      
+    } else {
+      if (!watch('contentCreator')) {
+        toast.error('Content Creator is required', { position: 'top-center' })
+        return
+      }
     }
+
     if (!watch('title')) {
       toast.error('Title is required', { position: 'top-center' })
       return
