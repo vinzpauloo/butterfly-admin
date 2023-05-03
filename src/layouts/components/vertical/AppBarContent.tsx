@@ -34,6 +34,34 @@ const notifications = [
   {
     id: 3,
     label: 'Third Notification'
+  },
+  {
+    id: 4,
+    label: 'Fourth Notification'
+  },
+  {
+    id: 5,
+    label: 'Fifth Notification'
+  },
+  {
+    id: 6,
+    label: 'Sixth Notification'
+  },
+  {
+    id: 7,
+    label: 'Seventh Notification'
+  },
+  {
+    id: 8,
+    label: 'Eighth Notification'
+  },
+  {
+    id: 9,
+    label: 'Ninth Notification'
+  },
+  {
+    id: 10,
+    label: 'Tenth Notification'
   }
 ]
 

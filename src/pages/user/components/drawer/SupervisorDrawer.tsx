@@ -17,7 +17,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Other Imports
 import CreatedSuccessful from '../form/CreatedSuccessful'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -95,7 +95,6 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
 
   const { createUser } = CreateAccount()
   const mutation = useMutation(createUser)
-  const [responseError, setResponseError] = useState<any>()
 
   const handleFormSubmit = async (data: FormValues) => {
     const userData = {
@@ -123,11 +122,17 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
     }
   }
 
+  interface ErrorResponse {
+    [key: string]: string[]
+  }
+
+  const [responseError, setResponseError] = useState<ErrorResponse>()
+
   const displayErrors = () => {
-    const errorElements: any = []
+    const errorElements: JSX.Element[] = []
 
     for (const key in responseError) {
-      responseError[key].forEach((value: any) => {
+      responseError[key].forEach(value => {
         errorElements.push(
           <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
             {value}
@@ -160,7 +165,9 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h6'>{TranslateString("Add")} {TranslateString("Operator")}/{TranslateString("Supervisor")}</Typography>
+        <Typography variant='h6'>
+          {TranslateString('Add')} {TranslateString('Operator')}/{TranslateString('Supervisor')}
+        </Typography>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
@@ -183,7 +190,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                       }}
                     >
                       <Box sx={styles.radio}>
-                        <Typography sx={styles.white}>{TranslateString("Operator")}</Typography>
+                        <Typography sx={styles.white}>{TranslateString('Operator')}</Typography>
                         <Radio
                           name='role_id'
                           value='1'
@@ -191,7 +198,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                           sx={styles.white}
                           color='default'
                         />
-                        <Typography sx={styles.white}>{TranslateString("Supervisor")}</Typography>
+                        <Typography sx={styles.white}>{TranslateString('Supervisor')}</Typography>
                         <Radio
                           name='role_id'
                           value='2'
@@ -216,7 +223,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={TranslateString("Enter") + " " + TranslateString("Username")}
+                        label={TranslateString('Enter') + ' ' + TranslateString('Username')}
                         variant='outlined'
                         fullWidth
                         error={!!errors.username}
@@ -234,7 +241,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={TranslateString("Enter") + " " + TranslateString("Password")}
+                        label={TranslateString('Enter') + ' ' + TranslateString('Password')}
                         variant='outlined'
                         fullWidth
                         error={!!errors.password}
@@ -253,7 +260,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={TranslateString("Re-enter") + " " + TranslateString("Password")}
+                        label={TranslateString('Re-enter') + ' ' + TranslateString('Password')}
                         variant='outlined'
                         fullWidth
                         error={!!errors.password_confirmation}
@@ -273,7 +280,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={TranslateString("Mobile Number")}
+                        label={TranslateString('Mobile Number')}
                         variant='outlined'
                         fullWidth
                         error={!!errors.mobile}
@@ -298,7 +305,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={TranslateString("Email")}
+                        label={TranslateString('Email')}
                         variant='outlined'
                         fullWidth
                         error={!!errors.email}
@@ -317,7 +324,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label={TranslateString("Notes")}
+                        label={TranslateString('Notes')}
                         variant='outlined'
                         fullWidth
                         multiline
@@ -336,13 +343,13 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                 <Box sx={styles.formButtonContainer}>
                   <Box>
                     <Button sx={styles.cancelButton} onClick={handleClose}>
-                      <Typography sx={styles.text}>{TranslateString("Cancel")}</Typography>
+                      <Typography sx={styles.text}>{TranslateString('Cancel')}</Typography>
                     </Button>
                   </Box>
 
                   <Box>
                     <Button type='submit' sx={styles.continueButton}>
-                      <Typography sx={styles.text}>{TranslateString("Continue")}</Typography>
+                      <Typography sx={styles.text}>{TranslateString('Continue')}</Typography>
                     </Button>
                   </Box>
                 </Box>
