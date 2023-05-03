@@ -51,11 +51,7 @@ const ContentCreatorProfile = () => {
   const { getUser, updateUser } = UserService();
   const { isLoading } = useQuery({
     queryKey: ["contentCreatorData"],
-    queryFn: () => getUser({
-      data: {
-        user_id: auth?.user?.id,
-      }
-    }),
+    queryFn: () => getUser({user_id: auth?.user?.id}),
     onSuccess: (data) => {
       console.log(data)
       setProfilePhoto(data?.photo)
@@ -144,9 +140,9 @@ const ContentCreatorProfile = () => {
   const UpdateProfile = () => {
     if (validateInput()) {
       mutateUpdate({
+        user_id: auth?.user?.id,
         data: {
           _method: 'put',
-          user_id: auth?.user?.id,
           username: username,
           email: email,
           biography: bio,

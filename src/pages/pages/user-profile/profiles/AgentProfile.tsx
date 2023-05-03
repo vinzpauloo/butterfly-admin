@@ -49,11 +49,7 @@ const AgentProfile = () => {
   const { getUser, updateUser } = UserService();
   const { isLoading, data } = useQuery({
     queryKey: ["agentData"],
-    queryFn: () => getUser({
-      data: {
-        user_id: auth?.user?.id
-      }
-    }),
+    queryFn: () => getUser({user_id: auth?.user?.id}),
     onSuccess: (data) => {
       console.log(data)
       setAgentID(data?.id)
@@ -84,9 +80,9 @@ const AgentProfile = () => {
 
   const UpdateProfile = () => {
     mutateUpdate({
+      user_id: auth?.user?.id,
       data: {
         _method: 'put',
-        user_id: auth?.user?.id,
         username: username,
         email: email,
         mobile: data?.mobile !== mobileNo ? mobileNo : undefined,

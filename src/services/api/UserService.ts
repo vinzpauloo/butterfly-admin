@@ -3,12 +3,13 @@ import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
 interface IUserParams {
-  data: {
-    user_id?: number;
+  user_id?: number;
+  data?: {
     paginate?: number;
     page?: number;
     _method?: 'put'
     select?: 'username,photo'
+    with?: 'partner'
 
     //updating user
     username?: string
@@ -32,8 +33,9 @@ const UserService = () => {
         Authorization: `Bearer ${accessToken}`,
         "Accept": "application/json",
       },
-      url: `/users/${params.data.user_id}`,
+      url: `/users/${params.user_id}`,
       method: "GET",
+      params: params.data
     });
   };
 
@@ -46,7 +48,7 @@ const UserService = () => {
         "Accept": "application/json",
         Authorization: `Bearer ${accessToken}`
       },
-      url: `/users/${params.data.user_id}`,
+      url: `/users/${params.user_id}`,
       method: "POST",
       data: params.data, // if body is JSON
     });
