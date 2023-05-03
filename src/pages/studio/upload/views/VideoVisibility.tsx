@@ -50,8 +50,13 @@ import {
   useAbortBatch,
   useBatchStartListener,
   useBatchProgressListener,
-  useBatchFinishListener
+  useBatchFinishListener,
+  UploadyContext,
+  UPLOADER_EVENTS
 } from '@rpldy/uploady'
+
+// ** Import base link
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
 
 // Styled components
 const HeaderBox = styled(Box)(({ theme }) => ({
@@ -85,15 +90,94 @@ const CustomAccordion = styled(Accordion)(({ theme }) => ({
 }))
 
 const VideoVisibility = () => {
-
   // ** Hooks
   const uploady = useUploady()
   const abortBatch = useAbortBatch()
 
+  // Context
+  const uploadyContext = React.useContext(UploadyContext)
+
   const router = useRouter()
+
+  // ** Use Effects
   React.useEffect(() => {
     console.log('studioContext FINAL', studioContext)
   }, [])
+
+  React.useEffect(() => {
+    const eventProgress = (item: any) => {
+      console.log('CALL PROGRESS EVENT', item)
+      studioContext?.setWorkProgress(item.completed)
+    }
+
+    const eventPreSend = async (items: any, options: any) => {
+      console.log('CALL PRESEND', options)
+      // let hasTrialVideo = false
+
+      // const { title, contentCreator } = getValues()
+
+      // if (options?.params?.video_type == 'full_video') {
+      //   const passFullVideoData = {
+      //     user_id: contentCreator,
+      //     video_type: 'full_video',
+      //     video_name: title
+      //   }
+      //   const result = await uploadVideoURL({ formData: passFullVideoData })
+      //   const { uploadUrl, work_id } = result
+      //   console.log('RESULT', result)
+      //   //set a work ID
+      //   setWorkVideo(work_id)
+
+      //   console.log('result', result)
+
+      //   // update the form
+      //   updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+
+      //   return uploadUrl
+      //     ? //set the new URL for this upload
+      //       { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+      //     : //not valid URL, cancel the upload
+      //       false
+      // } // end if full video
+
+      // if (options?.params?.video_type == 'trial_video') {
+      //   // we have a trial video
+      //   hasTrialVideo = true
+
+      //   const passTrailerVideoData = {
+      //     user_id: contentCreator,
+      //     video_type: 'trial_video',
+      //     video_name: title,
+      //     work_id: workVideo
+      //   }
+      //   const result = await uploadVideoURL({ formData: passTrailerVideoData })
+      //   console.log('result trailer', result)
+      //   const { uploadUrl } = result
+      //   // update the form
+      //   updateVideoByWorkId({ formData: handleFormData(workVideo as string, hasTrialVideo) })
+
+      //   return uploadUrl
+      //     ? //set the new URL for this upload
+      //       { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+      //     : //not valid URL, cancel the upload
+      //       false
+      // }
+
+    }
+
+    uploadyContext.on(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
+    uploadyContext.on(UPLOADER_EVENTS.REQUEST_PRE_SEND, eventPreSend)
+
+    return () => {
+      uploadyContext.off(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
+      uploadyContext.off(UPLOADER_EVENTS.REQUEST_PRE_SEND, eventPreSend)
+    }
+  }, [uploadyContext])
+
+  // ** Handle Presend
+  useRequestPreSend(async ({ items, options }) => {
+    console.log('VISIBILITY PRESEND', options)
+  })
 
   // ** Query apis
   const { updateVideoByWorkId } = VideoService()
@@ -118,10 +202,6 @@ const VideoVisibility = () => {
   }
   const dummyNavigate = () => {
     //studioContext?.setDisplayPage(DisplayPage.VideosList)
-
-    processUploady()
-    return false
-
 
     let isSchedule = selectedValue == 'publish' ? false : true
 
@@ -158,7 +238,6 @@ const VideoVisibility = () => {
     })
   }
 
-
   const dimOnTrue = (flag: boolean) => {
     return {
       opacity: flag ? 0.3 : 1,
@@ -181,37 +260,6 @@ const VideoVisibility = () => {
   const setStudioPublishDate = (publish: PublishSchedule) => {
     studioContext?.setPublishDate(publish)
   }
-
-
-  // ** UPLOADY HOOKS
-  // ** Batch Progress
-  const batch = useBatchProgressListener(batch => {})
-  if (batch && batch.completed > studioContext!.workProgress && batch.completed < 100) {
-    console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
-    studioContext?.setWorkProgress(() => batch.completed)
-  }
-
-  useBatchAddListener((batch, options) => {
-    console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
-    studioContext?.setWorkProgress(0)
-    console.log('Start setProgress in Video Visibility', studioContext?.workProgress)
-    //return false to cancel the batch
-  })
-
-  useBatchFinishListener(batch => {
-    console.log(`batch ${batch.id} finished uploading`)
-    studioContext?.setWorkProgress(100)
-    //toast.success('Successfully Upload Video!', { position: 'top-center', duration: 4000 })
-
-    setTimeout(() => {
-      console.log('CALL SOME FINISH UPLOAD HANDLER INSIDE VIDEO VISIBILITY')
-    }, 500)
-  })
-
-  // ** Handle Presend
-  useRequestPreSend(async ({ items, options }) => {
-      console.log('VISIBILITY PRESEND', options)
-  })
 
   const processUploady = () => {
     uploady.processPending()
@@ -454,7 +502,9 @@ const VideoVisibility = () => {
 
                     <Box>
                       <Button
-                        onClick={dummyNavigate}
+                        onClick={() => {
+                          uploady.processPending()
+                        }}
                         sx={{
                           bgcolor: 'primary.main',
                           color: 'common.white'

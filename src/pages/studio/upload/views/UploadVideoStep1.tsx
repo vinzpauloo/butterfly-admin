@@ -37,7 +37,7 @@ import CustomButton from '@/layouts/components/shared-components/CustomButton/Cu
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
 import * as yup from 'yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useFormContext  } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery } from '@tanstack/react-query'
 
@@ -199,18 +199,18 @@ const UploadVideoStep1 = (props: Props) => {
   console.log('THE BATCH', batch)
   if (batch && batch.completed > studioContext!.workProgress && batch.completed < 100) {
     console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
-    studioContext?.setWorkProgress(() => batch.completed)
+    //studioContext?.setWorkProgress(() => batch.completed)
   }
 
   useBatchAddListener((batch, options) => {
     console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
-    studioContext?.setWorkProgress(0)
+    //studioContext?.setWorkProgress(0)
     console.log('Start setProgress', studioContext?.workProgress)
   })
 
   useBatchFinishListener(batch => {
     console.log(`batch ${batch.id} finished uploading`)
-    studioContext?.setWorkProgress(100)
+    //studioContext?.setWorkProgress(100)
     //toast.success('Successfully Uploaded the Video!', { position: 'top-center', duration: 4000 })
 
     //close BD
@@ -260,60 +260,60 @@ const UploadVideoStep1 = (props: Props) => {
     setOpenBD(true)
   })
 
-  useRequestPreSend(async ({ items, options }) => {
-    let hasTrialVideo = false
+  // useRequestPreSend(async ({ items, options }) => {
+  //   let hasTrialVideo = false
 
-    const { title, contentCreator } = getValues()
+  //   const { title, contentCreator } = getValues()
 
-    if (options?.params?.video_type == 'full_video') {
-      const passFullVideoData = {
-        user_id: contentCreator,
-        video_type: 'full_video',
-        video_name: title
-      }
-      const result = await uploadVideoURL({ formData: passFullVideoData })
-      const { uploadUrl, work_id } = result
-      console.log('RESULT', result)
-      //set a work ID
-      setWorkVideo(work_id)
+  //   if (options?.params?.video_type == 'full_video') {
+  //     const passFullVideoData = {
+  //       user_id: contentCreator,
+  //       video_type: 'full_video',
+  //       video_name: title
+  //     }
+  //     const result = await uploadVideoURL({ formData: passFullVideoData })
+  //     const { uploadUrl, work_id } = result
+  //     console.log('RESULT', result)
+  //     //set a work ID
+  //     setWorkVideo(work_id)
 
-      console.log('result', result)
+  //     console.log('result', result)
 
-      // update the form
-      updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+  //     // update the form
+  //     updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
 
-      // studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
+  //     // studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
 
-      return uploadUrl
-        ? //set the new URL for this upload
-          { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-        : //not valid URL, cancel the upload
-          false
-    } // end if full video
+  //     return uploadUrl
+  //       ? //set the new URL for this upload
+  //         { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+  //       : //not valid URL, cancel the upload
+  //         false
+  //   } // end if full video
 
-    if (options?.params?.video_type == 'trial_video') {
-      // we have a trial video
-      hasTrialVideo = true
+  //   if (options?.params?.video_type == 'trial_video') {
+  //     // we have a trial video
+  //     hasTrialVideo = true
 
-      const passTrailerVideoData = {
-        user_id: contentCreator,
-        video_type: 'trial_video',
-        video_name: title,
-        work_id: workVideo
-      }
-      const result = await uploadVideoURL({ formData: passTrailerVideoData })
-      console.log('result trailer', result)
-      const { uploadUrl } = result
-      // update the form
-      updateVideoByWorkId({ formData: handleFormData(workVideo as string, hasTrialVideo) })
+  //     const passTrailerVideoData = {
+  //       user_id: contentCreator,
+  //       video_type: 'trial_video',
+  //       video_name: title,
+  //       work_id: workVideo
+  //     }
+  //     const result = await uploadVideoURL({ formData: passTrailerVideoData })
+  //     console.log('result trailer', result)
+  //     const { uploadUrl } = result
+  //     // update the form
+  //     updateVideoByWorkId({ formData: handleFormData(workVideo as string, hasTrialVideo) })
 
-      return uploadUrl
-        ? //set the new URL for this upload
-          { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-        : //not valid URL, cancel the upload
-          false
-    }
-  })
+  //     return uploadUrl
+  //       ? //set the new URL for this upload
+  //         { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+  //       : //not valid URL, cancel the upload
+  //         false
+  //   }
+  // })
 
   // Handle Form Data Function
   const handleFormData = (work_id: string, hasTrialCheck: boolean): FormData => {
@@ -380,15 +380,15 @@ const UploadVideoStep1 = (props: Props) => {
     resetField,
     control,
     watch,
-    getValues,
     setValue,
-    register,
     formState: { errors }
   } = useForm({
     defaultValues,
     mode: 'onBlur',
     resolver: yupResolver(schema)
   })
+  // ** Context ReactHookForm
+  const { register, getValues } = useFormContext()
 
   // ** react query / api services
   const { getGroupings } = useGroupingService()
@@ -498,6 +498,9 @@ const UploadVideoStep1 = (props: Props) => {
     setContextTags()
     setContextGroups()
 
+    console.log('GETVALUESSZZ', getValues())
+    return
+
     // Validations
     if (!watch('contentCreator')) {
       toast.error('Content Creator is required', { position: 'top-center' })
@@ -522,6 +525,8 @@ const UploadVideoStep1 = (props: Props) => {
 
     // UPLOADY UPLOAD
     handleUploadyUpload()
+
+    studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
   }
 
   const handleUploadyUpload = () => {
@@ -786,7 +791,7 @@ const UploadVideoStep1 = (props: Props) => {
 
                   <VideoUploady
                     destination={{
-                      url: 'https://webhook.site/946623c3-23ca-47e6-872f-13266345520e'
+                      url: 'https://webhook.site/8146606c-5741-47bd-b8d9-7537b7db6a2c'
                     }}
                     clearPendingOnAdd={false}
                     autoUpload={false}

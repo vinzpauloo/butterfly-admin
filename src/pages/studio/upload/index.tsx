@@ -20,6 +20,9 @@ import UploadAlbum from './views/UploadAlbum'
 // ** Uploady
 import ChunkedUploady from "@rpldy/chunked-uploady";
 
+// ** Hook form
+import { useForm, FormProvider, useFormContext } from "react-hook-form";
+
 // ** Styled Components
 const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundImage: `url("${bgPath}")`,
@@ -127,6 +130,9 @@ const UploadContent = () => {
   const [workId, setWorkId] = React.useState<number | null>(null)
   const [uploadURL, setUploadURL] = React.useState<string>('')
 
+  // ** React-Hook-Form hooks
+  const methods = useForm()
+
   React.useEffect(() => {
     // console.log('call useEffect workProgress')
 
@@ -191,7 +197,9 @@ const UploadContent = () => {
           headers: { 'x-custom': '123' } }
         }
       >
-        <BoxBG>{PageDisplay()}</BoxBG>
+        <FormProvider {...methods}>
+          <BoxBG>{PageDisplay()}</BoxBG>
+        </FormProvider>
       </ChunkedUploady>
     </StudioContext.Provider>
   )
