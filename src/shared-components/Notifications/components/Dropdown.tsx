@@ -6,7 +6,7 @@ import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import { Box, Button, Menu, MenuItem, Typography, TypographyProps, useMediaQuery } from '@mui/material'
+import { Box, Button, Divider, Menu, MenuItem, Typography, TypographyProps, useMediaQuery } from '@mui/material'
 import { styled, Theme } from '@mui/material/styles'
 
 // ** Type Imports
@@ -16,6 +16,8 @@ import { NotificationDropdownProps } from '@/types/notificationTypes'
 const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   maxHeight: 349
 })
+
+import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Styled component for the title in MenuItems
 const MenuItemTitle = styled(Typography)<TypographyProps>(({ theme }) => ({
@@ -73,17 +75,21 @@ const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: Notif
     >
       <ScrollWrapper hidden={hidden}>
         {menuItems.map((item, index) => (
-          <MenuItem key={index} onClick={handleClose}>
-            <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ mr: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
-                <MenuItemTitle>{item.label}</MenuItemTitle>
-                <MenuItemSubtitle variant='body2'>{item.label}</MenuItemSubtitle>
+          <Box key={index}>
+            <MenuItem onClick={handleClose}>
+              <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+                <CustomAvatar color='primary' sx={{ mr: { xs: 4, sm: 4, md: 4, lg: 4 } }} />
+                <Box sx={{ mr: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
+                  <MenuItemTitle>{item.label}</MenuItemTitle>
+                  <MenuItemSubtitle variant='body2'>{item.label}</MenuItemSubtitle>
+                </Box>
+                <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+                  {item.label}
+                </Typography>
               </Box>
-              <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                {item.label}
-              </Typography>
-            </Box>
-          </MenuItem>
+            </MenuItem>
+            {index < menuItems.length - 1 && <Divider />}
+          </Box>
         ))}
       </ScrollWrapper>
       <MenuItem
