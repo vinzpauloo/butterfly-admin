@@ -5,8 +5,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import CCFollowersTab from '../components/CCFollowersTab'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import { useAuth } from '@/services/useAuth'
-import CCVideosTab from '../components/CCVideosTab'
-import CCNewsfeedsTab from '../components/CCNewsfeedsTab'
 import CCActiveDonatorsTab from '../components/CCActiveDonatorsTab'
 
 const TabPanel = ({ children, index, value }: any) => {
@@ -32,6 +30,11 @@ const ContentCreatorProfile = () => {
     setTabIndex(newValue);
   };
 
+  const TabsOption = [
+    { sortName: "Followers", component: <CCFollowersTab /> },
+    { sortName: "Active Donators", component: <CCActiveDonatorsTab /> },
+  ]
+
   const viewProfile = () => {
     setIsProfileSelected(true)
     setIsOverviewSelected(false)
@@ -44,13 +47,6 @@ const ContentCreatorProfile = () => {
 
   const auth = useAuth()
 
-  const viewByOptions = [
-    { sortName: "Followers", component: <CCFollowersTab/>},
-    { sortName: "Most Liked Video", component: <CCVideosTab/> },
-    { sortName: "Most Liked Newsfeed", component: <CCNewsfeedsTab/> },
-    { sortName: "Active Donators", component: <CCActiveDonatorsTab/> },
-  ]
-  
   // get specific content creators data based on bearer token
   const { getUser, updateUser } = UserService();
   const { isLoading } = useQuery({
@@ -88,7 +84,7 @@ const ContentCreatorProfile = () => {
   });
 
 
-  //file to be send to back end - WIP
+  //photo file to be send to back end
   const [selectedProfPic, setSelectedProfPic] = useState('')
   const [selectedCoverPhoto, setSelectedCoverPhoto] = useState('')
   const [photoPreview, setPhotoPreview] = useState('')
@@ -126,16 +122,40 @@ const ContentCreatorProfile = () => {
     }
   }
 
+  const isValidUrl = (string: string) => {
+    try {
+      new URL(string)
+
+      return true
+    } catch (err) {
+      return false
+    }
+  }
+
+  const validateInput = () => {
+    isValidUrl(email)
+    if (username === '') {
+      return false
+    }
+
+    return true
+  }
+
   const UpdateProfile = () => {
-    mutateUpdate({
-      data: {
-        _method: 'put',
-        user_id: auth?.user?.id,
-        username: username,
-        email: email,
-        biography: bio,
-      }
-    });
+    if (validateInput()) {
+      mutateUpdate({
+        data: {
+          _method: 'put',
+          user_id: auth?.user?.id,
+          username: username,
+          email: email,
+          biography: bio,
+          photo: selectedProfPic !== '' ? selectedProfPic : null,
+          cover_photo: selectedCoverPhoto !== '' ? selectedCoverPhoto : null
+        }
+      })
+    }
+    else alert("input error")
   }
 
   const isLoadingOrUpdated = isLoading || updateLoading
@@ -184,17 +204,13 @@ const ContentCreatorProfile = () => {
                     }}
                   />
                   <TextField 
-                    label="Email Address" variant="outlined" fullWidth value={email}
+                    label="Email Address" type='email' variant="outlined" fullWidth value={email}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                       setEmail(event.target.value);
                     }}
                   />
                 </Stack>
-                <Stack direction={["column", "row"]} justifyContent="space-between" gap={6}>
-                  <TextField label="Password" variant="outlined" fullWidth />
-                  <TextField label="Re-enter password" variant="outlined" fullWidth />
-                </Stack>
-                <TextField 
+                <TextField
                   label="Biography" variant="outlined" fullWidth multiline rows={8} value={bio}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     setBio(event.target.value);
@@ -206,11 +222,11 @@ const ContentCreatorProfile = () => {
             {isOverviewSelected && !isLoadingOrUpdated &&
               <Stack bgcolor="white" boxShadow={4} borderRadius={1} p={4} gap={4}>
                 <Tabs value={tabIndex} onChange={onTabChange} variant='scrollable' centered allowScrollButtonsMobile>
-                  {viewByOptions.map((item, index) => 
+                  {TabsOption.map((item, index) => 
                     <Tab key={index} label={item.sortName} />
                   )}
                 </Tabs>
-                {viewByOptions.map((item, index) =>
+                {TabsOption.map((item, index) =>
                   <TabPanel value={tabIndex} index={index} key={index}>
                     {item.component}
                   </TabPanel>
