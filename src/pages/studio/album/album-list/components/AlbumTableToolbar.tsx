@@ -2,15 +2,10 @@
 import { ChangeEvent } from 'react'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
-import Button from '@mui/material/Button'
-import { CardHeader } from '@mui/material'
+import { Box, Button, IconButton, TextField } from '@mui/material'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import ExportButton from '@/pages/user/components/button/ExportButton'
 import { useTranslateString } from '@/utils/TranslateString'
 
 interface Props {
@@ -35,105 +30,64 @@ const AlbumTableToolbar = (props: Props) => {
   }
 
   return (
-    <Box
-      sx={{
-        padding: 5
-      }}
-    >
-      {/* <Box>
-        <CardHeader
-          title={TranslateString('Search') + ' ' + TranslateString('Filters')}
-          sx={{
-            margin: 0,
-            padding: 0
-          }}
-        />
-      </Box> */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: {
-            xs: 'column',
-            md: 'column',
-            lg: 'row'
-          },
-          padding: 0,
-          gap: 5
+    <Box sx={styles.container}>
+      <TextField
+        size='small'
+        value={props.titleValue}
+        onChange={props.onTitleChange}
+        placeholder={TranslateString('Search') + ' ' + TranslateString('Title') + '...'}
+        InputProps={{
+          startAdornment: (
+            <Box sx={{ mr: 2, display: 'flex' }}>
+              <Icon icon='mdi:magnify' fontSize={20} />
+            </Box>
+          ),
+          endAdornment: props?.titleValue ? (
+            <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+              <Icon icon='mdi:close' fontSize={20} />
+            </IconButton>
+          ) : (
+            false
+          )
         }}
-      >
-        <TextField
-          size='small'
-          value={props.titleValue}
-          onChange={props.onTitleChange}
-          placeholder={TranslateString('Search') + ' ' + TranslateString('Title') + '...'}
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ mr: 2, display: 'flex' }}>
-                <Icon icon='mdi:magnify' fontSize={20} />
-              </Box>
-            ),
-            endAdornment: props?.titleValue ? (
-              <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
-                <Icon icon='mdi:close' fontSize={20} />
-              </IconButton>
-            ) : (
-              false
-            )
-          }}
-          sx={{
-            width: {
-              xs: 1,
-              sm: 'auto',
-              lg: '45%'
-            },
-            '& .MuiInputBase-root > svg': {
-              mr: 2
-            }
-          }}
-        />
-        <Button
-          variant='contained'
-          color='error'
-          sx={{
-            width: {
-              xs: 'auto',
-              sm: 'auto',
-              md: 'auto',
-              lg: 150
-            }
-          }}
-          onClick={handleClear}
-        >
-          {TranslateString('Clear')}
-        </Button>
-      </Box>
-
-      {/* Export Button commented out for possible future use. */}
-      {/* <Box
-        sx={{
-          mt: 5,
-          borderTop: '1px solid #d3d3d3'
-        }}
-      >
-        <Box
-          sx={{
-            mt: 5,
-            display: 'flex',
-            justifyContent: 'space-between'
-          }}
-        >
-          <ExportButton
-            role={props.role}
-            emailValue={props.emailValue}
-            mobileValue={props.mobileValue}
-            usernameValue={props.usernameValue}
-            role_id={props.role_id}
-            titleValue={props.titleValue}
-          />
-        </Box>
-      </Box> */}
+        sx={styles.textField}
+      />
+      <Button variant='contained' color='error' sx={styles.button} onClick={handleClear}>
+        {TranslateString('Clear')}
+      </Button>
     </Box>
   )
+}
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      md: 'column',
+      lg: 'row'
+    },
+    mb: 2,
+    gap: 5
+  },
+  textField: {
+    width: {
+      xs: 1,
+      sm: 'auto',
+      lg: '45%'
+    },
+    '& .MuiInputBase-root > svg': {
+      mr: 2
+    }
+  },
+  button: {
+    width: {
+      xs: 'auto',
+      sm: 'auto',
+      md: 'auto',
+      lg: 150
+    }
+  }
 }
 
 export default AlbumTableToolbar

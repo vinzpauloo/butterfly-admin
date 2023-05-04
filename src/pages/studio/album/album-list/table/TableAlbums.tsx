@@ -2,7 +2,7 @@
 import React, { useState, useEffect, ChangeEvent } from 'react'
 
 // ** MUI Imports
-import { Box, Card, Grid, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
 // ** Custom Table Components Imports
@@ -11,6 +11,7 @@ import AlbumTableToolbar from '../components/AlbumTableToolbar'
 // ** Other Imports
 import { AlbumColumns } from '@/data/AlbumColumns'
 import { useTranslateString } from '@/utils/TranslateString'
+import Container from '@/pages/components/Container'
 
 // ** Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
@@ -58,6 +59,16 @@ const TableAlbums = () => {
   }
 
   const [albumData, setAlbumData] = useState<AlbumData[] | undefined>()
+  const [initialLoading, setInitialLoading] = useState(true)
+
+  useEffect(() => {
+    if (initialLoading) {
+      setPage(1)
+      setSort('desc')
+      setSortName('created_at')
+      setInitialLoading(false)
+    }
+  }, [initialLoading])
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['allAlbums', page, sort, sortName, search, search === 'title' ? debouncedTitle : undefined],
@@ -84,7 +95,7 @@ const TableAlbums = () => {
       setPageSize(response?.per_page)
       setPage(response?.current_page)
     },
-    enabled: true
+    enabled: !initialLoading
   })
 
   const handlePageChange = (newPage: any) => {
@@ -114,46 +125,42 @@ const TableAlbums = () => {
   const albumColumns = AlbumColumns()
 
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <Box sx={{ mx: 5, mt: 5, ...styles.buttonContainer }}>
-            <Typography variant='h4' component='h4'>
-              {TranslateString('Album List')}
-            </Typography>
-          </Box>
+    <Container>
+      <Box sx={styles.buttonContainer}>
+        <Typography variant='h4' component='h4'>
+          {TranslateString('Album List')}
+        </Typography>
+      </Box>
 
-          <DataGrid
-            disableColumnMenu
-            rowsPerPageOptions={[]}
-            loading={isLoading || isRefetching}
-            checkboxSelection={false}
-            disableSelectionOnClick
-            paginationMode='server'
-            sortingMode='server'
-            autoHeight
-            rows={albumData ?? []}
-            getRowId={(row: AlbumData) => row?._id}
-            columns={albumColumns}
-            pageSize={pageSize}
-            pagination
-            onPageChange={handlePageChange}
-            rowCount={rowCount}
-            onSortModelChange={handleSortModel}
-            components={{ Toolbar: AlbumTableToolbar }}
-            componentsProps={{
-              toolbar: {
-                titleValue: titleSearchValue,
-                clearSearch: () => {
-                  handleSearch('', 'title')
-                },
-                onTitleChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'title')
-              }
-            }}
-          />
-        </Card>
-      </Grid>
-    </Grid>
+      <DataGrid
+        disableColumnMenu
+        rowsPerPageOptions={[]}
+        loading={isLoading || isRefetching}
+        checkboxSelection={false}
+        disableSelectionOnClick
+        paginationMode='server'
+        sortingMode='server'
+        autoHeight
+        rows={albumData ?? []}
+        getRowId={(row: AlbumData) => row?._id}
+        columns={albumColumns}
+        pageSize={pageSize}
+        pagination
+        onPageChange={handlePageChange}
+        rowCount={rowCount}
+        onSortModelChange={handleSortModel}
+        components={{ Toolbar: AlbumTableToolbar }}
+        componentsProps={{
+          toolbar: {
+            titleValue: titleSearchValue,
+            clearSearch: () => {
+              handleSearch('', 'title')
+            },
+            onTitleChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'title')
+          }
+        }}
+      />
+    </Container>
   )
 }
 
@@ -177,7 +184,7 @@ const styles = {
       md: 'flex-start',
       lg: 'space-between'
     },
-    mb: 0
+    mb: 5
   },
   usersButtons: {
     display: 'flex',

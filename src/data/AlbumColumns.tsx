@@ -36,34 +36,38 @@ export const AlbumColumns = () => {
 
   return [
     {
+      flex: 0.04,
+      minWidth: 70,
       sortable: false,
       field: 'title',
-      headerName: TranslateString('Title'),
-      width: 400
+      headerName: TranslateString('Title')
     },
     {
+      flex: 0.03,
+      minWidth: 80,
       sortable: false,
       field: 'created_at',
       headerName: TranslateString('Date Created'),
-      width: 390,
       valueFormatter: (params: any) => {
         return formatDate(params?.value)
       }
     },
     {
+      flex: 0.03,
+      minWidth: 80,
       sortable: false,
       field: 'updated_at',
       headerName: TranslateString('Last Update'),
-      width: 390,
       valueFormatter: (params: any) => {
         return formatDate(params?.value)
       }
     },
     {
+      flex: 0.03,
+      minWidth: 60,
       sortable: false,
       field: 'cover',
       headerName: TranslateString('Cover Photo'),
-      width: 120,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -80,10 +84,11 @@ export const AlbumColumns = () => {
       }
     },
     {
+      flex: 0.01,
+      minWidth: 60,
       sortable: false,
       field: 'album',
       headerName: TranslateString('Gallery'),
-      width: 95,
       renderCell: (params: GridRenderCellParams) => {
         return <ToggleView data={params.row._id} />
       }
