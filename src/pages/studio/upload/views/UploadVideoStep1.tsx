@@ -108,7 +108,6 @@ const ThumbnailBox = styled(Box)(({ theme }) => ({
   borderRadius: '5px',
   padding: '0',
   marginBottom: 18,
-  maxWidth: '180px',
   marginInline: 'auto',
   height: '100%',
   flexDirection: 'column',
