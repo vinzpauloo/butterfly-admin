@@ -12,7 +12,7 @@ import SuperAgentToolbar from './SuperAgentToolbar'
 import AddAgentDrawer from './drawer/AddAgentDrawer'
 
 // ** Hooks
-import { useUsersTable } from '../../../services/api/useUsersTable'
+import { useUsersTable } from '../../../services/api/UserTableService'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'

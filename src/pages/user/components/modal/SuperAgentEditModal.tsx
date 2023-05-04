@@ -21,7 +21,7 @@ import {
 } from '@mui/material'
 
 // ** Hooks
-import { useUsersTable } from '@/services/api/useUsersTable'
+import { useUsersTable } from '@/services/api/UserTableService'
 
 // ** TanStack
 import { useMutation, useQuery } from '@tanstack/react-query'

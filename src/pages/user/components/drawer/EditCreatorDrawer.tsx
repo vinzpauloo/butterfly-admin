@@ -23,7 +23,7 @@ import CreatedSuccessful from '../form/CreatedSuccessful'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
-import { useUsersTable } from '@/services/api/useUsersTable'
+import { UserTableService } from '@/services/api/UserTableService'
 
 interface FormValues {
   password: string
@@ -81,7 +81,7 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
     })
   }
 
-  const { updateUser } = useUsersTable()
+  const { updateUser } = UserTableService()
   const mutation = useMutation(async (data: { id: any; data: any }) => {
     const response = await updateUser(data.id, data.data)
     if (response.ok) {

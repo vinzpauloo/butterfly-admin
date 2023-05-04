@@ -6,14 +6,14 @@ import { Icon } from '@iconify/react'
 import { Button } from '@mui/material'
 
 // ** Hooks
-import { useUsersTable } from '../../../../services/api/useUsersTable'
+import { useUsersTable } from '../../../../services/api/UserTableService'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
 
 // ** Custom Imports
 import { saveAs } from 'file-saver'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 interface Props {
   usernameValue: string
@@ -73,7 +73,7 @@ const ExportButton = (props: Props) => {
       startIcon={<Icon icon='mdi:export-variant' fontSize={20} />}
       onClick={handleExport}
     >
-      {TranslateString("Export")}
+      {TranslateString('Export')}
     </Button>
   )
 }

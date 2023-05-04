@@ -1,9 +1,9 @@
 // ** React Imports
-import React, { useState, useEffect, ChangeEvent, useCallback } from 'react'
+import React, { useEffect, ChangeEvent } from 'react'
 
 // ** MUI Imports
 import { Box, Card, Grid, Tab } from '@mui/material'
-import { DataGrid, GridSortModel } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
@@ -18,146 +18,89 @@ import UserTableToolbar from './UserTableToolbar'
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
-import EditBtn from './button/EditButton'
 import EditSupervisorDrawer from './drawer/EditSupervisorDrawer'
 import EditSuperAgentDrawer from './drawer/EditSuperAgentDrawer'
 import EditCreatorDrawer from './drawer/EditCreatorDrawer'
-import ToggleButton from '@/pages/user/components/button/ToggleButton'
+import { OperatorColumns } from '@/data/OperatorColumns'
+import { SuperAgentColumns } from '@/data/SuperAgentColumns'
+import { ContentCreatorColumns } from '@/data/ContentCreatorColumns'
 
 // ** Hooks/Services
-import { useUsersTable } from '../../../services/api/useUsersTable'
+import { UserTableService } from '../../../services/api/UserTableService'
 import { CreateAccount } from '@/services/api/CreateAccount'
+import useDebounce from '@/hooks/useDebounce'
 
 // ** TanStack Query
-import { useQuery, useQueries, useQueryClient, useMutation } from '@tanstack/react-query'
+import { useQuery, useQueries } from '@tanstack/react-query'
 
 // ** Utils Imports
-import formatDate from '@/utils/formatDate'
 import { useTranslateString } from '@/utils/TranslateString'
 
-interface ToggleActionProps {
-  value: string
-  id: any
-}
-
-const ToggleAction = ({ value, id }: ToggleActionProps) => {
-  const queryClient = useQueryClient()
-  const { updateUser } = useUsersTable()
-  const mutation = useMutation(
-    async (data: { id: string; data: any }) => {
-      const response = await updateUser(data.id, data.data)
-      if (response.ok) {
-        await response.json()
-      }
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
-      }
-    }
-  )
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleToggle = async (newValue: boolean) => {
-    // Determine the new status
-    const newStatus = value === 'Applied' || value === 'Approved' ? 'Hold' : 'Approved'
-
-    // Update the status in the backend
-    await mutation.mutateAsync({ id, data: { status: newStatus, _method: 'put' } })
-  }
-
-  return (
-    <ToggleButton checked={value === 'Approved' || value === 'Applied'} onToggle={newValue => handleToggle(newValue)} />
-  )
-}
-
-const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
-  '& .MuiTabs-indicator': {
-    display: 'none'
-  },
-  '& .Mui-selected': {
-    backgroundColor: theme.palette.primary.main,
-    color: `${theme.palette.common.white} !important`
-  },
-  '& .MuiTab-root': {
-    minWidth: 65,
-    minHeight: 40,
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius,
-    [theme.breakpoints.up('md')]: {
-      minWidth: 130
-    }
-  }
-}))
-
-const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
-
-type SortType = 'asc' | 'desc' | undefined | null
+// ** Zustand State Management
+import { useUserTableStore } from '@/zustand/userTableStore'
 
 const UserTable = () => {
-  const { getUsers } = useUsersTable()
+  const {
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    role,
+    setRole,
+    roleId,
+    columnType,
+    setColumnType,
+    rowCount,
+    setRowCount,
+    subRole,
+    sort,
+    setSort,
+    sortName,
+    setSortName,
+    search,
+    emailSearchValue,
+    mobileSearchValue,
+    searchValue,
+    initialLoad,
+    setInitialLoad,
+    activeTab,
+    setActiveTab,
+    languages,
+    setLanguages,
+    currencies,
+    setCurrencies,
+    rowData,
+    setRowData,
+    handleRoleChange,
+    openDrawer,
+    drawerRole,
+    drawerData,
+    setDrawerRole
+  } = useUserTableStore()
+
+  const { handlePageChange, handleSearch, handleDrawerToggle } = useUserTableStore(state => ({
+    handlePageChange: state.handlePageChange,
+    handleSearch: state.handleSearch,
+    handleDrawerToggle: state.handleDrawerToggle
+  }))
+
+  // ** Columns for DataGrid
+  const operatorColumns = OperatorColumns()
+  const superAgentColumns = SuperAgentColumns()
+  const contentCreatorColumns = ContentCreatorColumns()
+  const columnsMap = new Map([
+    ['operators', operatorColumns],
+    ['superagent', superAgentColumns],
+    ['contentcreators', contentCreatorColumns]
+  ])
+  const filteredColumns: any = columnsMap.get(columnType) ?? []
+
+  // ** Service/Hooks
+  const { getUsers } = UserTableService()
   const { getLanguages, getCurrency } = CreateAccount()
-  const [page, setPage] = useState<number>()
-  const [pageSize, setPageSize] = useState<number>()
-  const [role, setRole] = useState('SUPERVISOR')
-  const [roleId] = useState<any>()
-  const [columnType, setColumnType] = useState('SUPERVISOR')
-  const [rowCount, setRowCount] = useState<any>()
-
-  const [subRole] = useState('role')
-
-  const [sort, setSort] = useState<SortType>('desc')
-  const [sortName, setSortName] = useState<string>('created_at')
-
-  const [search, setSearch] = useState<string | undefined>(undefined)
-  const [emailSearchValue, setEmailSearchValue] = useState<string | undefined>(undefined)
-  const [mobileSearchValue, setMobileSearchValue] = useState<string | undefined>(undefined)
-  const [searchValue, setSearchValue] = useState<string | undefined>(undefined)
-
   const debouncedUsername = useDebounce(searchValue, 1000)
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
   const debouncedMobile = useDebounce(mobileSearchValue, 1000)
-
-  const [initialLoad, setInitialLoad] = useState(true)
-
-  const [activeTab, setActiveTab] = useState<any>()
-  const handleChange = (event: any, value: string) => {
-    setActiveTab(value)
-  }
-
-  const handleRoleChange = useCallback((newRole: any) => {
-    setRole(newRole)
-
-    // Updates the row data based on the newRole
-    switch (newRole) {
-      case 'SUPERVISOR':
-        setColumnType('operators')
-        break
-      case 'SA':
-        setColumnType('superagent')
-        break
-      case 'CC':
-        setColumnType('contentcreators')
-        break
-      default:
-        break
-    }
-  }, [])
 
   useEffect(() => {
     if (initialLoad) {
@@ -204,286 +147,39 @@ const UserTable = () => {
           ...(role === 'SUPERVISOR' ? { with: subRole } : {})
         }
       }),
-    onSuccess: (data: any) => {
-      setRowCount(data?.total)
-      setRowData(data?.data)
-      setPageSize(data?.per_page)
-      setPage(data?.current_page)
+    onSuccess: response => {
+      setRowCount(response?.total)
+      setRowData(response?.data)
+      setPageSize(response?.per_page)
+      setPage(response?.current_page)
     },
     enabled: !initialLoad
   })
 
-  const [languages, setLanguages] = useState([])
-  const [currencies, setCurrencies] = useState([])
   useQueries({
     queries: [
       {
         queryKey: ['Languages'],
         queryFn: getLanguages,
-        onSuccess: (data: any) => {
-          setLanguages(data?.data)
+        onSuccess: (response: { data: [] }) => {
+          setLanguages(response?.data)
         }
       },
       {
         queryKey: ['Currencies'],
         queryFn: getCurrency,
-        onSuccess: (data: any) => {
-          setCurrencies(data?.data)
+        onSuccess: (response: { data: [] }) => {
+          setCurrencies(response?.data)
         }
       }
     ]
   })
 
-  const [rowData, setRowData] = useState<any>()
-
-  const handlePageChange = useCallback((newPage: any) => {
-    setPage(newPage + 1)
-  }, [])
-
-  const operatorColumns = [
-    {
-      sortable: false,
-      field: 'role',
-      headerName: 'Role',
-      width: 150,
-      valueGetter: (params: any) => {
-        return params?.row.role ? params?.row.role.name : ''
-      }
-    },
-    { sortable: false, field: 'username', headerName: 'User Profile', width: 180 },
-    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 150 },
-    { sortable: false, field: 'email', headerName: 'Email', width: 250 },
-    {
-      sortable: false,
-      field: 'created_at',
-      headerName: 'Date Created',
-      width: 250,
-      valueFormatter: (params: any) => {
-        return formatDate(params?.value)
-      }
-    },
-    {
-      sortable: false,
-      field: 'updated_at',
-      headerName: 'Last Log In',
-      width: 250,
-      valueFormatter: (params: any) => {
-        return formatDate(params?.value)
-      }
-    },
-    {
-      sortable: false,
-      field: 'status',
-      headerName: 'Action',
-      width: 135,
-      renderCell: (params: any) => {
-        return (
-          <Box>
-            <ToggleAction id={params.row.id} value={params.value} />
-            <EditBtn
-              userId={params.row.id}
-              roleId={params.row.role_id}
-              data={params.row}
-              handleOpenDrawer={handleOpenDrawer}
-            />
-          </Box>
-        )
-      }
-    }
-  ]
-
-  const superAgentColumns = [
-    { sortable: false, field: 'username', headerName: 'Super Agent', width: 200 },
-    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 210 },
-    { sortable: false, field: 'email', headerName: 'Email', width: 250 },
-    {
-      sortable: false,
-      field: 'created_at',
-      headerName: 'Date Created',
-      width: 285,
-      valueFormatter: (params: any) => {
-        return formatDate(params?.value)
-      }
-    },
-    {
-      sortable: false,
-      field: 'updated_at',
-      headerName: 'Last Log In',
-      width: 285,
-      valueFormatter: (params: any) => {
-        return formatDate(params?.value)
-      }
-    },
-    {
-      sortable: false,
-      field: 'status',
-      headerName: 'Action',
-      width: 135,
-      renderCell: (params: any) => {
-        return (
-          <Box>
-            <ToggleAction id={params.row.id} value={params.value} />
-            <EditBtn
-              userId={params.row.id}
-              roleId={params.row.role_id}
-              data={params.row}
-              handleOpenDrawer={handleOpenDrawer}
-            />
-          </Box>
-        )
-      }
-    }
-  ]
-
-  const contentCreatorColumns = [
-    { sortable: false, field: 'username', headerName: 'User Name', width: 200 },
-    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 200 },
-    { sortable: false, field: 'email', headerName: 'Email', width: 255 },
-    {
-      sortable: false,
-      field: 'created_at',
-      headerName: 'Date Created',
-      width: 285,
-      valueFormatter: (params: any) => {
-        return formatDate(params?.value)
-      }
-    },
-    {
-      sortable: false,
-      field: 'updated_at',
-      headerName: 'Last Log In',
-      width: 285,
-      valueFormatter: (params: any) => {
-        return formatDate(params?.value)
-      }
-    },
-    {
-      sortable: false,
-      field: 'status',
-      headerName: 'Action',
-      width: 135,
-      renderCell: (params: any) => {
-        return (
-          <Box>
-            <ToggleAction id={params.row.id} value={params.value} />
-            <EditBtn
-              userId={params.row.id}
-              roleId={params.row.role_id}
-              data={params.row}
-              handleOpenDrawer={handleOpenDrawer}
-            />
-          </Box>
-        )
-      }
-    }
-  ]
-
-  const columnsMap = new Map([
-    ['operators', operatorColumns],
-    ['superagent', superAgentColumns],
-    ['contentcreators', contentCreatorColumns]
-  ])
-
-  const filteredColumns: any = columnsMap.get(columnType) ?? []
-
-  const handleSortModel = useCallback((newModel: GridSortModel) => {
-    if (newModel.length) {
-      setSort(newModel[0].sort)
-      setSortName(newModel[0].field)
-    } else {
-      setSort('asc')
-      setSortName('username')
-    }
-  }, [])
-
-  const handleSearch = useCallback((value: string, type: string) => {
-    setSearch(type)
-    switch (type) {
-      case 'username':
-        setSearchValue(value)
-        break
-      case 'email':
-        setEmailSearchValue(value)
-        break
-      case 'mobile':
-        setMobileSearchValue(value)
-        break
-    }
-  }, [])
-
-  type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
-  const [openDrawer, setOpenDrawer] = useState<DrawerType>(null)
-  const handleDrawerToggle = (role: string | null) => {
-    let drawerType: DrawerType
-
-    switch (role) {
-      case 'SUPERVISOR':
-        drawerType = 'SUPERVISOR'
-        break
-      case 'SA':
-        drawerType = 'SA'
-        break
-      case 'CC':
-        drawerType = 'CC'
-        break
-      default:
-        drawerType = null
-    }
-    setOpenDrawer(prevDrawer => (prevDrawer === drawerType ? null : drawerType))
-  }
-
-  const [drawerRole, setDrawerRole] = useState<DrawerType>(null)
-  const [drawerData, setDrawerData] = useState<any>(null)
-
-  const handleOpenDrawer = useCallback((role: DrawerType, data: any) => {
-    setDrawerRole(role)
-    setDrawerData(data)
-  }, [])
-
-  const TranslateString = useTranslateString()
-
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <Box sx={{ mx: 5, mt: 5, ...styles.buttonContainer }}>
-            <TabContext value={activeTab || 'SUPERVISOR'}>
-              <TabList
-                variant='scrollable'
-                scrollButtons='auto'
-                onChange={handleChange}
-                aria-label='forced scroll tabs example'
-              >
-                <Tab
-                  value='SUPERVISOR'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-                      <Icon fontSize={20} icon='mdi:account-outline' />
-                      {TranslateString('Operators')}
-                    </Box>
-                  }
-                />
-                <Tab
-                  value='SA'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-                      <Icon fontSize={20} icon='mdi:lock-outline' />
-                      {TranslateString('Super Agent')}
-                    </Box>
-                  }
-                />
-                <Tab
-                  value='CC'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-                      <Icon fontSize={20} icon='mdi:bookmark-outline' />
-                      {TranslateString('Content Creator')}
-                    </Box>
-                  }
-                />
-              </TabList>
-            </TabContext>
-          </Box>
+          <UserTabs />
 
           <DataGrid
             disableColumnMenu
@@ -500,7 +196,6 @@ const UserTable = () => {
             onPageChange={handlePageChange}
             rowCount={rowCount || 10}
             rowsPerPageOptions={[10]}
-            onSortModelChange={handleSortModel}
             components={{ Toolbar: UserTableToolbar }}
             componentsProps={{
               toolbar: {
@@ -526,6 +221,7 @@ const UserTable = () => {
             }}
             sx={{ padding: 0 }}
           />
+          {/* CREATE Drawers */}
           <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
           <SADrawer
             open={openDrawer === 'SA'}
@@ -534,6 +230,8 @@ const UserTable = () => {
             currencies={currencies}
           />
           <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
+
+          {/* EDIT Drawers */}
           {drawerRole === 'SUPERVISOR' && (
             <EditSupervisorDrawer
               data={drawerData}
@@ -559,13 +257,75 @@ const UserTable = () => {
   )
 }
 
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: 'auto',
-    overflow: 'hidden'
+function UserTabs() {
+  const TranslateString = useTranslateString()
+
+  const { activeTab } = useUserTableStore()
+  const handleChange = useUserTableStore(state => state.handleChange)
+
+  return (
+    <Box sx={styles.buttonContainer}>
+      <TabContext value={activeTab || 'SUPERVISOR'}>
+        <TabList
+          variant='scrollable'
+          scrollButtons='auto'
+          onChange={handleChange}
+          aria-label='forced scroll tabs example'
+        >
+          <Tab
+            value='SUPERVISOR'
+            label={
+              <Box sx={styles.tabStyle}>
+                <Icon fontSize={20} icon='mdi:account-outline' />
+                {TranslateString('Operators')}
+              </Box>
+            }
+          />
+          <Tab
+            value='SA'
+            label={
+              <Box sx={styles.tabStyle}>
+                <Icon fontSize={20} icon='mdi:lock-outline' />
+                {TranslateString('Super Agent')}
+              </Box>
+            }
+          />
+          <Tab
+            value='CC'
+            label={
+              <Box sx={styles.tabStyle}>
+                <Icon fontSize={20} icon='mdi:bookmark-outline' />
+                {TranslateString('Content Creator')}
+              </Box>
+            }
+          />
+        </TabList>
+      </TabContext>
+    </Box>
+  )
+}
+
+const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
+  '& .MuiTabs-indicator': {
+    display: 'none'
   },
+  '& .Mui-selected': {
+    backgroundColor: theme.palette.primary.main,
+    color: `${theme.palette.common.white} !important`
+  },
+  '& .MuiTab-root': {
+    minWidth: 65,
+    minHeight: 40,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    [theme.breakpoints.up('md')]: {
+      minWidth: 130
+    }
+  }
+}))
+
+const styles = {
   buttonContainer: {
     display: 'flex',
     flexDirection: {
@@ -579,120 +339,13 @@ const styles = {
       md: 'flex-start',
       lg: 'space-between'
     },
-    mb: 0
+    mx: 5,
+    mt: 5
   },
-  usersButtons: {
-    display: 'flex',
-    gap: 2,
-    flexWrap: 'wrap',
-    mb: {
-      xs: 5,
-      sm: 5,
-      md: 5,
-      lg: 0,
-      xl: 0
-    }
-  },
-  userButton: {
-    border: 1,
-    height: '56px',
-    minWidth: {
-      xs: '224px',
-      sm: 'auto',
-      md: 'auto',
-      lg: '224px'
-    },
-    flex: 1,
+  tabStyle: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderColor: 'black',
-    transition: 'background-color 0.1s',
-    '&:hover': {
-      backgroundColor: `#9747FF`,
-      color: 'white'
-    },
-    textTransform: 'uppercase'
-  },
-  linkButton: {
-    textDecoration: 'none'
-  },
-  createAccount: {
-    border: 1,
-    height: '56px',
-    minWidth: '224px',
-    width: {
-      xs: '100%',
-      md: '100%',
-      lg: '224px'
-    },
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    borderColor: 'black',
-    textTransform: 'uppercase',
-    color: 'black',
-    backgroundColor: '#FFF',
-    '&:hover': {
-      backgroundColor: `#9747FF`,
-      color: 'white'
-    }
-  },
-  tableContainer: {
-    minHeight: 540,
-    overflowX: 'auto'
-  },
-  paginationContainer: {
-    margin: '0 auto'
-  },
-  paginationContent: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center'
-  },
-  icon: {
-    fontSize: 12,
-    color: 'black'
-  },
-  text: {
-    color: 'black',
-    fontSize: 12
-  },
-  pageNumber: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 24,
-    height: 24,
-    borderRadius: 2,
-    marginLeft: 2,
-    marginRight: 2,
-    cursor: 'pointer'
-  },
-  searchContainer: {
-    padding: 5,
-    borderTop: '1px solid black'
-  },
-  cardHeader: {
-    margin: 0,
-    padding: 0
-  },
-  searchInput: {
-    display: 'flex',
-    flexDirection: {
-      xs: 'column',
-      md: 'column',
-      lg: 'row'
-    },
-    padding: 0,
-    gap: 5
-  },
-  fullWidth: {
-    width: '100%'
-  },
-  dataGrid: {
-    padding: 5
+    '& svg': { mr: 2 }
   }
 }
 
