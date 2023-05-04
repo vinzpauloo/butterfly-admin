@@ -26,7 +26,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 // ** Services Import
 import useGroupingService from '@/services/useGroupings'
-import { useUsersTable } from '@/services/api/useUsersTable'
+import { UserTableService } from '@/services/api/UserTableService'
 import VideoService from '@/services/api/VideoService'
 
 // ** Layout Imports
@@ -316,7 +316,7 @@ const UploadVideoStep1 = (props: Props) => {
   // ** react query / api services
   const { getGroupings } = useGroupingService()
   const { updateVideoByWorkId } = VideoService()
-  const { getAllDataFromCreator } = useUsersTable()
+  const { getAllDataFromCreator } = UserTableService()
 
   // load groupings
   const { isLoading: isGrpLoading } = useQuery({

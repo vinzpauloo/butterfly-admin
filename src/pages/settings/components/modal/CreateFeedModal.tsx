@@ -33,7 +33,7 @@ import { useDropzone } from 'react-dropzone'
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
 import VideoService from '@/services/api/VideoService'
-import { useUsersTable } from '@/services/api/useUsersTable'
+import { UserTableService } from '@/services/api/UserTableService'
 import { useQuery } from '@tanstack/react-query'
 
 import { useTranslateString } from '@/utils/TranslateString'
@@ -151,7 +151,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
 });
   
   // ** APIs and Tanstacks
-  const { getAllDataFromCreator } = useUsersTable()
+  const { getAllDataFromCreator } = UserTableService()
 
   const getCCsQuery = useQuery({
     queryKey: ['ccOptions'],
