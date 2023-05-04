@@ -145,7 +145,6 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
       if ( auth.user?.role == 'CC' ) {
         router.push('/studio/cc/post-status/')
       }
-      
 
     },1500)
     
@@ -266,6 +265,14 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
         // TURN OF LOADING
         setIsLoading(false)
         reset()
+
+        // redirect if CC
+        setTimeout( () => {
+          if ( auth.user?.role == 'CC' ) {
+            router.push('/studio/cc/post-status/')
+          }
+        },1500 )
+
       })
     }
   }

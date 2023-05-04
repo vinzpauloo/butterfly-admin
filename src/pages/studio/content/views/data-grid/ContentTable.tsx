@@ -99,40 +99,44 @@ const ContentTable = (props: IContentTable) => {
 
   const TranslateString = useTranslateString()
 
-  const columns: GridColDef[] = [
+  const columns : GridColDef[] = [
     {
-      flex: 0.1,
-      minWidth: 150,
-      field: 'video_thumbnail',
+      flex: 0.02,
+      minWidth: 70,
+      field: 'thumbnail_url',
       headerName: TranslateString("Video Thumbnail"),
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return <Box sx={{ display: 'flex', alignItems: 'center' }}>{renderClient(params)}</Box>
-      }
-    },
-    {
-      flex: 0.15,
-      minWidth: 150,
-      field: 'full_name',
-      headerName: TranslateString("Content Creator"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {params.row.user.username}
-              </Typography>
+              <CustomAvatar
+                src={FILE_SERVER_URL + params.row.thumbnail_url}
+                sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
+              />
             </Box>
           </Box>
         )
       }
     },
     {
-      flex: 0.1,
-      minWidth: 120,
-      headerName: TranslateString("Title"),
+      flex: 0.02,
+      minWidth: 90,
+      headerName: TranslateString("Content Creator"),
+      sortable: false,
+      field: 'content_creator',
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.user.username}
+        </Typography>
+      )
+    },
+    {
+      flex: 0.03,
+      minWidth: 60,
       field: 'title',
+      headerName: TranslateString("Title"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.title}
@@ -140,26 +144,11 @@ const ContentTable = (props: IContentTable) => {
       )
     },
     {
-      flex: 0.15,
-      minWidth: 110,
-      field: 'video_url',
-      align: 'center',
-      headerName: TranslateString("Video") + " " + TranslateString("URL"),
-      renderCell: (params: GridRenderCellParams) => (
-        <>
-          <Icon
-            onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls)}
-            icon='mdi:text-box-outline'
-            fontSize='1.4rem'
-          />
-        </>
-      )
-    },
-    {
-      flex: 0.13,
-      minWidth: 140,
-      field: 'tags',
+      flex: 0.04,
+      field: 'tag',
+      minWidth: 80,
       headerName: TranslateString("Tags"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params?.row?.tags?.join(', ')}
@@ -167,10 +156,11 @@ const ContentTable = (props: IContentTable) => {
       )
     },
     {
-      flex: 0.1,
+      flex: 0.04,
       minWidth: 140,
       field: 'last_update',
       headerName: TranslateString("Last Update"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {formatDate(params.row.updated_at)}
@@ -179,26 +169,114 @@ const ContentTable = (props: IContentTable) => {
     },
     {
       flex: 0.01,
-      minWidth: 140,
-      field: 'status',
-      headerName: TranslateString("Status"),
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return <Typography color={params.row.approval === "Declined" ? "red" : undefined}>{params.row.approval}</Typography>
-      }
-    },
-    {
-      flex: 0.06,
-      minWidth: 50,
-      field: 'actions',
-      headerName: TranslateString("View"),
-      align: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return <ContentDialog param={params.row} />
-      }
+      minWidth: 60,
+      field: 'action',
+      headerName: TranslateString("Action"),
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => <ContentDialog param={params.row} />
     }
   ]
+
+  // const columns: GridColDef[] = [
+  //   {
+  //     flex: 0.1,
+  //     minWidth: 150,
+  //     field: 'video_thumbnail',
+  //     headerName: TranslateString("Video Thumbnail"),
+  //     align: 'center',
+  //     headerAlign: 'center',
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return <Box sx={{ display: 'flex', alignItems: 'center' }}>{renderClient(params)}</Box>
+  //     }
+  //   },
+  //   {
+  //     flex: 0.15,
+  //     minWidth: 150,
+  //     field: 'full_name',
+  //     headerName: TranslateString("Content Creator"),
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return (
+  //         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+  //           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+  //             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
+  //               {params.row.user.username}
+  //             </Typography>
+  //           </Box>
+  //         </Box>
+  //       )
+  //     }
+  //   },
+  //   {
+  //     flex: 0.1,
+  //     minWidth: 120,
+  //     headerName: TranslateString("Title"),
+  //     field: 'title',
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <Typography variant='body2' sx={{ color: 'text.primary' }}>
+  //         {params.row.title}
+  //       </Typography>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.15,
+  //     minWidth: 110,
+  //     field: 'video_url',
+  //     align: 'center',
+  //     headerName: TranslateString("Video") + " " + TranslateString("URL"),
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <>
+  //         <Icon
+  //           onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls)}
+  //           icon='mdi:text-box-outline'
+  //           fontSize='1.4rem'
+  //         />
+  //       </>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.13,
+  //     minWidth: 140,
+  //     field: 'tags',
+  //     headerName: TranslateString("Tags"),
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <Typography variant='body2' sx={{ color: 'text.primary' }}>
+  //         {params?.row?.tags?.join(', ')}
+  //       </Typography>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.1,
+  //     minWidth: 140,
+  //     field: 'last_update',
+  //     headerName: TranslateString("Last Update"),
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <Typography variant='body2' sx={{ color: 'text.primary' }}>
+  //         {formatDate(params.row.updated_at)}
+  //       </Typography>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.01,
+  //     minWidth: 140,
+  //     field: 'status',
+  //     headerName: TranslateString("Status"),
+  //     align: 'center',
+  //     headerAlign: 'center',
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return <Typography color={params.row.approval === "Declined" ? "red" : undefined}>{params.row.approval}</Typography>
+  //     }
+  //   },
+  //   {
+  //     flex: 0.06,
+  //     minWidth: 50,
+  //     field: 'actions',
+  //     headerName: TranslateString("View"),
+  //     align: 'center',
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return <ContentDialog param={params.row} />
+  //     }
+  //   }
+  // ]
 
   const handleCopyToClipboard = (newState: SnackbarOrigin, trialUrl: string) => () => {
     navigator.clipboard.writeText(trialUrl)

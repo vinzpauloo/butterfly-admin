@@ -37,6 +37,16 @@ interface IGetFeedsByCC {
   status? : 'Approved' | 'Pending' | 'Declined'
 }
 
+interface IUpdateFeedParams {
+  id? : string
+  data : {
+    string_story? : string
+    tags? : string[] | any,
+    _method : 'put' | string,
+    resubmit? : 'true' | 'false'
+  }
+}
+
 const FeedsService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -92,7 +102,23 @@ const FeedsService = () => {
     })
   }
 
-  return { uploadFeed, getFeeds, approveNewsFeedContent, getFeedsByCC }
+  const updateFeedViaID = (params : IUpdateFeedParams) => {
+
+    return request({
+      headers: {
+        ...getHeaders(),
+        'Content-Type': 'multipart/form-data', // if POST is form-data
+        "Accept": "application/json",
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `admin/feeds/${params.id}`,
+      method: 'POST',
+      data: params.data, // if body is JSON
+    })
+
+  }
+
+  return { uploadFeed, getFeeds, approveNewsFeedContent, getFeedsByCC, updateFeedViaID }
 }
 
 export default FeedsService
