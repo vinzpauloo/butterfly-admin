@@ -2,7 +2,7 @@ import request from '@/lib/request'
 import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
-interface IGetContentsParams {
+export interface IGetContentsParams {
   data: {
     search_by?: string
     search_value?: string
@@ -15,6 +15,7 @@ interface IGetContentsParams {
     note?: string
     _method?: string
     paginate?: number
+    approval? : 'Approved' | 'Pending' | 'Declined'
   }
   token?: string
 }

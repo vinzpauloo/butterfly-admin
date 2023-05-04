@@ -33,7 +33,8 @@ interface IApproveFeedParams {
 }
 interface IGetFeedsByCC {
   all : boolean,
-  with? : string
+  with? : string,
+  status? : 'Approved' | 'Pending' | 'Declined'
 }
 
 const FeedsService = () => {

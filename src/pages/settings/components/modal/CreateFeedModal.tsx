@@ -52,6 +52,9 @@ import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
 // Reuse
 import ProgressCircularWithLabel from '@/layouts/components/shared-components/ProgressCircular'
 
+// ** Next Router
+import { useRouter } from 'next/router'
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -87,6 +90,8 @@ const UploadVideoButton = asUploadButton(
 )
 
 const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => {
+
+  // ** Auth Hook
   const auth = useAuth()
 
   // ** STATES
@@ -94,6 +99,9 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
   const [feedVideo, setFeedVideo] = React.useState<File[]>([])
   const [videoUploading, setVideoUploading] = React.useState<boolean>(false)
+
+  // ** Router Hook
+  const router = useRouter()
 
   // ** Uploady Hooks
   const uploady = useUploady()
@@ -120,7 +128,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   useBatchFinishListener((batch) => {
     console.log(`batch ${batch.id} finished uploading`);  
     setProgress(100)
-    toast.success('Successfully Upload Newsfeed with Video!', 
+    toast.success('Successfully Uploaded Newsfeed with Video!', 
     { position: 'top-center', duration : 4000 })
 
     setTimeout( () => {
@@ -132,6 +140,12 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
       setVideoUploading(false)
       setIsLoading(false)
       onClose()
+
+      // redirect
+      if ( auth.user?.role == 'CC' ) {
+        router.push('/studio/cc/post-status/')
+      }
+      
 
     },1500)
     
@@ -415,7 +429,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
           )}
 
           <Box sx={styles.buttonContainer}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: 3 }}>
               {!videoUploading ? (
                 <UploadVideoButton autoUpload={false} clearPendingOnAdd={true} />
               ) : (
@@ -518,7 +532,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 5
+    gap: 5,
   },
   upload: {
     backgroundColor: '#FFF',
@@ -527,7 +541,10 @@ const styles = {
     borderRadius: '20px',
     fontSize: 11,
     width: 145,
-    height: 25
+    height: 25,
+    '&:hover' : {
+      backgroundColor :'#FFF'
+    }
   },
   bottomBtnContainer: {
     display: 'flex',

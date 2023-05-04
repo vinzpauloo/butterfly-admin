@@ -47,6 +47,9 @@ const renderClient = (params: GridRenderCellParams) => {
   }
 }
 
+// ** Types and Interfaces
+type StatusTypes = 'Approved' | 'Pending' | 'Declined' 
+
 interface IContentTable {}
 
 interface SnackState extends SnackbarOrigin {
@@ -66,6 +69,7 @@ const ContentTable = (props: IContentTable) => {
   })
   // desctruct the snack state
   const { vertical, horizontal, open } = snackState
+  const [approval, setApproval] = React.useState<StatusTypes>('Pending')
 
   // Access the client
   const queryClient = useQueryClient()
@@ -75,9 +79,8 @@ const ContentTable = (props: IContentTable) => {
   //Queries
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['contents', page, pageSize],
-    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize } }),
+    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize, approval  } }),
     onSuccess: data => {
-      console.log('data isss', data)
       setData(data.data)
       setRowCount(data.total)
       setPage(data.current_page)

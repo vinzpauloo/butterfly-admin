@@ -36,6 +36,7 @@ const PostStatus = () => {
   const [specificType, setSpecificType] = React.useState<{} | null>(null)
   const [ searchBy, setSearchBy ] = React.useState<string>('username') //data columns
   const [ sortBy, setSortBy ] = React.useState<string>('username') //data columns
+  const [ postStatus, setPostStatus ] = React.useState<'Approved' | 'Pending' | 'Declined'>('Pending') //data columns
 
 
   const handleSetSort = (sort : GridSortDirection) => {
@@ -53,7 +54,8 @@ const PostStatus = () => {
     queryKey: ['getFeeds', paginate, page, debounceSearchText, sort, sortBy, specificType],
     queryFn: () => getFeedsByCC({
       all : true,
-      with : 'user'
+      with : 'user',
+      status : postStatus
     }),
     onSuccess: response => {
       setRowData(response.data)
