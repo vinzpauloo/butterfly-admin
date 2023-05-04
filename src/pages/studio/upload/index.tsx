@@ -193,8 +193,8 @@ const UploadContent = () => {
         grouped={false}
         method='POST'        
         destination={{ 
-          url: uploadURL, //uploadURL 
-          headers: { 'x-custom': '123' } }
+          url: uploadURL, //uploadURL  
+        }
         }
       >
         <FormProvider {...methods}>

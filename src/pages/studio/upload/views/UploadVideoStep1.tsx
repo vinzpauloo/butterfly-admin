@@ -409,6 +409,7 @@ const UploadVideoStep1 = (props: Props) => {
 
     setValue('startTime', target.value)
   }
+  
   const handleTaggingsDelete = (tag: string) => {
     let filteredTags = tags?.filter(e => e !== tag)
     setTags(filteredTags as [])
@@ -718,9 +719,6 @@ const UploadVideoStep1 = (props: Props) => {
                   </Box>
 
                   <VideoUploady
-                    destination={{
-                      url: 'https://webhook.site/8146606c-5741-47bd-b8d9-7537b7db6a2c'
-                    }}
                     clearPendingOnAdd={false}
                     autoUpload={false}
                     id='work'
@@ -760,9 +758,6 @@ const UploadVideoStep1 = (props: Props) => {
                         <CardActions sx={{ display: 'flex', justifyContent: 'center' }} className='card-action-dense'>
                           {trialUploadSwitch && (
                             <VideoUploadyTrial
-                              destination={{
-                                url: 'https://webhook.site/c5788191-fd80-42e3-9764-ff18dc23950d'
-                              }}
                               clearPendingOnAdd={false}
                               autoUpload={false}
                               id='trial'
