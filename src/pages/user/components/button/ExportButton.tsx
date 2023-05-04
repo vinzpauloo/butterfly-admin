@@ -6,7 +6,7 @@ import { Icon } from '@iconify/react'
 import { Button } from '@mui/material'
 
 // ** Hooks
-import { useUsersTable } from '../../../../services/api/UserTableService'
+import { UserTableService } from '@/services/api/UserTableService'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -28,7 +28,7 @@ const ExportButton = (props: Props) => {
   const [response, setResponse] = useState<any>()
   const [search, setSearch] = useState<any>()
 
-  const { getAllDataForCSV } = useUsersTable()
+  const { getAllDataForCSV } = UserTableService()
 
   useQuery({
     queryKey: ['UsersTableCSV', props.role, props.usernameValue, props.emailValue, props.mobileValue, props.role_id],
