@@ -172,7 +172,9 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 9,
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+      'image/png': ['.png'],
+      'image/jpg': ['.jpg'],
+      'image/jpeg': ['.jpeg'],
     },
     onDrop: (acceptedFiles: File[]) => {
       let imageFiles = acceptedFiles.map((file: File) => Object.assign(file))
