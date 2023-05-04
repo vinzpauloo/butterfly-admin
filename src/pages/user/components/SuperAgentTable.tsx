@@ -12,7 +12,7 @@ import SuperAgentToolbar from './SuperAgentToolbar'
 import AddAgentDrawer from './drawer/AddAgentDrawer'
 
 // ** Hooks
-import { useUsersTable } from '../../../services/api/UserTableService'
+import { UserTableService } from '@/services/api/UserTableService'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -37,7 +37,7 @@ const useDebounce = (value: any, delay: number) => {
 type SortType = 'asc' | 'desc' | undefined | null
 
 const SuperAgentTable = () => {
-  const { getUsers } = useUsersTable()
+  const { getUsers } = UserTableService()
   const [page, setPage] = useState<number>()
   const [pageSize, setPageSize] = useState<number>()
   const [role, setRole] = useState('AGENT')

@@ -21,7 +21,7 @@ import {
 } from '@mui/material'
 
 // ** Hooks
-import { useUsersTable } from '@/services/api/UserTableService'
+import { UserTableService } from '@/services/api/UserTableService'
 
 // ** TanStack
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -98,7 +98,7 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
     resolver: yupResolver(schema)
   })
 
-  const { updateUser, getSpecificUser } = useUsersTable()
+  const { updateUser, getSpecificUser } = UserTableService()
 
   const [specificUser, setSpecificUser] = useState<any>()
 

@@ -10,7 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
 
 // ** Hooks
-import { useUsersTable } from '@/services/api/UserTableService'
+import { UserTableService } from '@/services/api/UserTableService'
 
 // ** TanStack
 import { useMutation } from '@tanstack/react-query'
@@ -49,7 +49,7 @@ const FormModal: React.FC<FormModalProps> = ({ userId, data, isOpen, onClose }) 
     resolver: yupResolver(schema)
   })
 
-  const { updateUser } = useUsersTable()
+  const { updateUser } = UserTableService()
   const mutation = useMutation(async (data: { id: any; data: any }) => {
     const response = await updateUser(data.id, data.data)
     if (response.ok) {

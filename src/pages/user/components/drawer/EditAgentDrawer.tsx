@@ -22,7 +22,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
-import { useUsersTable } from '@/services/api/UserTableService'
+import { UserTableService } from '@/services/api/UserTableService'
 
 interface FormValues {
   password: string
@@ -79,7 +79,7 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
     })
   }
 
-  const { updateUser } = useUsersTable()
+  const { updateUser } = UserTableService()
   const mutation = useMutation(async (data: { id: any; data: any }) => {
     const response = await updateUser(data.id, data.data)
     if (response.ok) {
