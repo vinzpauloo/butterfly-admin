@@ -20,6 +20,7 @@ type Props = {
   bundleName: string
   bundlePrice: number
   bundleDescription: string
+  bundleDuration: number
   isBundleOn: boolean
   bundlePerks: {
     videos: boolean
@@ -144,10 +145,6 @@ const VIPBundleItem = (props: Props) => {
       featureName: 'Watch Ticket',
       isIncluded: props.bundlePerks.watch_ticket
     }
-    // {
-    //   featureName: 'Offline Benefits',
-    //   isIncluded: props.bundlePerks.offline_benefit
-    // }
   ]
 
   return (
@@ -158,6 +155,13 @@ const VIPBundleItem = (props: Props) => {
           <Stack gap={2}>
             <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
               {props.site_id}: {props.siteName}
+            </Typography>
+            <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
+              Duration:&nbsp;
+              {props.bundleDuration === 31 && '1 Month'}
+              {props.bundleDuration === 92 && '3 Months'}
+              {props.bundleDuration === 182 && '6 Months'}
+              {props.bundleDuration === 365 && '1 Year'}
             </Typography>
             <Stack gap={2} flexDirection='row' justifyContent='space-between'>
               <Typography

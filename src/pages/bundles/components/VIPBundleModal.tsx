@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import Stack, { StackProps } from '@mui/material/Stack'
 import Grid, { GridProps } from '@mui/material/Grid'
-import { Box, Icon, IconProps, Menu, MenuItem } from '@mui/material'
+import { Icon, IconProps, Menu, MenuItem } from '@mui/material'
 import IconList from './IconList'
 import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
@@ -14,7 +14,6 @@ import { useTranslateString } from '@/utils/TranslateString'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 type Props = {
-  // optional props to be passed if editing a bundle instead
   isEditingVIPBundle?: boolean
   bundleID?: string
   bundleName?: string
@@ -54,17 +53,22 @@ const VIPBundleModal = (props: Props) => {
   const [isVIPIncluded, setIsVIPIncluded] = useState(props.isVIPIncluded ?? false)
   const [isDownloadIncluded, setIsDownloadIncluded] = useState(props.isDownloadIncluded ?? false)
   const [isWatchTicketIncluded, setIsWatchTicketIncluded] = useState(props.isWatchTicketIncluded ?? false)
-  const [isOfflineBenefitsIncluded, setIsOfflineBenefitsIncluded] = useState(props.isOfflineBenefitsIncluded ?? false)
 
   const [featuresSelectionError, setFeaturesSelectionError] = useState(false)
+  const [selectedSiteID, setSelectedSiteID] = useState(0)
+  const [selectedDurationIndex, setSelectedDurationIndex] = useState(0)
 
-  // MENU
+  // SITE ID MENU
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const isMenuOpen = Boolean(anchorEl)
   const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget)
   const closeMenu = () => setAnchorEl(null)
 
-  const [selectedSiteID, setSelectedSiteID] = useState(0)
+  // DURATION MENU
+  const [durationAnchorEl, setDurationAnchorEl] = React.useState<null | HTMLElement>(null)
+  const isDurationMenuOpen = Boolean(durationAnchorEl)
+  const openDurationMenu = (event: React.MouseEvent<HTMLButtonElement>) => setDurationAnchorEl(event.currentTarget)
+  const closeDurationMenu = () => setDurationAnchorEl(null)
 
   const featuresList = [
     {
@@ -107,11 +111,13 @@ const VIPBundleModal = (props: Props) => {
       isIncluded: isWatchTicketIncluded,
       setFunction: () => setIsWatchTicketIncluded(prev => !prev)
     }
-    // {
-    // 	featureName: "Offline Benefits",
-    // 	isIncluded: isOfflineBenefitsIncluded,
-    // 	setFunction: () => setIsOfflineBenefitsIncluded(prev => !prev),
-    // },
+  ]
+
+  const bundleDurations = [
+    { duration: '1 Month', days: 31 },
+    { duration: '3 Months', days: 92 },
+    { duration: '6 Months', days: 182 },
+    { duration: '1 Year', days: 365 },
   ]
 
   const validateInputs = () => {
@@ -186,6 +192,7 @@ const VIPBundleModal = (props: Props) => {
           name: bundleName,
           price: Number(bundlePrice),
           description: bundleDescription,
+          duration_days: bundleDurations[selectedDurationIndex].days,
           active: isBundleActive,
           videos: featuresList[0].isIncluded,
           photos: featuresList[1].isIncluded,
@@ -209,6 +216,7 @@ const VIPBundleModal = (props: Props) => {
           name: bundleName,
           price: Number(bundlePrice),
           description: bundleDescription,
+          duration_days: bundleDurations[selectedDurationIndex].days,
           active: isBundleActive,
           videos: featuresList[0].isIncluded,
           photos: featuresList[1].isIncluded,
@@ -236,8 +244,26 @@ const VIPBundleModal = (props: Props) => {
       </Typography>
       <Stack flexDirection='column' gap={2} sx={loadingStyle} width={300}>
         {isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
-        {props.isEditingVIPBundle ? null : (
-          <Box>
+        {props.isEditingVIPBundle ?
+          <Stack alignItems='flex-start'>
+            <Button variant='contained' color='secondary' onClick={openDurationMenu} endIcon={<KeyboardArrowDownIcon />}>
+              Duration: {bundleDurations[selectedDurationIndex].duration}
+            </Button>
+            <Menu anchorEl={durationAnchorEl} open={isDurationMenuOpen} onClose={closeDurationMenu}>
+              {bundleDurations.map((item: any, index: any) => (
+                <MenuItem
+                  key={index}
+                  onClick={() => {
+                    setSelectedDurationIndex(index)
+                    closeDurationMenu()
+                  }}
+                >
+                  {item.duration}
+                </MenuItem>
+              ))}
+            </Menu>
+          </Stack> : (
+          <Stack gap={2} alignItems='flex-start'>
             <Button variant='contained' color='primary' onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>
               Site ID: {selectedSiteID}
             </Button>
@@ -262,7 +288,23 @@ const VIPBundleModal = (props: Props) => {
                 </MenuItem>
               ))}
             </Menu>
-          </Box>
+            <Button variant='contained' color='secondary' onClick={openDurationMenu} endIcon={<KeyboardArrowDownIcon />}>
+              Duration: {bundleDurations[selectedDurationIndex].duration}
+            </Button>
+            <Menu anchorEl={durationAnchorEl} open={isDurationMenuOpen} onClose={closeDurationMenu}>
+              {bundleDurations.map((item: any, index: any) => (
+                <MenuItem
+                  key={index}
+                  onClick={() => {
+                    setSelectedDurationIndex(index)
+                    closeDurationMenu()
+                  }}
+                >
+                  {item.duration}
+                </MenuItem>
+              ))}
+            </Menu>
+          </Stack>
         )}
         <Stack gap={2}>
           <Stack {...cardContainer}>

@@ -88,6 +88,7 @@ const VIPBundlesPage = () => {
                 bundleName={item.name}
                 bundlePrice={item.price}
                 bundleDescription={item.description}
+                bundleDuration={item.duration_days}
                 isBundleOn={item.active}
                 bundlePerks={item.perks}
                 siteName={item.sites === null ? "Default" : item.sites.name}

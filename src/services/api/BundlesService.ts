@@ -8,6 +8,7 @@ interface IBundlesParams {
     site_id?: number
     name?: string
     description?: string
+    duration_days?: number
     price?: number
     currency?: string
     currency_code?: string
