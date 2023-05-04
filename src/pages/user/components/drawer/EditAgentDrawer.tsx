@@ -22,7 +22,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
-import { useUsersTable } from '@/services/api/useUsersTable'
+import { useUsersTable } from '@/services/api/UserTableService'
 
 interface FormValues {
   password: string

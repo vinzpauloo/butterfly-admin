@@ -23,7 +23,7 @@ import CreatedSuccessful from '../form/CreatedSuccessful'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 
 // ** Hooks/ Services
-import { useUsersTable } from '@/services/api/useUsersTable'
+import { UserTableService } from '@/services/api/UserTableService'
 
 interface FormValues {
   [key: string]: string | number | File | null
@@ -98,7 +98,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
 
   // ** Hooks
-  const { updateUser, getSpecificUser } = useUsersTable()
+  const { updateUser, getSpecificUser } = UserTableService()
 
   // ** Props
   const { open, toggle, languages, currencies } = props

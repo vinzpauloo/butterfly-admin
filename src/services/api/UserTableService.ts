@@ -30,7 +30,7 @@ const processData = (response: any) => {
   return {}
 }
 
-export const useUsersTable = () => {
+export const UserTableService = () => {
   const getUsers = (params: UsersData) => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
