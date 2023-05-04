@@ -119,7 +119,7 @@ const VideoVisibility = () => {
     formData.append('work_id', work_id)
     formData.append('title', title)
     formData.append('description', description)
-    formData.append('orientation', 'landscape') // HardCoded
+    formData.append('orientation', 'Landscape') // HardCoded
     formData.append('startTimeSeconds', startTime)
     formData.append('_method', 'put')
 
