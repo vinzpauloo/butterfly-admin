@@ -274,7 +274,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
 
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '.5rem' }}>
-                <TextField disabled multiline rows={2} fullWidth defaultValue={param?.tags?.join(', ')} />
+                <TextField label='Tags' disabled multiline rows={2} fullWidth defaultValue={param?.tags?.join(', ')} />
               </FormControl>
             </Grid>
           </Grid>
@@ -297,9 +297,7 @@ const ContentDialog = ({ param }: ContentDialogType) => {
       <Dialog
         maxWidth='sm'
         scroll='body'
-        onClose={() => handleNoteDialogClose() }
         TransitionComponent={Transition}
-        onBackdropClick={() => setShowNotes(false)}
         open={showNotes}
       >
         <DialogContent sx={{ pb: 8, px: { xs: 8, sm: 15 }, pt: { xs: 8, sm: 12.5 }, position: 'relative' }}>

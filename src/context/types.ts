@@ -77,6 +77,7 @@ export interface IFeedStory {
   videos: {
     url: string
   }
+  type? : string
 }
 
 export interface IImages {

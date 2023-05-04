@@ -225,17 +225,11 @@ const TableNewsFeedApproval = ({rows, isLoading, rowCount, pageSize, setPageSize
         onSortModelChange={handleSortModel}
         rowsPerPageOptions={[7, 10, 25, 50]}
         onPageChange={newPage => handlePageChange(newPage)}
-        components={{ Toolbar: ServerSideToolbar }}
         onPageSizeChange={newPageSize => setPageSize(newPageSize)}
         componentsProps={{
           baseButton: {
             variant: 'outlined'
           },
-          toolbar: {
-            value: searchText,
-            clearSearch: () => handleSearch(''),
-            onChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value)
-          }
         }}
       />
     </>

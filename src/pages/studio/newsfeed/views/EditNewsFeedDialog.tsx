@@ -36,7 +36,7 @@ import FeedsService from '@/services/api/FeedsService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Base Links
-import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -176,8 +176,8 @@ const EditNewsFeedDialog = (props: INewsFeedDialogProps) => {
                       row?.images.map(image => {
                         return (
                           <img
-                            key={image._id}
-                            src={image.url.replace('http://localhost/', 'http://192.168.50.9/')} //TBR
+                            key={ image._id }
+                            src={ FILE_SERVER_URL + image.url }
                           />
                         )
                       })}

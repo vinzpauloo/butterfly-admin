@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 
+// ** MUI Imports
 import { Box, OutlinedInput, Typography, Button } from '@mui/material'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
@@ -19,8 +20,11 @@ import Icon from 'src/@core/components/icon'
 // ** Interfaces
 import { IVideoRow } from '@/context/types'
 import useDebounce from '@/hooks/useDebounce'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
+// ** AuthContext
+import { useAuth } from '@/services/useAuth'
 
 const navData = [
   {
@@ -93,6 +97,9 @@ const templateData = [
 ]
 
 const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, searchTag, setSearchTag }: any) => {
+  // ** Auth Hook
+  const auth = useAuth()
+
   const handleClear = () => {
     setSearchCreator('')
     setSearchTitle('')
@@ -104,22 +111,26 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
   return (
     <Box mb={2}>
       <Typography variant='h4' component='h4' mb={5}>
-        {TranslateString("Video List")}
+        {TranslateString('Video List')}
       </Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
+          
+          {auth.user?.role != 'CC' && (
+            <OutlinedInput
+              fullWidth
+              style={{ marginRight: 10 }}
+              placeholder={TranslateString('Search') + ' ' + TranslateString('Content Creator')}
+              size='small'
+              value={searchCreator}
+              onChange={e => setSearchCreator(e.target.value)}
+            />
+          )}
+
           <OutlinedInput
             fullWidth
             style={{ marginRight: 10 }}
-            placeholder={TranslateString("Search") + " " + TranslateString("Content Creator")}
-            size='small'
-            value={searchCreator}
-            onChange={e => setSearchCreator(e.target.value)}
-          />
-          <OutlinedInput
-            fullWidth
-            style={{ marginRight: 10 }}
-            placeholder={TranslateString("Search") + " " + TranslateString("Title")}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Title')}
             size='small'
             value={searchTitle}
             onChange={e => setSearchTitle(e.target.value)}
@@ -127,13 +138,13 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
           <OutlinedInput
             fullWidth
             style={{ marginRight: 10 }}
-            placeholder={TranslateString("Search") + " " + TranslateString("Tags")}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Tags')}
             size='small'
             value={searchTag}
             onChange={e => setSearchTag(e.target.value)}
           />
           <Button variant='contained' color='error' sx={{ width: 150 }} onClick={handleClear}>
-            {TranslateString("Clear")}
+            {TranslateString('Clear')}
           </Button>
         </Box>
       </Box>
@@ -141,13 +152,10 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
   )
 }
 
-
-
 const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: any) => {
-  
   // ** States
   const [editVideoOpen, setEditVideoOpen] = React.useState<boolean>(false)
-  const [ editVideoRow, setEditVideoRow ] = React.useState<IVideoRow>()
+  const [editVideoRow, setEditVideoRow] = React.useState<IVideoRow>()
   const toggleEditVideoDrawer = () => setEditVideoOpen(!editVideoOpen)
 
   const TranslateString = useTranslateString()
@@ -157,7 +165,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.02,
       minWidth: 70,
       field: 'thumbnail_url',
-      headerName: TranslateString("Video Thumbnail"),
+      headerName: TranslateString('Video Thumbnail'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
@@ -175,7 +183,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
     {
       flex: 0.02,
       minWidth: 90,
-      headerName: TranslateString("Content Creator"),
+      headerName: TranslateString('Content Creator'),
       sortable: false,
       field: 'content_creator',
       renderCell: (params: GridRenderCellParams) => (
@@ -188,7 +196,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.03,
       minWidth: 60,
       field: 'title',
-      headerName: TranslateString("Title"),
+      headerName: TranslateString('Title'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -200,7 +208,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.04,
       field: 'tag',
       minWidth: 80,
-      headerName: TranslateString("Tags"),
+      headerName: TranslateString('Tags'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -212,7 +220,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.04,
       minWidth: 140,
       field: 'last_update',
-      headerName: TranslateString("Last Update"),
+      headerName: TranslateString('Last Update'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -224,12 +232,19 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
       flex: 0.01,
       minWidth: 60,
       field: 'action',
-      headerName: TranslateString("Action"),
+      headerName: TranslateString('Action'),
       sortable: false,
-      renderCell: (params: GridRenderCellParams) => <Icon onClick={() => {
-        setEditVideoRow({ ...params.row }) // pass the row value to state
-        toggleEditVideoDrawer()
-      } } icon='mdi:eye-outline' fontSize={20} cursor='pointer' />
+      renderCell: (params: GridRenderCellParams) => (
+        <Icon
+          onClick={() => {
+            setEditVideoRow({ ...params.row }) // pass the row value to state
+            toggleEditVideoDrawer()
+          }}
+          icon='mdi:eye-outline'
+          fontSize={20}
+          cursor='pointer'
+        />
+      )
     }
   ]
 
@@ -260,11 +275,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
       />
-      {
-        editVideoRow && 
-        <EditVideoDrawer open={editVideoOpen} toggle={toggleEditVideoDrawer} row={editVideoRow} />
-      }
-      
+      {editVideoRow && <EditVideoDrawer open={editVideoOpen} toggle={toggleEditVideoDrawer} row={editVideoRow} />}
     </>
   )
 }
