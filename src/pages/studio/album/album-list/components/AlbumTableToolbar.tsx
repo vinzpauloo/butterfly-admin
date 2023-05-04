@@ -33,7 +33,7 @@ const AlbumTableToolbar = (props: Props) => {
     <Box sx={styles.container}>
       <TextField
         size='small'
-        value={props.titleValue}
+        value={props.titleValue ?? ''}
         onChange={props.onTitleChange}
         placeholder={TranslateString('Search') + ' ' + TranslateString('Title') + '...'}
         InputProps={{
