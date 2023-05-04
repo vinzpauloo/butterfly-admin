@@ -23,7 +23,7 @@ const VersionsTable = () => {
   const { columns } = MenuItemData()
 
   const [rowData, setRowData] = useState<[]>([])
-  const [siteId, setSiteId] = useState<string | undefined>('')
+  const [siteId, setSiteId] = useState<string>('1')
 
   const [sort] = useState<SortType>('desc')
   const [sortName] = useState<string>('created_at')
