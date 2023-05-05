@@ -141,8 +141,10 @@ export const useUserTableStore = create<UserTableState>((set) => ({
     },
 
     // handlePageChange: (value) => set({ page: value + 1 }),
-     handlePageChange: (value) =>
+    handlePageChange: (value) => {
         set((state) => {
+            set({ page: value + 1 });
+
             if (state.activeTab === 'SUPERVISOR') {
             return { supervisorPage: value + 1 };
             } else if (state.activeTab === 'SA') {
@@ -152,7 +154,8 @@ export const useUserTableStore = create<UserTableState>((set) => ({
             }
             
             return {};
-        }),
+        })       
+    },
     handleSearch: (value, type) => {
         set({ search: type });
 
