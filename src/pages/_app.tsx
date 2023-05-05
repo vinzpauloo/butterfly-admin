@@ -64,6 +64,9 @@ import 'src/iconify-bundle/icons-bundle-react'
 // ** Global css styles
 import '../../styles/globals.css'
 
+// ** Uploady
+import ChunkedUploady from '@rpldy/chunked-uploady'
+
 // ** TanStack Query
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
@@ -154,11 +157,24 @@ const App = (props: ExtendedAppProps) => {
                 return (
                   <ThemeComponent settings={settings}>
                     <WindowWrapper>
-                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                        <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
-                          {getLayout(<Component {...pageProps} />)}
-                        </AclGuard>
-                      </Guard>
+                      <ChunkedUploady
+                        accept='video/*'
+                        autoUpload={false}
+                        clearPendingOnAdd={true}
+                        multiple={false}
+                        maxGroupSize={0}
+                        grouped={false}
+                        method='POST'
+                        destination={{
+                          url: '' //uploadURL
+                        }}
+                      >
+                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                          <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard}>
+                            {getLayout(<Component {...pageProps} />)}
+                          </AclGuard>
+                        </Guard>
+                      </ChunkedUploady>
                     </WindowWrapper>
                     <ReactHotToast>
                       <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
