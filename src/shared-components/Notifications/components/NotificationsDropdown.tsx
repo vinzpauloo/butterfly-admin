@@ -1,23 +1,16 @@
-// ** React Imports
 import React, { ReactNode } from 'react'
+import { Avatar, Box, Button, Divider, Menu, MenuItem, Typography, TypographyProps, useMediaQuery, Stack } from '@mui/material'
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
-
-// ** Next Imports
 import { useRouter } from 'next/router'
-
-// ** MUI Imports
-import { Box, Button, Divider, Menu, MenuItem, Typography, TypographyProps, useMediaQuery } from '@mui/material'
 import { styled, Theme } from '@mui/material/styles'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import formatDate from '@/utils/formatDate'
 
-// ** Type Imports
-import { NotificationDropdownProps } from '@/types/notificationTypes'
 
 // ** Styled PerfectScrollbar component
 const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   maxHeight: 349
 })
-
-import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Styled component for the title in MenuItems
 const MenuItemTitle = styled(Typography)<TypographyProps>(({ theme }) => ({
@@ -46,24 +39,22 @@ const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: bool
   }
 }
 
-// ** Main Component
-const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: NotificationDropdownProps) => {
-  // ** Hook
+const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: any) => {
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
-
-  // ** Router
   const router = useRouter()
 
   const goToNotificationsPage = () => {
+    handleClose()
     router.push('/notifications')
   }
 
+  const navigateToSpecificNotification = (type: string) => {
+    console.log(type)
+    handleClose()
+  } 
+
   return (
-    <Menu
-      id='basic-menu'
-      anchorEl={anchorEl}
-      open={open}
-      onClose={handleClose}
+    <Menu anchorEl={anchorEl} open={open} onClose={handleClose}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'right'
@@ -74,27 +65,30 @@ const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: Notif
       }}
     >
       <ScrollWrapper hidden={hidden}>
-        {menuItems.map((item, index) => (
-          <Box key={index}>
-            <MenuItem onClick={handleClose}>
-              <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                <CustomAvatar color='primary' sx={{ mr: { xs: 4, sm: 4, md: 4, lg: 4 } }} />
+        {menuItems.length === 0 && 
+          <Stack direction='row' justifyContent='center' p={12}>
+            <Typography>You have no New Notification</Typography>
+          </Stack>
+        }
+        {menuItems.map((item: any, index: number) => (
+          <Box key={item?._id}>
+            <MenuItem onClick={() => navigateToSpecificNotification('test')}>
+              <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Avatar alt="Remy Sharp" src={FILE_SERVER_URL + item?.from?.photo} />
                 <Box sx={{ mr: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
-                  <MenuItemTitle>{item.label}</MenuItemTitle>
-                  <MenuItemSubtitle variant='body2'>{item.label}</MenuItemSubtitle>
+                  <MenuItemTitle>{item?.from?.username}</MenuItemTitle>
+                  <MenuItemSubtitle variant='body2' sx={{textTransform: 'capitalize'}}>
+                    {item?.type.replace(/_/g, ' ')}
+                  </MenuItemSubtitle>
                 </Box>
-                <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                  {item.label}
-                </Typography>
+                <Typography variant='caption' sx={{ color: 'text.disabled' }}>{formatDate(item?.created_at)}</Typography>
               </Box>
             </MenuItem>
             {index < menuItems.length - 1 && <Divider />}
           </Box>
         ))}
       </ScrollWrapper>
-      <MenuItem
-        disableRipple
-        disableTouchRipple
+      <MenuItem disableRipple disableTouchRipple
         sx={{
           py: 3.5,
           borderBottom: 0,
@@ -104,9 +98,7 @@ const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: Notif
           borderTop: theme => `1px solid ${theme.palette.divider}`
         }}
       >
-        <Button fullWidth variant='contained' onClick={goToNotificationsPage}>
-          Read All Notifications
-        </Button>
+        <Button fullWidth variant='contained' onClick={goToNotificationsPage}>View All Notifications</Button>
       </MenuItem>
     </Menu>
   )
