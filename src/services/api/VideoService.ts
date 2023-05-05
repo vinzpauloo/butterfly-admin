@@ -11,6 +11,7 @@ interface IVideoParams {
     with?: 'user'
     page?: number
     paginate?: number
+    approval? : 'Approved' | 'Pending' | 'Declined'
   }
   token?: string
 }

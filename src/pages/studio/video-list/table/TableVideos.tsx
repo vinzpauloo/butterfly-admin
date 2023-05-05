@@ -287,6 +287,7 @@ function TableVideos() {
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
+  const [postStatus, setPostStatus] = useState<'Approved' | 'Pending' | 'Declined'>('Approved')
 
   const [searchCreator, setSearchCreator] = useState('')
   const [searchTitle, setSearchTitle] = useState('')
@@ -304,8 +305,8 @@ function TableVideos() {
   }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['videosList', page, pageSize, debouncedCreator, debouncedTitle, debouncedTag],
-    queryFn: () => getAllVideos({ data: { with: 'user', page, paginate: pageSize, ...filterParams() } }),
+    queryKey: ['videosList', page, pageSize, debouncedCreator, debouncedTitle, debouncedTag, postStatus],
+    queryFn: () => getAllVideos({ data: { with: 'user', page, approval : postStatus, paginate: pageSize, ...filterParams() } }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
