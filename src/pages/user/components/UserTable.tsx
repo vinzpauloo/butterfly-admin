@@ -75,7 +75,13 @@ const UserTable = () => {
     openDrawer,
     drawerRole,
     drawerData,
-    setDrawerRole
+    setDrawerRole,
+    supervisorPage,
+    saPage,
+    ccPage,
+    setSupervisorPage,
+    setSaPage,
+    setCcPage
   } = useUserTableStore()
 
   const { handlePageChange, handleSearch, handleDrawerToggle } = useUserTableStore(state => ({
@@ -120,7 +126,6 @@ const UserTable = () => {
   const { isLoading, isRefetching } = useQuery({
     queryKey: [
       'allUsers',
-      page,
       role,
       roleId,
       sort,
@@ -131,14 +136,15 @@ const UserTable = () => {
         : search === 'email'
         ? debouncedEmail || undefined
         : debouncedMobile || undefined,
-      subRole
+      subRole,
+      activeTab === 'SUPERVISOR' ? supervisorPage : activeTab === 'SA' ? saPage : ccPage
     ],
     queryFn: () =>
       getUsers({
         data: {
           role: role,
           role_id: roleId,
-          page: page,
+          page: activeTab === 'SUPERVISOR' ? supervisorPage : activeTab === 'SA' ? saPage : ccPage,
           sort: sort,
           sort_by: sortName,
           search_by: search,
@@ -151,7 +157,13 @@ const UserTable = () => {
       setRowCount(response?.total)
       setRowData(response?.data)
       setPageSize(response?.per_page)
-      setPage(response?.current_page)
+      if (activeTab === 'SUPERVISOR') {
+        setSupervisorPage(response?.current_page)
+      } else if (activeTab === 'SA') {
+        setSaPage(response?.current_page)
+      } else if (activeTab === 'CC') {
+        setCcPage(response?.current_page)
+      }
     },
     enabled: !initialLoad
   })
@@ -182,6 +194,7 @@ const UserTable = () => {
           <UserTabs />
 
           <DataGrid
+            page={activeTab === 'SUPERVISOR' ? supervisorPage - 1 : activeTab === 'SA' ? saPage - 1 : ccPage - 1}
             disableColumnMenu
             loading={isLoading || isRefetching}
             checkboxSelection={false}
