@@ -182,7 +182,6 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
-
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -202,8 +201,7 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** UseEffect
   React.useEffect(() => {
-
-    const eventBatchStart = (batch : any, options : any ) => {
+    const eventBatchStart = (batch: any, options: any) => {
       console.log('step 1 - EVENT BATCH START batch', batch)
       console.log('step 1 - EVENT BATCH START options', options)
       if (options?.params?.video_type == 'full_video') {
@@ -329,8 +327,13 @@ const UploadVideoStep1 = (props: Props) => {
   })
 
   // load contentCreators
-  const { data: CCData, isLoading: isCCLoading } = useQuery({
+  const {
+    data: CCData,
+    isLoading: isCCLoading,
+    error: CCError
+  } = useQuery({
     queryKey: ['ccOptions'],
+    enabled: auth.user?.role != 'CC',
     queryFn: () => {
       return getAllDataFromCreator()
     },
@@ -375,7 +378,7 @@ const UploadVideoStep1 = (props: Props) => {
     if (e.code == 'Enter') {
       // handle add to Chip
       let tagWord = (e.target as HTMLInputElement).value as string
-      console.log('@@@@@@@', watch('multiTags') )
+      console.log('@@@@@@@', watch('multiTags'))
       if (tagWord == '') {
         return
       }
@@ -407,7 +410,7 @@ const UploadVideoStep1 = (props: Props) => {
 
     setValue('startTime', target.value)
   }
-  
+
   const handleTaggingsDelete = (tag: string) => {
     let filteredTags = tags?.filter(e => e !== tag)
     setTags(filteredTags as [])
@@ -425,7 +428,6 @@ const UploadVideoStep1 = (props: Props) => {
 
     // Validations
     if (auth?.user?.role == 'CC') {
-      
     } else {
       if (!watch('contentCreator')) {
         toast.error('Content Creator is required', { position: 'top-center' })
@@ -511,31 +513,34 @@ const UploadVideoStep1 = (props: Props) => {
                     rules={{ required: true }}
                     render={({ field: { value, onChange, onBlur } }) => (
                       <>
-                        {isCCLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
-                        {CCData && (
-                          <CustomSelect
-                            displayEmpty
-                            inputProps={{ 'aria-label': 'Without label' }}
-                            label={<Translations text='dsdasdas' />}
-                            defaultValue=''
-                            id='contentCreator'
-                            labelId='cc-select-label'
-                            value={value || ''}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            error={Boolean(errors.title)}
-                          >
-                            <MenuItem disabled value=''>
-                              {`${t('Select Content Creator')}`}
-                            </MenuItem>
-                            {ccOptions &&
-                              ccOptions.map(cc => (
-                                <MenuItem key={cc.id} value={cc.id}>
-                                  {cc.username}
-                                </MenuItem>
-                              ))}
-                          </CustomSelect>
-                        )}
+                        {auth.user?.role != 'CC' &&
+                          CCError &&
+                          <Typography color={ theme => theme.customBflyColors.primaryTextContrast}>Unable to load Content Creator List</Typography> ||
+                          isCCLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' /> &&
+                          CCData && (
+                            <CustomSelect
+                              displayEmpty
+                              inputProps={{ 'aria-label': 'Without label' }}
+                              label={<Translations text='dsdasdas' />}
+                              defaultValue=''
+                              id='contentCreator'
+                              labelId='cc-select-label'
+                              value={value || ''}
+                              onBlur={onBlur}
+                              onChange={onChange}
+                              error={Boolean(errors.title)}
+                            >
+                              <MenuItem disabled value=''>
+                                {`${t('Select Content Creator')}`}
+                              </MenuItem>
+                              {ccOptions &&
+                                ccOptions.map(cc => (
+                                  <MenuItem key={cc.id} value={cc.id}>
+                                    {cc.username}
+                                  </MenuItem>
+                                ))}
+                            </CustomSelect>
+                          )}
                       </>
                     )}
                   />
@@ -822,7 +827,7 @@ const UploadVideoStep1 = (props: Props) => {
                 </CustomButton>
               </Box>
               <Box>
-                {!hasFullVideo ? (
+                { ( !hasFullVideo ) ? (
                   <Alert severity='error'>
                     <Translations text='Select a video' />
                   </Alert>

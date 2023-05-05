@@ -165,6 +165,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
 
   const getCCsQuery = useQuery({
     queryKey: ['ccOptions'],
+    enabled : auth.user?.role != 'CC',
     queryFn: () => getAllDataFromCreator()
   })
 
