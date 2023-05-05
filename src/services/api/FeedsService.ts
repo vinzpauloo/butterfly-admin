@@ -20,7 +20,7 @@ interface IGetFeedsParams {
   sortBy : any, // returned columns of GET admin/feeds
   search_all? : boolean,
   all? : boolean,
-  status : NewsFeedStatusType
+  approval : NewsFeedStatusType
 }
 
 interface IApproveFeedParams {
@@ -34,7 +34,7 @@ interface IApproveFeedParams {
 interface IGetFeedsByCC {
   all : boolean,
   with? : string,
-  status? : 'Approved' | 'Pending' | 'Declined'
+  approval? : 'Approved' | 'Pending' | 'Declined'
 }
 
 interface IUpdateFeedParams {
