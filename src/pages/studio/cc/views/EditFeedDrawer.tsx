@@ -110,7 +110,7 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
   })
 
   const onSubmit = (data: IFeedStory) => {
-
+    return false
     const formData = new FormData()
 
     const { _id, string_story, tags } = data
@@ -133,7 +133,7 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
 
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.code != 'Enter') return
-    
+
     // handle add to Chip
     let tagWord = (e.target as HTMLInputElement).value as string
     let hasDuplicate = watch('tags')?.includes(tagWord)
@@ -145,11 +145,8 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
       e.preventDefault()
     } else {
       let insertTagArray = [tagWord]
-      let newTagsArray = [...getValues('tags'), ...insertTagArray]
-      //setTags(newTagsArray as [])
+      let newTagsArray = ( getValues('tags') == undefined )  ? [ ...insertTagArray ] :  [...getValues('tags'), ...insertTagArray]
       setValue('tags', newTagsArray)
-
-      console.log('newtagsarray', getValues('tags'))
       //reset multiTags
       resetField('tagTextField')
       e.preventDefault()
@@ -177,7 +174,6 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
   if (row == undefined) return <></>
 
   if (row) {
-    console.log(getValues())
 
     return (
       <Drawer
@@ -232,17 +228,18 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
                   handleTagPressEnter(e)
                 }}
               />
-
-              <Stack
-                sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding: '.5rem' }}
-                flexWrap='wrap'
-                direction='row'
-                spacing={1}
-                rowGap={2}
-              >
-                {watch('tags') &&
-                  watch('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
-              </Stack>
+              {watch('tags') != undefined && (
+                <Stack
+                  sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding: '.5rem' }}
+                  flexWrap='wrap'
+                  direction='row'
+                  spacing={1}
+                  rowGap={2}
+                >
+                  {watch('tags') &&
+                    watch('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
+                </Stack>
+              )}
             </FormControl>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>

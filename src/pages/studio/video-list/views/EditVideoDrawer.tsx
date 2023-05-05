@@ -147,11 +147,9 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
         e.preventDefault()
       } else {
         let insertTagArray = [tagWord]
-        let newTagsArray = [...getValues('tags'), ...insertTagArray]
+        let newTagsArray = ( getValues('tags') == undefined )  ? [ ...insertTagArray ] :  [...getValues('tags'), ...insertTagArray]
         //setTags(newTagsArray as [])
         setValue('tags', newTagsArray)
-
-        console.log('newtagsarray', getValues('tags'))
         //reset multiTags
         resetField('tagTextField')
         e.preventDefault()
