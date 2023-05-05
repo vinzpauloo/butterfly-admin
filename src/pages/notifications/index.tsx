@@ -1,93 +1,70 @@
-// ** React Imports
-import React from 'react'
-
-// ** MUI Imports
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Divider
-} from '@mui/material'
-
-import CustomAvatar from 'src/@core/components/mui/avatar'
-
-const notifications = [
-  {
-    id: 0,
-    label: 'First notification'
-  },
-  {
-    id: 1,
-    label: 'Second notification'
-  },
-  {
-    id: 3,
-    label: 'Third Notification'
-  },
-  {
-    id: 4,
-    label: 'Fourth Notification'
-  },
-  {
-    id: 5,
-    label: 'Fifth Notification'
-  },
-  {
-    id: 6,
-    label: 'Sixth Notification'
-  },
-  {
-    id: 7,
-    label: 'Seventh Notification'
-  },
-  {
-    id: 8,
-    label: 'Eighth Notification'
-  },
-  {
-    id: 9,
-    label: 'Eighth Notification'
-  },
-  {
-    id: 10,
-    label: 'Eighth Notification'
-  }
-]
+import React, { useState } from 'react'
+import { Button, Card, CardActions, CardContent, Typography, List, ListItem, ListItemText, Divider, Avatar, Stack, Box, CircularProgress, Badge } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import NotificationService from '@/services/api/NotificationService'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import formatDate from '@/utils/formatDate'
+import router from 'next/router'
 
 const NotificationsPage = () => {
+  const [data, setData] = useState<any>([])
+  const [page, setPage] = useState<number>(1)
+  const [hasNextPage, setHasNextPage] = useState<boolean>(false)
+
+  const { getAllAdminNotifs } = NotificationService()
+  const { isLoading } = useQuery({
+    queryKey: ['allAdminNotifs', page],
+    queryFn: () => getAllAdminNotifs({
+      data: {
+        with: 'from',
+        page: page
+      }
+    }),
+    onSuccess: data => {
+      setData((prev: any) => prev.concat(data?.data))
+      setHasNextPage(data?.next_page_url !== null ? true : false)
+    },
+    onError: error => { console.log(error) }
+  })
+
+  const navigateToPage = (type: string) => {
+    console.log(type)
+    if (type === 'work_approval') router.push('/studio/content')
+  }
+
   return (
-    <div>
-      <h1>Notifications</h1>
+    <Box>
+      <Typography variant='h4' mb={4}>Notifications</Typography>
       <Card>
         <CardContent>
-          <Typography color='textSecondary' gutterBottom>
-            Recent Notifications
-          </Typography>
           <List>
-            {notifications.map((notification, index) => (
-              <React.Fragment key={notification.id}>
-                <ListItem>
-                  <CustomAvatar color='primary' sx={{ mr: { xs: 4, sm: 4, md: 4, lg: 10 } }} />
-                  <ListItemText primary={notification.label} secondary={`Received ${index + 1} hour ago`} />
-                  <Typography variant='caption'>{index + 1} hour ago</Typography>
+            {data?.map((item: any, index: number) => (
+              <React.Fragment key={item?._id}>
+                <ListItem sx={{ padding: 0, display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => navigateToPage(item?.type)}>
+                  <Stack direction='row' gap={4} alignItems='center'>
+                    <Badge color={'primary'} variant='dot'/>
+                    <Avatar alt={item?.from?.username} src={FILE_SERVER_URL + item?.from?.photo} />
+                    <ListItemText sx={{textTransform: 'capitalize'}} primary={item?.from?.username} secondary={item?.type.replace(/_/g, ' ')} />
+                  </Stack>
+                  <Typography variant='caption' color={'primary'}>{formatDate(item?.created_at)}</Typography>
                 </ListItem>
-                {index < notifications.length - 1 && <Divider />}
+                {index < data.length - 1 && <Divider />}
               </React.Fragment>
             ))}
+            {isLoading &&
+              <Stack direction='row' justifyContent='center' py={6}>
+                <CircularProgress />
+              </Stack>
+            }
           </List>
         </CardContent>
-        <CardActions>
-          <Button size='small' color='primary'>
-            View All
-          </Button>
-        </CardActions>
+        {hasNextPage && 
+          <CardActions sx={{ display: 'flex', justifyContent: 'center'}}>
+            <Button color='primary' variant='outlined' onClick={() => hasNextPage && setPage(prev => prev + 1)}>View More</Button>
+          </CardActions>
+        }
       </Card>
-    </div>
+    </Box>
   )
 }
 
