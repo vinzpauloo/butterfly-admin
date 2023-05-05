@@ -29,9 +29,9 @@ type UserTableState = {
     openDrawer: DrawerType | null;
     drawerRole: DrawerType | null;
     drawerData: any | null; 
-    supervisorPage: number | undefined;
-    saPage: number | undefined;
-    ccPage: number | undefined;
+    supervisorPage: number;
+    saPage: number;
+    ccPage: number;
 
     // Define actions here
     setPage: (page: number) => void;
@@ -54,9 +54,9 @@ type UserTableState = {
     setRowData: (rowData: [] | undefined) => void;
     setOpenDrawer: (openDrawer: DrawerType) => void;
     setDrawerRole: (drawerRole: DrawerType) => void;
-    setSupervisorPage: (supervisorPage: number | undefined) => void;
-    setSaPage: (saPage: number | undefined) => void;
-    setCcPage: (ccPage: number | undefined) => void;
+    setSupervisorPage: (supervisorPage: number) => void;
+    setSaPage: (saPage: number) => void;
+    setCcPage: (ccPage: number) => void;
 
     // Functions
     handleChange: (event: any, value: string | undefined) => void;

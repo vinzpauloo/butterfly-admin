@@ -1,6 +1,9 @@
 // ** React Imports
 import React, { useEffect, ChangeEvent } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { Box, Card, Grid, Tab } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
@@ -39,9 +42,10 @@ import { useTranslateString } from '@/utils/TranslateString'
 // ** Zustand State Management
 import { useUserTableStore } from '@/zustand/userTableStore'
 
+import { captureSuccess, captureError } from '@/services/Sentry'
+
 const UserTable = () => {
   const {
-    page,
     setPage,
     pageSize,
     setPageSize,
@@ -89,6 +93,10 @@ const UserTable = () => {
     handleSearch: state.handleSearch,
     handleDrawerToggle: state.handleDrawerToggle
   }))
+
+  // ** Router
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   // ** Columns for DataGrid
   const operatorColumns = OperatorColumns()
@@ -164,6 +172,10 @@ const UserTable = () => {
       } else if (activeTab === 'CC') {
         setCcPage(response?.current_page)
       }
+      captureSuccess(currentLocation, `getUsers() ${JSON.stringify(response)}`)
+    },
+    onError: error => {
+      captureError(currentLocation, `ERROR: ${error}`, `queryFn: getUsers()`)
     },
     enabled: !initialLoad
   })
