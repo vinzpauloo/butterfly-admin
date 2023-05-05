@@ -28,7 +28,10 @@ type UserTableState = {
     rowData: [];
     openDrawer: DrawerType | null;
     drawerRole: DrawerType | null;
-    drawerData: any | null;
+    drawerData: any | null; 
+    supervisorPage: number | undefined;
+    saPage: number | undefined;
+    ccPage: number | undefined;
 
     // Define actions here
     setPage: (page: number) => void;
@@ -51,6 +54,9 @@ type UserTableState = {
     setRowData: (rowData: [] | undefined) => void;
     setOpenDrawer: (openDrawer: DrawerType) => void;
     setDrawerRole: (drawerRole: DrawerType) => void;
+    setSupervisorPage: (supervisorPage: number | undefined) => void;
+    setSaPage: (saPage: number | undefined) => void;
+    setCcPage: (ccPage: number | undefined) => void;
 
     // Functions
     handleChange: (event: any, value: string | undefined) => void;
@@ -84,6 +90,9 @@ export const useUserTableStore = create<UserTableState>((set) => ({
     openDrawer: null,
     drawerRole: null,
     drawerData: null,
+    supervisorPage: 1,
+    saPage: 1,
+    ccPage: 1,
 
     // Define actions
     setPage: (page) => set({ page }),
@@ -106,6 +115,9 @@ export const useUserTableStore = create<UserTableState>((set) => ({
     setRowData: (rowData) => set({ rowData }),
     setOpenDrawer: (openDrawer) => set({ openDrawer }),
     setDrawerRole: (drawerRole) => set({ drawerRole }),
+    setSupervisorPage: (supervisorPage) => set({ supervisorPage }),
+    setSaPage: (saPage) => set({ saPage }),
+    setCcPage: (ccPage) => set({ ccPage }),
 
     // Functions
     handleChange: (event, value) => set({activeTab: value}),
@@ -127,7 +139,20 @@ export const useUserTableStore = create<UserTableState>((set) => ({
             break;
         }
     },
-    handlePageChange: (value) => set({ page: value + 1 }),
+
+    // handlePageChange: (value) => set({ page: value + 1 }),
+     handlePageChange: (value) =>
+        set((state) => {
+            if (state.activeTab === 'SUPERVISOR') {
+            return { supervisorPage: value + 1 };
+            } else if (state.activeTab === 'SA') {
+            return { saPage: value + 1 };
+            } else if (state.activeTab === 'CC') {
+            return { ccPage: value + 1 };
+            }
+            
+            return {};
+        }),
     handleSearch: (value, type) => {
         set({ search: type });
 

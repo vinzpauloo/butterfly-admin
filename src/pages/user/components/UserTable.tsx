@@ -75,7 +75,10 @@ const UserTable = () => {
     openDrawer,
     drawerRole,
     drawerData,
-    setDrawerRole
+    setDrawerRole,
+    supervisorPage,
+    saPage,
+    ccPage
   } = useUserTableStore()
 
   const { handlePageChange, handleSearch, handleDrawerToggle } = useUserTableStore(state => ({
@@ -131,7 +134,8 @@ const UserTable = () => {
         : search === 'email'
         ? debouncedEmail || undefined
         : debouncedMobile || undefined,
-      subRole
+      subRole,
+      activeTab === 'SUPERVISOR' ? supervisorPage : activeTab === 'SA' ? saPage : ccPage
     ],
     queryFn: () =>
       getUsers({
