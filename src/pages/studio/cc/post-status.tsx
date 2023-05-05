@@ -55,7 +55,7 @@ const PostStatus = () => {
       getFeedsByCC({
         all: true,
         with: 'user',
-        status: postStatus
+        approval: postStatus
       }),
     onSuccess: response => {
       setRowData(response.data)

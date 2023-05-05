@@ -127,7 +127,7 @@ const NewsFeedApproval = () => {
         with: 'user',
         search_all: true,
         all: true,
-        status: 'Pending'
+        approval: 'Pending'
       }),
     onSuccess: response => {
       setRowData(response.data)
