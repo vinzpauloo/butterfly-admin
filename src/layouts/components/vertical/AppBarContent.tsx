@@ -1,14 +1,7 @@
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-
-// ** Icon Imports
 import Icon from 'src/@core/components/icon'
-
-// ** Type Import
 import { Settings } from 'src/@core/context/settingsContext'
-
-// ** Components
 import Autocomplete from 'src/layouts/components/Autocomplete'
 import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
 import UserDropdown from 'src/layouts/components/shared-components/CustomUserDropdownNew'
@@ -22,51 +15,7 @@ interface Props {
   saveSettings: (values: Settings) => void
 }
 
-const notifications = [
-  {
-    id: 0,
-    label: 'First notification'
-  },
-  {
-    id: 1,
-    label: 'Second notification'
-  },
-  {
-    id: 3,
-    label: 'Third Notification'
-  },
-  {
-    id: 4,
-    label: 'Fourth Notification'
-  },
-  {
-    id: 5,
-    label: 'Fifth Notification'
-  },
-  {
-    id: 6,
-    label: 'Sixth Notification'
-  },
-  {
-    id: 7,
-    label: 'Seventh Notification'
-  },
-  {
-    id: 8,
-    label: 'Eighth Notification'
-  },
-  {
-    id: 9,
-    label: 'Ninth Notification'
-  },
-  {
-    id: 10,
-    label: 'Tenth Notification'
-  }
-]
-
 const AppBarContent = (props: Props) => {
-  // ** Props
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
 
   return (
@@ -82,7 +31,7 @@ const AppBarContent = (props: Props) => {
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
         <LanguageDropdown settings={settings} saveSettings={saveSettings} />
         <ModeToggler settings={settings} saveSettings={saveSettings} />
-        <Notifications notifications={notifications} />
+        <Notifications />
         <UserDropdown settings={settings} />
       </Box>
     </Box>
