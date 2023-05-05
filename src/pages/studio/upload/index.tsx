@@ -17,11 +17,8 @@ import UploadVideoPublish from './views/UploadVideoPublish'
 import VideosListTable from './views/VideosList'
 import UploadAlbum from './views/UploadAlbum'
 
-// ** Uploady
-import ChunkedUploady from "@rpldy/chunked-uploady";
-
 // ** Hook form
-import { useForm, FormProvider, useFormContext } from "react-hook-form";
+import { useForm, FormProvider, useFormContext } from 'react-hook-form'
 
 // ** Styled Components
 const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
@@ -104,8 +101,8 @@ export type StudioContextType = {
   setTrialProgress: React.Dispatch<React.SetStateAction<number>>
   workId: number | null
   setWorkId: React.Dispatch<React.SetStateAction<number | null>>
-  uploadURL : string,
-  setUploadURL : React.Dispatch<React.SetStateAction<string>>
+  uploadURL: string
+  setUploadURL: React.Dispatch<React.SetStateAction<string>>
 }
 
 //** DATA */
@@ -184,23 +181,9 @@ const UploadContent = () => {
         setUploadURL
       }}
     >
-      <ChunkedUploady
-        accept='video/*'
-        autoUpload={false}
-        clearPendingOnAdd={true}
-        multiple={false}
-        maxGroupSize={0}
-        grouped={false}
-        method='POST'        
-        destination={{ 
-          url: uploadURL, //uploadURL  
-        }
-        }
-      >
-        <FormProvider {...methods}>
-          <BoxBG>{PageDisplay()}</BoxBG>
-        </FormProvider>
-      </ChunkedUploady>
+      <FormProvider {...methods}>
+        <BoxBG>{PageDisplay()}</BoxBG>
+      </FormProvider>
     </StudioContext.Provider>
   )
 }

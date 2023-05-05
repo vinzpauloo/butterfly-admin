@@ -303,7 +303,6 @@ const UploadVideoStep1 = (props: Props) => {
   // ** UseForm
   const {
     reset,
-    resetField,
     formState: { errors }
   } = useForm({
     defaultValues,
@@ -311,7 +310,7 @@ const UploadVideoStep1 = (props: Props) => {
     resolver: yupResolver(schema)
   })
   // ** Context ReactHookForm
-  const { register, getValues, control, watch, setValue, } = useFormContext()
+  const { register, getValues, control, watch, setValue, resetField } = useFormContext()
 
   // ** react query / api services
   const { getGroupings } = useGroupingService()
@@ -376,7 +375,7 @@ const UploadVideoStep1 = (props: Props) => {
     if (e.code == 'Enter') {
       // handle add to Chip
       let tagWord = (e.target as HTMLInputElement).value as string
-
+      console.log('@@@@@@@', watch('multiTags') )
       if (tagWord == '') {
         return
       }

@@ -94,6 +94,7 @@ const VIPBundleItem = (props: Props) => {
         price: Number(props.bundlePrice),
         description: props.bundleDescription,
         active: !props.isBundleOn,
+        duration_days: props.bundleDuration,
         videos: props.bundlePerks.videos,
         photos: props.bundlePerks.photos,
         live_streaming: props.bundlePerks.live_streaming,
