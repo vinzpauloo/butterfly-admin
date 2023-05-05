@@ -47,26 +47,27 @@ const withTM = require('next-transpile-modules')([
   '@fullcalendar/timegrid'
 ])
 
-module.exports = withTM({
-  trailingSlash: true,
-  reactStrictMode: false,
-  experimental: {
-    esmExternals: false
-  },
-  webpack: config => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      apexcharts: path.resolve(__dirname, './node_modules/apexcharts-clevision')
+module.exports = withSentryConfig(
+  withTM({
+    trailingSlash: true,
+    reactStrictMode: false,
+    experimental: {
+      esmExternals: false
+    },
+    webpack: config => {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        apexcharts: path.resolve(__dirname, './node_modules/apexcharts-clevision')
+      }
+
+      return config
+    },
+    eslint: {
+      // Warning: This allows production builds to successfully complete even if
+      // your project has ESLint errors.
+      ignoreDuringBuilds: true
     }
-
-    return config
-  },
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true
-  }
-})
-
-// Module exports for Sentry
-module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions)
+  }),
+  nextConfig,
+  sentryWebpackPluginOptions
+)
