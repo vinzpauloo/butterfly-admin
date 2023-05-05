@@ -22,7 +22,7 @@ import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
 import EditSupervisorDrawer from './drawer/EditSupervisorDrawer'
-import EditSuperAgentDrawer from './drawer/EditSuperAgentDrawer'
+import EditSuperAgentDrawer from './drawer/editsuperagent'
 import EditCreatorDrawer from './drawer/EditCreatorDrawer'
 import { OperatorColumns } from '@/data/OperatorColumns'
 import { SuperAgentColumns } from '@/data/SuperAgentColumns'
@@ -265,13 +265,7 @@ const UserTable = () => {
             />
           )}
           {drawerRole === 'SA' && (
-            <EditSuperAgentDrawer
-              data={drawerData}
-              open={drawerRole === 'SA'}
-              toggle={() => setDrawerRole(null)}
-              languages={languages}
-              currencies={currencies}
-            />
+            <EditSuperAgentDrawer open={drawerRole === 'SA'} toggle={() => setDrawerRole(null)} />
           )}
           {drawerRole === 'CC' && (
             <EditCreatorDrawer data={drawerData} open={drawerRole === 'CC'} toggle={() => setDrawerRole(null)} />
