@@ -15,7 +15,9 @@ import {
   LinearProgress,
   Select,
   MenuItem,
-  Skeleton
+  Skeleton,
+  Autocomplete,
+  Chip
 } from '@mui/material'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -69,7 +71,7 @@ interface ModalProps {
 
 type Inputs = {
   string_story: string
-  tags: string
+  tags: string[]
   'images[]'?: any
   video: any
   user_id?: string
@@ -148,7 +150,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     setTimeout(() => {
       reset({
         string_story: '',
-        tags: ''
+        tags: []
       })
       setVideoUploading(false)
       setIsLoading(false)
@@ -172,7 +174,10 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     getValues,
     setValue,
     reset,
+    resetField,
+    watch,
     control,
+    setError,
     formState: { errors }
   } = useForm<Inputs>()
 
@@ -212,11 +217,11 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     setIsLoading(false)
     setVideoUploading(false)
     reset()
-
   }
 
   const handlePublish = async () => {
     setIsLoading(true)
+
 
     let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
@@ -274,26 +279,27 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     } else {
       // HAS NO VIDEO - continue upload Feed
 
-      uploadFeed({ formData: formData }).then(data => {
-        console.log('data', data)
-        toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
-        onClose()
-        // TURN OF LOADING
-        setIsLoading(false)
-        reset()
+      uploadFeed({ formData: formData })
+        .then(data => {
+          console.log('data', data)
+          toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
+          onClose()
+          // TURN OF LOADING
+          setIsLoading(false)
+          reset()
 
-        // redirect if CC
-        setTimeout(() => {
-          if (auth.user?.role == 'CC') {
-            router.push('/studio/cc/post-status/')
-          }
-        }, 1500)
-      }).catch( (error) => { 
-        console.log('ERrror', error)
-        toast.error(`An error has occured ${error.data?.message}`, { duration : 3000 })
-        handleCancel() 
-
-      })
+          // redirect if CC
+          setTimeout(() => {
+            if (auth.user?.role == 'CC') {
+              router.push('/studio/cc/post-status/')
+            }
+          }, 1500)
+        })
+        .catch(error => {
+          console.log('ERrror', error)
+          toast.error(`An error has occured ${error.data?.message}`, { duration: 3000 })
+          handleCancel()
+        })
     }
   }
 
@@ -443,14 +449,30 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
                 }}
                 {...register('string_story')}
               />
-              <TextField
-                label={TranslateString('Tags')}
-                sx={{
-                  ...styles.fullWidth,
-                  backgroundColor: theme => theme.palette.background.paper,
-                  borderRadius: '8px'
-                }}
-                {...register('tags')}
+
+              <Autocomplete
+                multiple
+                id='tags-filled'
+                options={[]}
+                freeSolo
+                onChange={( event, value )=>{ setValue('tags', value) }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => 
+                  <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+                }
+                renderInput={params => (
+                  <TextField
+                    sx={{
+                      ...styles.fullWidth,
+                      backgroundColor: theme => theme.palette.background.paper,
+                      borderRadius: '8px'
+                    }}
+                    {...params}
+                    variant='filled'
+                    label='Tags'
+                    placeholder='Tags'
+                  />
+                )}
               />
             </Box>
           )}
@@ -593,8 +615,8 @@ const styles = {
     fontSize: 11,
     width: 125,
     height: 35,
-    '&:hover' : {
-      backgroundColor: '#FFF',
+    '&:hover': {
+      backgroundColor: '#FFF'
     }
   }
 }

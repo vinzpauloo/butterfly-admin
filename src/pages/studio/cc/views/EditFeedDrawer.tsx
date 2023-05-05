@@ -30,11 +30,10 @@ import FeedsService from '@/services/api/FeedsService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircularProgress } from '@mui/material'
 
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** BASE APIS Import
 import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
-
 
 interface SidebarEditVideoType {
   open: boolean
@@ -43,7 +42,7 @@ interface SidebarEditVideoType {
 }
 
 interface FormFields extends IFeedStory {
-  tagTextField : string
+  tagTextField: string
 }
 
 const VideoBox = styled(Box)(({ theme }) => ({
@@ -111,30 +110,20 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
   })
 
   const onSubmit = (data: IFeedStory) => {
-    console.log('submitted data', data)
-    
+    return false
     const formData = new FormData()
 
     const { _id, string_story, tags } = data
 
-    // formData.append('work_id', work_id)
-    // formData.append('title', title as string)
-    // formData.append('description', description as string)
-    // formData.append('_method', 'put')
-
-    // if (tags && tags.length > 0) {
-    //   tags.forEach(tag => {
-    //     formData.append('tags[]', tag.toString())
-    //   })
-    // }
-
-    mutateEditFeed( { id : _id, 
-    data : { 
-      string_story,
-      resubmit: 'true',
-      _method: 'put',
-      tags : tags
-    }} )
+    mutateEditFeed({
+      id: _id,
+      data: {
+        string_story,
+        resubmit: 'true',
+        _method: 'put',
+        tags: tags
+      }
+    })
   }
 
   const handleClose = () => {
@@ -143,27 +132,24 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
   }
 
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.code == 'Enter') {
-      // handle add to Chip
-      let tagWord = (e.target as HTMLInputElement).value as string
-      let hasDuplicate = watch('tags')?.includes(tagWord)
+    if (e.code != 'Enter') return
 
-      if (hasDuplicate || tagWord == '') {
-        //handle Errors
-        toast.error('The tag you entered already exists')
-        setError('tags', { type: 'custom', message: 'Tag cannot empty or duplicate' })
-        e.preventDefault()
-      } else {
-        let insertTagArray = [tagWord]
-        let newTagsArray = [...getValues('tags'), ...insertTagArray]
-        //setTags(newTagsArray as [])
-        setValue('tags', newTagsArray)
+    // handle add to Chip
+    let tagWord = (e.target as HTMLInputElement).value as string
+    let hasDuplicate = watch('tags')?.includes(tagWord)
 
-        console.log('newtagsarray', getValues('tags'))
-        //reset multiTags
-        resetField('tagTextField')
-        e.preventDefault()
-      }
+    if (hasDuplicate || tagWord == '') {
+      //handle Errors
+      toast.error('The tag you entered already exists')
+      setError('tags', { type: 'custom', message: 'Tag cannot empty or duplicate' })
+      e.preventDefault()
+    } else {
+      let insertTagArray = [tagWord]
+      let newTagsArray = ( getValues('tags') == undefined )  ? [ ...insertTagArray ] :  [...getValues('tags'), ...insertTagArray]
+      setValue('tags', newTagsArray)
+      //reset multiTags
+      resetField('tagTextField')
+      e.preventDefault()
     }
   }
 
@@ -183,14 +169,11 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
     setValue('tags', row.tags)
 
     console.log('the get Value', getValues())
-
   }, [row])
 
   if (row == undefined) return <></>
 
   if (row) {
-
-    console.log( getValues() )
 
     return (
       <Drawer
@@ -201,24 +184,26 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
         sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
       >
         <Header>
-          <Typography textTransform='uppercase' variant='h6'>Feed Type : {row.type ? row.type : 'Story'}</Typography>
+          <Typography textTransform='uppercase' variant='h6'>
+            Feed Type : {row.type ? row.type : 'Story'}
+          </Typography>
           <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
             <Icon icon='mdi:close' fontSize={20} />
           </IconButton>
         </Header>
-        {
-          row.videos &&
+        {row.videos && (
           <Box>
-          <VideoBox>
-            <ReactPlayer 
-              className='reactPlayer' 
-              width='100%' 
-              height='100%' 
-              controls={true} 
-              url={ row.videos?.url ? STREAMING_SERVER_URL + row.videos.url : '' } />
-          </VideoBox>
-        </Box>
-        }
+            <VideoBox>
+              <ReactPlayer
+                className='reactPlayer'
+                width='100%'
+                height='100%'
+                controls={true}
+                url={row.videos?.url ? STREAMING_SERVER_URL + row.videos.url : ''}
+              />
+            </VideoBox>
+          </Box>
+        )}
         <Box sx={{ p: 5 }}>
           <form onSubmit={event => event.preventDefault()}>
             <FormControl fullWidth sx={{ mb: 6 }}>
@@ -243,11 +228,18 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
                   handleTagPressEnter(e)
                 }}
               />
-
-              <Stack sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding:'.5rem' }} flexWrap='wrap' direction='row' spacing={1} rowGap={2}>
-                { watch('tags') &&
-                  watch('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
-              </Stack>
+              {watch('tags') != undefined && (
+                <Stack
+                  sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding: '.5rem' }}
+                  flexWrap='wrap'
+                  direction='row'
+                  spacing={1}
+                  rowGap={2}
+                >
+                  {watch('tags') &&
+                    watch('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
+                </Stack>
+              )}
             </FormControl>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -261,7 +253,7 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
                 sx={{ mr: 3 }}
                 disabled={isEditLoading ? true : false}
               >
-                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString("Resubmit")}
+                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString('Resubmit')}
               </Button>
               <Button
                 disabled={isEditLoading ? true : false}
@@ -270,7 +262,7 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
                 color='secondary'
                 onClick={handleClose}
               >
-                {TranslateString("Cancel")}
+                {TranslateString('Cancel')}
               </Button>
             </Box>
           </form>

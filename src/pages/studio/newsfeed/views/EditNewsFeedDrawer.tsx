@@ -131,11 +131,8 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
         e.preventDefault()
       } else {
         let insertTagArray = [tagWord]
-        let newTagsArray = [...getValues('tags'), ...insertTagArray]
-        //setTags(newTagsArray as [])
+        let newTagsArray = ( getValues('tags') == undefined )  ? [ ...insertTagArray ] :  [...getValues('tags'), ...insertTagArray]
         setValue('tags', newTagsArray)
-
-        console.log('newtagsarray', getValues('tags'))
         //reset multiTags
         resetField('tagTextField')
         e.preventDefault()
