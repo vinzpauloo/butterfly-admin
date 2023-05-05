@@ -7,7 +7,6 @@ import { DataGrid } from '@mui/x-data-grid'
 
 // ** Other Imports
 import SelectFeedsModal from '../components/modal/SelectFeedsModal'
-import CreateFeedModal from '../components/modal/CreateFeedModal'
 import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
 
@@ -150,7 +149,6 @@ const FeedFeatures = () => {
         </Card>
       </Grid>
       <SelectFeedsModal isOpen={openModal === 'select'} onClose={() => handleModalToggle('select')} />
-      <CreateFeedModal isOpen={openModal === 'create'} onClose={() => handleModalToggle('create')} />
     </Grid>
   )
 }
