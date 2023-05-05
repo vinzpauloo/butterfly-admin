@@ -22,7 +22,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import ContentService from '@/services/api/ContentService'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
 import { useTranslateString } from '@/utils/TranslateString';
 
 // ** BASE APIS Import

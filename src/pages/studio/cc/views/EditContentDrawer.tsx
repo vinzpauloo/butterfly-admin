@@ -12,6 +12,7 @@ import Box, { BoxProps } from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
 import Stack from '@mui/material/Stack'
 import Chip from '@mui/material/Chip'
+import Autocomplete from '@mui/material/Autocomplete'
 
 // ** Third Party Imports
 import { useForm } from 'react-hook-form'
@@ -22,11 +23,10 @@ import toast from 'react-hot-toast'
 import Icon from 'src/@core/components/icon'
 
 // ** Import types
-import { IFeedStory } from '@/context/types'
+import { IVideoRow } from '@/context/types'
 
 // ** Tanstack and APIS
 import VideoService from '@/services/api/VideoService'
-import FeedsService from '@/services/api/FeedsService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircularProgress } from '@mui/material'
 
@@ -38,10 +38,10 @@ import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
 interface SidebarEditVideoType {
   open: boolean
   toggle: () => void
-  row: IFeedStory
+  row: IVideoRow
 }
 
-interface FormFields extends IFeedStory {
+interface FormFields extends IVideoRow {
   tagTextField: string
 }
 
@@ -67,15 +67,15 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   backgroundColor: theme.palette.background.default
 }))
 
-const EditFeedDialog = (props: SidebarEditVideoType) => {
+const EditContentDrawer = (props: SidebarEditVideoType) => {
   // ** Props
   const { open, toggle, row } = props
 
   // tanstack
   const queryClient = useQueryClient()
-  const { updateFeedViaID } = FeedsService()
+  const { updateVideoByWorkId } = VideoService()
 
-  const { mutate: mutateEditFeed, isLoading: isEditLoading } = useMutation(updateFeedViaID, {
+  const { mutate: mutateEditContent, isLoading: isEditLoading } = useMutation(updateVideoByWorkId, {
     onSuccess: data => {
       console.log('success', data)
       queryClient.invalidateQueries({ queryKey: ['getFeeds'] })
@@ -109,47 +109,33 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
     mode: 'onBlur'
   })
 
-  const onSubmit = (data: IFeedStory) => {
-    const formData = new FormData()
-    
-    const { _id, string_story, tags } = data
+  const onSubmit = (data: IVideoRow) => {
 
-    mutateEditFeed({
-      id: _id,
-      data: {
-        string_story,
-        resubmit: 'true',
-        _method: 'put',
-        tags: tags
-      }
-    })
+    const formData = new FormData()
+    console.log('dataaaa submitted', data)
+
+    console.log('watch', getValues())
+
+    const { title, groups, tags, description } = getValues()
+
+    const fd = new FormData()
+
+    fd.append('title', title )
+    if ( tags.length > 0  ){
+      tags.map( tag => fd.append('tags[0]',tag) )
+    }
+    if ( groups.length > 0  ){
+      groups.map( tag => fd.append('groups[0]',tag) )
+    }
+
+    fd.append('description', description)
+
+    mutateEditContent({formData : fd })
   }
 
   const handleClose = () => {
     reset()
     toggle()
-  }
-
-  const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.code != 'Enter') return
-
-    // handle add to Chip
-    let tagWord = (e.target as HTMLInputElement).value as string
-    let hasDuplicate = watch('tags')?.includes(tagWord)
-
-    if (hasDuplicate || tagWord == '') {
-      //handle Errors
-      toast.error('The tag you entered already exists')
-      setError('tags', { type: 'custom', message: 'Tag cannot empty or duplicate' })
-      e.preventDefault()
-    } else {
-      let insertTagArray = [tagWord]
-      let newTagsArray = ( getValues('tags') == undefined )  ? [ ...insertTagArray ] :  [...getValues('tags'), ...insertTagArray]
-      setValue('tags', newTagsArray)
-      //reset multiTags
-      resetField('tagTextField')
-      e.preventDefault()
-    }
   }
 
   const TranslateString = useTranslateString()
@@ -163,17 +149,17 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
   // because useForm caches the defaults on first render
   React.useEffect(() => {
     console.log('therowwww', row)
-    setValue('_id', row._id)
-    setValue('string_story', row.string_story)
-    setValue('tags', row.tags)
 
     console.log('the get Value', getValues())
+
+    setValue('tags', row.tags)
+    setValue('groups', row.groups)
+
   }, [row])
 
   if (row == undefined) return <></>
 
   if (row) {
-
     return (
       <Drawer
         open={open}
@@ -184,13 +170,13 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
       >
         <Header>
           <Typography textTransform='uppercase' variant='h6'>
-            Feed Type : {row.type ? row.type : 'Story'}
+            {row.username}
           </Typography>
           <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
             <Icon icon='mdi:close' fontSize={20} />
           </IconButton>
         </Header>
-        {row.videos && (
+        {row.full_video_hls && (
           <Box>
             <VideoBox>
               <ReactPlayer
@@ -198,7 +184,7 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
                 width='100%'
                 height='100%'
                 controls={true}
-                url={row.videos?.url ? STREAMING_SERVER_URL + row.videos.url : ''}
+                url={row.full_video_hls ? STREAMING_SERVER_URL + row.full_video_hls : ''}
               />
             </VideoBox>
           </Box>
@@ -207,39 +193,74 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
           <form onSubmit={event => event.preventDefault()}>
             <FormControl fullWidth sx={{ mb: 6 }}>
               <TextField
-                {...register('string_story')}
-                label={TranslateString('string_story')}
+                {...register('title')}
+                label={TranslateString('Title')}
                 placeholder='Story'
-                defaultValue={row.string_story}
-                error={Boolean(errors.string_story)}
-                multiline
-                rows={3}
+                defaultValue={row.title}
+                error={Boolean(errors.title)}
               />
             </FormControl>
 
             <FormControl fullWidth sx={{ mb: 6 }}>
-              {errors.tags && <p style={{ color: 'red' }}>{errors.tags.message}</p>}
               <TextField
-                sx={{ mb: 5 }}
-                {...register('tagTextField')}
-                placeholder={TranslateString('Type your tag then press enter')}
-                onKeyDown={e => {
-                  handleTagPressEnter(e)
-                }}
+                {...register('description')}
+                label={TranslateString('Description')}
+                placeholder='Description'
+                defaultValue={row.description}
+                error={Boolean(errors.description)}
               />
-              {watch('tags') != undefined && (
-                <Stack
-                  sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding: '.5rem' }}
-                  flexWrap='wrap'
-                  direction='row'
-                  spacing={1}
-                  rowGap={2}
-                >
-                  {watch('tags') &&
-                    watch('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
-                </Stack>
-              )}
             </FormControl>
+
+            <Autocomplete
+              sx={{mb : '1.5rem'}}
+              multiple
+              options={[]}
+              freeSolo
+              onChange={(event, value) => {
+                setValue('tags', value as string[])
+              }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+              }
+              defaultValue={row.tags}
+              renderInput={params => (
+                <TextField
+                  sx={{
+                    backgroundColor: theme => theme.palette.background.paper,
+                    borderRadius: '8px'
+                  }}
+                  {...params}
+                  variant='filled'
+                  label='Tags'
+                  placeholder='Tags'
+                />
+              )}
+            />
+
+          <Autocomplete
+              sx={{mb : '1.5rem'}}
+              multiple
+              options={[]}
+              freeSolo
+              onChange={(event, value) => {
+                setValue('groups', value as string[])
+              }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+              }
+              defaultValue={row.groups}
+              renderInput={params => (
+                <TextField
+                  sx={{
+                    backgroundColor: theme => theme.palette.background.paper,
+                    borderRadius: '8px'
+                  }}
+                  {...params}
+                  variant='filled'
+                  label='Groups'
+                />
+              )}
+            />
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button
@@ -273,4 +294,4 @@ const EditFeedDialog = (props: SidebarEditVideoType) => {
   return <></>
 }
 
-export default EditFeedDialog
+export default EditContentDrawer

@@ -27,7 +27,7 @@ type videoPhotosProps = {
 // ** Types
 import { IFeedStory } from '@/context/types'
 
-const videoWithPhotos = { video_images: true, with: 'user', page : 1, status : 'Approved' }
+const videoWithPhotos = { video_images: true, with: 'user', page : 1, approval : 'Approved' }
 
 const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
   React.useEffect(() => {

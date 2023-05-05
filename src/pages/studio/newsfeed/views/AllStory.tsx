@@ -25,7 +25,7 @@ type StoryProps = {
   handleFeedParams? : any
 }
 
-const StoryOnlyParams = { story_feeds_only: true, with: 'user', page : 1, status : 'Approved' }
+const StoryOnlyParams = { story_feeds_only: true, with: 'user', page : 1, approval : 'Approved' }
 
 const AllStory = ({data, handleFeedParams}: StoryProps) => {
   React.useEffect(() => {

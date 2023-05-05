@@ -113,6 +113,12 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'cc-page'
         },
         {
+          title: 'Content Status',
+          path: '/studio/cc/content-status',
+          action: 'read',
+          subject: 'cc-post-status'
+        },
+        {
           title: 'Newsfeed Status',
           path: '/studio/cc/post-status',
           action: 'read',
