@@ -142,7 +142,7 @@ const TableCCContentStatus = ({
       field: 'content_creator',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {/* {params.row.user.username}  */} USERNAME
+          {params.row.username}  
         </Typography>
       )
     },
