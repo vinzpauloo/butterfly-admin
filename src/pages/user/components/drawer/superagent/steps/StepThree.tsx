@@ -36,7 +36,7 @@ interface FormValues {
   [key: string]: string | number | File | null
   site_id: string
   merchant_id: string | number
-  md5: string
+  key: string
   rsa_private: string
   rsa_public: string
 }
@@ -202,18 +202,18 @@ const SAStepThree = (
               </Box>
               <Box sx={styles.fullWidth}>
                 <Controller
-                  name='md5'
+                  name='key'
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='MD5'
+                      label='key'
                       variant='outlined'
                       fullWidth
-                      error={!!errors.md5}
-                      helperText={errors.md5?.message}
+                      error={!!errors.key}
+                      helperText={errors.key?.message}
                       defaultValue={field.value}
                       onChange={field.onChange}
-                      name='md5'
+                      name='key'
                     />
                   )}
                 />
