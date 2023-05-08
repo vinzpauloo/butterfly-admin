@@ -145,7 +145,7 @@ const TwoFA = () => {
       })
 
       // Sentry Failure Log
-      captureError(currentLocation, `ERROR: ${error.data.error.message}`, `LOGIN ATTEMPT FAILED`)
+      captureError(currentLocation, `${error.data.error.message}, LOGIN ATTEMPT FAILED`)
     }
   })
 

@@ -174,8 +174,8 @@ const UserTable = () => {
       }
       captureSuccess(currentLocation, `getUsers() ${JSON.stringify(response)}`)
     },
-    onError: error => {
-      captureError(currentLocation, `ERROR: ${error}`, `queryFn: getUsers()`)
+    onError: (error: { data: { message: string } }) => {
+      captureError(currentLocation, `${error?.data.message} queryFn: getUsers()`)
     },
     enabled: !initialLoad
   })

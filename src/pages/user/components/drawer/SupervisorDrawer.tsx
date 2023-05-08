@@ -1,5 +1,8 @@
 // ** React Imports
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import { Radio, RadioGroup, Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
@@ -24,6 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { CreateAccount } from '@/services/api/CreateAccount'
+import { captureSuccess, captureError } from '@/services/Sentry'
 
 interface FormValues {
   role_id: '1' | '2' | ''
@@ -65,6 +69,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const SupervisorDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   // ** Props
   const { open, toggle } = props
@@ -104,6 +110,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
     try {
       await mutation.mutateAsync(userData)
       setSubmitted(true)
+      captureSuccess(currentLocation, `createUser() ${JSON.stringify(userData)}`)
 
       setTimeout(() => {
         toggle()
@@ -119,6 +126,11 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
         data: { error }
       } = e
       setResponseError(error)
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} queryFn: createUser()`)
+        })
+      }
     }
   }
 
@@ -128,7 +140,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
 
   const [responseError, setResponseError] = useState<ErrorResponse>()
 
-  const displayErrors = () => {
+  function displayErrors() {
     const errorElements: JSX.Element[] = []
 
     for (const key in responseError) {

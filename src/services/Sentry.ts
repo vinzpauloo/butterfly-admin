@@ -6,12 +6,12 @@ export const captureSuccess = (route: any, message: any) => {
     )
 };
 
-export const captureError = (error: any, route: any, message: any) => {
-    const e = JSON.stringify(error);
+export const captureError = (route: any, message: any) => {
+    const r = JSON.stringify(route);
 
     Sentry.captureMessage(
-        `ADMIN ROUTE/PAGE: ${route}, CUSTOM ERROR MSG: ${message}, ERROR MSG: ${e}`
+        `ADMIN ERROR! ROUTE/PAGE: ${r}, ERROR MSG: ${message}`
     );
 
-    Sentry.captureException(error, route);
+    Sentry.captureException(route, message);
 }
