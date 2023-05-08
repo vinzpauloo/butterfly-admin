@@ -29,7 +29,7 @@ interface FormValues {
   [key: string]: string | number | File | null
   site_id: string
   merchant_id: string | number
-  md5: string
+  key: string
   rsa_private: string
   rsa_public: string
 }
@@ -116,7 +116,7 @@ const EditStepThree = (props: ToggleProps) => {
     }
 
     //These are currently required by backend, not visible in UI
-    // formDat/a.append('site_id', `${siteID}`)
+    formData.append('site_id', `${siteData[0]?.id}`)
 
     const form: any = {
       data: formData
@@ -124,9 +124,17 @@ const EditStepThree = (props: ToggleProps) => {
 
     setIsLoading(true)
     setSubmitted(true)
-    mutateStepThree(form)
 
     try {
+      mutateStepThree(form)
+
+      setTimeout(() => {
+        toggle()
+        setSubmitted(false)
+
+        // Re-fetches UserTable and CSV exportation
+        queryClient.invalidateQueries({ queryKey: ['allUsers'] })
+      }, 1500)
     } catch (e: any) {
       const {
         data: { error }
@@ -185,23 +193,22 @@ const EditStepThree = (props: ToggleProps) => {
               </Box>
               <Box sx={styles.fullWidth}>
                 <Controller
-                  name='md5'
+                  name='key'
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='MD5'
+                      label='key'
                       variant='outlined'
                       fullWidth
-                      error={!!errors.md5}
-                      helperText={errors.md5?.message}
+                      error={!!errors.key}
+                      helperText={errors.key?.message}
                       value={field.value || siteData[0]?.yuanhua_md5_key}
                       onChange={field.onChange}
-                      name='md5'
+                      name='key'
                     />
                   )}
                 />
               </Box>
-
               <Box sx={styles.fullWidth}>
                 <Controller
                   name='rsa_private'
@@ -222,7 +229,6 @@ const EditStepThree = (props: ToggleProps) => {
                   )}
                 />
               </Box>
-
               <Box sx={styles.fullWidth}>
                 <Controller
                   name='rsa_public'
@@ -243,7 +249,6 @@ const EditStepThree = (props: ToggleProps) => {
                   )}
                 />
               </Box>
-
               {/* {displayErrors()} */}
               <Box sx={styles.formButtonContainer}>
                 <Box>
