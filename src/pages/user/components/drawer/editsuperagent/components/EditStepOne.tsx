@@ -2,19 +2,10 @@
 import { useRef, useState, useEffect } from 'react'
 
 // ** MUI Imports
-import Box, { BoxProps } from '@mui/material/Box'
-import { Drawer, Button, TextField, IconButton, Typography, MenuItem, InputAdornment } from '@mui/material'
-
-// ** Style Imports
-import { styled } from '@mui/material/styles'
+import { Box, Button, TextField, Typography, MenuItem, InputAdornment } from '@mui/material'
 
 // ** Third Party Imports
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { Controller, useForm } from 'react-hook-form'
-
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
 
 // ** Other Imports
 import CreatedSuccessful from '../../../form/CreatedSuccessful'
@@ -24,6 +15,9 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 
 // ** Hooks/ Services
 import { UserTableService } from '@/services/api/UserTableService'
+
+// ** Zustand Imports
+import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
 
 interface FormValues {
   [key: string]: string | number | File | null
@@ -86,14 +80,6 @@ interface ResponseErrorProps {
   user_note?: string
 }
 
-const Header = styled(Box)<BoxProps>(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(3, 4),
-  justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
-}))
-
 const EditStepOne = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
 
@@ -101,7 +87,7 @@ const EditStepOne = (props: SidebarAddUserType) => {
   const { updateUser, getSpecificUser } = UserTableService()
 
   // ** Props
-  const { open, toggle, languages, currencies } = props
+  const { toggle, languages, currencies } = props
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
@@ -112,8 +98,12 @@ const EditStepOne = (props: SidebarAddUserType) => {
     fileInputRef.current.click()
   }
 
+  // ** Zustand/Store Imports
+  const { siteData, setSiteData } = editSuperAgentStore()
+
   const [partner, setPartner] = useState<Partner | null>(null)
-  const [siteData, setSiteData] = useState<SiteData[]>([])
+
+  // const [siteData, setSiteData] = useState<SiteData[]>([])
 
   const [responseError, setResponseError] = useState<ResponseErrorProps>()
 
@@ -144,6 +134,8 @@ const EditStepOne = (props: SidebarAddUserType) => {
     SitesPartnerQuery(props?.data.id)
   }
 
+  console.log(`SITE DATA:`, siteData)
+
   const {
     control,
     handleSubmit,
@@ -165,8 +157,8 @@ const EditStepOne = (props: SidebarAddUserType) => {
         currency_id: siteData[0]?.currency_id,
         description: siteData[0]?.description,
         logo: null,
-        site_name: siteData[0].name,
-        amount: siteData[0].security_funds_balance,
+        site_name: siteData[0]?.name,
+        amount: siteData[0]?.security_funds_balance,
         email: props?.data.email,
         mobile: props?.data.mobile,
         user_note: props?.data.note,

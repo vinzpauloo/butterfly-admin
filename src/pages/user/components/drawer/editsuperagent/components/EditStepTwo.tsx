@@ -11,12 +11,19 @@ import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import FQDNService from '@/services/api/FQDNService'
 
+// ** Zustand Imports
+import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
+
+interface SidebarAddUserType {
+  data: any
+}
+
 export type FQDNData = {
   name: string
   values: [{ value: string }]
 }
 
-const EditStepTwo = () => {
+const EditStepTwo = (props: SidebarAddUserType) => {
   // ** Tanstack and services
   const { addFQDN } = FQDNService()
   const queryClient = useQueryClient()
@@ -29,6 +36,13 @@ const EditStepTwo = () => {
       queryClient.invalidateQueries(['fqdns'])
     }
   })
+
+  const { siteData } = editSuperAgentStore()
+
+  const { data } = props
+
+  console.log(`STEP 2 SITE DATA`, siteData[0])
+  console.log(`STEP 2 Site Data ID`, siteData[0]?.id)
 
   // ** State
   const [isLoading] = React.useState<boolean>(false)
@@ -83,9 +97,7 @@ const EditStepTwo = () => {
       allFQDNData?.map((data: FQDNData) => {
         const type = data.name as 'Api' | 'Photo' | 'Streaming'
         data.values.forEach(value => {
-          promiseArray.push({ site: 1, name: value.value, type: type }) // TESTING
-
-          // promiseArray.push({ site: siteID, name: value.value, type: type })
+          promiseArray.push({ site: siteData[0]?.id, name: value.value, type: type })
         })
       })
 
