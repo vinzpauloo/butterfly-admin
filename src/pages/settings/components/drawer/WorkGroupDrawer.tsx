@@ -1,6 +1,10 @@
 // ** React Imports
 import { useEffect, useState } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+import Image from 'next/image'
+
 // ** MUI Imports
 import {
   Drawer,
@@ -14,9 +18,10 @@ import {
   MenuItem,
   FormHelperText
 } from '@mui/material'
-
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
+import CustomAvatar from 'src/@core/components/mui/avatar'
+import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -24,15 +29,21 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
-import CustomAvatar from 'src/@core/components/mui/avatar'
 import Icon from 'src/@core/components/icon'
+
+// ** Hooks/Services Imports
 import WorkgroupService from '@/services/api/Workgroup'
-import WorkList from '../modal/WorkList'
-import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
+import { captureError } from '@/services/Sentry'
+
+// ** TanStack Imports
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import Image from 'next/image'
+
+// ** Utils Imports
 import { useTranslateString } from '@/utils/TranslateString'
+
+// ** Project/Other Imports
 import Translations from '@/layouts/components/Translations'
+import WorkList from '../modal/WorkList'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const navData = [
@@ -185,6 +196,9 @@ const RandomVideoPicker = (num: number, all: string[]) => {
 const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: any) => {
   // ** State
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   const [navbar, setNavbar] = useState<string>('selection') // ** default value
   const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
@@ -218,6 +232,9 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       setPageSize(data.per_page)
       setPage(data.current_page)
       setRowCount(data.total)
+    },
+    onError: (err: any) => {
+      captureError(currentLocation, `${err} getAllWorkgroup() Workgroup Drawer`)
     },
     enabled: header === 'Edit'
   })
@@ -278,34 +295,39 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
   const onSubmit = (data: any) => {
     // @ts-ignore
     const vid: string[] = layoutPattern(template)
-    if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
-      mutateEditWorkgroup({
-        id: sectionID,
-        data: {
-          title: data.title,
-          navbar: navbar,
-          template_id: template,
-          single: vid[0],
-          multiple: vid?.slice(1)
-        }
-      })
-    } else {
-      mutateEditWorkgroup({
-        id: sectionID,
-        data: {
-          title: data.title,
-          navbar: navbar,
-          template_id: template,
-          single: vid[0],
-          multiple: vid?.slice(1)
-        }
-      })
+
+    try {
+      if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
+        mutateEditWorkgroup({
+          id: sectionID,
+          data: {
+            title: data.title,
+            navbar: navbar,
+            template_id: template,
+            single: vid[0],
+            multiple: vid?.slice(1)
+          }
+        })
+      } else {
+        mutateEditWorkgroup({
+          id: sectionID,
+          data: {
+            title: data.title,
+            navbar: navbar,
+            template_id: template,
+            single: vid[0],
+            multiple: vid?.slice(1)
+          }
+        })
+      }
+      reset()
+      setTemplate('videoSlider')
+      setNavbar('selection')
+      setData([])
+      setOpen(false)
+    } catch (err) {
+      captureError(currentLocation, `${err} WorkGroups putWorkGroup()`)
     }
-    reset()
-    setTemplate('videoSlider')
-    setNavbar('selection')
-    setData([])
-    setOpen(false)
   }
 
   useEffect(() => {
