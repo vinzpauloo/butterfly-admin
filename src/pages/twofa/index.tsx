@@ -26,6 +26,7 @@ import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustrationsV1'
 
 // ** Hooks
 import { useAuth } from '@/services/useAuth'
+import { captureSuccess, captureError } from '@/services/Sentry'
 
 // ** Custom Styled Component
 import CleaveWrapper from 'src/@core/styles/libs/react-cleave'
@@ -98,6 +99,7 @@ const TwoFA = () => {
     formState: { errors }
   } = useForm({ defaultValues })
   const router = useRouter()
+  const currentLocation = router.asPath
   const auth = useAuth()
 
   // ** Vars
@@ -130,15 +132,20 @@ const TwoFA = () => {
 
       // Go to redirect URL
       router.replace(redirectURL as string)
+
+      // Sentry Success Log
+      captureSuccess(currentLocation, `LOGIN ATTEMPT SUCCESSFUL`)
     },
-    onError: error => {
+    onError: (error: { data: { error: { message: string } } }) => {
       console.log('mutate2fa error', error)
 
       setError('twoFA', {
         type: 'custom',
-        // @ts-ignore
         message: error.data.error.message
       })
+
+      // Sentry Failure Log
+      captureError(currentLocation, `ERROR: ${error.data.error.message}`, `LOGIN ATTEMPT FAILED`)
     }
   })
 
