@@ -193,7 +193,7 @@ const SAStepThree = (
                       fullWidth
                       error={!!errors.merchant_id}
                       helperText={errors.merchant_id?.message}
-                      defaultValue={field.value}
+                      defaultValue={field.value ?? ''}
                       onChange={field.onChange}
                       name='merchant_id'
                     />
@@ -211,7 +211,7 @@ const SAStepThree = (
                       fullWidth
                       error={!!errors.key}
                       helperText={errors.key?.message}
-                      defaultValue={field.value}
+                      defaultValue={field.value ?? ''}
                       onChange={field.onChange}
                       name='key'
                     />
@@ -232,7 +232,7 @@ const SAStepThree = (
                       rows={8}
                       error={!!errors.rsa_private}
                       helperText={errors.rsa_private?.message}
-                      defaultValue={field.value}
+                      defaultValue={field.value ?? ''}
                       onChange={field.onChange}
                       name='rsa_private'
                     />
@@ -253,7 +253,7 @@ const SAStepThree = (
                       rows={8}
                       error={!!errors.rsa_public}
                       helperText={errors.rsa_public?.message}
-                      defaultValue={field.value}
+                      defaultValue={field.value ?? ''}
                       onChange={field.onChange}
                       name='rsa_public'
                     />

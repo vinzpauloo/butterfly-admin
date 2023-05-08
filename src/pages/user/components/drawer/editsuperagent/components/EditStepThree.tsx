@@ -267,7 +267,7 @@ const EditStepThree = (props: ToggleProps) => {
           </form>
         </Box>
       ) : (
-        <CreatedSuccessful />
+        <CreatedSuccessful update />
       )}
     </>
   )

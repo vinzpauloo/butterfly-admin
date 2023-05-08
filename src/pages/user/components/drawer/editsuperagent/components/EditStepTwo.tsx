@@ -2,7 +2,7 @@ import React from 'react'
 import toast from 'react-hot-toast'
 
 // ** Import MUI
-import { Box, Button } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 
 // ** Import component
 import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
@@ -40,6 +40,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
   const { siteData } = editSuperAgentStore()
 
   const { data } = props
+  console.log(`PROPS DATA`, data)
 
   console.log(`STEP 2 SITE DATA`, siteData[0])
   console.log(`STEP 2 Site Data ID`, siteData[0]?.id)
@@ -125,6 +126,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
         gap: '1rem',
         '& .MuiPaper-root': {
           boxShadow: 'none'
@@ -165,9 +167,31 @@ const EditStepTwo = (props: SidebarAddUserType) => {
         disableSaveButton={true}
       />
 
-      <Button onClick={handleSubmit}>Submit</Button>
+      <Button sx={styles.submitButton} onClick={handleSubmit}>
+        <Typography sx={styles.text}>Submit</Typography>
+      </Button>
     </Box>
   )
+}
+
+const styles = {
+  submitButton: {
+    backgroundColor: '#9747FF',
+    color: 'white',
+    width: '200px',
+    mr: 4,
+    '&:hover': {
+      backgroundColor: '#9747FF'
+    }
+  },
+  text: {
+    color: 'white',
+    textTransform: 'uppercase',
+    '&:hover': {
+      transform: 'scale(1.1)',
+      transition: 'transform 0.2s ease-in-out'
+    }
+  }
 }
 
 export default EditStepTwo
