@@ -1,5 +1,8 @@
 // ** React Imports
-import { useEffect, useState } from 'react'
+import { VoidFunctionComponent, useEffect, useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
@@ -24,6 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { UserTableService } from '@/services/api/UserTableService'
+import { captureError, captureSuccess } from '@/services/Sentry'
 
 interface FormValues {
   password: string
@@ -35,9 +39,7 @@ const schema = yup.object().shape({})
 
 interface SidebarAddUserType {
   open: boolean
-  toggle: () => void
-  // roleId: any
-  // userId: any
+  toggle: () => VoidFunctionComponent
   data: any
 }
 
@@ -51,6 +53,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const EditCreatorDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   // ** Props
   const { open, toggle } = props
@@ -107,6 +111,8 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
         })
         setSubmitted(true)
 
+        captureSuccess(currentLocation, `updateUser() ${JSON.stringify(data)}`)
+
         setTimeout(() => {
           toggle()
           setSubmitted(false)
@@ -122,6 +128,11 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
           data: { error }
         } = e
         setResponseError(error)
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value} queryFn: updateUser()`)
+          })
+        }
       }
     }
   }

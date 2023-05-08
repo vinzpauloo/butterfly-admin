@@ -134,7 +134,6 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
         setResponseError(error)
         for (const key in error) {
           error[key].forEach((value: any) => {
-            console.log(value)
             captureError(currentLocation, `${value} queryFn: updateUser()`)
           })
         }
