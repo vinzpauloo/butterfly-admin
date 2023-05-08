@@ -13,7 +13,7 @@ import { useForm, Controller } from 'react-hook-form'
 import CreatedSuccessful from '../../../form/CreatedSuccessful'
 
 // ** TanStack Query
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { PaymentService } from '@/services/api/PaymentService'
@@ -39,14 +39,12 @@ const schema = yup.object().shape({})
 const EditStepThree = (props: ToggleProps) => {
   const queryClient = useQueryClient()
 
-  const { setIsLoading } = editSuperAgentStore()
+  const { setIsLoading, siteData, rsaData, setRsaData } = editSuperAgentStore()
 
   const { toggle } = props
 
-  const { siteData } = editSuperAgentStore()
-
-  console.log(`STEP 3 SITE DATA`, siteData[0])
-  console.log(siteData[0]?.yuanhua_member_id)
+  // console.log(`STEP 3 SITE DATA`, siteData[0])
+  // console.log(siteData[0]?.yuanhua_member_id)
 
   // ** State
   const [submitted, setSubmitted] = React.useState<boolean>()
@@ -64,7 +62,25 @@ const EditStepThree = (props: ToggleProps) => {
     reset({})
   }
 
-  const { registerPayment } = PaymentService()
+  const { getIntegrationRSA, registerPayment } = PaymentService()
+
+  useQuery({
+    queryKey: ['getRSA'],
+    queryFn: () =>
+      getIntegrationRSA({
+        data: {
+          merchant_id: siteData[0]?.yuanhua_member_id
+        }
+      }),
+    onSuccess: response => {
+      setRsaData(response)
+    },
+    onError: e => {
+      console.log(e)
+    }
+  })
+
+  console.log(`GET INTEGRATION AND RSA@@@`, rsaData)
 
   const { mutate: mutateStepThree } = useMutation(registerPayment, {
     onSuccess: response => {
@@ -202,7 +218,7 @@ const EditStepThree = (props: ToggleProps) => {
                       fullWidth
                       error={!!errors.key}
                       helperText={errors.key?.message}
-                      value={field.value || siteData[0]?.yuanhua_md5_key}
+                      value={field.value || rsaData?.yuanhua_md5_key}
                       onChange={field.onChange}
                       name='key'
                     />
@@ -222,7 +238,7 @@ const EditStepThree = (props: ToggleProps) => {
                       rows={8}
                       error={!!errors.rsa_private}
                       helperText={errors.rsa_private?.message}
-                      value={field.value || siteData[0]?.yuanhua_rsa}
+                      value={field.value || rsaData?.yuanhua_rsa_private}
                       onChange={field.onChange}
                       name='rsa_private'
                     />
@@ -242,7 +258,7 @@ const EditStepThree = (props: ToggleProps) => {
                       rows={8}
                       error={!!errors.rsa_public}
                       helperText={errors.rsa_public?.message}
-                      defaultValue={field.value}
+                      value={field.value || rsaData?.yuanhua_rsa_public}
                       onChange={field.onChange}
                       name='rsa_public'
                     />

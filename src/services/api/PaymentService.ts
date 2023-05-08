@@ -12,6 +12,14 @@ interface RegisterPayment {
   }
 }
 
+const processData = (response: any) => {
+  if (response && response.data) {
+    return response.data
+  }
+
+  return {}
+}
+
 export const PaymentService = () => {
   
   const registerPayment = (params: RegisterPayment) => {
@@ -24,13 +32,30 @@ export const PaymentService = () => {
                  'ngrok-skip-browser-warning': '69420', // only for dev
                 Authorization: `Bearer ${accessToken}`
             },
-            url: `/admin/payment/method/register/yuanhua/account`,
+            url: `/admin/payment/method/yuanhua/account`,
             method: 'POST',
             data: params.data
         })
-    }
+  }
+  
+  const getIntegrationRSA = (params: RegisterPayment) => {
+        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+        return request({
+            headers: {
+              ...getHeaders(),
+              'ngrok-skip-browser-warning': '69420', // only for dev
+              Authorization: `Bearer ${accessToken}`
+            },
+            url: `/admin/payment/method/yuanhua/account/${params.data.merchant_id}`,
+            method: 'GET',
+        },
+        processData
+      )
+  }
 
   return {
-    registerPayment
+    registerPayment,
+    getIntegrationRSA
   }
 }

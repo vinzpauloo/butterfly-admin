@@ -24,11 +24,13 @@ type EditSuperAgentState = {
     isLoading: boolean;
     activeStep: number;
     siteData: SiteData[]; // Step One state property
+    rsaData: Record<string, any>; // Step Three state property
 
     // Define actions
     setIsLoading: (isLoading: boolean) => void;
     setActiveStep: (step: number | ((prevStep: number) => number)) => void;
     setSiteData: (siteData: SiteData[]) => void; // Step One action property
+    setRsaData: (rsaData: Record<string, any>) => void; // Step Three action property
 
     // Functions
 }
@@ -40,6 +42,7 @@ export const editSuperAgentStore = create<EditSuperAgentState>((set) => ({
     activeStep: defaultStateValues.step,
     stepOpenStatus: [],
     siteData: [], // Step One initial state property
+    rsaData: {}, // Step Three initial state property
 
     // Define actions
     setIsLoading: (isLoading) => set({ isLoading }),
@@ -48,7 +51,8 @@ export const editSuperAgentStore = create<EditSuperAgentState>((set) => ({
       activeStep: typeof step === "function" ? step(state.activeStep) : step,
     })),
 
-    setSiteData: (siteData) => set({ siteData}) // Step One initial action property
+    setSiteData: (siteData) => set({ siteData }), // Step One initial action property
+    setRsaData: (rsaData) => set({ rsaData }), // Step Three action property
 
     // Functions
 }))
