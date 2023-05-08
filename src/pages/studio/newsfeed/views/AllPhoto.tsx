@@ -24,14 +24,7 @@ type Props = {
   handleFeedParams?: any
 }
 
-const photoOnlyParams = { images_only: true, with: 'user', page : 1, status : 'Approved' }
-
-const AllPhoto = ({ data, handleFeedParams }: Props) => {
-  React.useEffect(() => {
-    if (data) {
-      handleFeedParams(photoOnlyParams)
-    }
-  }, [data])
+const AllPhoto = ({ data }: Props) => {
 
   if (data) {
     return (
@@ -59,7 +52,7 @@ const AllPhoto = ({ data, handleFeedParams }: Props) => {
                     )}
 
                     <FeedAttachments>
-                      <PhotoGridCard>
+                      <PhotoGridCard cols={ ( story!.images!.length > 3) ? 3 : story?.images?.length  }>
                         {
                           story && story?.images && story?.images.map( image =>  {
                             return <img key={image._id} src={FILE_SERVER_URL + image.url} alt='photo' />// TBR

@@ -27,14 +27,7 @@ type videoPhotosProps = {
 // ** Types
 import { IFeedStory } from '@/context/types'
 
-const videoWithPhotos = { video_images: true, with: 'user', page : 1, approval : 'Approved' }
-
-const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
-  React.useEffect(() => {
-    if (data) {
-      handleFeedParams(videoWithPhotos)
-    }
-  }, [data])
+const VideosWithPhotos = ({ data }: videoPhotosProps) => {
 
   if (data) {
     return (
@@ -67,7 +60,7 @@ const VideosWithPhotos = ({ data, handleFeedParams }: videoPhotosProps) => {
                       </FeedAttachments>
                     )}
                     <FeedAttachments>
-                      <PhotoGridCard>
+                      <PhotoGridCard cols={ ( story!.images!.length > 3) ? 3 : story?.images?.length  }>
                         {story &&
                           story?.images &&
                           story?.images.map(image => {

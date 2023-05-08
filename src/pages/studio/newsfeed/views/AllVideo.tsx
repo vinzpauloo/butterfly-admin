@@ -25,14 +25,7 @@ type AllVideoProps = {
   handleFeedParams?: any
 }
 
-const videoOnlyParams = { video_only: true, with: 'user', page : 1, approval : 'Approved' }
-
-const AllVideo = ({ data, handleFeedParams }: AllVideoProps) => {
-  React.useEffect(() => {
-    if (data) {
-      handleFeedParams(videoOnlyParams)
-    }
-  }, [data])
+const AllVideo = ({ data }: AllVideoProps) => {
 
   if (data) {
     return (

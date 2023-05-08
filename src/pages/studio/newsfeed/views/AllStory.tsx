@@ -22,17 +22,9 @@ import NoPostsFound from './NoPostsFound'
 
 type StoryProps = {
   data? : any,
-  handleFeedParams? : any
 }
 
-const StoryOnlyParams = { story_feeds_only: true, with: 'user', page : 1, approval : 'Approved' }
-
-const AllStory = ({data, handleFeedParams}: StoryProps) => {
-  React.useEffect(() => {
-    if (data) {
-      handleFeedParams(StoryOnlyParams)
-    }
-  }, [data])
+const AllStory = ({data}: StoryProps) => {
 
   if ( data?.length == 0 ) {
     return <NoPostsFound />

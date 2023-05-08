@@ -27,30 +27,43 @@ import createSkeleton from '@/utils/createSkeleton'
 import { useTranslateString } from '@/utils/TranslateString';
 import Translations from '@/layouts/components/Translations'
 
-const steps = [
+// ** Types
+interface IFeedButton {
+  title : string
+  param : {
+    [key : string] : boolean
+  }
+}
+
+const feedButtons : IFeedButton[] = [
   {
-    title: 'All Story Feeds'
+    title: 'All Story Feeds',
+    param : { story_feeds_only: true }
   },
   {
-    title: 'All Photo Feeds'
+    title: 'All Photo Feeds',
+    param : { images_only: true }
   },
   {
-    title: 'All Video Feeds'
+    title: 'All Video Feeds',
+    param : { video_only: true }
   },
   {
-    title: 'Videos With Photos'
+    title: 'Videos With Photos',
+    param : { video_images: true }
   }
 ]
+
 
 type Props = {}
 
 // ** Feeds Params
-const defaultParams = { story_feeds_only: true, with: 'user', page: 1, approval : 'Approved' }
+const defaultParams = { with: 'user', page: 1, approval : 'Approved' }
 
 const NewsFeedList = (props: Props) => {
   // ** States
   const [activeTab, setActiveTab] = React.useState<number>(0)
-  const [feedParams, setFeedParams] = React.useState<{}>(defaultParams)
+  const [feedParams, setFeedParams] = React.useState<{}>({  ...defaultParams })
 
   // ** QueryAPI
   const { getFeeds } = FeedsService()
@@ -78,9 +91,11 @@ const NewsFeedList = (props: Props) => {
     console.log('changed tab so I will call refetch from react query')
   }, [activeTab])
 
-  const handleFeedParams = (feedObj: {}) => {
-    const newFeed = feedObj
-    setFeedParams(newFeed)
+  const handleFeedParams = (index: number) => {
+
+    const feedParams = { ...feedButtons[index].param, ...defaultParams }
+    setFeedParams( feedParams )
+    setActiveTab(index)
   }
 
   // TURN THIS TO ENUM SO ITS READABLE
@@ -91,15 +106,15 @@ const NewsFeedList = (props: Props) => {
 
       switch (step) {
         case 0: {
-          return <AllStory data={flatMap} handleFeedParams={handleFeedParams} />
+          return <AllStory data={flatMap}  />
         }
         case 1:
-          return <AllPhoto data={flatMap} handleFeedParams={handleFeedParams} />
+          return <AllPhoto data={flatMap} />
         case 2: {
-          return <AllVideo data={flatMap} handleFeedParams={handleFeedParams} />
+          return <AllVideo data={flatMap} />
         }
         case 3:
-          return <VideosWithPhotos data={flatMap} handleFeedParams={handleFeedParams} />
+          return <VideosWithPhotos data={flatMap} />
         default:
           return null
       }
@@ -132,18 +147,18 @@ const NewsFeedList = (props: Props) => {
             marginBottom: '0rem'
           }}
         >
-          {steps.map((step, index) => {
+          {feedButtons.map((button, index) => {
             return (
               <Button
                 key={index}
                 sx={{ paddingBlock: '.5em', textTransform: 'uppercase' }}
                 size='medium'
                 onClick={() => {
-                  setActiveTab(index)
+                  handleFeedParams(index)
                 }}
                 variant={index == activeTab ? 'contained' : 'outlined'}
               >
-                {TranslateString(step.title)}
+                {TranslateString(button.title)}
               </Button>
             )
           })}
