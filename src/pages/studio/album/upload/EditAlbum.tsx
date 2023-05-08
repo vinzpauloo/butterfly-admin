@@ -26,6 +26,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 // ** API Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   title: string
@@ -297,6 +298,7 @@ interface AlbumDataProps {
 
 const EditAlbum = () => {
   const router = useRouter()
+  const currentLocation = router.asPath
   const { query } = router
   const albumId = Object.keys(query)
 
@@ -397,8 +399,15 @@ const EditAlbum = () => {
       setTimeout(() => {
         router.push(`/studio/album/album-list`)
       }, 1000)
-    } catch (error) {
-      alert(error)
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} queryFn: editAlbum()`)
+        })
+      }
     }
   }
 

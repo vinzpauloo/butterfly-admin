@@ -126,7 +126,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
       setResponseError(error)
       for (const key in error) {
         error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} queryFn: createUser()`)
+          captureError(currentLocation, `${value} queryFn: createUser() Supervisor`)
         })
       }
     }
