@@ -1,5 +1,5 @@
 // ** React Imports
-import { VoidFunctionComponent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** Next Imports
 import { useRouter } from 'next/router'
@@ -27,7 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { UserTableService } from '@/services/api/UserTableService'
-import { captureError, captureSuccess } from '@/services/Sentry'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   password: string
@@ -39,7 +39,7 @@ const schema = yup.object().shape({})
 
 interface SidebarAddUserType {
   open: boolean
-  toggle: () => VoidFunctionComponent
+  toggle: () => void
   data: any
 }
 
@@ -110,8 +110,6 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
           data: { password, password_confirmation, _method: 'put', user_note }
         })
         setSubmitted(true)
-
-        captureSuccess(currentLocation, `updateUser() ${JSON.stringify(data)}`)
 
         setTimeout(() => {
           toggle()

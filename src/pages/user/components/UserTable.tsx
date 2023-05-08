@@ -42,7 +42,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 // ** Zustand State Management
 import { useUserTableStore } from '@/zustand/userTableStore'
 
-import { captureSuccess, captureError } from '@/services/Sentry'
+import { captureError } from '@/services/Sentry'
 
 const UserTable = () => {
   const {
@@ -172,7 +172,6 @@ const UserTable = () => {
       } else if (activeTab === 'CC') {
         setCcPage(response?.current_page)
       }
-      captureSuccess(currentLocation, `getUsers() ${JSON.stringify(response)}`)
     },
     onError: (error: { data: { message: string } }) => {
       captureError(currentLocation, `${error?.data.message} queryFn: getUsers()`)

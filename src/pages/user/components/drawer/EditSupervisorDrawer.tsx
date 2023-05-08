@@ -27,7 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { UserTableService } from '@/services/api/UserTableService'
-import { captureSuccess, captureError } from '@/services/Sentry'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   password: string
@@ -114,8 +114,6 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
           data: { password, password_confirmation, _method: 'put', user_note }
         })
         setSubmitted(true)
-
-        captureSuccess(currentLocation, `updateUser() ${JSON.stringify(data)}`)
 
         setTimeout(() => {
           toggle()

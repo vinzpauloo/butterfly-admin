@@ -27,7 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { CreateAccount } from '@/services/api/CreateAccount'
-import { captureSuccess, captureError } from '@/services/Sentry'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   role_id: '1' | '2' | ''
@@ -110,8 +110,6 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
     try {
       await mutation.mutateAsync(userData)
       setSubmitted(true)
-      captureSuccess(currentLocation, `createUser() ${JSON.stringify(userData)}`)
-
       setTimeout(() => {
         toggle()
         resetForm()
