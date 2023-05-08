@@ -1,16 +1,32 @@
+// ** React Imports
 import React, { useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
+
+// ** MUI Imports
 import { CircularProgress, Typography, Stack, Tabs, Tab } from '@mui/material'
+
+// ** TanStack Imports
 import { useQuery } from '@tanstack/react-query'
+
+// ** Project/Other Imports
 import AdvertisementModal from '../components/modal/AdvertisementModal'
 import AdsContainer from '../components/ads/AdsContainer'
 import Translations from '@/layouts/components/Translations'
+
+// ** Hooks/Services Imports
 import AdvertisementService from '@/services/api/AdvertisementService'
+import { captureError } from '@/services/Sentry'
 
 const TabPanel = ({ children, index, value }: any) => {
   return <>{value === index && <Stack pt={4}>{children}</Stack>}</>
 }
 
 const Advertisements = () => {
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   const [open, setOpen] = useState(false)
   const handleClose = () => setOpen(false)
   const handleOpen = () => setOpen(true)
@@ -30,7 +46,7 @@ const Advertisements = () => {
       console.log('ADMIN ADS FETCHED', data)
     },
     onError: error => {
-      console.log(error)
+      captureError(currentLocation, `${error} queryFn: getAllAdminAds() Advertisements`)
     }
   })
 
