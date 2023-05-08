@@ -20,7 +20,6 @@ import formatDate from '@/utils/formatDate'
 import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Import SideDrawer
-import EditNewsFeedDrawer from './EditNewsFeedDrawer'
 import EditNewsFeedDialog from './EditNewsFeedDialog'
 
 // ** Types
