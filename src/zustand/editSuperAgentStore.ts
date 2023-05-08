@@ -8,6 +8,9 @@ interface SiteData {
   description: string
   language_id: string
   currency_id: string
+  yuanhua_member_id: string
+  yuanhua_md5_key: string
+  yuanhua_rsa: string // private key at the moment
 }
 
 const defaultStateValues = {

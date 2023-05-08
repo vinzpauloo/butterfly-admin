@@ -43,6 +43,11 @@ const EditStepThree = (props: ToggleProps) => {
 
   const { toggle } = props
 
+  const { siteData } = editSuperAgentStore()
+
+  console.log(`STEP 3 SITE DATA`, siteData[0])
+  console.log(siteData[0]?.yuanhua_member_id)
+
   // ** State
   const [submitted, setSubmitted] = React.useState<boolean>()
 
@@ -171,7 +176,7 @@ const EditStepThree = (props: ToggleProps) => {
                       fullWidth
                       error={!!errors.merchant_id}
                       helperText={errors.merchant_id?.message}
-                      defaultValue={field.value}
+                      value={field.value || siteData[0]?.yuanhua_member_id}
                       onChange={field.onChange}
                       name='merchant_id'
                     />
@@ -189,7 +194,7 @@ const EditStepThree = (props: ToggleProps) => {
                       fullWidth
                       error={!!errors.md5}
                       helperText={errors.md5?.message}
-                      defaultValue={field.value}
+                      value={field.value || siteData[0]?.yuanhua_md5_key}
                       onChange={field.onChange}
                       name='md5'
                     />
@@ -210,7 +215,7 @@ const EditStepThree = (props: ToggleProps) => {
                       rows={8}
                       error={!!errors.rsa_private}
                       helperText={errors.rsa_private?.message}
-                      defaultValue={field.value}
+                      value={field.value || siteData[0]?.yuanhua_rsa}
                       onChange={field.onChange}
                       name='rsa_private'
                     />
