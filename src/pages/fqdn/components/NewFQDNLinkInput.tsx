@@ -1,22 +1,28 @@
-import { OutlinedInput, InputAdornment, IconButton, Stack, CircularProgress } from '@mui/material';
+import { OutlinedInput, InputAdornment, IconButton, Stack, CircularProgress, Tooltip } from '@mui/material';
 import Icon from 'src/@core/components/icon'
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 
 type Props = {
-  newInputs: any[]
+  newInputs: string[]
   index: number
   isLoading: boolean
-  setNewInputs: (_: any) => void
+  setNewInputs: Dispatch<SetStateAction<string[]>>
 }
 
 const NewFQDNLinkInput = (props: Props) => {
   const { newInputs, index, isLoading, setNewInputs } = props
   const [inputValue, setInputValue] = useState<string>('')
+  const [inputError, setInputError] = useState<boolean>(false)
 
   const handleItemStateChange = (val: string) => {
     const newItemStates = [...newInputs];
     newItemStates[index] = val;
     setNewInputs(newItemStates);
+  }
+
+  const isValidUrl = (string: string) => {
+    try { new URL(string); setInputError(false) }
+    catch (err) { setInputError(true) }
   }
 
   return (
@@ -27,6 +33,7 @@ const NewFQDNLinkInput = (props: Props) => {
         disabled={isLoading}
         onPasteCapture={(event: React.ClipboardEvent) => {
           handleItemStateChange(event.clipboardData.getData('text'))
+          isValidUrl(event.clipboardData.getData('text'))
         }}
         type='url'
         autoFocus
@@ -34,16 +41,19 @@ const NewFQDNLinkInput = (props: Props) => {
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setInputValue(event.target.value);
           handleItemStateChange(event.target.value)
+          isValidUrl(event.target.value)
         }}
-        error={false}
+        error={inputError}
         placeholder='new link'
         endAdornment={
           <InputAdornment position='end'>
-            <IconButton edge='end' disabled={isLoading} onClick={() => {
-              setNewInputs((_: any) => _.filter((_: any, index: any) => index !== 0));
-            }}>
-              <Icon fontSize={20} icon='mdi:delete-outline' />
-            </IconButton>
+            <Tooltip title="Delete">
+              <IconButton edge='end' disabled={isLoading} sx={{ '&:hover': { color: "red" } }} onClick={() => {
+                setNewInputs((item: any) => item.filter((_: string, index: number) => index !== 0));
+              }}>
+                <Icon icon='mdi:close' />
+              </IconButton>
+            </Tooltip>
           </InputAdornment>
         }
       />
