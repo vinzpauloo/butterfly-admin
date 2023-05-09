@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { Avatar, Box, Button, Divider, Menu, MenuItem, Typography, TypographyProps, useMediaQuery, Stack } from '@mui/material'
+import { Avatar, Box, Button, Divider, Menu, MenuItem, Typography, TypographyProps, useMediaQuery, Stack, Badge } from '@mui/material'
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import { useRouter } from 'next/router'
 import { styled, Theme } from '@mui/material/styles'
@@ -48,10 +48,12 @@ const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: any) 
     router.push('/notifications')
   }
 
-  const navigateToSpecificNotification = (type: string) => {
-    console.log(type)
+  const navigateToPage = (id: string, type: string) => {
     handleClose()
-  } 
+    console.log(type)
+    console.log('PUT as READ', id)
+    if (type === 'work_approval') router.push('/studio/content')
+  }
 
   return (
     <Menu anchorEl={anchorEl} open={open} onClose={handleClose}
@@ -72,9 +74,10 @@ const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: any) 
         }
         {menuItems.map((item: any, index: number) => (
           <Box key={item?._id}>
-            <MenuItem onClick={() => navigateToSpecificNotification('test')}>
+            <MenuItem onClick={() => navigateToPage(item?._id, item?.type)}>
               <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Avatar alt="Remy Sharp" src={FILE_SERVER_URL + item?.from?.photo} />
+                <Badge color={'primary'} variant='dot' />
+                <Avatar alt={item?.from?.username} src={FILE_SERVER_URL + item?.from?.photo} />
                 <Box sx={{ mr: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
                   <MenuItemTitle>{item?.from?.username}</MenuItemTitle>
                   <MenuItemSubtitle variant='body2' sx={{textTransform: 'capitalize'}}>

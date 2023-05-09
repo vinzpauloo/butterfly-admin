@@ -9,7 +9,7 @@ const Notifications = () => {
   const [data, setData] = useState<any>([])
   const [totalNotifs, setTotalNotifs] = useState<number>(0)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const newNotifications = `You have ${data.length} new notifications!`
+  const newNotifications = `You have ${totalNotifs} new notifications!`
   const noNotifications = `No new notifications.`
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
