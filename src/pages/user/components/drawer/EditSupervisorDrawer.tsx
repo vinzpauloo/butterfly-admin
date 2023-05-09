@@ -1,6 +1,9 @@
 // ** React Imports
 import { useState, useEffect } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
 import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
@@ -24,6 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { UserTableService } from '@/services/api/UserTableService'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   password: string
@@ -49,6 +53,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const EditSupervisorDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   console.log(props.data)
 
@@ -124,6 +130,11 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
           data: { error }
         } = e
         setResponseError(error)
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value} queryFn: updateUser() Supervisor`)
+          })
+        }
       }
     }
   }

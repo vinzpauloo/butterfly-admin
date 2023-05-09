@@ -1,6 +1,9 @@
 // ** React Imports
 import { useState } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -22,6 +25,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { CreateAccount } from '@/services/api/CreateAccount'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   role_id: '3' | ''
@@ -61,6 +65,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const CCDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   // ** Props
   const { open, toggle } = props
@@ -119,6 +125,11 @@ const CCDrawer = (props: SidebarAddUserType) => {
         data: { error }
       } = e
       setResponseError(error)
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} queryFn: createUser() Content Creator`)
+        })
+      }
     }
   }
 

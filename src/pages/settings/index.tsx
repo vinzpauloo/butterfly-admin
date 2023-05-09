@@ -1,16 +1,30 @@
+// ** React Imports
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
+// ** Next Imports
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+
+// ** MUI Imports
 import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+
+// ** TanStack Imports
 import { useQuery } from '@tanstack/react-query'
 
+// ** Project/Other Imports
 import Container from './components/Container'
-import WorkgroupService from '@/services/api/Workgroup'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
-import Image from 'next/image'
-import { useTranslateString } from '@/utils/TranslateString';
+
+// ** Hooks/Services Imports
+import WorkgroupService from '@/services/api/Workgroup'
+import useDebounce from '@/hooks/useDebounce'
+import { captureError } from '@/services/Sentry'
+
+// ** Utils Imports
+import { useTranslateString } from '@/utils/TranslateString'
 
 const navData = [
   {
@@ -82,22 +96,6 @@ const templateData = [
     image: '/images/template/grid.png'
   }
 ]
-
-const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
 
 const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue, setNavbar, setTemplate }: any) => {
   const handleClick = () => {
@@ -203,7 +201,7 @@ const Table = ({
     },
     {
       field: 'template_id',
-      headerName: TranslateString("Template") + " ID",
+      headerName: TranslateString('Template') + ' ID',
       width: 300,
       sortable: false,
       renderCell: (params: any) => {
@@ -276,6 +274,9 @@ const Table = ({
 
 function index() {
   const { getWorkgroup } = WorkgroupService()
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
@@ -315,6 +316,9 @@ function index() {
       setRowCount(data.total)
       setPageSize(data.per_page)
       setPage(data.current_page)
+    },
+    onError: err => {
+      captureError(currentLocation, `queryFn: getWorkgroup() ${err} Work Groupings`)
     }
   })
 

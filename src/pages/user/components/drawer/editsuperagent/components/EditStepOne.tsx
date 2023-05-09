@@ -52,16 +52,6 @@ interface Partner {
   note: string
 }
 
-interface SiteData {
-  id: any
-  logo: any
-  name: string
-  security_funds_balance: string
-  description: string
-  language_id: string
-  currency_id: string
-}
-
 interface ResponseErrorProps {
   role_id?: string
   username?: string

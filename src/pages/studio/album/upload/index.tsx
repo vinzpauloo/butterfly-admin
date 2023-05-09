@@ -1,5 +1,5 @@
 // ** React imports
-import React, { Fragment, useEffect, useCallback, useState, SyntheticEvent } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 
 // ** Next Images
 import Image from 'next/image'
@@ -7,7 +7,6 @@ import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import { Box, Typography, TextField, Button, List, ListItem, IconButton } from '@mui/material'
-import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -17,14 +16,16 @@ import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 
 // ** Third Party Components
 import { useDropzone } from 'react-dropzone'
-import { v4 as uuidv4 } from 'uuid'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 // ** TanStack Query
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
 import { AlbumService } from '@/services/api/AlbumService'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   title: string
@@ -222,7 +223,7 @@ const FileUploaderMultiple = ({ onFilesChange, files }: { onFilesChange?: (files
 
 const UploadAlbum = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
+  const currentLocation = router.asPath
 
   /* States */
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
@@ -302,9 +303,15 @@ const UploadAlbum = () => {
       setTimeout(() => {
         router.push(`/studio/album/album-list`)
       }, 1000)
-    } catch (error) {
-      console.log(error)
-      alert(error)
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} queryFn: postAlbum()`)
+        })
+      }
     }
   }
 

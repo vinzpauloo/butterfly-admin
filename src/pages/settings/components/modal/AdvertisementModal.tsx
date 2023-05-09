@@ -1,6 +1,12 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
+import DatePicker from 'react-datepicker'
+
+// ** Next Imports
 import Image from 'next/image'
+import { useRouter } from 'next/router'
+
+// ** MUI Imports
 import {
   Box,
   Dialog,
@@ -15,15 +21,25 @@ import {
   FormControlLabel,
   styled
 } from '@mui/material'
-import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
+
+// ** Third Party Imports
 import format from 'date-fns/format'
-import DatePicker from 'react-datepicker'
+
+// ** Project/Other Imports
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
-import { adsGlobalStore } from '../../../../zustand/adsGlobalStore'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import AdvertisementService from '@/services/api/AdvertisementService'
 import Translations from '@/layouts/components/Translations'
+import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
+// ** Zustand Store Imports
+import { adsGlobalStore } from '../../../../zustand/adsGlobalStore'
+
+// ** TanStack Imports
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
+import AdvertisementService from '@/services/api/AdvertisementService'
+import { captureError } from '@/services/Sentry'
 
 interface ModalProps {
   isOpen: boolean
@@ -57,6 +73,9 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     state.isCreatingNewAds,
     state.setAdsPhotoURL
   ])
+
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   // if creating new ads used this value, if editing use global store
   const [newAdsStartDate, setNewAdsStartDate] = useState<Date>(new Date())
@@ -158,8 +177,15 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setPreview('')
       setAdsPhotoURL('')
     },
-    onError: error => {
-      alert(error)
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, createNewAds() Create Banner Ads`)
+        })
+      }
     }
   })
 
@@ -174,8 +200,15 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setPreview('')
       setAdsPhotoURL('')
     },
-    onError: error => {
-      alert(error)
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, updateAds() Edit Banner Ads`)
+        })
+      }
     }
   })
 
@@ -190,8 +223,15 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setPreview('')
       setAdsPhotoURL('')
     },
-    onError: error => {
-      alert(error)
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, deleteAds() Delete Banner Ads`)
+        })
+      }
     }
   })
 
