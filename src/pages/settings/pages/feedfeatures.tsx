@@ -128,10 +128,6 @@ const FeedFeatures = () => {
               <Button sx={styles.button} onClick={() => handleModalToggle('select')}>
                 {TranslateString('Select Featured Feeds')}
               </Button>
-
-              <Button sx={styles.button} onClick={() => handleModalToggle('create')}>
-                {TranslateString('Create Feed')}
-              </Button>
             </Box>
           </Box>
           <Divider />

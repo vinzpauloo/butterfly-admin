@@ -177,7 +177,7 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                 multiple
                 options={[]}
                 freeSolo
-                defaultValue={row?.tags || null}
+                
                 sx={{ mb:10 }}
                 onChange={( event, value )=>{ setValue('tags', value as string[]) }}
                 renderTags={(value, getTagProps) =>

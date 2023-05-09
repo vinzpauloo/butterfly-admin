@@ -79,7 +79,7 @@ const FeedCard = ({ string_story, user, children, datePublished, editable=false,
               editable && handleEditButtonClick && 
               <Box>
                 <IconButton onClick={ handleEditButtonClick }>
-                  <Icon icon='mdi:pencil' fontSize={20} />
+                  <Icon icon='mdi:pencil' fontSize={20} color={ theme.palette.common.white } />
                 </IconButton>
               </Box>
             }
