@@ -309,6 +309,7 @@ const UploadVideoStep1 = (props: Props) => {
     mode: 'onBlur',
     resolver: yupResolver(schema)
   })
+
   // ** Context ReactHookForm
   const { register, getValues, control, watch, setValue, resetField } = useFormContext()
 
@@ -388,6 +389,7 @@ const UploadVideoStep1 = (props: Props) => {
       let insertTagArray = [tagWord]
       let newTagsArray = [...(tags as []), ...insertTagArray]
       setTags(newTagsArray as [])
+      setValue('tags',newTagsArray)
 
       //reset multiTags
       resetField('multiTags')
@@ -410,6 +412,7 @@ const UploadVideoStep1 = (props: Props) => {
   
   const handleTaggingsDelete = (tag: string) => {
     let filteredTags = tags?.filter(e => e !== tag)
+    setValue('tags',filteredTags)
     setTags(filteredTags as [])
   }
   const handleGroupingsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -419,24 +422,37 @@ const UploadVideoStep1 = (props: Props) => {
     let filteredGroupings = groupings?.filter(e => e !== group)
     setGroupings(filteredGroupings as [])
   }
-  const dummyNavigate = () => {
+  const handleStartUpload = () => {
     setContextTags()
     setContextGroups()
+
 
     // Validations
     if (auth?.user?.role == 'CC') {
       
     } else {
+      
       if (!watch('contentCreator')) {
         toast.error('Content Creator is required', { position: 'top-center' })
         return
       }
     }
 
-    if (!watch('title')) {
-      toast.error('Title is required', { position: 'top-center' })
+    if ( watch('title')?.length < 10 ) {
+      toast.error('Title is required and must be a minimum of 10 characters', { position: 'top-center' })
       return
     }
+
+    if ( !watch('thumbnailFile') ) {
+      toast.error('Please upload a thumbnail', { position: 'top-center' })
+      return
+    }
+
+    if ( !watch('tags') || !watch('tags').length ) {
+      toast.error('Please enter at least 1 tag', { position: 'top-center' })
+      return
+    }
+
     if (!hasFullVideo) {
       toast.error('Please upload a video', { position: 'top-center' })
       return
@@ -828,7 +844,7 @@ const UploadVideoStep1 = (props: Props) => {
                   </Alert>
                 ) : (
                   <CustomButton
-                    onClick={dummyNavigate}
+                    onClick={handleStartUpload}
                     sx={{
                       bgcolor: 'primary.main',
                       color: 'common.white'
