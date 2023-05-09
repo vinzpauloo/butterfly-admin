@@ -73,6 +73,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
+  const [errorResponse, setErrorResponse] = useState<string>()
 
   const {
     control,
@@ -127,12 +128,18 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
       }, 1500)
     } catch (e: any) {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} postAPK() CreateDrawer Versions`)
-        })
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            setErrorResponse(value)
+            captureError(currentLocation, `${value}, postAPK() Create Versions`)
+          })
+        }
+      } else if (message) {
+        setErrorResponse(message)
+        captureError(currentLocation, `${message}, postAPK() Create Versions`)
       }
     }
   }
@@ -142,6 +149,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
   const handleClose = () => {
     resetForm()
     setResetKey(prevKey => prevKey + 1)
+    setErrorResponse('')
     toggle()
   }
 
@@ -270,6 +278,10 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                     )}
                   />
                 </Box>
+
+                {/* Error messages from backend */}
+                <Typography color='error'>{errorResponse}</Typography>
+
                 <Box sx={styles.formButtonContainer}>
                   <Box>
                     <Button sx={styles.cancelButton} onClick={handleClose}>
