@@ -1,3 +1,6 @@
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** Utils Import
 import formatDate from '@/utils/formatDate'
 
@@ -6,7 +9,10 @@ import { useQueryClient, useMutation } from '@tanstack/react-query'
 
 // ** Project Imports
 import ToggleButton from '@/pages/user/components/button/ToggleButton'
+
+// ** Hooks/Services Imports
 import { WalletService } from '@/services/api/WalletService'
+import { captureError } from '@/services/Sentry'
 
 interface ToggleActionProps {
   value: number
@@ -16,6 +22,8 @@ interface ToggleActionProps {
 const ToggleAction = ({ value, id }: ToggleActionProps) => {
   const queryClient = useQueryClient()
   const { editWallet } = WalletService()
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   const mutation = useMutation(
     async (data: { id: string; data: any }) => {
@@ -36,8 +44,19 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
     // Determine the new status
     const newStatus = value === 1 ? 0 : 1
 
-    // Update the status in the backend
-    await mutation.mutateAsync({ id, data: { active: newStatus, _method: 'put' } })
+    try {
+      // Update the status in the backend
+      await mutation.mutateAsync({ id, data: { active: newStatus, _method: 'put' } })
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, editWallet() PaymentsColumns`)
+        })
+      }
+    }
   }
 
   return <ToggleButton checked={value === 1} onToggle={newValue => handleToggle(newValue)} />
