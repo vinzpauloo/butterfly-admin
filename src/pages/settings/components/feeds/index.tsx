@@ -21,51 +21,52 @@ import FeedsService from '@/services/api/FeedsService'
 
 // ** Utils
 import createSkeleton from '@/utils/createSkeleton'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 import Translations from '@/layouts/components/Translations'
 import EditNewsFeedDrawer from '@/pages/studio/newsfeed/views/EditNewsFeedDrawer'
 
 // ** Types
 import { IFeedStory } from '@/context/types'
 interface IFeedButton {
-  title : string
-  param : {
-    [key : string] : boolean
+  title: string
+  param: {
+    [key: string]: boolean
   }
 }
 
-const feedButtons : IFeedButton[] = [
+const feedButtons: IFeedButton[] = [
   {
     title: 'All Story Feeds',
-    param : { story_feeds_only: true }
+    param: { story_feeds_only: true }
   },
   {
     title: 'All Photo Feeds',
-    param : { images_only: true }
+    param: { images_only: true }
   },
   {
     title: 'All Video Feeds',
-    param : { video_only: true }
+    param: { video_only: true }
   },
   {
     title: 'Videos With Photos',
-    param : { video_images: true }
+    param: { video_images: true }
   }
 ]
 
-
-type Props = {}
+type Props = {
+  onClose: () => void
+}
 
 // ** Feeds Params
-const defaultParams = { with: 'user', page: 1, approval : 'Approved' }
+const defaultParams = { with: 'user', page: 1, approval: 'Approved' }
 
 const SelectFeaturedFeeds = (props: Props) => {
   // ** States
   const [activeTab, setActiveTab] = React.useState<number>(0)
-  const [feedParams, setFeedParams] = React.useState<{}>({ ...defaultParams, story_feeds_only : true })
+  const [feedParams, setFeedParams] = React.useState<{}>({ ...defaultParams, story_feeds_only: true })
 
   // ** Drawer states
-  const [ open, setOpen ] = React.useState<boolean>(false)
+  const [open, setOpen] = React.useState<boolean>(false)
   const [feedRow, setFeedRow] = React.useState<IFeedStory | null>(null)
 
   const toggleEditDrawer = () => {
@@ -99,13 +100,12 @@ const SelectFeaturedFeeds = (props: Props) => {
   }, [activeTab])
 
   const handleFeedParams = (index: number) => {
-
     const feedParams = { ...feedButtons[index].param, ...defaultParams }
-    setFeedParams( feedParams )
+    setFeedParams(feedParams)
     setActiveTab(index)
   }
 
-  const handleFeedItemClick = (feed : IFeedStory) => {
+  const handleFeedItemClick = (feed: IFeedStory) => {
     console.log('@@@@@@@@@ THE FEED ID', feed)
     setFeedRow(feed)
     setOpen(true)
@@ -211,19 +211,19 @@ const SelectFeaturedFeeds = (props: Props) => {
                     fetchNextPage()
                   }}
                 >
-                  {isFetchingNextPage ? <CircularProgress size={15} color='secondary' /> : <Translations text="Load More Stories"/>}
+                  {isFetchingNextPage ? (
+                    <CircularProgress size={15} color='secondary' />
+                  ) : (
+                    <Translations text='Load More Stories' />
+                  )}
                 </Button>
               </Grid>
             </Grid>
           </Box>
         )}
       </Box>
-      
-      {
-        feedRow && 
-        <EditNewsFeedDrawer open={open} row={feedRow as IFeedStory} toggle={ () => toggleEditDrawer() } />
-      }
-      
+
+      {feedRow && <EditNewsFeedDrawer open={open} row={feedRow as IFeedStory} toggle={() => toggleEditDrawer()} />}
     </Box>
   )
 }
