@@ -1,11 +1,27 @@
+// ** React Imports
 import React, { useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
+
+// ** MUI Imports
 import { Badge, IconButton, Tooltip } from '@mui/material'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
+
+// ** Project/Other Imports
 import NotificationsDropdown from './components/NotificationsDropdown'
-import NotificationService from '@/services/api/NotificationService'
+
+// ** TanStack Imports
 import { useQuery } from '@tanstack/react-query'
 
+// Hooks/Services Imports
+import NotificationService from '@/services/api/NotificationService'
+import { captureError } from '@/services/Sentry'
+
 const Notifications = () => {
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   const [data, setData] = useState<any>([])
   const [totalNotifs, setTotalNotifs] = useState<number>(0)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -21,19 +37,29 @@ const Notifications = () => {
   }
 
   const { getAllAdminNotifs } = NotificationService()
-  const { } = useQuery({
+  const {} = useQuery({
     queryKey: ['allAdminNotifs'],
-    queryFn: () => getAllAdminNotifs({
-      data: {
-        with: 'from',
-        page: 1
-      }
-    }),
+    queryFn: () =>
+      getAllAdminNotifs({
+        data: {
+          with: 'from',
+          page: 1
+        }
+      }),
     onSuccess: data => {
       setData(data?.data)
       setTotalNotifs(data?.total)
     },
-    onError: error => { console.log(error) }
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, getAllAdminNotifs() shared-components/Notifications`)
+        })
+      }
+    }
   })
 
   return (
@@ -45,12 +71,7 @@ const Notifications = () => {
           </Badge>
         </IconButton>
       </Tooltip>
-      <NotificationsDropdown
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        handleClose={handleClose}
-        menuItems={data}
-      />
+      <NotificationsDropdown open={Boolean(anchorEl)} anchorEl={anchorEl} handleClose={handleClose} menuItems={data} />
     </div>
   )
 }
