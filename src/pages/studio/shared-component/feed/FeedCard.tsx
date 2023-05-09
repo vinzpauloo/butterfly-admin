@@ -4,6 +4,7 @@ import Card from '@mui/material/Card'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
+import IconButton from '@mui/material/IconButton'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/system'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
@@ -12,6 +13,7 @@ import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import FeedAttachments from './FeedAttachments'
 
 // ** Custom Layout Style Components
+import Icon from 'src/@core/components/icon'
 
 // ** Styled Components
 const FeedTextContent = styled(Typography)(({ theme }) => ({
@@ -25,18 +27,18 @@ type User = {
   username: string
 }
 interface FeedCardProps {
+  _id? : string
   user?: User
+  editable? : boolean
   string_story?: string
   datePublished?: string
   children?:
     | (React.ReactNode & React.ReactElement<typeof FeedAttachments>)
     | (React.ReactNode & React.ReactElement<typeof FeedAttachments>[])
+  handleEditButtonClick? : () => void
 }
 
-// TBR
-let baseURL = 'http://192.168.50.9/'
-
-const FeedCard = ({ string_story, user, children, datePublished }: FeedCardProps) => {
+const FeedCard = ({ string_story, user, children, datePublished, editable=false, handleEditButtonClick }: FeedCardProps) => {
   // ** Hook
   const theme = useTheme()
 
@@ -73,6 +75,14 @@ const FeedCard = ({ string_story, user, children, datePublished }: FeedCardProps
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 3.5, '& svg': { mr: 1.25 } }}>
               <img src='/images/icons/chat.png' />
             </Box>
+            {
+              editable && handleEditButtonClick && 
+              <Box>
+                <IconButton onClick={ handleEditButtonClick }>
+                  <Icon icon='mdi:pencil' fontSize={20} />
+                </IconButton>
+              </Box>
+            }
           </Box>
         </Box>
 
