@@ -6,12 +6,21 @@ import { Box, Button } from '@mui/material'
 // ** Import component
 import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
 
-// ** API queries
-import { useQueryClient } from '@tanstack/react-query'
-import FQDNService from '@/services/api/FQDNService'
+// Zustand SuperAgentStore
+import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
 
+// ** Import third party components
+import toast from 'react-hot-toast'
+
+// ** Tanstack and services
+import FQDNService from '@/services/api/FQDNService'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// ** types
 type SAStepTwoProps = {
   siteID: number | null
+  handleNext: () => void
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export type FQDNData = {
@@ -19,7 +28,7 @@ export type FQDNData = {
   values: [{ value: string }]
 }
 
-const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
+const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: any) => {
   // ** State
   const [isLoading] = React.useState<boolean>(false)
 
@@ -28,50 +37,97 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
   const formPhotosRef = React.useRef<any>()
   const formStreamRef = React.useRef<any>()
 
-  // ** Use Imperative
-  React.useImperativeHandle(
-    ref,
-    () => {
-      return { handleFinish: () => handleFinish() }
+  // ** Hooks
+  const { addFQDN } = FQDNService()
+  const queryClient = useQueryClient()
+  const fqdnM = useMutation({
+    mutationFn: addFQDN,
+    onSuccess: response => {
+      console.log('response from addFQDN', response)
     },
-    []
-  )
+    onSettled: () => {
+      queryClient.invalidateQueries(['fqdns'])
+    }
+  })
 
   const handleFinish = () => {
     const allDataArray = []
 
     // check for empty values handleVALIDATIONS
-    let noEmptyvalues = false
-    noEmptyvalues = formAPIRef.current.getFormData().some((item: { value: string }) => {
+    let hasEmptyvalues = false
+    hasEmptyvalues = formAPIRef.current.getFormData().some((item: { value: string }) => {
       return item.value.length < 3
     })
       ? true
       : false
-    noEmptyvalues = formStreamRef.current.getFormData().some((item: { value: string }) => {
+    hasEmptyvalues = formStreamRef.current.getFormData().some((item: { value: string }) => {
       return item.value.length < 3
     })
       ? true
       : false
-    noEmptyvalues = formPhotosRef.current.getFormData().some((item: { value: string }) => {
+    hasEmptyvalues = formPhotosRef.current.getFormData().some((item: { value: string }) => {
       return item.value.length < 3
     })
       ? true
       : false
 
-    if (noEmptyvalues) return []
+    if (hasEmptyvalues) {
+      alert('DONT SUBMIT')
+      return
+    }
 
+    // structure
     allDataArray.push({ name: 'API', values: formAPIRef.current.getFormData() })
     allDataArray.push({ name: 'Photo', values: formPhotosRef.current.getFormData() })
     allDataArray.push({ name: 'Streaming', values: formStreamRef.current.getFormData() })
 
-    return allDataArray
+    console.log('START SUBMIT', allDataArray)
+
+    //submit FQDN
+    submitFQDN(allDataArray)
   }
 
-  const handleAPISubmit = async (data: any) => {}
+  const submitFQDN = async (allDataArray: FQDNData[]) => {
+    const allFQDNData = allDataArray
+    console.log('SUBMIT THIS FQDN', allFQDNData)
 
-  const handleStreamSubmit = async (data: any) => {}
+    // start stepper loader
+    setIsLoading(true)
 
-  const handlePhotoSubmit = async (data: any) => {}
+    //Do submissions!!
+
+    if (allFQDNData?.length == 0) {
+      toast.error('FQDN Values Must at least be 3 characters')
+      return
+    } else {
+      console.log('allFQDNData', allFQDNData)
+
+      const promiseArray: any[] = []
+      allFQDNData?.map((data: FQDNData) => {
+        const type = data.name as 'Api' | 'Photo' | 'Streaming'
+        data.values.forEach(value => {
+          promiseArray.push({ site: siteID, name: value.value, type: type })
+        })
+      })
+
+      setIsLoading(true)
+      const promises = promiseArray.map((data: { name: string; site: number; type: string }) =>
+        fqdnM.mutateAsync({
+          data: {
+            site: data.site,
+            name: data.name,
+            type: data.type as 'Api' | 'Photo' | 'Streaming'
+          }
+        })
+      )
+      await Promise.all(promises)
+    }
+
+    setTimeout(() => {
+      setIsLoading(false)
+      handleNext()
+    }, 1500)
+  }
 
   return (
     <>
@@ -99,7 +155,6 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
         >
           <ExpandoForm
             ref={formAPIRef}
-            handleExpandoSubmit={data => handleAPISubmit(data)}
             fileType='text'
             pageHeader="API's"
             isLoading={isLoading}
@@ -107,7 +162,6 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
           />
           <ExpandoForm
             ref={formStreamRef}
-            handleExpandoSubmit={handleStreamSubmit}
             fileType='text'
             pageHeader='STREAMING'
             isLoading={isLoading}
@@ -115,16 +169,40 @@ const SAStepTwo = ({ siteID }: SAStepTwoProps, ref: any) => {
           />
           <ExpandoForm
             ref={formPhotosRef}
-            handleExpandoSubmit={handlePhotoSubmit}
             fileType='text'
             pageHeader='PHOTOS'
             isLoading={isLoading}
             disableSaveButton={true}
           />
+
+          <div className='button-wrapper' style={{ paddingTop: '1rem', textAlign: 'center' }}>
+            <Button
+              style={styles.cancelButton}
+              size='large'
+              variant='contained'
+              onClick={() => {
+                handleFinish()
+              }}
+              sx={{ ml: 4 }}
+            >
+              Next
+            </Button>
+          </div>
         </Box>
       )}
     </>
   )
+}
+
+const styles = {
+  cancelButton: {
+    backgroundColor: '#98A9BC',
+    color: 'white',
+    width: '200px',
+    '&:hover': {
+      backgroundColor: '#7899ac'
+    }
+  }
 }
 
 export default React.forwardRef(SAStepTwo)

@@ -37,12 +37,8 @@ import SAStepOne from './superagent/steps/StepOne'
 import SAStepTwo from './superagent/steps/StepTwo'
 import SAStepThree from './superagent/steps/StepThree'
 
-// ** Types
-import { FQDNData } from './superagent/steps/StepTwo'
-
-// ** Services
-import FQDNService from '@/services/api/FQDNService'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+// import superAgentStore
+import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
 
 interface SidebarAddUserType {
   open: boolean
@@ -72,19 +68,6 @@ const SADrawer = (props: SidebarAddUserType) => {
   const [fileName, setFileName] = useState('')
   const [responseError, setResponseError] = useState<any>()
   const [resetKey, setResetKey] = useState(0)
-
-  // ** Tanstack and services
-  const { addFQDN } = FQDNService()
-  const queryClient = useQueryClient()
-  const fqdnM = useMutation({
-    mutationFn: addFQDN,
-    onSuccess: response => {
-      console.log('response from addFQDN', response)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries(['fqdns'])
-    }
-  })
 
   // ** References to multisteps
   const stepOneRef = React.useRef<any>()
@@ -116,46 +99,10 @@ const SADrawer = (props: SidebarAddUserType) => {
   }
 
   const handleFinishForm = async () => {
-    console.log('data from SADRAWER', stepTwoRef)
-
-    //call stepTwoReference handle Finish
-    const allFQDNData = stepTwoRef?.current?.handleFinish()
-
-    if (allFQDNData?.length == 0) {
-      toast.error('FQDN Values Must at least be 3 characters')
-
-      return
-    } else {
-      console.log('allFQDNData', allFQDNData)
-
-      //handleDataSubmit
-      const promiseArray: any[] = []
-      allFQDNData?.map((data: FQDNData) => {
-        const type = data.name as 'Api' | 'Photo' | 'Streaming'
-        data.values.forEach(value => {
-          promiseArray.push({ site: siteID, name: value.value, type: type })
-        })
-      })
-
-      setIsLoading(true)
-      const promises = promiseArray.map((data: { name: string; site: number; type: string }) =>
-        fqdnM.mutateAsync({
-          data: {
-            site: data.site,
-            name: data.name,
-            type: data.type as 'Api' | 'Photo' | 'Streaming'
-          }
-        })
-      )
-      await Promise.all(promises)
-
-      setIsLoading(false)
-      setActiveStep(prevActiveStep => prevActiveStep + 1)
-      setTimeout(() => {
-        handleStepsReset()
-        handleClose()
-      }, 1500)
-    }
+    setTimeout(() => {
+      handleStepsReset()
+      handleClose()
+    }, 1500)
   }
 
   // ** SA Steps
@@ -184,7 +131,7 @@ const SADrawer = (props: SidebarAddUserType) => {
     {
       title: 'FQDNS Info',
       subtitle: 'Setup FQDNS',
-      component: <SAStepTwo siteID={siteID} ref={stepTwoRef} />
+      component: <SAStepTwo setIsLoading={setIsLoading} siteID={siteID} ref={stepTwoRef} handleNext={handleNext} />
     },
     {
       title: 'Integration',
@@ -204,7 +151,8 @@ const SADrawer = (props: SidebarAddUserType) => {
           handleNext={handleNext}
           setIsLoading={setIsLoading}
         />
-      )
+      ),
+      hideStepperButton : true
     }
   ]
 
@@ -242,7 +190,7 @@ const SADrawer = (props: SidebarAddUserType) => {
                     {!isLoading ? (
                       <>
                         {step.component}
-                        {index > 0 && (
+                        { step.hideStepperButton == undefined || false && index > 0 && (
                           <div className='button-wrapper' style={{ paddingTop: '1rem', textAlign: 'center' }}>
                             <Button
                               style={styles.cancelButton}
