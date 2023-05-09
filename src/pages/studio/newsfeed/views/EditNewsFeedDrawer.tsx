@@ -12,6 +12,7 @@ import Box, { BoxProps } from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
 import Stack from '@mui/material/Stack'
 import Chip from '@mui/material/Chip'
+import Autocomplete from '@mui/material/Autocomplete'
 
 // ** Third Party Imports
 import { useForm } from 'react-hook-form'
@@ -31,20 +32,13 @@ import { CircularProgress } from '@mui/material'
 
 import { useTranslateString } from '@/utils/TranslateString';
 
+// ** Base Links
+import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+
 interface SidebarEditType {
   open: boolean
   toggle: () => void
   row: IFeedStory
-}
-
-interface FormsData {
-  work_id: string
-  title?: string
-  description?: string
-  thumbnail?: string
-  tagTextField: string
-  tags: string[]
-  groups?: string[]
 }
 
 const VideoBox = styled(Box)(({ theme }) => ({
@@ -106,51 +100,33 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
     watch,
     setError,
     formState: { errors }
-  } = useForm<FormsData>({
-    mode: 'onBlur'
+  } = useForm<IFeedStory>({
+    mode: 'onBlur',
+    defaultValues : {
+      tags : row.tags
+    }
   })
 
-  const onSubmit = (data: FormsData) => {
+  const onSubmit = (data: IFeedStory) => {
 
   }
 
   const handleClose = () => {
+    reset()
     toggle()
   }
 
-  const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.code == 'Enter') {
-      // handle add to Chip
-      let tagWord = (e.target as HTMLInputElement).value as string
-      let hasDuplicate = watch('tags')?.includes(tagWord)
 
-      if (hasDuplicate || tagWord == '') {
-        //handle Errors
-        toast.error('The tag you entered already exists')
-        setError('tags', { type: 'custom', message: 'Tag cannot empty or duplicate' })
-        e.preventDefault()
-      } else {
-        let insertTagArray = [tagWord]
-        let newTagsArray = ( getValues('tags') == undefined )  ? [ ...insertTagArray ] :  [...getValues('tags'), ...insertTagArray]
-        setValue('tags', newTagsArray)
-        //reset multiTags
-        resetField('tagTextField')
-        e.preventDefault()
-      }
-    }
-  }
-
-  const handleTagDelete = (tag: string) => {
-    let filteredTags = getValues('tags')?.filter(e => e !== tag)
-    setValue('tags', filteredTags as [])
-  }
 
   // manually set the default values
   // because useForm caches the defaults on first render
   React.useEffect(() => {
 
     //setValues
+    console.log('CALL THIS tags',row.tags)
 
+    setValue('tags', row?.tags)
+    setValue('string_story', row?.string_story)
 
   }, [row])
 
@@ -164,59 +140,62 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
         open={open}
         anchor='right'
         variant='temporary'
-        onClose={handleClose}
         ModalProps={{ keepMounted: true }}
         sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
       >
         <Header>
-          <Typography variant='h6'>{row.string_story}</Typography>
+          <Typography variant='h6'>Edit Feed</Typography>
           <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
             <Icon icon='mdi:close' fontSize={20} />
           </IconButton>
         </Header>
-        {/* <Box>
-          <VideoBox>
-            <ReactPlayer className='reactPlayer' width='100%' height='100%' controls={true} url={row.} />
-          </VideoBox>
-        </Box> */}
+        {
+          row?.type?.includes('video') &&
+          <Box>
+            <VideoBox>
+              <ReactPlayer className='reactPlayer' width='100%' height='100%' controls={true} url={ STREAMING_SERVER_URL + row.videos.url} />
+            </VideoBox>
+          </Box>
+        }
+        
         <Box sx={{ p: 5 }}>
-          {/* <form onSubmit={event => event.preventDefault()}>
+          <form onSubmit={event => event.preventDefault()}>
             <FormControl fullWidth sx={{ mb: 6 }}>
               <TextField
-                {...register('title')}
+                {...register('string_story')}
                 label={TranslateString('Title')}
-                placeholder='Title'
-                defaultValue={row.title}
-                error={Boolean(errors.title)}
+                placeholder='Story'
+                defaultValue={row.string_story}
+                error={Boolean(errors.string_story)}
+                multiline={true}
+                rows={5}
               />
             </FormControl>
 
-            <FormControl fullWidth sx={{ mb: 6 }}>
-              <TextField
-                {...register('description')}
-                label={TranslateString('Description')}
-                placeholder='Description'
-                defaultValue={row.description}
-                error={Boolean(errors.description)}
-              />
-            </FormControl>
 
-            <FormControl fullWidth sx={{ mb: 6 }}>
-              {errors.tags && <p style={{ color: 'red' }}>{errors.tags.message}</p>}
-              <TextField
-                sx={{ mb: 5 }}
-                placeholder={TranslateString('Type your tag then press enter')}
-                {...register('tagTextField')}
-                onKeyDown={e => {
-                  handleTagPressEnter(e)
-                }}
+            <Autocomplete
+                multiple
+                options={[]}
+                freeSolo
+                defaultValue={row?.tags || null}
+                sx={{ mb:10 }}
+                onChange={( event, value )=>{ setValue('tags', value as string[]) }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => 
+                  <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+                }
+                renderInput={params => (
+                  <TextField
+                    sx={{
+                      backgroundColor: theme => theme.palette.background.paper,
+                      borderRadius: '8px'
+                    }}
+                    {...params}
+                    {...register('tags')}
+                  />
+                )}
               />
 
-              <Stack flexWrap='wrap' direction='row' spacing={1} rowGap={2}>
-                {watch('tags') &&
-                  getValues('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
-              </Stack>
-            </FormControl>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button
@@ -241,7 +220,7 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                 {TranslateString("Cancel")}
               </Button>
             </Box>
-          </form> */}
+          </form>
         </Box>
       </Drawer>
     )
