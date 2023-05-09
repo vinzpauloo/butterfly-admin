@@ -58,8 +58,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const SADrawer = (props: SidebarAddUserType) => {
   // ** State
   const defaultStateValues = {
-    step: 1,
-    siteID: 2
+    step: 0,
+    siteID: null
   }
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [activeStep, setActiveStep] = useState<number>(defaultStateValues.step)

@@ -72,7 +72,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
       : false
 
     if (hasEmptyvalues) {
-      alert('DONT SUBMIT')
+      console.log('has empty values dont submit')
       return
     }
 
