@@ -1,6 +1,9 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { DataGrid } from '@mui/x-data-grid'
 
@@ -14,10 +17,14 @@ import { useQuery } from '@tanstack/react-query'
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
 import { useAuth } from '@/services/useAuth'
+import { captureError } from '@/services/Sentry'
 
 type SortType = 'asc' | 'desc' | undefined | null
 
 const VersionsTable = () => {
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   const { selectedSite } = useSiteContext()
   const { getAllApks } = ApkService()
   const { columns } = MenuItemData()
@@ -48,6 +55,16 @@ const VersionsTable = () => {
       }),
     onSuccess: (data: any) => {
       setRowData(data?.data)
+    },
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} getAllApks() VersionsTable`)
+        })
+      }
     }
   })
 

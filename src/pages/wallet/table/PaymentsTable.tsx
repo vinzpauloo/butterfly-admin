@@ -1,6 +1,9 @@
 // ** React Imports
 import React, { useState } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { DataGrid } from '@mui/x-data-grid'
 
@@ -12,12 +15,15 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { WalletService } from '@/services/api/WalletService'
+import { captureError } from '@/services/Sentry'
 
 type SortType = 'asc' | 'desc' | undefined | null
 
 const PaymentTable = () => {
   const { getAllWallet } = WalletService()
   const { columns } = PaymentsColumns()
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   const [rowData, setRowData] = useState<[]>([])
 
@@ -36,6 +42,16 @@ const PaymentTable = () => {
     onSuccess: (data: any) => {
       setRowData(data?.data)
       console.log(data?.data)
+    },
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} getAllWallet() PaymentsTable`)
+        })
+      }
     }
   })
 

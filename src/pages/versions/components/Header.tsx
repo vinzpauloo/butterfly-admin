@@ -1,6 +1,9 @@
 // ** React Imports
 import React, { useState } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { Box, FormControl, InputLabel, MenuItem, Select, Typography, Button } from '@mui/material'
 import { SelectChangeEvent } from '@mui/material/Select'
@@ -18,6 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import { captureError } from '@/services/Sentry'
 
 interface SiteNameProps {
   name: string
@@ -26,6 +30,9 @@ interface SiteNameProps {
 }
 
 const Header = () => {
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   const { selectedSite, setSelectedSite } = useSiteContext()
   const [openDrawer, setOpenDrawer] = useState(false)
   const [siteName, setSiteName] = useState<SiteNameProps[]>([])
@@ -46,6 +53,16 @@ const Header = () => {
     queryFn: () => getAllSites(),
     onSuccess: (data: any) => {
       setSiteName(data)
+    },
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, getAllSites() Versions Header component`)
+        })
+      }
     }
   })
 

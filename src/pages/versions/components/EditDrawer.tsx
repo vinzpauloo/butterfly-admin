@@ -1,6 +1,9 @@
 // ** React Imports
 import { useEffect, useState } from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography, MenuItem } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -22,8 +25,9 @@ import { useSiteContext } from '../../../context/SiteContext'
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Hooks
+// ** Hooks/Services Imports
 import { ApkService } from '@/services/api/ApkService'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   [key: string]: any
@@ -62,6 +66,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const EditVersionDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   // ** Props
   const { open, toggle, id, rowData } = props
@@ -144,8 +150,15 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
         // Re-fetches UserTable and CSV exportation
         queryClient.invalidateQueries({ queryKey: ['allApk'] })
       }, 1500)
-    } catch (e) {
-      console.log(`Error`, e)
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} editAPK() Edit Versions Drawer`)
+        })
+      }
     }
   }
 
