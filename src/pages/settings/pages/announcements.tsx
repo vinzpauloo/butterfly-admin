@@ -128,20 +128,44 @@ const Announcements = () => {
   }
 
   const activateDeactivateAnnouncement = (id: string, active: boolean) => {
-    mutateUpdateAnnouncement({
-      announcementID: id,
-      data: {
-        active: active === true ? 1 : 0,
-        _method: 'put'
+    try {
+      mutateUpdateAnnouncement({
+        announcementID: id,
+        data: {
+          active: active === true ? 1 : 0,
+          _method: 'put'
+        }
+      })
+    } catch (e: any) {
+      const {
+        data: { error, message }
+      } = e
+
+      const errorsToCapture = error || message
+
+      for (const key in errorsToCapture) {
+        errorsToCapture[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, updateAnnouncement() announcements.tsx`)
+        })
       }
-    })
+    }
   }
 
   const deleteSpecificAnnouncement = (id: string) => {
     try {
       mutateDeleteAnnouncement({ announcementID: id })
-    } catch (error) {
-      console.log(`ERROR`, error)
+    } catch (e: any) {
+      const {
+        data: { error, message }
+      } = e
+
+      const errorsToCapture = error || message
+
+      for (const key in errorsToCapture) {
+        errorsToCapture[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, deleteAnnouncement() announcements.tsx`)
+        })
+      }
     }
   }
 
