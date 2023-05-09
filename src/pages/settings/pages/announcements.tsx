@@ -1,19 +1,34 @@
+// ** React Imports
 import React, { useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
+
+// ** MUI Imports
 import { Box, Card, Grid, Divider, Typography, Button, Switch, Stack, IconButton } from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import AnnouncementModal from '../components/modal/AnnouncementModal'
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import { GridRenderCellParams } from '@mui/x-data-grid'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+
+// ** Project/Other Imports
+import AnnouncementModal from '../components/modal/AnnouncementModal'
 import Translations from '../../../layouts/components/Translations'
+
+// ** TanStack Imports
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
 import AnnouncementsService from '../../../services/api/AnnouncementsService'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { captureError } from '@/services/Sentry'
 
 const Announcements = () => {
   // in case pagination is added on backend
   // const [pageSize, setPageSize] = useState<number>(5)
   // const [rowCount, setRowCount] = useState<number>(0)
   // const [page, setPage] = useState<number>(1)
+
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
@@ -37,7 +52,7 @@ const Announcements = () => {
       setData(data?.data)
     },
     onError: error => {
-      console.log(error)
+      captureError(currentLocation, `${error} getAllAnnouncement()`)
     }
   })
 
@@ -47,17 +62,36 @@ const Announcements = () => {
   const { mutate: mutateUpdateAnnouncement, isLoading: updateLoading } = useMutation(updateAnnouncement, {
     onSuccess: data => {
       console.log(data)
-      queryClient.invalidateQueries({queryKey: ['allAnnouncement']})
+      queryClient.invalidateQueries({ queryKey: ['allAnnouncement'] })
     },
-    onError: error => {console.log(error)}
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, updateAnnouncement()`)
+        })
+      }
+    }
   })
 
   const { mutate: mutateDeleteAnnouncement, isLoading: deleteLoading } = useMutation(deleteAnnouncement, {
     onSuccess: data => {
       console.log(data)
-      queryClient.invalidateQueries({queryKey: ['allAnnouncement']})
+      queryClient.invalidateQueries({ queryKey: ['allAnnouncement'] })
     },
-    onError: error => {console.log(error)}
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, deleteAnnouncement()`)
+          console.log(`DELETE ERROR`, value)
+        })
+      }
+    }
   })
 
   const openEditModal = (
@@ -104,7 +138,11 @@ const Announcements = () => {
   }
 
   const deleteSpecificAnnouncement = (id: string) => {
-    mutateDeleteAnnouncement({announcementID: id,})
+    try {
+      mutateDeleteAnnouncement({ announcementID: id })
+    } catch (error) {
+      console.log(`ERROR`, error)
+    }
   }
 
   const columns: GridColDef[] = [
@@ -144,16 +182,19 @@ const Announcements = () => {
       disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams) => (
         <Stack direction='row'>
-          <IconButton onClick={() =>
-            openEditModal(
-              params.row.site_id,
-              params.row._id,
-              params.row.title,
-              params.row.description,
-              params.row.start_date,
-              params.row.end_date,
-              params.row.active
-            )}>
+          <IconButton
+            onClick={() =>
+              openEditModal(
+                params.row.site_id,
+                params.row._id,
+                params.row.title,
+                params.row.description,
+                params.row.start_date,
+                params.row.end_date,
+                params.row.active
+              )
+            }
+          >
             <EditOutlinedIcon color='secondary' />
           </IconButton>
           <IconButton onClick={() => deleteSpecificAnnouncement(params.row._id)}>
