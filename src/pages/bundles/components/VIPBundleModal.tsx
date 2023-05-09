@@ -1,17 +1,28 @@
+// ** React Imports
 import React, { useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
+
+// ** MUI Imports
+import { Button, CircularProgress, Icon, IconProps, Menu, MenuItem, Switch, TextField } from '@mui/material'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import Stack, { StackProps } from '@mui/material/Stack'
 import Grid, { GridProps } from '@mui/material/Grid'
-import { Icon, IconProps, Menu, MenuItem } from '@mui/material'
-import IconList from './IconList'
-import Switch from '@mui/material/Switch'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-import BundlesService from '@/services/api/BundlesService'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useTranslateString } from '@/utils/TranslateString'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+
+// ** Project/Other Imports
+import IconList from './IconList'
+
+// ** Utils Imports
+import { useTranslateString } from '@/utils/TranslateString'
+
+// ** TanStack Imports
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
+import BundlesService from '@/services/api/BundlesService'
+import { captureError } from '@/services/Sentry'
 
 type Props = {
   isEditingVIPBundle?: boolean
@@ -34,6 +45,9 @@ type Props = {
 }
 
 const VIPBundleModal = (props: Props) => {
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   const [bundleName, setBundleName] = useState(props.bundleName ?? '')
   const [bundleNameError, setBundleNameError] = useState(false)
 
@@ -117,7 +131,7 @@ const VIPBundleModal = (props: Props) => {
     { duration: '1 Month', days: 31 },
     { duration: '3 Months', days: 92 },
     { duration: '6 Months', days: 182 },
-    { duration: '1 Year', days: 365 },
+    { duration: '1 Year', days: 365 }
   ]
 
   const validateInputs = () => {
@@ -161,8 +175,15 @@ const VIPBundleModal = (props: Props) => {
       })
       props.onClose()
     },
-    onError: error => {
-      alert(error)
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, addVIPBundle() VIP Modal`)
+        })
+      }
     }
   })
 
@@ -178,8 +199,15 @@ const VIPBundleModal = (props: Props) => {
       })
       props.onClose()
     },
-    onError: error => {
-      alert(error)
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value}, editVIPBundle() VIP Modal`)
+        })
+      }
     }
   })
 
@@ -244,9 +272,14 @@ const VIPBundleModal = (props: Props) => {
       </Typography>
       <Stack flexDirection='column' gap={2} sx={loadingStyle} width={300}>
         {isBeingAddedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
-        {props.isEditingVIPBundle ?
+        {props.isEditingVIPBundle ? (
           <Stack alignItems='flex-start'>
-            <Button variant='contained' color='secondary' onClick={openDurationMenu} endIcon={<KeyboardArrowDownIcon />}>
+            <Button
+              variant='contained'
+              color='secondary'
+              onClick={openDurationMenu}
+              endIcon={<KeyboardArrowDownIcon />}
+            >
               Duration: {bundleDurations[selectedDurationIndex].duration}
             </Button>
             <Menu anchorEl={durationAnchorEl} open={isDurationMenuOpen} onClose={closeDurationMenu}>
@@ -262,7 +295,8 @@ const VIPBundleModal = (props: Props) => {
                 </MenuItem>
               ))}
             </Menu>
-          </Stack> : (
+          </Stack>
+        ) : (
           <Stack gap={2} alignItems='flex-start'>
             <Button variant='contained' color='primary' onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>
               Site ID: {selectedSiteID}
@@ -288,7 +322,12 @@ const VIPBundleModal = (props: Props) => {
                 </MenuItem>
               ))}
             </Menu>
-            <Button variant='contained' color='secondary' onClick={openDurationMenu} endIcon={<KeyboardArrowDownIcon />}>
+            <Button
+              variant='contained'
+              color='secondary'
+              onClick={openDurationMenu}
+              endIcon={<KeyboardArrowDownIcon />}
+            >
               Duration: {bundleDurations[selectedDurationIndex].duration}
             </Button>
             <Menu anchorEl={durationAnchorEl} open={isDurationMenuOpen} onClose={closeDurationMenu}>
