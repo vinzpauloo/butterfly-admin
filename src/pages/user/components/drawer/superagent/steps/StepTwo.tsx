@@ -24,8 +24,8 @@ type SAStepTwoProps = {
 }
 
 export type FQDNData = {
-  name: string
-  values: [{ value: string }]
+  site: number
+  fqdns: [{ name: string, type : string }]
 }
 
 const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: any) => {
@@ -77,50 +77,36 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
     }
 
     // structure
-    allDataArray.push({ name: 'API', values: formAPIRef.current.getFormData() })
-    allDataArray.push({ name: 'Photo', values: formPhotosRef.current.getFormData() })
-    allDataArray.push({ name: 'Streaming', values: formStreamRef.current.getFormData() })
+    const apiArray = formAPIRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'API'} ) ) 
+    const photoArray = formPhotosRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'Photo'} ) ) 
+    const streamingArray = formStreamRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'Streaming'} ) ) 
+    const fqdnsObject = { "site" : siteID,"fqdns" : [ ...apiArray, ...photoArray, ...streamingArray ] }
 
-    console.log('START SUBMIT', allDataArray)
+    console.log('START SUBMIT fqdnsObject', fqdnsObject)
 
     //submit FQDN
-    submitFQDN(allDataArray)
+    submitFQDN(fqdnsObject as FQDNData)
   }
 
-  const submitFQDN = async (allDataArray: FQDNData[]) => {
-    const allFQDNData = allDataArray
-    console.log('SUBMIT THIS FQDN', allFQDNData)
+  const submitFQDN = async (fqdnsObject  : FQDNData) => {
 
     // start stepper loader
     setIsLoading(true)
 
     //Do submissions!!
 
-    if (allFQDNData?.length == 0) {
-      toast.error('FQDN Values Must at least be 3 characters')
+    if (Object.keys(fqdnsObject)?.length == 0) {
+      toast.error('FQDN is required')
       return
     } else {
-      console.log('allFQDNData', allFQDNData)
-
-      const promiseArray: any[] = []
-      allFQDNData?.map((data: FQDNData) => {
-        const type = data.name as 'Api' | 'Photo' | 'Streaming'
-        data.values.forEach(value => {
-          promiseArray.push({ site: siteID, name: value.value, type: type })
-        })
-      })
+      console.log('allFQDNData', fqdnsObject)
 
       setIsLoading(true)
-      const promises = promiseArray.map((data: { name: string; site: number; type: string }) =>
-        fqdnM.mutateAsync({
-          data: {
-            site: data.site,
-            name: data.name,
-            type: data.type as 'Api' | 'Photo' | 'Streaming'
-          }
-        })
-      )
-      await Promise.all(promises)
+
+      await fqdnM.mutateAsync({
+        data: fqdnsObject
+      })
+      
     }
 
     setTimeout(() => {
