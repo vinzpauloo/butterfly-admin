@@ -1,5 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
+import toast from 'react-hot-toast'
 
 // ** Next Imports
 import { useRouter } from 'next/router'
@@ -177,11 +178,21 @@ const VIPBundleModal = (props: Props) => {
     },
     onError: (e: any) => {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, addVIPBundle() VIP Modal`)
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value}, addVIPBundle() VIP Modal`)
+            toast.error(`Error ${value}`, {
+              duration: 2000
+            })
+          })
+        }
+      } else if (message) {
+        captureError(currentLocation, `${message}, addVIPBundle() VIP Modal`)
+        toast.error(`Error ${message}`, {
+          duration: 2000
         })
       }
     }
@@ -201,11 +212,21 @@ const VIPBundleModal = (props: Props) => {
     },
     onError: (e: any) => {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, editVIPBundle() VIP Modal`)
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value}, editVIPBundle() VIP Modal`)
+            toast.error(`Error ${value}`, {
+              duration: 2000
+            })
+          })
+        }
+      } else if (message) {
+        captureError(currentLocation, `${message}, editVIPBundle() VIP Modal`)
+        toast.error(`Error ${message}`, {
+          duration: 2000
         })
       }
     }
