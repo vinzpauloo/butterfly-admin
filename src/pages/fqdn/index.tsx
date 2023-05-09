@@ -17,10 +17,17 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   display: 'flex'
 })
 
+type response = {
+  id: number
+  site_id: number
+  name: string
+  type: 'Api' | 'Streaming' | 'Photo'  
+}
+
 const FQDN = () => {
-  const [APIFQDNS, setAPIFQDNS] = useState<any>([])
-  const [streamingFQDNS, setStreamingFQDNS] = useState<any>([])
-  const [photosFQDNS, setPhotosFQDNS] = useState<any>([])
+  const [APIFQDNS, setAPIFQDNS] = useState<response[]>([])
+  const [streamingFQDNS, setStreamingFQDNS] = useState<response[]>([])
+  const [photosFQDNS, setPhotosFQDNS] = useState<response[]>([])
   const auth = useAuth()
 
   const { getFQDNList } = FQDNService()
@@ -32,9 +39,9 @@ const FQDN = () => {
      }),
     onSuccess: data => {
       console.log(data?.data)
-      setAPIFQDNS(data?.data?.filter((item: any) => item?.type === 'Api'))
-      setStreamingFQDNS(data?.data?.filter((item: any) => item?.type === 'Streaming'))
-      setPhotosFQDNS(data?.data?.filter((item: any) => item?.type === 'Photo'))
+      setAPIFQDNS(data?.data?.filter((item: response) => item?.type === 'Api'))
+      setStreamingFQDNS(data?.data?.filter((item: response) => item?.type === 'Streaming'))
+      setPhotosFQDNS(data?.data?.filter((item: response) => item?.type === 'Photo'))
     },
     onError: error => { console.log(error) }
   })
