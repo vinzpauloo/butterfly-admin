@@ -185,7 +185,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
               }}
               sx={{ ml: 4 }}
             >
-              Next
+              Save and Continue
             </Button>
           </div>
         </Box>
