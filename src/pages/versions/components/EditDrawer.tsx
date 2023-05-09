@@ -72,13 +72,15 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
   // ** Props
   const { open, toggle, id, rowData } = props
 
+  const { selectedSite } = useSiteContext()
+
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
+  const [errorResponse, setErrorResponse] = useState<string>()
 
   const {
     control,
     handleSubmit,
-    reset,
     formState: { errors },
     setValue
   } = useForm<FormValues>({
@@ -100,16 +102,6 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
     }
   }, [rowData, setValue])
 
-  const resetForm = () => {
-    reset({
-      download_link: '',
-      os: '',
-      version: '',
-      patch_notes: '',
-      name: ''
-    })
-  }
-
   const { editAPK } = ApkService()
   const mutation = useMutation(async (data: { id: any; data: any }) => {
     const response = await editAPK(data.id, data.data)
@@ -117,8 +109,6 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
       await response.json()
     }
   })
-
-  const { selectedSite } = useSiteContext()
 
   const handleFormSubmit = async (data: FormValues) => {
     const formData = new FormData()
@@ -152,12 +142,18 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
       }, 1500)
     } catch (e: any) {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} editAPK() Edit Versions Drawer`)
-        })
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            setErrorResponse(value)
+            captureError(currentLocation, `${value}, editAPK() Edit Versions`)
+          })
+        }
+      } else if (message) {
+        setErrorResponse(message)
+        captureError(currentLocation, `${message}, editAPK() Edit Versions`)
       }
     }
   }
@@ -165,8 +161,8 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
   const [resetKey, setResetKey] = useState(0)
 
   const handleClose = () => {
-    resetForm()
     setResetKey(prevKey => prevKey + 1)
+    setErrorResponse('')
     toggle()
   }
 
@@ -295,6 +291,9 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
                     )}
                   />
                 </Box>
+
+                <Typography color='error'>{errorResponse}</Typography>
+
                 <Box sx={styles.formButtonContainer}>
                   <Box>
                     <Button sx={styles.cancelButton} onClick={handleClose}>
