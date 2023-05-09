@@ -1,5 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
+import toast from 'react-hot-toast'
 
 // ** Next Imports
 import { useRouter } from 'next/router'
@@ -74,11 +75,21 @@ const GoldCoinBundleModal = (props: Props) => {
     },
     onError: (e: any) => {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, addCoinsBundle() GoldCoinBundleModal`)
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value}, addCoinsBundle() GoldCoinBundleModal`)
+            toast.error(`ERROR: ${value}`, {
+              duration: 2000
+            })
+          })
+        }
+      } else if (message) {
+        captureError(currentLocation, `${message}, addCoinsBundle() GoldCoinBundleModal`)
+        toast.error(`ERROR: ${message}`, {
+          duration: 2000
         })
       }
     }
@@ -98,11 +109,21 @@ const GoldCoinBundleModal = (props: Props) => {
     },
     onError: (e: any) => {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, editCoinsBundle() GoldCoinBundleModal`)
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value}, editCoinsBundle() GoldCoinBundleModal`)
+            toast.error(`ERROR: ${value}`, {
+              duration: 2000
+            })
+          })
+        }
+      } else if (message) {
+        captureError(currentLocation, `${message}, editCoinsBundle() GoldCoinBundleModal`)
+        toast.error(`ERROR: ${message}`, {
+          duration: 2000
         })
       }
     }
