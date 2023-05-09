@@ -37,11 +37,13 @@ const Advertisements = () => {
     setTabIndex(newValue)
   }
 
+  const selectedLanguage = window.localStorage.getItem("i18nextLng")
+
   // FETCH ALL ADMIN ADVERTISEMENT
   const { getAllAdminAds } = AdvertisementService()
   const { isLoading, data } = useQuery({
-    queryKey: ['allAdvertisement'],
-    queryFn: () => getAllAdminAds({ data: {} }),
+    queryKey: ['allAdvertisement', selectedLanguage],
+    queryFn: () => getAllAdminAds({ data: { language: `${selectedLanguage}` } }),
     onSuccess: data => {
       console.log('ADMIN ADS FETCHED', data)
     },
