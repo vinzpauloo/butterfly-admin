@@ -1,6 +1,7 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
+import toast from 'react-hot-toast'
 
 // ** Next Imports
 import Image from 'next/image'
@@ -179,11 +180,21 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     },
     onError: (e: any) => {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, createNewAds() Create Banner Ads`)
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value}, createNewAds() Create Banner Ads`)
+            toast.error(`ERROR: ${value}`, {
+              duration: 2000
+            })
+          })
+        }
+      } else if (message) {
+        captureError(currentLocation, `${message}, createNewAds() Create Banner Ads`)
+        toast.error(`ERROR: ${message}`, {
+          duration: 2000
         })
       }
     }
@@ -202,11 +213,21 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     },
     onError: (e: any) => {
       const {
-        data: { error }
+        data: { message, error }
       } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, updateAds() Edit Banner Ads`)
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value}, updateAds() Edit Banner Ads`)
+            toast.error(`ERROR: ${value}`, {
+              duration: 2000
+            })
+          })
+        }
+      } else if (message) {
+        captureError(currentLocation, `${message}, updateAds() Edit Banner Ads`)
+        toast.error(`ERROR: ${message}`, {
+          duration: 2000
         })
       }
     }
