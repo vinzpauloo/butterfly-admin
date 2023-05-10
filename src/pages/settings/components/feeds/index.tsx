@@ -15,9 +15,10 @@ import InputAdornment from '@mui/material/InputAdornment'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** API Imports
+// ** Hooks/Services Imports
 import { useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import FeedsService from '@/services/api/FeedsService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** Utils
 import createSkeleton from '@/utils/createSkeleton'
@@ -27,6 +28,7 @@ import EditNewsFeedDrawer from '@/pages/studio/newsfeed/views/EditNewsFeedDrawer
 
 // ** Types
 import { IFeedStory } from '@/context/types'
+
 interface IFeedButton {
   title: string
   param: {
@@ -61,6 +63,7 @@ type Props = {
 const defaultParams = { with: 'user', page: 1, approval: 'Approved' }
 
 const SelectFeaturedFeeds = (props: Props) => {
+  const { handleError } = useErrorHandling()
   // ** States
   const [activeTab, setActiveTab] = React.useState<number>(0)
   const [feedParams, setFeedParams] = React.useState<{}>({ ...defaultParams, story_feeds_only: true })
@@ -91,6 +94,9 @@ const SelectFeaturedFeeds = (props: Props) => {
     },
     queryFn: ({ pageParam = { ...feedParams } }) => {
       return getFeeds(pageParam)
+    },
+    onError: (e: any) => {
+      handleError(e, `getFeeds() SelectFeaturedFeeds`)
     }
   })
 

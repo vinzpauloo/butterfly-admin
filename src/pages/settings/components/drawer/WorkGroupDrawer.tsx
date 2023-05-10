@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 
 // ** Next Imports
-import { useRouter } from 'next/router'
 import Image from 'next/image'
 
 // ** MUI Imports
@@ -20,7 +19,6 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
-import CustomAvatar from 'src/@core/components/mui/avatar'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 
 // ** Third Party Imports
@@ -33,18 +31,19 @@ import Icon from 'src/@core/components/icon'
 
 // ** Hooks/Services Imports
 import WorkgroupService from '@/services/api/Workgroup'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** TanStack Imports
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-// ** Utils Imports
+// ** Utils/Lib Imports
 import { useTranslateString } from '@/utils/TranslateString'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** Project/Other Imports
 import Translations from '@/layouts/components/Translations'
 import WorkList from '../modal/WorkList'
-import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import CustomAvatar from 'src/@core/components/mui/avatar'
 
 const navData = [
   {
@@ -194,11 +193,11 @@ const RandomVideoPicker = (num: number, all: string[]) => {
 // ** title -> to set a default value for the edit
 // ** setTitle -> to reset the title
 const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: any) => {
-  // ** State
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const currentLocation = router.asPath
 
+  const { handleError, getErrorResponse } = useErrorHandling()
+
+  // ** State
   const [navbar, setNavbar] = useState<string>('selection') // ** default value
   const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
@@ -233,15 +232,18 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       setPage(data.current_page)
       setRowCount(data.total)
     },
-    onError: (err: any) => {
-      captureError(currentLocation, `${err} getAllWorkgroup() Workgroup Drawer`)
+    onError: (e: any) => {
+      handleError(e, `getAllWorkgroup() WorkGroupDrawer`)
     },
     enabled: header === 'Edit'
   })
 
   // ** use to PUT or update the workgroup
   const { mutate: mutateEditWorkgroup } = useMutation(putWorkgroup, {
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['search-workgroup'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['search-workgroup'] }),
+    onError: (e: any) => {
+      handleError(e, `putWorkgroup() WorkGroupDrawer`)
+    }
   })
 
   // @ts-ignore
@@ -325,8 +327,8 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       setNavbar('selection')
       setData([])
       setOpen(false)
-    } catch (err) {
-      captureError(currentLocation, `${err} WorkGroups putWorkGroup()`)
+    } catch (e: any) {
+      handleError(e, `putWorkgroup(), onSubmit function of WorkGroupDrawer`)
     }
   }
 
@@ -455,6 +457,10 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 disableColumnMenu
               />
             </Box>
+
+            {/* Error messages from backend */}
+            {getErrorResponse(12)}
+
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {header === 'Edit' ? (
                 <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>

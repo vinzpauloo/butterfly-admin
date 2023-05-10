@@ -1,11 +1,9 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
-import toast from 'react-hot-toast'
 
 // ** Next Imports
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import {
@@ -40,7 +38,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import AdvertisementService from '@/services/api/AdvertisementService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface ModalProps {
   isOpen: boolean
@@ -75,8 +73,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
     state.setAdsPhotoURL
   ])
 
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError, getErrorResponse } = useErrorHandling()
 
   // if creating new ads used this value, if editing use global store
   const [newAdsStartDate, setNewAdsStartDate] = useState<Date>(new Date())
@@ -179,24 +176,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setAdsPhotoURL('')
     },
     onError: (e: any) => {
-      const {
-        data: { message, error }
-      } = e
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            captureError(currentLocation, `${value}, createNewAds() Create Banner Ads`)
-            toast.error(`ERROR: ${value}`, {
-              duration: 2000
-            })
-          })
-        }
-      } else if (message) {
-        captureError(currentLocation, `${message}, createNewAds() Create Banner Ads`)
-        toast.error(`ERROR: ${message}`, {
-          duration: 2000
-        })
-      }
+      handleError(e, `createNewAds() AdvertisementModal`)
     }
   })
 
@@ -212,24 +192,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setAdsPhotoURL('')
     },
     onError: (e: any) => {
-      const {
-        data: { message, error }
-      } = e
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            captureError(currentLocation, `${value}, updateAds() Edit Banner Ads`)
-            toast.error(`ERROR: ${value}`, {
-              duration: 2000
-            })
-          })
-        }
-      } else if (message) {
-        captureError(currentLocation, `${message}, updateAds() Edit Banner Ads`)
-        toast.error(`ERROR: ${message}`, {
-          duration: 2000
-        })
-      }
+      handleError(e, `updateAds() AdvertisementModal`)
     }
   })
 
@@ -245,14 +208,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
       setAdsPhotoURL('')
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, deleteAds() Delete Banner Ads`)
-        })
-      }
+      handleError(e, `deleteAds() AdvertisementModal`)
     }
   })
 
@@ -428,6 +384,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                   }}
                 />
               </Box>
+              {getErrorResponse(12)}
               <Box sx={styles.bottomBtnWrapper}>
                 <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={props.onClose}>
                   <Translations text='Cancel' />

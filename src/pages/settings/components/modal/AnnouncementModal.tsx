@@ -2,9 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import {
   Box,
@@ -37,7 +34,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 // ** Hooks/Services Imports
 import AnnouncementsService from '@/services/api/AnnouncementsService'
 import SitesService from '@/services/api/SitesService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface ModalProps {
   isOpen: boolean
@@ -55,8 +52,7 @@ interface ModalProps {
 }
 
 const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, modalInfo }) => {
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
@@ -134,15 +130,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
       setUniqueSites(data?.data)
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, getSitesList()`)
-          console.log(value)
-        })
-      }
+      handleError(e, `getSitesList() AnnouncementModal`)
     }
   })
 
@@ -159,15 +147,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
       onClose()
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, createAnnouncement()`)
-          console.log(value)
-        })
-      }
+      handleError(e, `createAnnouncement() AnnouncementModal`)
     }
   })
 
@@ -180,15 +160,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
       onClose()
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, updateAnnouncement()`)
-          console.log(value)
-        })
-      }
+      handleError(e, `updateAnnouncement() AnnouncementModal`)
     }
   })
 
@@ -229,9 +201,15 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
 
   const isBeingAddedUpdated = addedLoading || updateLoading
 
+  // Function that closes the modal as well as clears the error messages
+  const handleClose = () => {
+    clearErrorResponse()
+    onClose()
+  }
+
   return (
     <DatePickerWrapper>
-      <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'lg'}>
+      <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth={'lg'}>
         <DialogContent sx={{ padding: 10 }}>
           <DialogTitle sx={styles.dialogTitle}>
             {isEditing ? <Translations text='Edit Announcement' /> : <Translations text='New Announcement' />}
@@ -345,6 +323,10 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                   label={<Translations text='Duration: Forever' />}
                 />
               </Box>
+
+              {/* Error messages from backend */}
+              {getErrorResponse(12)}
+
               <Box
                 sx={{
                   display: 'flex',
@@ -359,7 +341,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
                   sx={styles.buttons}
                   variant='outlined'
                   color='error'
-                  onClick={onClose}
+                  onClick={handleClose}
                 >
                   <Translations text='Cancel' />
                 </Button>

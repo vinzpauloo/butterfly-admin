@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { CircularProgress, Typography, Stack, Tabs, Tab } from '@mui/material'
 
@@ -17,15 +14,14 @@ import Translations from '@/layouts/components/Translations'
 
 // ** Hooks/Services Imports
 import AdvertisementService from '@/services/api/AdvertisementService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 const TabPanel = ({ children, index, value }: any) => {
   return <>{value === index && <Stack pt={4}>{children}</Stack>}</>
 }
 
 const Advertisements = () => {
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError } = useErrorHandling()
 
   const [open, setOpen] = useState(false)
   const handleClose = () => setOpen(false)
@@ -37,7 +33,7 @@ const Advertisements = () => {
     setTabIndex(newValue)
   }
 
-  const selectedLanguage = window.localStorage.getItem("i18nextLng")
+  const selectedLanguage = window.localStorage.getItem('i18nextLng')
 
   // FETCH ALL ADMIN ADVERTISEMENT
   const { getAllAdminAds } = AdvertisementService()
@@ -47,8 +43,8 @@ const Advertisements = () => {
     onSuccess: data => {
       console.log('ADMIN ADS FETCHED', data)
     },
-    onError: error => {
-      captureError(currentLocation, `${error} queryFn: getAllAdminAds() Advertisements`)
+    onError: (e: any) => {
+      handleError(e, `getAllAdminAds() ads.tsx Advertisements`)
     }
   })
 
