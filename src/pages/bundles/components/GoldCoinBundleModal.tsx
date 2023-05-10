@@ -246,11 +246,11 @@ const GoldCoinBundleModal = (props: Props) => {
             onChange={event => {setBundlePrice(event.target.value); setbundlePriceError(false)}}
             label={TranslateString('Gold Coin')}
           />
-          {props.isEditingGoldCoinBundle && bundlePrice < 200 ? (
+          {bundlePriceError && 
             <Typography variant='caption' color='error'>
               must be atleast 200
             </Typography>
-          ) : undefined}
+          }
         </Stack>
         <Stack {...cardContainer}>
           <TextField
