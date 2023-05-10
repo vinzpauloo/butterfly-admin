@@ -73,6 +73,8 @@ const VIPBundleModal = (props: Props) => {
   const [selectedSiteID, setSelectedSiteID] = useState(0)
   const [selectedDurationIndex, setSelectedDurationIndex] = useState(0)
 
+  const [errorResponse, setErrorResponse] = useState<string>()
+
   // SITE ID MENU
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const isMenuOpen = Boolean(anchorEl)
@@ -180,6 +182,8 @@ const VIPBundleModal = (props: Props) => {
       const {
         data: { message, error }
       } = e
+      const errorMessages: string[] = []
+
       if (error) {
         for (const key in error) {
           error[key].forEach((value: any) => {
@@ -187,6 +191,7 @@ const VIPBundleModal = (props: Props) => {
             toast.error(`Error ${value}`, {
               duration: 2000
             })
+            errorMessages.push(value)
           })
         }
       } else if (message) {
@@ -194,7 +199,10 @@ const VIPBundleModal = (props: Props) => {
         toast.error(`Error ${message}`, {
           duration: 2000
         })
+        errorMessages.push(message)
       }
+
+      setErrorResponse(errorMessages.join('\n'))
     }
   })
 
@@ -214,6 +222,8 @@ const VIPBundleModal = (props: Props) => {
       const {
         data: { message, error }
       } = e
+      const errorMessages: string[] = []
+
       if (error) {
         for (const key in error) {
           error[key].forEach((value: any) => {
@@ -221,6 +231,7 @@ const VIPBundleModal = (props: Props) => {
             toast.error(`Error ${value}`, {
               duration: 2000
             })
+            errorMessages.push(value)
           })
         }
       } else if (message) {
@@ -228,7 +239,10 @@ const VIPBundleModal = (props: Props) => {
         toast.error(`Error ${message}`, {
           duration: 2000
         })
+        errorMessages.push(message)
       }
+
+      setErrorResponse(errorMessages.join('\n'))
     }
   })
 
@@ -427,6 +441,19 @@ const VIPBundleModal = (props: Props) => {
           </Stack>
         </Stack>
       </Stack>
+
+      <Stack p={1} width={300} height='max-content'>
+        <Typography color='error'>
+          {errorResponse &&
+            errorResponse.split('\n').map((line, index) => (
+              <React.Fragment key={index}>
+                {line}
+                {index !== errorResponse.split('\n').length - 1 && <br />}
+              </React.Fragment>
+            ))}
+        </Typography>
+      </Stack>
+
       <Stack flexDirection='row' gap={2} mt={4}>
         <Button variant='contained' color='error' onClick={props.onClose} fullWidth>
           {TranslateString('Cancel')}
