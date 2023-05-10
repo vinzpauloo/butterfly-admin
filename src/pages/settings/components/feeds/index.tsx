@@ -29,6 +29,9 @@ import EditNewsFeedDrawer from '@/pages/studio/newsfeed/views/EditNewsFeedDrawer
 // ** Types
 import { IFeedStory } from '@/context/types'
 
+// ** global featured feed store
+import { useFeaturedFeedStore } from '@/zustand/featuredFeedGlobalStore'
+
 interface IFeedButton {
   title: string
   param: {
@@ -76,6 +79,9 @@ const SelectFeaturedFeeds = (props: Props) => {
     setOpen(!open)
   }
 
+  // ** Featured Feed Store
+  const { setFeed, toggleFeedModal } = useFeaturedFeedStore()
+
   // ** QueryAPI
   const { getFeeds } = FeedsService()
   const { isLoading, data, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } = useInfiniteQuery({
@@ -118,8 +124,12 @@ const SelectFeaturedFeeds = (props: Props) => {
   }
 
   const handleCardClick = (feed: IFeedStory) => {
-    
+    setFeed(feed)
   } 
+
+  const handleSelectFeed = () => {
+    toggleFeedModal()
+  }
 
   const getActiveTabContent = (step: number) => {
     if (data) {
@@ -137,6 +147,16 @@ const SelectFeaturedFeeds = (props: Props) => {
 
   return (
     <Box sx={{ marginInline: 'auto', marginTop: '2rem', paddingBottom: '4rem', alignItems: 'center' }}>
+      
+      <Box sx={{mb:10}}>
+        <form>
+          <Box sx={{ display:'flex', flexDirection:'row', justifyContent:'space-between' }}>
+            <TextField required label='Featured Feed Title' />
+            <Button sx={{minWidth : 100}} color='success' size='small' variant='contained' onClick={ handleSelectFeed }>Save</Button>
+          </Box>
+        </form>
+      </Box>
+
       <Box
         sx={{
           display: 'flex',
