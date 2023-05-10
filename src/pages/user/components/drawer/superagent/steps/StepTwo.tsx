@@ -25,7 +25,7 @@ type SAStepTwoProps = {
 
 export type FQDNData = {
   site: number
-  fqdns: [{ name: string, type : string }]
+  fqdns: {name?: string, type?: 'Api' | 'Streaming' | 'Photo'}[]
 }
 
 const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: any) => {
