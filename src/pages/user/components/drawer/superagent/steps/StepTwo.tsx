@@ -80,7 +80,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
     const apiArray = formAPIRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'API'} ) ) 
     const photoArray = formPhotosRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'Photo'} ) ) 
     const streamingArray = formStreamRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'Streaming'} ) ) 
-    const fqdnsObject = { "site" : siteID,"fqdns" : [ ...apiArray, ...photoArray, ...streamingArray ] }
+    const fqdnsObject = { "fqdns" : [ ...apiArray, ...photoArray, ...streamingArray ] }
 
     console.log('START SUBMIT fqdnsObject', fqdnsObject)
 
