@@ -50,15 +50,16 @@ const LinksContainer = (props: Props) => {
   }
 
   const addNewFQDNS = () => {
-    newInputs.map((item: string) => {
-      if (isValidUrl(item)) {
-        mutateAddFQDN({
-          data: {
-            site: auth?.user?.site,
-            name: item,
-            type: type
-          }
-        })
+    // create a new array of validated FQDNs
+    const newFQDNSArray: any = newInputs.map((item: string) => {
+      if (isValidUrl(item)) return { name: item, type: type }
+      else return null
+    })
+
+    mutateAddFQDN({
+      data: {
+        site: auth?.user?.site,
+        fqdns: newFQDNSArray
       }
     })
   }
