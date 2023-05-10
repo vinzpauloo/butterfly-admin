@@ -443,15 +443,15 @@ const VIPBundleModal = (props: Props) => {
       </Stack>
 
       <Stack p={1} width={300} height='max-content'>
-        <Typography color='error'>
-          {errorResponse &&
-            errorResponse.split('\n').map((line, index) => (
-              <React.Fragment key={index}>
-                {line}
-                {index !== errorResponse.split('\n').length - 1 && <br />}
-              </React.Fragment>
-            ))}
-        </Typography>
+        {errorResponse &&
+          errorResponse.split('\n').map((line, index) => (
+            <React.Fragment key={index}>
+              <Typography color='error' fontSize={10} margin='0.15em'>
+                {`***` + line}
+              </Typography>
+              {index !== errorResponse.split('\n').length - 1}
+            </React.Fragment>
+          ))}
       </Stack>
 
       <Stack flexDirection='row' gap={2} mt={4}>
