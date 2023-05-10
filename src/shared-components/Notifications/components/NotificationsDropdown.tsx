@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 import { styled, Theme } from '@mui/material/styles'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import formatDate from '@/utils/formatDate'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import NotificationService from '@/services/api/NotificationService'
 
 
 // ** Styled PerfectScrollbar component
@@ -43,16 +45,28 @@ const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: any) 
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
   const router = useRouter()
 
+  const { makeNotificationSeen } = NotificationService()
+  const queryClient = useQueryClient()
+  const { mutate: mutateMakeNotificationSeen } = useMutation(makeNotificationSeen, {
+    onSuccess: data => {
+      console.log(data)
+      queryClient.invalidateQueries({ queryKey: ['allAdminNotifs'] })
+      queryClient.invalidateQueries({ queryKey: ['newNotifsCount'] })
+    },
+    onError: error => { console.log(error) },
+  },)
+
+  const seeNotification = (id: string, type: string) => {
+    handleClose()
+    mutateMakeNotificationSeen({ id: id, data: { _method: 'put'} })
+
+    // navigate to certain page base on the type of notification - WIP
+    if (type === 'work_approval') router.push('/studio/content')
+  }
+
   const goToNotificationsPage = () => {
     handleClose()
     router.push('/notifications')
-  }
-
-  const navigateToPage = (id: string, type: string) => {
-    handleClose()
-    console.log(type)
-    console.log('PUT as READ', id)
-    if (type === 'work_approval') router.push('/studio/content')
   }
 
   return (
@@ -74,9 +88,9 @@ const NotificationsDropdown = ({ anchorEl, handleClose, open, menuItems }: any) 
         }
         {menuItems.map((item: any, index: number) => (
           <Box key={item?._id}>
-            <MenuItem onClick={() => navigateToPage(item?._id, item?.type)}>
+            <MenuItem disableRipple={item?.is_seen} onClick={item?.is_seen ? undefined : () => seeNotification(item?._id, item?.type)}>
               <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Badge color={'primary'} variant='dot' />
+                <Badge color={item?.is_seen ? undefined : 'primary'} variant='dot' />
                 <Avatar alt={item?.from?.username} src={FILE_SERVER_URL + item?.from?.photo} />
                 <Box sx={{ mr: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
                   <MenuItemTitle>{item?.from?.username}</MenuItemTitle>

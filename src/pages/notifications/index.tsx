@@ -5,32 +5,15 @@ import React, { useState } from 'react'
 import router, { useRouter } from 'next/router'
 
 // ** MUI Imports
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  Avatar,
-  Stack,
-  Box,
-  CircularProgress,
-  Badge,
-  IconButton
-} from '@mui/material'
+import { Button, Card, CardActions, CardContent, Typography, List, ListItem, ListItemText, Divider, Avatar, Stack, Box, CircularProgress, Badge } from '@mui/material'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 // ** Lib and Utils Imports
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import formatDate from '@/utils/formatDate'
 
 // ** TanStack Imports
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import NotificationService from '@/services/api/NotificationService'
@@ -41,6 +24,7 @@ type response = {
   type: string
   message: string
   created_at: string
+  is_seen: boolean
   from: {
     id: number
     photo: string
@@ -56,16 +40,10 @@ const NotificationsPage = () => {
   const [page, setPage] = useState<number>(1)
   const [hasNextPage, setHasNextPage] = useState<boolean>(false)
 
-  const { getAllAdminNotifs } = NotificationService()
+  const { getAllAdminNotifs, makeNotificationSeen } = NotificationService()
   const { isLoading } = useQuery({
     queryKey: ['allAdminNotifs', page],
-    queryFn: () =>
-      getAllAdminNotifs({
-        data: {
-          with: 'from',
-          page: page
-        }
-      }),
+    queryFn: () => getAllAdminNotifs({ data: { with: 'from', page: page } }),
     onSuccess: data => {
       setData((prev: response[]) => prev.concat(data?.data))
       setHasNextPage(data?.next_page_url !== null ? true : false)
@@ -82,14 +60,22 @@ const NotificationsPage = () => {
     }
   })
 
-  const navigateToPage = (id: string, type: string) => {
-    console.log(type)
-    console.log('PUT as READ', id)
-    if (type === 'work_approval') router.push('/studio/content')
-  }
+  const queryClient = useQueryClient()
+  const { mutate: mutateMakeNotificationSeen } = useMutation(makeNotificationSeen, {
+    onSuccess: data => {
+      console.log(data)
+      setData([])
+      queryClient.invalidateQueries({ queryKey: ['allAdminNotifs'] })
+      queryClient.invalidateQueries({ queryKey: ['newNotifsCount'] })
+    },
+    onError: error => { console.log(error) },
+  },)
 
-  const deleteNotification = (id: string) => {
-    console.log('delete', id)
+  const seeNotification = (id: string, type: string) => {
+    mutateMakeNotificationSeen({ id: id, data: { _method: 'put'} })
+
+    // navigate to certain page base on the type of notification - WIP
+    if (type === 'work_approval') router.push('/studio/content')
   }
 
   const markAllAsRead = () => {
@@ -98,27 +84,12 @@ const NotificationsPage = () => {
     })
   }
 
-  const deleteAll = () => {
-    data.map((item: response) => {
-      console.log('DELETE', item?._id)
-    })
-  }
-
   return (
     <Box>
       <Stack direction={['column', 'row']} mb={4} justifyContent='space-between' gap={4}>
         <Typography variant='h4'>Notifications</Typography>
-        <Button
-          variant='outlined'
-          size='small'
-          color='secondary'
-          startIcon={<MarkEmailReadIcon />}
-          onClick={markAllAsRead}
-        >
+        <Button variant='outlined' size='small' color='primary' startIcon={<MarkEmailReadIcon />} onClick={markAllAsRead}>
           Mark all as Read
-        </Button>
-        <Button variant='outlined' size='small' color='error' startIcon={<DeleteForeverIcon />} onClick={deleteAll}>
-          Delete All
         </Button>
       </Stack>
       <Card>
@@ -126,7 +97,7 @@ const NotificationsPage = () => {
           <List>
             {data?.map((item: response, index: number) => (
               <React.Fragment key={item?._id}>
-                <ListItem
+                <ListItem 
                   sx={{
                     padding: 0,
                     display: 'flex',
@@ -140,26 +111,19 @@ const NotificationsPage = () => {
                     direction='row'
                     gap={4}
                     alignItems='center'
-                    onClick={() => navigateToPage(item?._id, item?.type)}
-                    sx={{ cursor: 'pointer' }}
+                    onClick={item?.is_seen ? undefined : () => seeNotification(item?._id, item?.type)}
+                    sx={{ cursor: item?.is_seen ? 'default' : 'pointer' }}
                   >
-                    <Badge color={'primary'} variant='dot' />
+                    <Badge color={item?.is_seen? undefined : 'primary'} variant='dot' />
                     <Avatar alt={item?.from?.username} src={FILE_SERVER_URL + item?.from?.photo} />
-                    <ListItemText
+                    <ListItemText 
                       sx={{ textTransform: 'capitalize' }}
                       primary={item?.from?.username}
                       primaryTypographyProps={{ fontWeight: 500 }}
                       secondary={item?.type.replace(/_/g, ' ')}
                     />
                   </Stack>
-                  <Stack direction='row' gap={4} alignItems='center'>
-                    <Typography variant='caption' color={'primary'}>
-                      {formatDate(item?.created_at)}
-                    </Typography>
-                    <IconButton size='small' onClick={() => deleteNotification(item?._id)}>
-                      <DeleteForeverIcon fontSize='small' />
-                    </IconButton>
-                  </Stack>
+                  <Typography variant='caption'>{formatDate(item?.created_at)}</Typography>
                 </ListItem>
                 {index < data.length - 1 && <Divider />}
               </React.Fragment>
