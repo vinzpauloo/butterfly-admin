@@ -1,9 +1,6 @@
 // ** React Imports
 import { useState, useEffect } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
 import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
@@ -25,9 +22,9 @@ import CreatedSuccessful from '../form/CreatedSuccessful'
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Hooks
+// ** Hooks/Services Imports
 import { UserTableService } from '@/services/api/UserTableService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   password: string
@@ -53,10 +50,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const EditSupervisorDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const currentLocation = router.asPath
 
-  console.log(props.data)
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   // ** Props
   const { open, toggle } = props
@@ -97,13 +92,6 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
     }
   })
 
-  interface ResponseErrorProps {
-    password?: string
-    user_note?: string
-  }
-
-  const [responseError, setResponseError] = useState<ResponseErrorProps>()
-
   const handleFormSubmit = async (data: FormValues) => {
     const { password, password_confirmation, user_note } = data
 
@@ -119,22 +107,14 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
           toggle()
           setSubmitted(false)
           resetForm()
-          setResponseError({ password: '' })
+          clearErrorResponse()
 
           // Re-fetches UserTable and CSV exportation
           queryClient.invalidateQueries({ queryKey: ['allUsers'] })
           queryClient.invalidateQueries({ queryKey: ['UsersTableCSV'] })
         }, 1500)
       } catch (e: any) {
-        const {
-          data: { error }
-        } = e
-        setResponseError(error)
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            captureError(currentLocation, `${value} queryFn: updateUser() Supervisor`)
-          })
-        }
+        handleError(e, `updateUser() EditSupervisorDrawer.tsx`)
       }
     }
   }
@@ -142,7 +122,7 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
   const handleClose = () => {
     toggle()
     resetForm()
-    setResponseError({ password: '' })
+    clearErrorResponse()
   }
 
   return (
@@ -276,9 +256,8 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                {responseError && (
-                  <Typography color='red'>{responseError.password || responseError.user_note}</Typography>
-                )}
+                {/* Error messages from backend */}
+                {getErrorResponse(12)}
 
                 <Box sx={styles.formButtonContainer}>
                   <Box>

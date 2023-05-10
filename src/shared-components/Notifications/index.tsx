@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Badge, IconButton, Tooltip } from '@mui/material'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
@@ -16,7 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // Hooks/Services Imports
 import NotificationService from '@/services/api/NotificationService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 type response = {
   _id: string
@@ -32,8 +29,7 @@ type response = {
 }
 
 const Notifications = () => {
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError } = useErrorHandling()
 
   const [data, setData] = useState<response[]>([])
   const [totalNewNotifs, setTotalNewNotifs] = useState<number>(0)
@@ -51,36 +47,26 @@ const Notifications = () => {
 
   const { getAllAdminNotifs } = NotificationService()
   const {} = useQuery({
-    // seperate api for getting the amount of unseen notifs 
+    // seperate api for getting the amount of unseen notifs
     // cannot combine with the fetch below, as params - will probably change?
     queryKey: ['newNotifsCount'],
     queryFn: () => getAllAdminNotifs({ data: { count_unseen: true } }),
-    onSuccess: data => { setTotalNewNotifs(data) },
+    onSuccess: data => {
+      setTotalNewNotifs(data)
+    },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} getAllAdminNotifs() Notifications`)
-        })
-      }
+      handleError(e, `getAllAdminNotifs() count_unseen shared-components/notifications/index.tsx`)
     }
   })
 
   const {} = useQuery({
     queryKey: ['allAdminNotifs'],
     queryFn: () => getAllAdminNotifs({ data: { with: 'from', page: 1 } }),
-    onSuccess: data => { setData(data?.data) },
+    onSuccess: data => {
+      setData(data?.data)
+    },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, getAllAdminNotifs() shared-components/Notifications`)
-        })
-      }
+      handleError(e, `getAllAdminNotifs()  with:'from' shared-components/notifications/index.tsx`)
     }
   })
 

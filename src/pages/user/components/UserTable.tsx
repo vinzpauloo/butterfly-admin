@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useEffect, ChangeEvent } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Box, Card, Grid, Tab } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
@@ -17,7 +14,7 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Table Components Imports
 import UserTableToolbar from './UserTableToolbar'
 
-// ** Other Imports
+// ** Project/Other Imports
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
@@ -32,6 +29,7 @@ import { ContentCreatorColumns } from '@/data/ContentCreatorColumns'
 import { UserTableService } from '../../../services/api/UserTableService'
 import { CreateAccount } from '@/services/api/CreateAccount'
 import useDebounce from '@/hooks/useDebounce'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** TanStack Query
 import { useQuery, useQueries } from '@tanstack/react-query'
@@ -41,8 +39,6 @@ import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Zustand State Management
 import { useUserTableStore } from '@/zustand/userTableStore'
-
-import { captureError } from '@/services/Sentry'
 
 const UserTable = () => {
   const {
@@ -94,10 +90,6 @@ const UserTable = () => {
     handleDrawerToggle: state.handleDrawerToggle
   }))
 
-  // ** Router
-  const router = useRouter()
-  const currentLocation = router.asPath
-
   // ** Columns for DataGrid
   const operatorColumns = OperatorColumns()
   const superAgentColumns = SuperAgentColumns()
@@ -111,6 +103,7 @@ const UserTable = () => {
 
   // ** Service/Hooks
   const { getUsers } = UserTableService()
+  const { handleError } = useErrorHandling()
   const { getLanguages, getCurrency } = CreateAccount()
   const debouncedUsername = useDebounce(searchValue, 1000)
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
@@ -173,8 +166,8 @@ const UserTable = () => {
         setCcPage(response?.current_page)
       }
     },
-    onError: (error: { data: { message: string } }) => {
-      captureError(currentLocation, `${error?.data.message} queryFn: getUsers()`)
+    onError: (e: any) => {
+      handleError(e, `getUsers() UserTable.tsx`)
     },
     enabled: !initialLoad
   })
@@ -186,6 +179,9 @@ const UserTable = () => {
         queryFn: getLanguages,
         onSuccess: (response: { data: [] }) => {
           setLanguages(response?.data)
+        },
+        onError: (e: any) => {
+          handleError(e, `getLanguages() UserTable.tsx`)
         }
       },
       {
@@ -193,6 +189,9 @@ const UserTable = () => {
         queryFn: getCurrency,
         onSuccess: (response: { data: [] }) => {
           setCurrencies(response?.data)
+        },
+        onError: (e: any) => {
+          handleError(e, `getCurrency() UserTable.tsx`)
         }
       }
     ]

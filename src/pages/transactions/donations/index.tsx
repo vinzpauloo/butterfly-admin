@@ -9,13 +9,15 @@ import { useQuery } from '@tanstack/react-query'
 import formatDate from '@/utils/formatDate'
 import Transaction from '@/pages/transactions'
 import TransactionsService from '@/services/api/Transactions'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 import Translations from '@/layouts/components/Translations'
+
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 const columnData = [
   {
     field: 'content_creator',
-    headerName: <Translations text='Content Creator'/>,
+    headerName: <Translations text='Content Creator' />,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -26,7 +28,7 @@ const columnData = [
   },
   {
     field: 'customer',
-    headerName: <Translations text='Customer'/>,
+    headerName: <Translations text='Customer' />,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -37,7 +39,7 @@ const columnData = [
   },
   {
     field: 'site',
-    headerName: <Translations text='Site Name'/>,
+    headerName: <Translations text='Site Name' />,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -48,7 +50,7 @@ const columnData = [
   },
   {
     field: 'coin_amount',
-    headerName: <Translations text='Amount (Gold)'/>,
+    headerName: <Translations text='Amount (Gold)' />,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -59,7 +61,7 @@ const columnData = [
   },
   {
     field: 'money_amount',
-    headerName: <Translations text='Amount (CNY)'/>,
+    headerName: <Translations text='Amount (CNY)' />,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -70,7 +72,7 @@ const columnData = [
   },
   {
     field: 'created_at',
-    headerName: <Translations text='Date Created'/>,
+    headerName: <Translations text='Date Created' />,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -81,7 +83,7 @@ const columnData = [
   },
   {
     field: 'updated_at',
-    headerName: <Translations text='Last Update'/>,
+    headerName: <Translations text='Last Update' />,
     width: 193,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -109,6 +111,8 @@ const useDebounce = (value: any, delay: number) => {
 }
 
 function index() {
+  const { handleError } = useErrorHandling()
+
   const [contentCreator, setContentCreator] = useState('')
   const [customer, setCustomer] = useState('')
   const [sitename, setSiteName] = useState('')
@@ -140,8 +144,8 @@ function index() {
       setPageSize(data.per_page)
       setPage(data.current_page)
     },
-    onError: error => {
-      console.log('Transactions Donations Tab', error)
+    onError: (e: any) => {
+      handleError(e, `getDonations() transactions/donations/index.tsx`)
     }
   })
 

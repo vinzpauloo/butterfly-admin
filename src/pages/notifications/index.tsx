@@ -2,10 +2,25 @@
 import React, { useState } from 'react'
 
 // ** Next Imports
-import router, { useRouter } from 'next/router'
+import router from 'next/router'
 
 // ** MUI Imports
-import { Button, Card, CardActions, CardContent, Typography, List, ListItem, ListItemText, Divider, Avatar, Stack, Box, CircularProgress, Badge } from '@mui/material'
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Avatar,
+  Stack,
+  Box,
+  CircularProgress,
+  Badge
+} from '@mui/material'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
 
 // ** Lib and Utils Imports
@@ -17,7 +32,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import NotificationService from '@/services/api/NotificationService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 type response = {
   _id: string
@@ -33,8 +48,7 @@ type response = {
 }
 
 const NotificationsPage = () => {
-  const route = useRouter()
-  const currentLocation = route.asPath
+  const { handleError } = useErrorHandling()
 
   const [data, setData] = useState<response[]>([])
   const [page, setPage] = useState<number>(1)
@@ -49,14 +63,7 @@ const NotificationsPage = () => {
       setHasNextPage(data?.next_page_url !== null ? true : false)
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} getAllAdminNotifs() Notifications`)
-        })
-      }
+      handleError(e, `getAllAdminNotifs() notifications/index.tsx`)
     }
   })
 
@@ -68,11 +75,13 @@ const NotificationsPage = () => {
       queryClient.invalidateQueries({ queryKey: ['allAdminNotifs'] })
       queryClient.invalidateQueries({ queryKey: ['newNotifsCount'] })
     },
-    onError: error => { console.log(error) },
-  },)
+    onError: (e: any) => {
+      handleError(e, `makeNotificationSeen() notifications/index.tsx`)
+    }
+  })
 
   const seeNotification = (id: string, type: string) => {
-    mutateMakeNotificationSeen({ id: id, data: { _method: 'put'} })
+    mutateMakeNotificationSeen({ id: id, data: { _method: 'put' } })
 
     // navigate to certain page base on the type of notification - WIP
     if (type === 'work_approval') router.push('/studio/content')
@@ -88,7 +97,13 @@ const NotificationsPage = () => {
     <Box>
       <Stack direction={['column', 'row']} mb={4} justifyContent='space-between' gap={4}>
         <Typography variant='h4'>Notifications</Typography>
-        <Button variant='outlined' size='small' color='primary' startIcon={<MarkEmailReadIcon />} onClick={markAllAsRead}>
+        <Button
+          variant='outlined'
+          size='small'
+          color='primary'
+          startIcon={<MarkEmailReadIcon />}
+          onClick={markAllAsRead}
+        >
           Mark all as Read
         </Button>
       </Stack>
@@ -97,7 +112,7 @@ const NotificationsPage = () => {
           <List>
             {data?.map((item: response, index: number) => (
               <React.Fragment key={item?._id}>
-                <ListItem 
+                <ListItem
                   sx={{
                     padding: 0,
                     display: 'flex',
@@ -114,9 +129,9 @@ const NotificationsPage = () => {
                     onClick={item?.is_seen ? undefined : () => seeNotification(item?._id, item?.type)}
                     sx={{ cursor: item?.is_seen ? 'default' : 'pointer' }}
                   >
-                    <Badge color={item?.is_seen? undefined : 'primary'} variant='dot' />
+                    <Badge color={item?.is_seen ? undefined : 'primary'} variant='dot' />
                     <Avatar alt={item?.from?.username} src={FILE_SERVER_URL + item?.from?.photo} />
-                    <ListItemText 
+                    <ListItemText
                       sx={{ textTransform: 'capitalize' }}
                       primary={item?.from?.username}
                       primaryTypographyProps={{ fontWeight: 500 }}

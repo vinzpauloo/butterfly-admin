@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { DashboardService } from '@/services/api/DashboardService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface DataType {
   stats: string
@@ -117,6 +118,8 @@ const InformationCard = () => {
   const { getMostActiveContentCreatorCount, getMostActiveUsers, getMostFollowedCreator } = DashboardService()
   const { setMostActiveContentCreatorCount, setMostActiveUsers, setTopFollowedContentCreators } = useDashboardContext()
 
+  const { handleError } = useErrorHandling()
+
   useQuery({
     queryKey: [`mostActiveCreatorCount`],
     queryFn: () =>
@@ -128,6 +131,9 @@ const InformationCard = () => {
       }),
     onSuccess: (data: any) => {
       setMostActiveContentCreatorCount(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getMostActiveContentCreatorCount() operator/InformationCard.tsx`)
     }
   })
 
@@ -136,6 +142,9 @@ const InformationCard = () => {
     queryFn: () => getMostActiveUsers(),
     onSuccess: (data: any) => {
       setMostActiveUsers(data?.total_active)
+    },
+    onError: (e: any) => {
+      handleError(e, `getMostActiveUsers() operator/InformationCard.tsx`)
     }
   })
 
@@ -157,6 +166,9 @@ const InformationCard = () => {
           }
         })
       )
+    },
+    onError: (e: any) => {
+      handleError(e, `getMostFollowedCreator() operator/InformationCard.tsx`)
     }
   })
 
