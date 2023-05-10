@@ -38,8 +38,14 @@ const GoldCoinBundleModal = (props: Props) => {
   const currentLocation = router.asPath
 
   const [bundleName, setBundleName] = useState(props.bundleName ?? '')
+  const [bundleNameError, setBundleNameError] = useState(false)
+
   const [bundlePrice, setBundlePrice] = useState<any>(props.bundlePrice ?? '')
+  const [bundlePriceError, setbundlePriceError] = useState(false)
+  
   const [bundleDescription, setBundleDescription] = useState(props.bundleDescription ?? '')
+  const [bundleDescriptionError, setbundleDescriptionError] = useState(false)
+
   const [isBundleActive, setIsBundleActive] = useState(props.isBundleOn ?? false)
   const [selectedSiteID, setSelectedSiteID] = useState(0)
 
@@ -50,9 +56,23 @@ const GoldCoinBundleModal = (props: Props) => {
   const closeMenu = () => setAnchorEl(null)
 
   const validateInputs = () => {
-    if (bundleName === '') return false
-    if (bundlePrice === '' || bundlePrice < 200) return false
-    if (bundleDescription === '') return false
+    if (bundleName === '') {
+      setBundleNameError(true);
+
+      return false
+    }
+
+    if (bundlePrice === '' || bundlePrice < 200) {
+      setbundlePriceError(true)
+
+      return false
+    }
+
+    if (bundleDescription === '') {
+      setbundleDescriptionError(true)
+
+      return false
+    }
 
     return true
   }
@@ -204,10 +224,10 @@ const GoldCoinBundleModal = (props: Props) => {
         <Stack {...cardContainer}>
           <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
             <TextField
-              error={props.isEditingGoldCoinBundle ? bundleName === '' : false}
+              error={bundleNameError}
               sx={textFieldStyle}
               value={bundleName}
-              onChange={event => setBundleName(event.target.value)}
+              onChange={event => {setBundleName(event.target.value); setBundleNameError(false)}}
               label={TranslateString('Bundle Name')}
             />
             <Switch
@@ -219,11 +239,11 @@ const GoldCoinBundleModal = (props: Props) => {
           </Stack>
           <TextField
             type='number'
-            error={props.isEditingGoldCoinBundle ? bundlePrice < 200 || bundlePrice === '' : false}
+            error={bundlePriceError}
             sx={textFieldStyle}
             inputProps={{ min: 0 }}
             value={bundlePrice}
-            onChange={event => setBundlePrice(event.target.value)}
+            onChange={event => {setBundlePrice(event.target.value); setbundlePriceError(false)}}
             label={TranslateString('Gold Coin')}
           />
           {props.isEditingGoldCoinBundle && bundlePrice < 200 ? (
@@ -234,10 +254,10 @@ const GoldCoinBundleModal = (props: Props) => {
         </Stack>
         <Stack {...cardContainer}>
           <TextField
-            error={props.isEditingGoldCoinBundle ? bundleDescription === '' : false}
+            error={bundleDescriptionError}
             sx={textFieldStyle}
             value={bundleDescription}
-            onChange={event => setBundleDescription(event.target.value)}
+            onChange={event => {setBundleDescription(event.target.value); setbundleDescriptionError(false)}}
             label={TranslateString('Description')}
             multiline
             rows={4}
