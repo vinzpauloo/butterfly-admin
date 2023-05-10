@@ -84,42 +84,11 @@ const EditStepTwo = (props: SidebarAddUserType) => {
   }
 
   const handleSubmit = async () => {
-    const allFQDNData = handleFinish()
 
-    if (allFQDNData?.length == 0) {
-      toast.error('FQDN Values Must at least be 3 characters')
+    // TODO ** edit fqdns waiting for api changes
+    return
 
-      return
-    } else {
-      console.log('allFQDNData', allFQDNData)
-
-      //handleDataSubmit
-      const promiseArray: any[] = []
-      allFQDNData?.map((data: FQDNData) => {
-        const type = data.name as 'Api' | 'Photo' | 'Streaming'
-        data.values.forEach(value => {
-          promiseArray.push({ site: siteData[0]?.id, name: value.value, type: type })
-        })
-      })
-
-      const promises = promiseArray.map((data: { name: string; site: number; type: string }) =>
-        fqdnM.mutateAsync({
-          data: {
-            site: data.site,
-            name: data.name,
-            type: data.type as 'Api' | 'Photo' | 'Streaming'
-          }
-        })
-      )
-      await Promise.all(promises)
-    }
   }
-
-  const handleAPISubmit = async (data: any) => {}
-
-  const handleStreamSubmit = async (data: any) => {}
-
-  const handlePhotoSubmit = async (data: any) => {}
 
   return (
     <Box
