@@ -1,18 +1,16 @@
 import React from 'react'
-import { Box, Typography, Button, CircularProgress, } from '@mui/material'
-import { convertToRaw } from 'draft-js';
-import { EditorProps } from 'react-draft-wysiwyg';
-import draftToHtml from 'draftjs-to-html';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import { Box, Typography, Button, CircularProgress } from '@mui/material'
+import { convertToRaw } from 'draft-js'
+import { EditorProps } from 'react-draft-wysiwyg'
+import draftToHtml from 'draftjs-to-html'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import dynamic from 'next/dynamic'
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import SitesService from '@/services/api/SitesService';
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import SitesService from '@/services/api/SitesService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // NEED TO RENDER EDITOR PROPERLY
-const Editor = dynamic<EditorProps>(
-  () => import('react-draft-wysiwyg').then((mod) => mod.Editor),
-  { ssr: false }
-)
+const Editor = dynamic<EditorProps>(() => import('react-draft-wysiwyg').then(mod => mod.Editor), { ssr: false })
 
 type Props = {
   title: string
@@ -24,76 +22,78 @@ type Props = {
 const EditorContainer = (props: Props) => {
   const { title, editorState, setEditorState, isLoading } = props
 
+  const { handleError, getErrorResponse } = useErrorHandling()
+
   // Get QueryClient from the context
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const { updateSiteOtherDetails } = SitesService()
   const { mutate: mutateToS, isLoading: updatingToS } = useMutation(updateSiteOtherDetails, {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: data => {
+      console.log(data)
       queryClient.invalidateQueries({
-        queryKey: ["termsOfService"],
-      });
+        queryKey: ['termsOfService']
+      })
     },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+    onError: (e: any) => {
+      handleError(e, `updateSiteOtherDetails() EditorContainer of Terms Of Service`)
+    }
+  })
 
   const { mutate: mutatePolicy, isLoading: updatingPolicy } = useMutation(updateSiteOtherDetails, {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: data => {
+      console.log(data)
       queryClient.invalidateQueries({
-        queryKey: ["privacyPolicy"],
-      });
+        queryKey: ['privacyPolicy']
+      })
     },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+    onError: (e: any) => {
+      handleError(e, `updateSiteOtherDetails() EditorContainer of Privacy Policy`)
+    }
+  })
 
   const publish = () => {
-    const contentState = editorState.getCurrentContent();
-    const rawHtml = draftToHtml(convertToRaw(contentState));
+    const contentState = editorState.getCurrentContent()
+    const rawHtml = draftToHtml(convertToRaw(contentState))
 
-    if (title === "Terms of Service") {
+    if (title === 'Terms of Service') {
       mutateToS({
         data: {
           provisions: rawHtml,
-          _method: "put"
-        },
-      });
+          _method: 'put'
+        }
+      })
     }
 
-    if (title === "Privacy Policy") {
+    if (title === 'Privacy Policy') {
       mutatePolicy({
         data: {
           policy: rawHtml,
-          _method: "put"
-        },
-      });
+          _method: 'put'
+        }
+      })
     }
-  };
+  }
 
   const toolbar = {
-    options: ['inline', 'blockType', 'fontSize', 'list', 'textAlign', 'history', 'link',],
+    options: ['inline', 'blockType', 'fontSize', 'list', 'textAlign', 'history', 'link'],
     inline: {
       inDropdown: false,
-      options: ['bold', 'italic', 'underline', 'strikethrough'],
+      options: ['bold', 'italic', 'underline', 'strikethrough']
     },
     blockType: {
       inDropdown: true,
-      options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'Code'],
+      options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'Code']
     },
     list: {
       inDropdown: true,
-      options: ['unordered', 'ordered'],
+      options: ['unordered', 'ordered']
     },
     textAlign: {
       inDropdown: true,
-      options: ['left', 'center', 'right'],
-    },
-  };
+      options: ['left', 'center', 'right']
+    }
+  }
 
   const isBeingLoadedOrUpdated = isLoading || updatingToS || updatingPolicy
 
@@ -108,13 +108,16 @@ const EditorContainer = (props: Props) => {
           readOnly={isBeingLoadedOrUpdated}
           editorState={editorState}
           onEditorStateChange={setEditorState}
-          wrapperStyle={isBeingLoadedOrUpdated ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+          wrapperStyle={isBeingLoadedOrUpdated ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
           editorStyle={styles.editor}
           toolbar={toolbar}
         />
       </Box>
+      {getErrorResponse(12)}
       <Box sx={styles.btnContainer}>
-        <Button sx={styles.publish} variant="contained" disabled={isLoading} color="success" onClick={publish}>Publish</Button>
+        <Button sx={styles.publish} variant='contained' disabled={isLoading} color='success' onClick={publish}>
+          Publish
+        </Button>
       </Box>
     </Box>
   )
@@ -130,7 +133,7 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'space-evenly',
     gap: 5,
-    position: "relative"
+    position: 'relative'
   },
   title: {
     textTransform: 'uppercase',
@@ -155,7 +158,7 @@ const styles = {
   },
   btnContainer: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   publish: {
     textTransform: 'uppercase',
@@ -163,18 +166,18 @@ const styles = {
     fontSize: {
       xs: 10,
       lg: 14
-    },
+    }
   },
   loaderStyle: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
-    margin: "auto"
+    margin: 'auto'
   },
   editor: {
-    outline: "1px solid gray",
+    outline: '1px solid gray',
     height: 500,
     paddingInline: 12
   }

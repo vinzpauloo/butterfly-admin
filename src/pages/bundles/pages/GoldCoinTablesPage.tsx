@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import {
   Button,
@@ -27,20 +24,20 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import BundlesService from '@/services/api/BundlesService'
-import { captureError } from '@/services/Sentry'
 import SitesService from '@/services/api/SitesService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 const tableHeader = ['Site ID', 'Bundle Name', 'Description', 'Price', 'Active / Edit / Delete']
 
 const loadingArray = [1, 2, 3, 4, 5, 6]
 
 const GoldCoinTablesPage = () => {
-  const router = useRouter()
-  const currentLocation = router.asPath
   const [uniqueSites, setUniqueSites] = useState<any>([])
 
   const [open, setOpen] = useState(false)
   const handleClose = () => setOpen(false)
+
+  const { handleError } = useErrorHandling()
 
   // FETCH ALL GOLD COIN BUNDLES
   const { getAllCoinsBundle } = BundlesService()
@@ -51,20 +48,13 @@ const GoldCoinTablesPage = () => {
       console.log('COINS BUNDLE:', data?.data)
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} getAllCoinsBundle() GoldCoinTablesPage`)
-        })
-      }
+      handleError(e, `getAllCoinsBundle() GoldCoinTablesPage`)
     }
   })
 
   // AS GOD USER, WE FETCH THE UNIQUE SITE IDs
   const { getSitesList } = SitesService()
-  const { } = useQuery({
+  const {} = useQuery({
     queryKey: ['allSitesList'],
     queryFn: () => getSitesList({}),
     onSuccess: data => {
@@ -72,14 +62,7 @@ const GoldCoinTablesPage = () => {
       setUniqueSites(data?.data)
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, getSitesList() GoldCoinBundlesPage`)
-        })
-      }
+      handleError(e, `getSitesList() GoldCoinTablesPage`)
     }
   })
 

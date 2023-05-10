@@ -18,14 +18,27 @@ import { useQuery } from '@tanstack/react-query'
 import NotificationService from '@/services/api/NotificationService'
 import { captureError } from '@/services/Sentry'
 
+type response = {
+  _id: string
+  type: string
+  message: string
+  created_at: string
+  is_seen: boolean
+  from: {
+    id: number
+    photo: string
+    username: string
+  }
+}
+
 const Notifications = () => {
   const router = useRouter()
   const currentLocation = router.asPath
 
-  const [data, setData] = useState<any>([])
-  const [totalNotifs, setTotalNotifs] = useState<number>(0)
+  const [data, setData] = useState<response[]>([])
+  const [totalNewNotifs, setTotalNewNotifs] = useState<number>(0)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const newNotifications = `You have ${totalNotifs} new notifications!`
+  const newNotifications = `You have ${totalNewNotifs} new notifications!`
   const noNotifications = `No new notifications.`
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -38,18 +51,27 @@ const Notifications = () => {
 
   const { getAllAdminNotifs } = NotificationService()
   const {} = useQuery({
+    // seperate api for getting the amount of unseen notifs 
+    // cannot combine with the fetch below, as params - will probably change?
+    queryKey: ['newNotifsCount'],
+    queryFn: () => getAllAdminNotifs({ data: { count_unseen: true } }),
+    onSuccess: data => { setTotalNewNotifs(data) },
+    onError: (e: any) => {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} getAllAdminNotifs() Notifications`)
+        })
+      }
+    }
+  })
+
+  const {} = useQuery({
     queryKey: ['allAdminNotifs'],
-    queryFn: () =>
-      getAllAdminNotifs({
-        data: {
-          with: 'from',
-          page: 1
-        }
-      }),
-    onSuccess: data => {
-      setData(data?.data)
-      setTotalNotifs(data?.total)
-    },
+    queryFn: () => getAllAdminNotifs({ data: { with: 'from', page: 1 } }),
+    onSuccess: data => { setData(data?.data) },
     onError: (e: any) => {
       const {
         data: { error }
@@ -64,9 +86,9 @@ const Notifications = () => {
 
   return (
     <div>
-      <Tooltip title={totalNotifs > 0 ? newNotifications : noNotifications}>
-        <IconButton color='inherit' onClick={totalNotifs > 0 ? handleOpen : undefined}>
-          <Badge badgeContent={totalNotifs} color='error'>
+      <Tooltip title={totalNewNotifs > 0 ? newNotifications : noNotifications}>
+        <IconButton color='inherit' onClick={totalNewNotifs > 0 ? handleOpen : undefined}>
+          <Badge badgeContent={totalNewNotifs} color='error'>
             <NotificationsNoneIcon />
           </Badge>
         </IconButton>

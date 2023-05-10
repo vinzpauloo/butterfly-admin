@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Box, Menu, MenuItem, Grid, Modal, Stack, Typography, Button, CircularProgress } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
@@ -21,11 +18,10 @@ import { useQuery } from '@tanstack/react-query'
 // ** Hooks/Services Imports
 import BundlesService from '@/services/api/BundlesService'
 import SitesService from '@/services/api/SitesService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 const GoldCoinBundlesPage = () => {
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError } = useErrorHandling()
 
   const [open, setOpen] = useState(false)
   const handleClose = () => setOpen(false)
@@ -53,14 +49,7 @@ const GoldCoinBundlesPage = () => {
       console.log('COINS BUNDLE:', data?.data)
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, getAllCoinsBundle() GoldCoinBundlesPage`)
-        })
-      }
+      handleError(e, `getAllCoinsBundle() GoldCoinBundlesPage`)
     }
   })
 
@@ -74,14 +63,7 @@ const GoldCoinBundlesPage = () => {
       setUniqueSites(data?.data)
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, getSitesList() GoldCoinBundlesPage`)
-        })
-      }
+      handleError(e, `getSitesList() GoldCoinBundlesPage`)
     }
   })
 

@@ -1,8 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
-
-// ** Next Imports
-import { useRouter } from 'next/router'
+import React, { useState } from 'react'
 
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography, MenuItem } from '@mui/material'
@@ -27,7 +24,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import { ApkService } from '@/services/api/ApkService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   [key: string]: any
@@ -64,16 +61,12 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const VersionsDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
-  const router = useRouter()
-
-  const currentLocation = router.asPath
 
   // ** Props
   const { open, toggle } = props
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
-  const [errorResponse, setErrorResponse] = useState<string>()
 
   const {
     control,
@@ -98,6 +91,8 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
   const mutation = useMutation(postAPK)
 
   const { selectedSite } = useSiteContext()
+
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   const handleFormSubmit = async (data: FormValues) => {
     const formData = new FormData()
@@ -127,20 +122,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
         queryClient.invalidateQueries({ queryKey: ['allApk'] })
       }, 1500)
     } catch (e: any) {
-      const {
-        data: { message, error }
-      } = e
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            setErrorResponse(value)
-            captureError(currentLocation, `${value}, postAPK() Create Versions`)
-          })
-        }
-      } else if (message) {
-        setErrorResponse(message)
-        captureError(currentLocation, `${message}, postAPK() Create Versions`)
-      }
+      handleError(e, `postAPK() Versions Create Drawer`)
     }
   }
 
@@ -149,7 +131,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
   const handleClose = () => {
     resetForm()
     setResetKey(prevKey => prevKey + 1)
-    setErrorResponse('')
+    clearErrorResponse()
     toggle()
   }
 
@@ -257,7 +239,6 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                     )}
                   />
                 </Box>
-
                 <Box sx={styles.fullWidth}>
                   <Controller
                     name='patch_note'
@@ -280,7 +261,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                 </Box>
 
                 {/* Error messages from backend */}
-                <Typography color='error'>{errorResponse}</Typography>
+                {getErrorResponse(12)}
 
                 <Box sx={styles.formButtonContainer}>
                   <Box>

@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 
 // ** Next Imports
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
@@ -21,7 +20,7 @@ import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
 // ** Hooks/Services Imports
 import WorkgroupService from '@/services/api/Workgroup'
 import useDebounce from '@/hooks/useDebounce'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** Utils Imports
 import { useTranslateString } from '@/utils/TranslateString'
@@ -274,8 +273,8 @@ const Table = ({
 
 function index() {
   const { getWorkgroup } = WorkgroupService()
-  const router = useRouter()
-  const currentLocation = router.asPath
+
+  const { handleError } = useErrorHandling()
 
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
@@ -317,8 +316,8 @@ function index() {
       setPageSize(data.per_page)
       setPage(data.current_page)
     },
-    onError: err => {
-      captureError(currentLocation, `queryFn: getWorkgroup() ${err} Work Groupings`)
+    onError: (e: any) => {
+      handleError(e, `getWorkgroup() index of settings`)
     }
   })
 

@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Box, Card, Grid, Divider, Typography, Button, Switch, Stack, IconButton } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
@@ -19,7 +16,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import AnnouncementsService from '../../../services/api/AnnouncementsService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 const Announcements = () => {
   // in case pagination is added on backend
@@ -27,8 +24,7 @@ const Announcements = () => {
   // const [rowCount, setRowCount] = useState<number>(0)
   // const [page, setPage] = useState<number>(1)
 
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError } = useErrorHandling()
 
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
@@ -51,8 +47,8 @@ const Announcements = () => {
     onSuccess: data => {
       setData(data?.data)
     },
-    onError: error => {
-      captureError(currentLocation, `${error} getAllAnnouncement()`)
+    onError: (e: any) => {
+      handleError(e, `getAllAnnouncement() announcements.tsx`)
     }
   })
 
@@ -65,14 +61,7 @@ const Announcements = () => {
       queryClient.invalidateQueries({ queryKey: ['allAnnouncement'] })
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, updateAnnouncement()`)
-        })
-      }
+      handleError(e, `updateAnnouncement() announcements.tsx`)
     }
   })
 
@@ -82,15 +71,7 @@ const Announcements = () => {
       queryClient.invalidateQueries({ queryKey: ['allAnnouncement'] })
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, deleteAnnouncement()`)
-          console.log(`DELETE ERROR`, value)
-        })
-      }
+      handleError(e, `deleteAnnouncement() announcements.tsx`)
     }
   })
 
@@ -137,17 +118,7 @@ const Announcements = () => {
         }
       })
     } catch (e: any) {
-      const {
-        data: { error, message }
-      } = e
-
-      const errorsToCapture = error || message
-
-      for (const key in errorsToCapture) {
-        errorsToCapture[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, updateAnnouncement() announcements.tsx`)
-        })
-      }
+      handleError(e, `updateAnnouncement() activateDeactivateAnnouncement Function in announcements`)
     }
   }
 
@@ -155,17 +126,7 @@ const Announcements = () => {
     try {
       mutateDeleteAnnouncement({ announcementID: id })
     } catch (e: any) {
-      const {
-        data: { error, message }
-      } = e
-
-      const errorsToCapture = error || message
-
-      for (const key in errorsToCapture) {
-        errorsToCapture[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, deleteAnnouncement() announcements.tsx`)
-        })
-      }
+      handleError(e, `deleteAnnouncement() deleteSpecificAnnouncement Function in announcements`)
     }
   }
 

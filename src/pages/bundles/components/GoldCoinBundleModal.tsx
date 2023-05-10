@@ -1,9 +1,5 @@
 // ** React Imports
 import React, { useState } from 'react'
-import toast from 'react-hot-toast'
-
-// ** Next Imports
-import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import { Box, Button, CircularProgress, Menu, MenuItem, Switch, TextField, Typography } from '@mui/material'
@@ -18,7 +14,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import BundlesService from '@/services/api/BundlesService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // optional props to be passed if editing a bundle instead
 type Props = {
@@ -34,12 +30,15 @@ type Props = {
 }
 
 const GoldCoinBundleModal = (props: Props) => {
-  const router = useRouter()
-  const currentLocation = router.asPath
-
   const [bundleName, setBundleName] = useState(props.bundleName ?? '')
+  const [bundleNameError, setBundleNameError] = useState(false)
+
   const [bundlePrice, setBundlePrice] = useState<any>(props.bundlePrice ?? '')
+  const [bundlePriceError, setbundlePriceError] = useState(false)
+
   const [bundleDescription, setBundleDescription] = useState(props.bundleDescription ?? '')
+  const [bundleDescriptionError, setbundleDescriptionError] = useState(false)
+
   const [isBundleActive, setIsBundleActive] = useState(props.isBundleOn ?? false)
   const [selectedSiteID, setSelectedSiteID] = useState(0)
 
@@ -50,12 +49,28 @@ const GoldCoinBundleModal = (props: Props) => {
   const closeMenu = () => setAnchorEl(null)
 
   const validateInputs = () => {
-    if (bundleName === '') return false
-    if (bundlePrice === '' || bundlePrice < 200) return false
-    if (bundleDescription === '') return false
+    if (bundleName === '') {
+      setBundleNameError(true)
+
+      return false
+    }
+
+    if (bundlePrice === '' || bundlePrice < 200) {
+      setbundlePriceError(true)
+
+      return false
+    }
+
+    if (bundleDescription === '') {
+      setbundleDescriptionError(true)
+
+      return false
+    }
 
     return true
   }
+
+  const { handleError, getErrorResponse } = useErrorHandling()
 
   // Get QueryClient from the context
   const queryClient = useQueryClient()
@@ -74,24 +89,7 @@ const GoldCoinBundleModal = (props: Props) => {
       props.onClose()
     },
     onError: (e: any) => {
-      const {
-        data: { message, error }
-      } = e
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            captureError(currentLocation, `${value}, addCoinsBundle() GoldCoinBundleModal`)
-            toast.error(`ERROR: ${value}`, {
-              duration: 2000
-            })
-          })
-        }
-      } else if (message) {
-        captureError(currentLocation, `${message}, addCoinsBundle() GoldCoinBundleModal`)
-        toast.error(`ERROR: ${message}`, {
-          duration: 2000
-        })
-      }
+      handleError(e, `addCoinsBundle() GoldCoinBundleModal`)
     }
   })
 
@@ -108,24 +106,7 @@ const GoldCoinBundleModal = (props: Props) => {
       props.onClose()
     },
     onError: (e: any) => {
-      const {
-        data: { message, error }
-      } = e
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            captureError(currentLocation, `${value}, editCoinsBundle() GoldCoinBundleModal`)
-            toast.error(`ERROR: ${value}`, {
-              duration: 2000
-            })
-          })
-        }
-      } else if (message) {
-        captureError(currentLocation, `${message}, editCoinsBundle() GoldCoinBundleModal`)
-        toast.error(`ERROR: ${message}`, {
-          duration: 2000
-        })
-      }
+      handleError(e, `editCoinsBundle() GoldCoinBundleModal`)
     }
   })
 
@@ -204,10 +185,13 @@ const GoldCoinBundleModal = (props: Props) => {
         <Stack {...cardContainer}>
           <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
             <TextField
-              error={props.isEditingGoldCoinBundle ? bundleName === '' : false}
+              error={bundleNameError}
               sx={textFieldStyle}
               value={bundleName}
-              onChange={event => setBundleName(event.target.value)}
+              onChange={event => {
+                setBundleName(event.target.value)
+                setBundleNameError(false)
+              }}
               label={TranslateString('Bundle Name')}
             />
             <Switch
@@ -219,30 +203,42 @@ const GoldCoinBundleModal = (props: Props) => {
           </Stack>
           <TextField
             type='number'
-            error={props.isEditingGoldCoinBundle ? bundlePrice < 200 || bundlePrice === '' : false}
+            error={bundlePriceError}
             sx={textFieldStyle}
             inputProps={{ min: 0 }}
             value={bundlePrice}
-            onChange={event => setBundlePrice(event.target.value)}
+            onChange={event => {
+              setBundlePrice(event.target.value)
+              setbundlePriceError(false)
+            }}
             label={TranslateString('Gold Coin')}
           />
-          {props.isEditingGoldCoinBundle && bundlePrice < 200 ? (
+          {bundlePriceError && (
             <Typography variant='caption' color='error'>
               must be atleast 200
             </Typography>
-          ) : undefined}
+          )}
         </Stack>
         <Stack {...cardContainer}>
           <TextField
-            error={props.isEditingGoldCoinBundle ? bundleDescription === '' : false}
+            error={bundleDescriptionError}
             sx={textFieldStyle}
             value={bundleDescription}
-            onChange={event => setBundleDescription(event.target.value)}
+            onChange={event => {
+              setBundleDescription(event.target.value)
+              setbundleDescriptionError(false)
+            }}
             label={TranslateString('Description')}
             multiline
             rows={4}
           />
         </Stack>
+
+        {/* Error messages from backend */}
+        <Stack p={1} width={300} height='max-content'>
+          {getErrorResponse(10)}
+        </Stack>
+
         <Stack flexDirection='row' gap={2} mt={4}>
           <Button variant='contained' color='error' onClick={props.onClose} fullWidth>
             {TranslateString('Cancel')}

@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** Third Party Imports
 import { ContentState, EditorState, convertFromHTML } from 'draft-js'
 
@@ -14,12 +11,11 @@ import EditorContainer from '../components/forms/EditorContainer'
 import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
-import { captureError } from '@/services/Sentry'
 import SitesService from '@/services/api/SitesService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 const PrivacyPolicy = () => {
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError } = useErrorHandling()
 
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
 
@@ -33,14 +29,7 @@ const PrivacyPolicy = () => {
       )
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, getSiteOtherDetails() Privacy Policy`)
-        })
-      }
+      handleError(e, `getSiteOtherDetails() privacypolicy`)
     }
   })
 
