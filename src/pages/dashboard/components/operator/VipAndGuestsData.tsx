@@ -95,7 +95,6 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
         }
       }),
     onSuccess: (data: any) => {
-      console.log(`DATA`, data)
       const date = data?.map((item: any) => item?.created_at)
       const guest = data?.map((item: any) => item?.total_new_guest)
       const vip = data?.map((item: any) => item?.total_new_vip)
