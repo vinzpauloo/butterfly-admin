@@ -1,9 +1,6 @@
 // ** React Imports
 import { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -23,9 +20,9 @@ import CreatedSuccessful from '../form/CreatedSuccessful'
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Hooks
+// ** Hooks/Services Imports
 import { CreateAccount } from '@/services/api/CreateAccount'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   role_id: '3' | ''
@@ -65,8 +62,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const CCDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   // ** Props
   const { open, toggle } = props
@@ -97,7 +93,6 @@ const CCDrawer = (props: SidebarAddUserType) => {
 
   const { createUser } = CreateAccount()
   const mutation = useMutation(createUser)
-  const [responseError, setResponseError] = useState<any>()
 
   const handleFormSubmit = async (data: FormValues) => {
     const userData = {
@@ -121,32 +116,8 @@ const CCDrawer = (props: SidebarAddUserType) => {
         queryClient.invalidateQueries({ queryKey: ['UsersTableCSV'] })
       }, 1500)
     } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      setResponseError(error)
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} queryFn: createUser() Content Creator`)
-        })
-      }
+      handleError(e, `createUser() CCDrawer.tsx`)
     }
-  }
-
-  const displayErrors = () => {
-    const errorElements: any = []
-
-    for (const key in responseError) {
-      responseError[key].forEach((value: any) => {
-        errorElements.push(
-          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
-            {value}
-          </Typography>
-        )
-      })
-    }
-
-    return errorElements
   }
 
   const [resetKey, setResetKey] = useState(0)
@@ -154,7 +125,7 @@ const CCDrawer = (props: SidebarAddUserType) => {
   const handleClose = () => {
     resetForm()
     setResetKey(prevKey => prevKey + 1)
-    setResponseError({})
+    clearErrorResponse()
     toggle()
   }
 
@@ -300,7 +271,9 @@ const CCDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                {displayErrors()}
+                {/* Error messages from backend */}
+                {getErrorResponse(12)}
+
                 <Box sx={styles.formButtonContainer}>
                   <Box>
                     <Button sx={styles.cancelButton} onClick={handleClose}>

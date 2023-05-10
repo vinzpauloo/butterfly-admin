@@ -7,10 +7,13 @@ import { Card, CardHeader, CardContent, ToggleButtonGroup, ToggleButton } from '
 // ** Third Party Imports
 import { Bar } from 'react-chartjs-2'
 import { ChartData, ChartOptions } from 'chart.js'
-import { DashboardService } from '@/services/api/DashboardService'
 
 // ** TanStack
 import { useQuery } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
+import { DashboardService } from '@/services/api/DashboardService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface VerticalBarProps {
   info: string
@@ -59,6 +62,7 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
   const { warning, labelColor, borderColor, legendColor } = props
 
   const { getVideoBarChart } = DashboardService()
+  const { handleError } = useErrorHandling()
 
   const [fromDate, setFromDate] = useState<string | undefined>()
   const [toDate, setToDate] = useState<string | undefined>()
@@ -87,6 +91,9 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
       }),
     onSuccess: (data: any) => {
       setVideoContentData(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getVideoBarChart() operator/VideoContentsBarChart.tsx`)
     }
   })
 

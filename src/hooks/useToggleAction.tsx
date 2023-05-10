@@ -3,6 +3,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query'
 
 // ** Services Imports
 import { UserTableService } from '@/services/api/UserTableService'
+import { useErrorHandling } from './useErrorHandling'
 
 // ** Project/Other Imports
 import ToggleButton from '@/pages/user/components/button/ToggleButton'
@@ -15,6 +16,8 @@ export interface ToggleActionProps {
 export const useToggleAction = ({ value, id }: ToggleActionProps) => {
   const queryClient = useQueryClient()
   const { updateUser } = UserTableService()
+  const { handleError } = useErrorHandling()
+
   const mutation = useMutation(
     async (data: { id: string; data: any }) => {
       const response = await updateUser(data.id, data.data)
@@ -25,6 +28,9 @@ export const useToggleAction = ({ value, id }: ToggleActionProps) => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
+      },
+      onError: (e: any) => {
+        handleError(e, `updateUser() useToggleAction hook`)
       }
     }
   )

@@ -1,12 +1,8 @@
 // ** React Imports
 import { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Radio, RadioGroup, Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
-
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -18,16 +14,16 @@ import { useForm, Controller } from 'react-hook-form'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** Other Imports
+// ** Project/Other Imports
 import CreatedSuccessful from '../form/CreatedSuccessful'
 import { useTranslateString } from '@/utils/TranslateString'
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Hooks
+// ** Hooks/Services Imports
 import { CreateAccount } from '@/services/api/CreateAccount'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   role_id: '1' | '2' | ''
@@ -69,14 +65,16 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const SupervisorDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const currentLocation = router.asPath
+
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
+  const TranslateString = useTranslateString()
 
   // ** Props
   const { open, toggle } = props
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
+  const [resetKey, setResetKey] = useState(0)
 
   const {
     control,
@@ -120,50 +118,16 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
         queryClient.invalidateQueries({ queryKey: ['UsersTableCSV'] })
       }, 1500)
     } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      setResponseError(error)
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} queryFn: createUser() Supervisor`)
-        })
-      }
+      handleError(e, `createUser() SupervisorDrawer.tsx`)
     }
   }
-
-  interface ErrorResponse {
-    [key: string]: string[]
-  }
-
-  const [responseError, setResponseError] = useState<ErrorResponse>()
-
-  function displayErrors() {
-    const errorElements: JSX.Element[] = []
-
-    for (const key in responseError) {
-      responseError[key].forEach(value => {
-        errorElements.push(
-          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
-            {value}
-          </Typography>
-        )
-      })
-    }
-
-    return errorElements
-  }
-
-  const [resetKey, setResetKey] = useState(0)
 
   const handleClose = () => {
     resetForm()
     setResetKey(prevKey => prevKey + 1)
-    setResponseError({})
+    clearErrorResponse()
     toggle()
   }
-
-  const TranslateString = useTranslateString()
 
   return (
     <Drawer
@@ -349,7 +313,9 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                {displayErrors()}
+                {/* Error messages from backend */}
+                {getErrorResponse(12)}
+
                 <Box sx={styles.formButtonContainer}>
                   <Box>
                     <Button sx={styles.cancelButton} onClick={handleClose}>

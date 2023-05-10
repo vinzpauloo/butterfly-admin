@@ -12,10 +12,13 @@ import { ChartData, ChartOptions } from 'chart.js'
 // ** Project/Other Imports
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import PickersComponent from '@/layouts/components/shared-components/Picker/CustomPickerInput'
-import { DashboardService } from '@/services/api/DashboardService'
 
 // ** TanStack Query Imports
 import { useQuery } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
+import { DashboardService } from '@/services/api/DashboardService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface VerticalBarProps {
   info: string
@@ -69,6 +72,7 @@ type SortType = 'asc' | 'desc' | undefined | null
 const VipAndGuestsData = (props: VerticalBarProps) => {
   const { info, warning, labelColor, borderColor } = props
   const { getVIPandGuestChart } = DashboardService()
+  const { handleError } = useErrorHandling()
 
   const [fromDate, setFromDate] = useState<string | undefined>()
   const [toDate, setToDate] = useState<string | undefined>()
@@ -96,6 +100,9 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
       const guest = data?.map((item: any) => item?.total_new_guest)
       const vip = data?.map((item: any) => item?.total_new_vip)
       setChartData(generateChartData(startDate, endDate, warning, info, date, guest, vip))
+    },
+    onError: (e: any) => {
+      handleError(e, `getVIPandGuestChart() operator/VipAndGuestsData.tsx`)
     }
   })
 
