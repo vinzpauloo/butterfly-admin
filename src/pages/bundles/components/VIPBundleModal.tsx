@@ -1,6 +1,5 @@
 // ** React Imports
 import React, { useState } from 'react'
-import toast from 'react-hot-toast'
 
 // ** Next Imports
 import { useRouter } from 'next/router'
@@ -23,7 +22,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import BundlesService from '@/services/api/BundlesService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 type Props = {
   isEditingVIPBundle?: boolean
@@ -72,8 +71,6 @@ const VIPBundleModal = (props: Props) => {
   const [featuresSelectionError, setFeaturesSelectionError] = useState(false)
   const [selectedSiteID, setSelectedSiteID] = useState(0)
   const [selectedDurationIndex, setSelectedDurationIndex] = useState(0)
-
-  const [errorResponse, setErrorResponse] = useState<string>()
 
   // SITE ID MENU
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -166,6 +163,10 @@ const VIPBundleModal = (props: Props) => {
   const queryClient = useQueryClient()
   const { addVIPBundle, editVIPBundle } = BundlesService()
 
+  const { handleError, getErrorResponse } = useErrorHandling({
+    currentLocation
+  })
+
   const {
     mutate: mutateAddNewVIPBundle,
     isLoading: addedLoading,
@@ -179,30 +180,7 @@ const VIPBundleModal = (props: Props) => {
       props.onClose()
     },
     onError: (e: any) => {
-      const {
-        data: { message, error }
-      } = e
-      const errorMessages: string[] = []
-
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            captureError(currentLocation, `${value}, addVIPBundle() VIP Modal`)
-            toast.error(`Error ${value}`, {
-              duration: 2000
-            })
-            errorMessages.push(value)
-          })
-        }
-      } else if (message) {
-        captureError(currentLocation, `${message}, addVIPBundle() VIP Modal`)
-        toast.error(`Error ${message}`, {
-          duration: 2000
-        })
-        errorMessages.push(message)
-      }
-
-      setErrorResponse(errorMessages.join('\n'))
+      handleError(e, `addVIPBundle() VIPBundleModal`)
     }
   })
 
@@ -219,30 +197,7 @@ const VIPBundleModal = (props: Props) => {
       props.onClose()
     },
     onError: (e: any) => {
-      const {
-        data: { message, error }
-      } = e
-      const errorMessages: string[] = []
-
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            captureError(currentLocation, `${value}, editVIPBundle() VIP Modal`)
-            toast.error(`Error ${value}`, {
-              duration: 2000
-            })
-            errorMessages.push(value)
-          })
-        }
-      } else if (message) {
-        captureError(currentLocation, `${message}, editVIPBundle() VIP Modal`)
-        toast.error(`Error ${message}`, {
-          duration: 2000
-        })
-        errorMessages.push(message)
-      }
-
-      setErrorResponse(errorMessages.join('\n'))
+      handleError(e, `editVIPBundle() VIPBundleModal`)
     }
   })
 
@@ -442,16 +397,9 @@ const VIPBundleModal = (props: Props) => {
         </Stack>
       </Stack>
 
+      {/* Error messages from backend */}
       <Stack p={1} width={300} height='max-content'>
-        {errorResponse &&
-          errorResponse.split('\n').map((line, index) => (
-            <React.Fragment key={index}>
-              <Typography color='error' fontSize={10} margin='0.15em'>
-                {`***` + line}
-              </Typography>
-              {index !== errorResponse.split('\n').length - 1}
-            </React.Fragment>
-          ))}
+        {getErrorResponse(10)}
       </Stack>
 
       <Stack flexDirection='row' gap={2} mt={4}>

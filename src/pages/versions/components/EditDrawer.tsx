@@ -27,7 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import { ApkService } from '@/services/api/ApkService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   [key: string]: any
@@ -76,7 +76,6 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
-  const [errorResponse, setErrorResponse] = useState<string>()
 
   const {
     control,
@@ -110,6 +109,8 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
     }
   })
 
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling({ currentLocation })
+
   const handleFormSubmit = async (data: FormValues) => {
     const formData = new FormData()
 
@@ -141,20 +142,7 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
         queryClient.invalidateQueries({ queryKey: ['allApk'] })
       }, 1500)
     } catch (e: any) {
-      const {
-        data: { message, error }
-      } = e
-      if (error) {
-        for (const key in error) {
-          error[key].forEach((value: any) => {
-            setErrorResponse(value)
-            captureError(currentLocation, `${value}, editAPK() Edit Versions`)
-          })
-        }
-      } else if (message) {
-        setErrorResponse(message)
-        captureError(currentLocation, `${message}, editAPK() Edit Versions`)
-      }
+      handleError(e, `editAPK() Versions Edit Drawer`)
     }
   }
 
@@ -162,7 +150,7 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
 
   const handleClose = () => {
     setResetKey(prevKey => prevKey + 1)
-    setErrorResponse('')
+    clearErrorResponse()
     toggle()
   }
 
@@ -292,7 +280,8 @@ const EditVersionDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                <Typography color='error'>{errorResponse}</Typography>
+                {/* Error messages from backend */}
+                {getErrorResponse(12)}
 
                 <Box sx={styles.formButtonContainer}>
                   <Box>
