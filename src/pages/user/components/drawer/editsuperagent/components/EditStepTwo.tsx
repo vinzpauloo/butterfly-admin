@@ -113,7 +113,6 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     >
       <ExpandoForm
         ref={formAPIRef}
-        handleExpandoSubmit={data => handleAPISubmit(data)}
         fileType='text'
         pageHeader="API's"
         isLoading={isLoading}
@@ -121,7 +120,6 @@ const EditStepTwo = (props: SidebarAddUserType) => {
       />
       <ExpandoForm
         ref={formStreamRef}
-        handleExpandoSubmit={handleStreamSubmit}
         fileType='text'
         pageHeader='STREAMING'
         isLoading={isLoading}
@@ -129,7 +127,6 @@ const EditStepTwo = (props: SidebarAddUserType) => {
       />
       <ExpandoForm
         ref={formPhotosRef}
-        handleExpandoSubmit={handlePhotoSubmit}
         fileType='text'
         pageHeader='PHOTOS'
         isLoading={isLoading}
