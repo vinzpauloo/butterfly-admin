@@ -71,12 +71,11 @@ const FQDNService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'Content-Type': 'multipart/form-data', // if POST is form-data
         "Accept": "application/json",
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/fqdns',
-      method: 'POST',
+      url: `/admin/sites/${params.data?.site}/fqdn`,
+      method: 'PUT',
       data: params.data,
   })
   }
