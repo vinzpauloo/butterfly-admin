@@ -111,8 +111,10 @@ const UploadVideoPublish = () => {
               variant='filled'
               fullWidth
               placeholder='Title'
+              label='Title'
             />
             <CustomTextField
+              label="Description"
               onChange={event => {
                 handleDescriptionChange(event)
               }}
@@ -132,6 +134,7 @@ const UploadVideoPublish = () => {
                   variant='filled'
                   fullWidth
                   placeholder='#TAGS'
+                  label='Tags'
                   value={finalTags}
                   InputProps={{ readOnly: true }}
                 />
@@ -143,6 +146,7 @@ const UploadVideoPublish = () => {
                   placeholder='GROUPING TEMPLATE'
                   value={finalGroupings}
                   InputProps={{ readOnly: true }}
+                  label='Groupings'
                 />
               </Grid>
             </Grid>

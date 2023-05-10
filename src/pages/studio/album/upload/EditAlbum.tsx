@@ -1,13 +1,12 @@
 // ** React imports
-import React, { Fragment, useEffect, useCallback, useState, SyntheticEvent } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 
-// ** Next Images
+// ** Next Imports
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import { Box, Typography, TextField, Button, List, ListItem, IconButton } from '@mui/material'
-import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -17,14 +16,17 @@ import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 
 // ** Third Party Components
 import { useDropzone } from 'react-dropzone'
-import { v4 as uuidv4 } from 'uuid'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** TanStack Query
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+
+// ** API Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
+import { captureError } from '@/services/Sentry'
 
 interface FormValues {
   title: string
@@ -133,7 +135,11 @@ const FileUploaderSingle: React.FC<FileUploaderSingleProps> = ({ onFilesChange, 
               height: '100%'
             }}
           >
-            {files.length > 0 ? img : <img src={albumData?.cover.cover_photo} width='100%' height='100%' alt='test' />}
+            {files.length > 0 ? (
+              img
+            ) : (
+              <img src={FILE_SERVER_URL + albumData?.cover.cover_photo} width='100%' height='100%' alt='test' />
+            )}
           </Box>
         )}
       </Box>
@@ -273,7 +279,7 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
             responseMultiple.map((item: any, index: any) => {
               return (
                 <Box key={index} sx={{ display: 'flex' }}>
-                  <img src={item.photo} alt='test2' width='250' height='250' />
+                  <img src={FILE_SERVER_URL + item.photo} alt='test2' width='250' height='250' />
                   <IconButton onClick={() => handlePhotoDelete(item.photo_id)}>
                     <Icon icon='mdi:close' fontSize={20} />
                   </IconButton>
@@ -286,16 +292,19 @@ const FileUploaderMultiple: React.FC<FileUploaderMultipleProps> = ({
   )
 }
 
+interface AlbumDataProps {
+  title: string
+}
+
 const EditAlbum = () => {
   const router = useRouter()
+  const currentLocation = router.asPath
   const { query } = router
   const albumId = Object.keys(query)
 
   // Use albumId[0] to get the specific id
 
-  const queryClient = useQueryClient()
-
-  const { isLoading, isRefetching } = useQuery({
+  useQuery({
     queryKey: ['specificAlbum', albumId[0]],
     queryFn: () =>
       getSpecificUserAlbum({
@@ -309,15 +318,13 @@ const EditAlbum = () => {
   })
 
   /* States */
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
-  const [albumData, setAlbumData] = useState(null)
+  const [uploadedFiles] = useState<File[]>([])
+  const [albumData, setAlbumData] = useState<AlbumDataProps | null>(null)
 
   // ** Navigate to previous page
   const handleCancelButton = () => {
     router.back()
   }
-
-  const [fileName, setFileName] = useState('')
 
   const {
     register,
@@ -330,34 +337,21 @@ const EditAlbum = () => {
 
   useEffect(() => {
     if (albumData) {
-      // @ts-ignore
       setValue(`title`, `${albumData?.title}`)
       setFormValue(prevState => ({
         ...prevState,
-        // @ts-ignore
         title: albumData?.title
       }))
     }
   }, [albumData])
 
   const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = event.target
+    const { name, value } = event.target
 
-    if (name === 'logo' && files) {
-      const file = files[0]
-      if (file) {
-        setFileName(file.name)
-        setFormValue(prevState => ({
-          ...prevState,
-          [name]: file
-        }))
-      }
-    } else {
-      setFormValue(prevState => ({
-        ...prevState,
-        [name]: value
-      }))
-    }
+    setFormValue(prevState => ({
+      ...prevState,
+      [name]: value
+    }))
   }
 
   const handleCoverPhotoChange = (files: File[]) => {
@@ -370,12 +364,10 @@ const EditAlbum = () => {
     }
 
     setFormValue({ ...formValue, cover_photo: files[0] })
-    console.log(`handleCOVERCHANGE`, formValue)
   }
 
   const handleMultiplePhotoChange = (files: File[]) => {
     setFormValue({ ...formValue, photo: files })
-    console.log(`handleMultiplePhoto`, formValue)
   }
 
   const handleDeletedPhotos = (deletedPhotoIds: any[]) => {
@@ -398,8 +390,6 @@ const EditAlbum = () => {
   })
 
   const handleFormSubmit = async () => {
-    console.log(formValue)
-
     try {
       await mutation.mutateAsync({
         _id: albumId[0],
@@ -409,9 +399,15 @@ const EditAlbum = () => {
       setTimeout(() => {
         router.push(`/studio/album/album-list`)
       }, 1000)
-    } catch (error) {
-      console.log(error)
-      alert(error)
+    } catch (e: any) {
+      const {
+        data: { error }
+      } = e
+      for (const key in error) {
+        error[key].forEach((value: any) => {
+          captureError(currentLocation, `${value} queryFn: editAlbum()`)
+        })
+      }
     }
   }
 

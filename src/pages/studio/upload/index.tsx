@@ -11,12 +11,14 @@ import UserLayoutNoPadding from '@/layouts/UserLayoutNoPadding'
 //** Views Imports */
 import UploadMenu from './views/UploadMenu'
 import UploadVideoStep1 from './views/UploadVideoStep1'
-import UploadNewsfeedsStep1 from './views/UploadNewsfeedsStep1'
 import LoadingScreen from './views/LoadingScreen'
 import VideoVisibility from './views/VideoVisibility'
 import UploadVideoPublish from './views/UploadVideoPublish'
 import VideosListTable from './views/VideosList'
 import UploadAlbum from './views/UploadAlbum'
+
+// ** Hook form
+import { useForm, FormProvider, useFormContext } from 'react-hook-form'
 
 // ** Styled Components
 const BoxBG = styled(Box)<BoxProps>(({ theme }) => ({
@@ -42,7 +44,6 @@ export enum DisplayPage {
   MainPage,
   UploadVideoStep1,
   UploadAlbum,
-  UploadNewsfeedsStep1,
   LoadingScreen,
   VideoVisibility,
   UploadVideoPublish,
@@ -100,6 +101,8 @@ export type StudioContextType = {
   setTrialProgress: React.Dispatch<React.SetStateAction<number>>
   workId: number | null
   setWorkId: React.Dispatch<React.SetStateAction<number | null>>
+  uploadURL: string
+  setUploadURL: React.Dispatch<React.SetStateAction<string>>
 }
 
 //** DATA */
@@ -122,6 +125,10 @@ const UploadContent = () => {
   const [workProgress, setWorkProgress] = React.useState<number>(0)
   const [trialProgress, setTrialProgress] = React.useState<number>(0)
   const [workId, setWorkId] = React.useState<number | null>(null)
+  const [uploadURL, setUploadURL] = React.useState<string>('')
+
+  // ** React-Hook-Form hooks
+  const methods = useForm()
 
   React.useEffect(() => {
     // console.log('call useEffect workProgress')
@@ -139,7 +146,6 @@ const UploadContent = () => {
     if (displayPage == DisplayPage.MainPage) return <UploadMenu />
     if (displayPage == DisplayPage.UploadVideoStep1) return <UploadVideoStep1 />
     if (displayPage == DisplayPage.UploadAlbum) return <UploadAlbum />
-    if (displayPage == DisplayPage.UploadNewsfeedsStep1) return <UploadNewsfeedsStep1 />
     if (displayPage == DisplayPage.LoadingScreen) return <LoadingScreen />
     if (displayPage == DisplayPage.VideoVisibility) return <VideoVisibility />
     if (displayPage == DisplayPage.UploadVideoPublish) return <UploadVideoPublish />
@@ -170,10 +176,14 @@ const UploadContent = () => {
         trialProgress,
         setTrialProgress,
         workId,
-        setWorkId
+        setWorkId,
+        uploadURL,
+        setUploadURL
       }}
     >
-      <BoxBG>{PageDisplay()}</BoxBG>
+      <FormProvider {...methods}>
+        <BoxBG>{PageDisplay()}</BoxBG>
+      </FormProvider>
     </StudioContext.Provider>
   )
 }
@@ -182,4 +192,10 @@ UploadContent.contentHeightFixed = false
 UploadContent.getLayout = (page: ReactNode) => (
   <UserLayoutNoPadding contentHeightFixed={UploadContent.contentHeightFixed}>{page}</UserLayoutNoPadding>
 )
+
+UploadContent.acl = {
+  action: 'read',
+  subject: 'cc-page'
+}
+
 export default UploadContent

@@ -1,21 +1,21 @@
+// ** React Imports
 import React from 'react'
 
-// ** MUI Imports
-import { Box, Card, Grid, Tab, IconButton } from '@mui/material'
-import Icon from 'src/@core/components/icon'
-
+// ** Next Imports
 import { useRouter } from 'next/router'
 
-import ToggleButton from '@/pages/user/components/button/ToggleButton'
-import formatDate from '@/utils/formatDate'
-
-// ** Hooks
-import { useUsersTable } from '@/services/api/useUsersTable'
-
-// ** TanStack Query
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import CustomAvatar from 'src/@core/components/mui/avatar'
+// ** MUI Imports
+import { Box } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
+
+// ** Project Imports
+import CustomAvatar from 'src/@core/components/mui/avatar'
+import Icon from 'src/@core/components/icon'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
+// ** Utils Imports
+import formatDate from '@/utils/formatDate'
+import { useTranslateString } from '@/utils/TranslateString'
 
 interface ToggleViewProps {
   data: any
@@ -31,51 +31,67 @@ const ToggleView: React.FC<ToggleViewProps> = ({ data }) => {
   return <Icon onClick={handleViewClick} icon='mdi:eye-outline' fontSize={20} cursor='pointer' />
 }
 
-export const AlbumColumns = [
-  {
-    field: 'title',
-    headerName: 'Title',
-    width: 400
-  },
-  {
-    field: 'created_at',
-    headerName: 'Date Created',
-    width: 250,
-    valueFormatter: (params: any) => {
-      return formatDate(params?.value)
-    }
-  },
-  {
-    field: 'updated_at',
-    headerName: 'Last Updated',
-    width: 250,
-    valueFormatter: (params: any) => {
-      return formatDate(params?.value)
-    }
-  },
-  {
-    field: 'cover',
-    headerName: 'Cover Photo',
-    width: 250,
-    renderCell: (params: GridRenderCellParams) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <CustomAvatar
-              src={params?.row.cover.cover_photo || params?.row.cover[0].cover_photo}
-              sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
-            />
+export const AlbumColumns = () => {
+  const TranslateString = useTranslateString()
+
+  return [
+    {
+      flex: 0.04,
+      minWidth: 70,
+      sortable: false,
+      field: 'title',
+      headerName: TranslateString('Title')
+    },
+    {
+      flex: 0.03,
+      minWidth: 80,
+      sortable: false,
+      field: 'created_at',
+      headerName: TranslateString('Date Created'),
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      flex: 0.03,
+      minWidth: 80,
+      sortable: false,
+      field: 'updated_at',
+      headerName: TranslateString('Last Update'),
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      flex: 0.03,
+      minWidth: 60,
+      sortable: false,
+      field: 'cover',
+      headerName: TranslateString('Cover Photo'),
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <CustomAvatar
+                src={
+                  FILE_SERVER_URL + params?.row.cover.cover_photo || FILE_SERVER_URL + params?.row.cover[0].cover_photo
+                }
+                sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
+              />
+            </Box>
           </Box>
-        </Box>
-      )
+        )
+      }
+    },
+    {
+      flex: 0.01,
+      minWidth: 60,
+      sortable: false,
+      field: 'album',
+      headerName: TranslateString('Gallery'),
+      renderCell: (params: GridRenderCellParams) => {
+        return <ToggleView data={params.row._id} />
+      }
     }
-  },
-  {
-    field: 'album',
-    headerName: 'Gallery',
-    width: 100,
-    renderCell: (params: GridRenderCellParams) => {
-      return <ToggleView data={params.row._id} />
-    }
-  }
-]
+  ]
+}

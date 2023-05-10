@@ -20,7 +20,6 @@ import Icon from 'src/@core/components/icon'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
-import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
 
 //* Context Import
 import { StudioContext, DisplayPage } from '..'
@@ -41,6 +40,20 @@ import { PublishSchedule } from '..'
 
 // ** Services Import
 import VideoService from '@/services/api/VideoService'
+
+// ** react-hook-form
+import { useFormContext  } from 'react-hook-form'
+
+// ** Uploady
+import {
+  useUploady,
+  useAbortBatch,
+  UploadyContext,
+  UPLOADER_EVENTS
+} from '@rpldy/uploady'
+
+// ** Import base link
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
 
 // Styled components
 const HeaderBox = styled(Box)(({ theme }) => ({
@@ -74,18 +87,175 @@ const CustomAccordion = styled(Accordion)(({ theme }) => ({
 }))
 
 const VideoVisibility = () => {
-  const router = useRouter()
-  React.useEffect(() => {
-    console.log('studioContext FINAL', studioContext)
-  }, [])
+  // ** Hooks
+  const uploady = useUploady()
+  const abortBatch = useAbortBatch()
 
-  // ** Query apis
-  const { updateVideoByWorkId } = VideoService()
   // ** State
   const [expanded, setExpanded] = React.useState<string | false>('panel1')
   const [date, setDate] = React.useState<DateType>(new Date())
   const [selectedValue, setSelectedValue] = React.useState<string>('publish')
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [workVideo, setWorkVideo] = React.useState<string | null>(null)
+  const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
+  const [ videoTypeUploaded, setVideoTypeUploaded ] = React.useState<'full_video' | 'trial_video'>('full_video')
+
+  // ** SERVICES CALLS
+  const { uploadVideoURL } = VideoService()
+
+  // ** Context ReactHookForm
+  const { getValues, setValue } = useFormContext()
+
+  // ** COMPONENT FUNCTIONS **/
+
+  const handleFormData = (work_id: string, hasTrialCheck: boolean): FormData => {
+    // ** Update the table with the work_id -- Refactor this formData values
+    console.log('handleFormData getValues', getValues())
+
+    const { title, description, startTime, thumbnailFile } = getValues()
+
+    const formData = new FormData()
+
+    formData.append('work_id', work_id)
+    formData.append('title', title)
+    formData.append('description', description)
+    formData.append('orientation', 'Landscape') // HardCoded
+    formData.append('startTimeSeconds', startTime)
+    formData.append('_method', 'put')
+
+    if (thumbnailFile?.length) {
+      formData.append('thumbnail', thumbnailFile[0])
+    }
+
+    formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
+
+    if (studioContext?.tags.length) {
+      studioContext?.tags.map(tag => formData.append('tags[]', tag))
+    }
+    if (studioContext?.groupings.length) {
+      studioContext?.groupings.map(group => formData.append('groups[]', group))
+    }
+
+    return formData
+  } // end handleFormData Fxn
+
+  
+
+  // Context
+  const uploadyContext = React.useContext(UploadyContext)
+
+  // Router
+  const router = useRouter()
+
+  // ** Use Effects
+  React.useEffect(() => {
+    console.log('studioContext FINAL', studioContext)
+  }, [])
+
+  React.useEffect(() => {
+
+    const eventBatchStart = (batch : any, options : any ) => {
+      console.log('EVENT BATCH START batch', batch)
+      console.log('EVENT BATCH START options', options)
+    }
+
+    const eventProgress = (item: any) => {
+      //console.log('CALL PROGRESS EVENT', item)
+      const { videoType }  = getValues()
+      console.log('call in event progress', videoType)
+
+      if ( videoType == 'full_video' ) {
+        studioContext?.setWorkProgress(item.completed)
+      } 
+
+      if ( videoType == 'trial_video' ) {
+        studioContext?.setTrialProgress(item.completed)
+      }
+      
+    }
+
+    const eventPreSend = async (items: any, options: any) => {
+      console.log('CALL PRESEND', options)
+
+      let hasTrialVideo = false
+
+      const { title, contentCreator } = getValues()
+
+      console.log('EVENTPRESEND VALUES', getValues())
+
+      if (options?.params?.video_type == 'full_video') {
+
+        // use react-hook-form context
+        setValue('videoType', 'full_video')
+
+        const passFullVideoData = {
+          user_id: contentCreator,
+          video_type: 'full_video',
+          video_name: title
+        }
+
+        const result = await uploadVideoURL({ formData: passFullVideoData })
+        const { uploadUrl, work_id } = result
+        console.log('RESULT', result)
+        //set a work ID
+        studioContext?.setWorkId(work_id)
+        setWorkVideo(work_id)
+        setValue('work_id', work_id)
+
+        // update the form
+        updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+
+        return uploadUrl
+          ? //set the new URL for this upload
+            { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+          : //not valid URL, cancel the upload
+            false
+
+      
+      } else if (options?.params?.video_type == 'trial_video') {
+        // we have a trial video
+        hasTrialVideo = true
+        
+        // use react-hook-form context
+        setValue('videoType', 'trial_video')
+
+        const { work_id } = getValues()
+
+        const passTrailerVideoData = {
+          user_id: contentCreator,
+          video_type: 'trial_video',
+          video_name: title,
+          work_id: work_id
+        }
+        const result = await uploadVideoURL({ formData: passTrailerVideoData })
+        console.log('result trailer', result)
+        const { uploadUrl } = result
+        // update the form
+        updateVideoByWorkId({ formData: handleFormData( work_id as unknown as string, hasTrialVideo) })
+
+        return uploadUrl
+          ? //set the new URL for this upload
+            { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+          : //not valid URL, cancel the upload  
+            false
+
+      }
+
+    }
+
+    uploadyContext.on(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
+    uploadyContext.on(UPLOADER_EVENTS.REQUEST_PRE_SEND, eventPreSend)
+    uploadyContext.on(UPLOADER_EVENTS.BATCH_START, eventBatchStart);
+
+    return () => {
+      uploadyContext.off(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
+      uploadyContext.off(UPLOADER_EVENTS.BATCH_START, eventBatchStart)
+    }
+  }, [uploadyContext])
+
+
+  // ** Query apis
+  const { updateVideoByWorkId } = VideoService()
 
   //** Popper
   const popperPlacement = 'bottom-end'
@@ -102,10 +272,11 @@ const VideoVisibility = () => {
   }
   const dummyNavigate = () => {
     //studioContext?.setDisplayPage(DisplayPage.VideosList)
+
     let isSchedule = selectedValue == 'publish' ? false : true
 
     let defaultWorkFormParams = {
-      work_id: studioContext?.workId,
+      work_id: getValues().work_id, //getting from react-hook-form context provider
       _method: 'put'
     }
 
@@ -123,6 +294,7 @@ const VideoVisibility = () => {
       router.push('/studio/video-list')
     })
   }
+
   const updateWork = (formDataParams: { [key: string]: any }) => {
     let formData = new FormData()
     Object.keys(formDataParams).forEach(key => {
@@ -136,10 +308,12 @@ const VideoVisibility = () => {
       formData: formData
     })
   }
+
   const dimOnTrue = (flag: boolean) => {
     return {
       opacity: flag ? 0.3 : 1,
-      backgroundColor: 'black'
+      backgroundColor: 'black',
+      padding: '.3rem'
     }
   }
 
@@ -158,7 +332,6 @@ const VideoVisibility = () => {
     studioContext?.setPublishDate(publish)
   }
 
-  console.log('workProgress', studioContext?.workProgress)
 
   return (
     <Box
@@ -176,8 +349,9 @@ const VideoVisibility = () => {
             lineHeight: 1,
             fontWeight: 600,
             textTransform: 'uppercase',
-            fontSize: '1.5rem !important',
-            textAlign: 'left'
+            fontSize: ['1rem', '1.5rem !important'],
+            textAlign: 'left',
+            mt: ['1.5rem', '0']
           }}
           color={theme => theme.customBflyColors.primaryText}
         >
@@ -193,7 +367,7 @@ const VideoVisibility = () => {
           }}
         >
           <Grid container spacing={5}>
-            <Grid item sm={8}>
+            <Grid item xs={12} sm={8}>
               <CustomAccordion expanded>
                 <AccordionSummary id='panel-header-1' aria-controls='panel-content-1'>
                   <HeaderBox>
@@ -324,7 +498,7 @@ const VideoVisibility = () => {
               </CustomAccordion>
             </Grid>
 
-            <Grid item sm={4}>
+            <Grid item xs={12} sm={4}>
               <UploadBox>
                 <Box>
                   <Box
@@ -389,28 +563,23 @@ const VideoVisibility = () => {
                 ) : (
                   <>
                     <Box>
-                      <Button
-                        disabled={studioContext?.workProgress != 100 ? true : false}
-                        onClick={handleCancelButton}
-                      >
+                      <Button disabled={studioContext?.workProgress != 100 ? true : false} onClick={handleCancelButton}>
                         Back
                       </Button>
                     </Box>
 
                     <Box>
                       <Button
-                        onClick={dummyNavigate}
+                        onClick={() => {
+                          dummyNavigate()
+                        }}
                         sx={{
                           bgcolor: 'primary.main',
                           color: 'common.white'
                         }}
                         color='primary'
                         variant='contained'
-                        disabled={studioContext?.workProgress != 100 ? true : false}
                       >
-                        {studioContext?.workProgress != 100 ? (
-                          <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' />
-                        ) : null}{' '}
                         Save
                       </Button>
                     </Box>

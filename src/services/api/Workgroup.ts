@@ -1,23 +1,24 @@
 import request from '../../lib/request'
 import authConfig from 'src/configs/auth'
+import { getHeaders } from '@/lib/cryptoJs'
 
 interface IGetWorkgroup {
   page: number
   paginate: number
+  sort: string
+  sort_by: string
+  search_by: string
+  search_value?: string
+  select?: string
+  navbar?: string
+  template_id?: string
 }
 interface IGetSpecificWorkgroup {
   id: string
 }
 interface IGetAllWorkgroup {
   workgroup_id: string
-}
-interface IGetSearchWorkgroup {
   page: number
-  search_by: string
-  search_value?: string
-  select: string
-  navbar?: string
-  template_id?: string
 }
 
 interface IPostWorkgroup {
@@ -52,7 +53,7 @@ const WorkgroupService = () => {
   const getWorkgroup = (params: IGetWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -65,7 +66,7 @@ const WorkgroupService = () => {
   const postWorkgroup = (params: IPostWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -78,7 +79,7 @@ const WorkgroupService = () => {
   const putWorkgroup = (params: IPutWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -88,23 +89,10 @@ const WorkgroupService = () => {
     })
   }
 
-  const getSearchWorkgroups = (params: IGetSearchWorkgroup) => {
-    return request({
-      headers: {
-        'X-Authorization': 'postman|1',
-        'ngrok-skip-browser-warning': '69420', // only for dev
-        Authorization: `Bearer ${accessToken}`
-      },
-      url: '/workgroups',
-      method: 'GET',
-      params: params
-    })
-  }
-
   const getSpecificWorkgroup = (params: IGetSpecificWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -116,8 +104,7 @@ const WorkgroupService = () => {
   const getAllWorkgroup = (params: IGetAllWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
-        'ngrok-skip-browser-warning': '69420', // only for dev
+        ...getHeaders(),
         Authorization: `Bearer ${accessToken}`
       },
       url: 'admin/works',
@@ -129,7 +116,7 @@ const WorkgroupService = () => {
   const deleteCheckWorkgroup = (params: ICheckWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -142,7 +129,7 @@ const WorkgroupService = () => {
   const postCheckWorkgroup = (params: ICheckWorkgroup) => {
     return request({
       headers: {
-        'X-Authorization': 'postman|1',
+        ...getHeaders(),
         'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
@@ -155,7 +142,6 @@ const WorkgroupService = () => {
   return {
     getWorkgroup,
     postWorkgroup,
-    getSearchWorkgroups,
     getSpecificWorkgroup,
     putWorkgroup,
     getAllWorkgroup,

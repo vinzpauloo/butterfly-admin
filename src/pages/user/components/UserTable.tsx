@@ -1,9 +1,9 @@
 // ** React Imports
-import React, { useState, useEffect, ChangeEvent } from 'react'
+import React, { useEffect, ChangeEvent } from 'react'
 
 // ** MUI Imports
 import { Box, Card, Grid, Tab } from '@mui/material'
-import { DataGrid, GridSortModel } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
@@ -14,21 +14,313 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Table Components Imports
 import UserTableToolbar from './UserTableToolbar'
 
-// ** Style Imports
-
-// ** Other Imports
+// ** Project/Other Imports
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import SADrawer from './drawer/SADrawer'
 import CCDrawer from './drawer/CCDrawer'
+import EditSupervisorDrawer from './drawer/EditSupervisorDrawer'
+import EditSuperAgentDrawer from './drawer/editsuperagent'
+import EditCreatorDrawer from './drawer/EditCreatorDrawer'
+import { OperatorColumns } from '@/data/OperatorColumns'
+import { SuperAgentColumns } from '@/data/SuperAgentColumns'
+import { ContentCreatorColumns } from '@/data/ContentCreatorColumns'
 
-// ** Hooks
-import { useUsersTable } from '../../../services/api/useUsersTable'
+// ** Hooks/Services
+import { UserTableService } from '../../../services/api/UserTableService'
+import { CreateAccount } from '@/services/api/CreateAccount'
+import useDebounce from '@/hooks/useDebounce'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** TanStack Query
-import { useQuery } from '@tanstack/react-query'
-import { operatorColumns } from '@/data/OperatorColumns'
-import { superAgentColumns } from '@/data/SuperAgentColumns'
-import { contentCreatorColumns } from '@/data/ContentCreatorColumns'
+import { useQuery, useQueries } from '@tanstack/react-query'
+
+// ** Utils Imports
+import { useTranslateString } from '@/utils/TranslateString'
+
+// ** Zustand State Management
+import { useUserTableStore } from '@/zustand/userTableStore'
+
+const UserTable = () => {
+  const {
+    setPage,
+    pageSize,
+    setPageSize,
+    role,
+    setRole,
+    roleId,
+    columnType,
+    setColumnType,
+    rowCount,
+    setRowCount,
+    subRole,
+    sort,
+    setSort,
+    sortName,
+    setSortName,
+    search,
+    emailSearchValue,
+    mobileSearchValue,
+    searchValue,
+    initialLoad,
+    setInitialLoad,
+    activeTab,
+    setActiveTab,
+    languages,
+    setLanguages,
+    currencies,
+    setCurrencies,
+    rowData,
+    setRowData,
+    handleRoleChange,
+    openDrawer,
+    drawerRole,
+    drawerData,
+    setDrawerRole,
+    supervisorPage,
+    saPage,
+    ccPage,
+    setSupervisorPage,
+    setSaPage,
+    setCcPage
+  } = useUserTableStore()
+
+  const { handlePageChange, handleSearch, handleDrawerToggle } = useUserTableStore(state => ({
+    handlePageChange: state.handlePageChange,
+    handleSearch: state.handleSearch,
+    handleDrawerToggle: state.handleDrawerToggle
+  }))
+
+  // ** Columns for DataGrid
+  const operatorColumns = OperatorColumns()
+  const superAgentColumns = SuperAgentColumns()
+  const contentCreatorColumns = ContentCreatorColumns()
+  const columnsMap = new Map([
+    ['operators', operatorColumns],
+    ['superagent', superAgentColumns],
+    ['contentcreators', contentCreatorColumns]
+  ])
+  const filteredColumns: any = columnsMap.get(columnType) ?? []
+
+  // ** Service/Hooks
+  const { getUsers } = UserTableService()
+  const { handleError } = useErrorHandling()
+  const { getLanguages, getCurrency } = CreateAccount()
+  const debouncedUsername = useDebounce(searchValue, 1000)
+  const debouncedEmail = useDebounce(emailSearchValue, 1000)
+  const debouncedMobile = useDebounce(mobileSearchValue, 1000)
+
+  useEffect(() => {
+    if (initialLoad) {
+      setPage(1)
+      setRole('SUPERVISOR')
+      setColumnType('operators')
+      setActiveTab('SUPERVISOR')
+      setSort('desc')
+      setSortName('created_at')
+      handleRoleChange('SUPERVISOR')
+      setInitialLoad(false)
+    } else {
+      handleRoleChange(activeTab)
+    }
+  }, [initialLoad, activeTab, handleRoleChange])
+
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: [
+      'allUsers',
+      role,
+      roleId,
+      sort,
+      sortName,
+      search,
+      search === 'username'
+        ? debouncedUsername || undefined
+        : search === 'email'
+        ? debouncedEmail || undefined
+        : debouncedMobile || undefined,
+      subRole,
+      activeTab === 'SUPERVISOR' ? supervisorPage : activeTab === 'SA' ? saPage : ccPage
+    ],
+    queryFn: () =>
+      getUsers({
+        data: {
+          role: role,
+          role_id: roleId,
+          page: activeTab === 'SUPERVISOR' ? supervisorPage : activeTab === 'SA' ? saPage : ccPage,
+          sort: sort,
+          sort_by: sortName,
+          search_by: search,
+          search_value:
+            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile,
+          ...(role === 'SUPERVISOR' ? { with: subRole } : {})
+        }
+      }),
+    onSuccess: response => {
+      setRowCount(response?.total)
+      setRowData(response?.data)
+      setPageSize(response?.per_page)
+      if (activeTab === 'SUPERVISOR') {
+        setSupervisorPage(response?.current_page)
+      } else if (activeTab === 'SA') {
+        setSaPage(response?.current_page)
+      } else if (activeTab === 'CC') {
+        setCcPage(response?.current_page)
+      }
+    },
+    onError: (e: any) => {
+      handleError(e, `getUsers() UserTable.tsx`)
+    },
+    enabled: !initialLoad
+  })
+
+  useQueries({
+    queries: [
+      {
+        queryKey: ['Languages'],
+        queryFn: getLanguages,
+        onSuccess: (response: { data: [] }) => {
+          setLanguages(response?.data)
+        },
+        onError: (e: any) => {
+          handleError(e, `getLanguages() UserTable.tsx`)
+        }
+      },
+      {
+        queryKey: ['Currencies'],
+        queryFn: getCurrency,
+        onSuccess: (response: { data: [] }) => {
+          setCurrencies(response?.data)
+        },
+        onError: (e: any) => {
+          handleError(e, `getCurrency() UserTable.tsx`)
+        }
+      }
+    ]
+  })
+
+  return (
+    <Grid container spacing={6}>
+      <Grid item xs={12}>
+        <Card>
+          <UserTabs />
+
+          <DataGrid
+            page={activeTab === 'SUPERVISOR' ? supervisorPage - 1 : activeTab === 'SA' ? saPage - 1 : ccPage - 1}
+            disableColumnMenu
+            loading={isLoading || isRefetching}
+            checkboxSelection={false}
+            disableSelectionOnClick
+            paginationMode='server'
+            sortingMode='server'
+            autoHeight
+            rows={rowData ?? []}
+            columns={filteredColumns}
+            pageSize={pageSize || 10}
+            pagination
+            onPageChange={handlePageChange}
+            rowCount={rowCount || 10}
+            rowsPerPageOptions={[10]}
+            components={{ Toolbar: UserTableToolbar }}
+            componentsProps={{
+              toolbar: {
+                toggle: (role: any) => handleDrawerToggle(role),
+                role: role,
+                role_id: roleId,
+                usernameValue: searchValue,
+                emailValue: emailSearchValue,
+                mobileValue: mobileSearchValue,
+                clearUsername: () => handleSearch('', 'username'),
+                clearEmail: () => handleSearch('', 'email'),
+                clearMobile: () => handleSearch('', 'mobile'),
+                clearAll: () => {
+                  handleSearch('', 'username')
+                  handleSearch('', 'email')
+                  handleSearch('', 'mobile')
+                },
+                onUsernameChange: (event: ChangeEvent<HTMLInputElement>) =>
+                  handleSearch(event.target.value, 'username'),
+                onEmailChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'email'),
+                onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
+              }
+            }}
+            sx={{ padding: 0 }}
+          />
+          {/* CREATE Drawers */}
+          <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
+          <SADrawer
+            open={openDrawer === 'SA'}
+            toggle={() => handleDrawerToggle('SA')}
+            languages={languages}
+            currencies={currencies}
+          />
+          <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
+
+          {/* EDIT Drawers */}
+          {drawerRole === 'SUPERVISOR' && (
+            <EditSupervisorDrawer
+              data={drawerData}
+              open={drawerRole === 'SUPERVISOR'}
+              toggle={() => setDrawerRole(null)}
+            />
+          )}
+          {drawerRole === 'SA' && (
+            <EditSuperAgentDrawer open={drawerRole === 'SA'} toggle={() => setDrawerRole(null)} />
+          )}
+          {drawerRole === 'CC' && (
+            <EditCreatorDrawer data={drawerData} open={drawerRole === 'CC'} toggle={() => setDrawerRole(null)} />
+          )}
+        </Card>
+      </Grid>
+    </Grid>
+  )
+}
+
+function UserTabs() {
+  const TranslateString = useTranslateString()
+
+  const { activeTab } = useUserTableStore()
+  const handleChange = useUserTableStore(state => state.handleChange)
+
+  return (
+    <Box sx={styles.buttonContainer}>
+      <TabContext value={activeTab || 'SUPERVISOR'}>
+        <TabList
+          variant='scrollable'
+          scrollButtons='auto'
+          onChange={handleChange}
+          aria-label='forced scroll tabs example'
+        >
+          <Tab
+            value='SUPERVISOR'
+            label={
+              <Box sx={styles.tabStyle}>
+                <Icon fontSize={20} icon='mdi:account-outline' />
+                {TranslateString('Operators')}
+              </Box>
+            }
+          />
+          <Tab
+            value='SA'
+            label={
+              <Box sx={styles.tabStyle}>
+                <Icon fontSize={20} icon='mdi:lock-outline' />
+                {TranslateString('Super Agent')}
+              </Box>
+            }
+          />
+          <Tab
+            value='CC'
+            label={
+              <Box sx={styles.tabStyle}>
+                <Icon fontSize={20} icon='mdi:bookmark-outline' />
+                {TranslateString('Content Creator')}
+              </Box>
+            }
+          />
+        </TabList>
+      </TabContext>
+    </Box>
+  )
+}
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -50,268 +342,7 @@ const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   }
 }))
 
-const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
-
-type SortType = 'asc' | 'desc' | undefined | null
-
-const UserTable = () => {
-  const { getUsers } = useUsersTable()
-  const [page, setPage] = useState<number>()
-  const [pageSize, setPageSize] = useState<number>()
-  const [role, setRole] = useState('SUPERVISOR')
-  const [roleId, setRoleId] = useState<any>()
-  const [columnType, setColumnType] = useState('SUPERVISOR')
-  const [rowCount, setRowCount] = useState<any>()
-
-  const [sort, setSort] = useState<SortType>('desc')
-  const [sortName, setSortName] = useState<string>('created_at')
-
-  const [search, setSearch] = useState<string>()
-  const [emailSearchValue, setEmailSearchValue] = useState<string>('')
-  const [mobileSearchValue, setMobileSearchValue] = useState<string>('')
-  const [searchValue, setSearchValue] = useState<string>('')
-
-  const debouncedUsername = useDebounce(searchValue, 1000)
-  const debouncedEmail = useDebounce(emailSearchValue, 1000)
-  const debouncedMobile = useDebounce(mobileSearchValue, 1000)
-
-  const { isLoading, isRefetching } = useQuery({
-    queryKey: [
-      'allUsers',
-      page,
-      role,
-      roleId,
-      sort,
-      sortName,
-      search,
-      search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
-    ],
-    queryFn: () =>
-      getUsers({
-        data: {
-          role: role,
-          role_id: roleId,
-          page: page,
-          sort: sort,
-          sort_by: sortName,
-          search_by: search,
-          search_value:
-            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
-        }
-      }),
-    onSuccess: (data: any) => {
-      setRowCount(data?.total)
-      setRowData(data?.data)
-      setPageSize(data?.per_page)
-      setPage(data?.current_page)
-    }
-  })
-
-  const handleRoleChange = (newRole: any) => {
-    setRole(newRole)
-
-    // Updates the row data based on the newRole
-    switch (newRole) {
-      case 'SUPERVISOR':
-        setColumnType('operators')
-        break
-      case 'SA':
-        setColumnType('superagent')
-        break
-      case 'CC':
-        setColumnType('contentcreators')
-        break
-      default:
-        break
-    }
-  }
-
-  const [rowData, setRowData] = useState<any>()
-
-  const handlePageChange = (newPage: any) => {
-    setPage(newPage + 1)
-    console.log(page)
-  }
-
-  const columnsMap = new Map([
-    ['operators', operatorColumns],
-    ['superagent', superAgentColumns],
-    ['contentcreators', contentCreatorColumns]
-  ])
-
-  const filteredColumns: any = columnsMap.get(columnType) ?? []
-
-  useEffect(() => {
-    setRole('SUPERVISOR')
-    setColumnType('operators')
-    setActiveTab('SUPERVISOR')
-    setRoleId('2')
-  }, [])
-
-  const handleSortModel = (newModel: GridSortModel) => {
-    if (newModel.length) {
-      setSort(newModel[0].sort)
-      setSortName(newModel[0].field)
-    } else {
-      setSort('asc')
-      setSortName('username')
-    }
-  }
-
-  const handleSearch = (value: string, type: string) => {
-    setSearch(type)
-    switch (type) {
-      case 'username':
-        setSearchValue(value)
-        break
-      case 'email':
-        setEmailSearchValue(value)
-        break
-      case 'mobile':
-        setMobileSearchValue(value)
-        break
-    }
-  }
-
-  const [activeTab, setActiveTab] = useState<any>()
-  const handleChange = (event: any, value: string) => {
-    setActiveTab(value)
-  }
-
-  useEffect(() => {
-    handleRoleChange(activeTab)
-  }, [activeTab])
-
-  type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
-  const [openDrawer, setOpenDrawer] = useState<DrawerType>(null)
-  const handleDrawerToggle = (role: string | null) => {
-    let drawerType: DrawerType
-
-    switch (role) {
-      case 'SUPERVISOR':
-        drawerType = 'SUPERVISOR'
-        break
-      case 'SA':
-        drawerType = 'SA'
-        break
-      case 'CC':
-        drawerType = 'CC'
-        break
-      default:
-        drawerType = null
-    }
-    setOpenDrawer(prevDrawer => (prevDrawer === drawerType ? null : drawerType))
-  }
-
-  return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <Box sx={{ mx: 5, mt: 5, ...styles.buttonContainer }}>
-            <TabContext value={activeTab}>
-              <TabList
-                variant='scrollable'
-                scrollButtons='auto'
-                onChange={handleChange}
-                aria-label='forced scroll tabs example'
-              >
-                <Tab
-                  value='SUPERVISOR'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-                      <Icon fontSize={20} icon='mdi:account-outline' />
-                      Operators
-                    </Box>
-                  }
-                />
-                <Tab
-                  value='SA'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-                      <Icon fontSize={20} icon='mdi:lock-outline' />
-                      Super Agent
-                    </Box>
-                  }
-                />
-                <Tab
-                  value='CC'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-                      <Icon fontSize={20} icon='mdi:bookmark-outline' />
-                      Content Creator
-                    </Box>
-                  }
-                />
-              </TabList>
-            </TabContext>
-          </Box>
-
-          <DataGrid
-            loading={isLoading || isRefetching}
-            checkboxSelection={false}
-            disableSelectionOnClick
-            paginationMode='server'
-            sortingMode='server'
-            autoHeight
-            rows={rowData ?? []}
-            columns={filteredColumns}
-            pageSize={pageSize}
-            pagination
-            onPageChange={handlePageChange}
-            rowCount={rowCount}
-            onSortModelChange={handleSortModel}
-            components={{ Toolbar: UserTableToolbar }}
-            componentsProps={{
-              toolbar: {
-                toggle: (role: any) => handleDrawerToggle(role),
-                role: role,
-                role_id: roleId,
-                usernameValue: searchValue,
-                emailValue: emailSearchValue,
-                mobileValue: mobileSearchValue,
-                clearSearch: () => {
-                  handleSearch('', 'username')
-                  handleSearch('', 'email')
-                  handleSearch('', 'mobile')
-                },
-                onUsernameChange: (event: ChangeEvent<HTMLInputElement>) =>
-                  handleSearch(event.target.value, 'username'),
-                onEmailChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'email'),
-                onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
-              }
-            }}
-            sx={{ padding: 0 }}
-          />
-          <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
-          <SADrawer open={openDrawer === 'SA'} toggle={() => handleDrawerToggle('SA')} />
-          <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
-        </Card>
-      </Grid>
-    </Grid>
-  )
-}
-
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: 'auto',
-    overflow: 'hidden'
-  },
   buttonContainer: {
     display: 'flex',
     flexDirection: {
@@ -325,120 +356,13 @@ const styles = {
       md: 'flex-start',
       lg: 'space-between'
     },
-    mb: 0
+    mx: 5,
+    mt: 5
   },
-  usersButtons: {
-    display: 'flex',
-    gap: 2,
-    flexWrap: 'wrap',
-    mb: {
-      xs: 5,
-      sm: 5,
-      md: 5,
-      lg: 0,
-      xl: 0
-    }
-  },
-  userButton: {
-    border: 1,
-    height: '56px',
-    minWidth: {
-      xs: '224px',
-      sm: 'auto',
-      md: 'auto',
-      lg: '224px'
-    },
-    flex: 1,
+  tabStyle: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderColor: 'black',
-    transition: 'background-color 0.1s',
-    '&:hover': {
-      backgroundColor: `#9747FF`,
-      color: 'white'
-    },
-    textTransform: 'uppercase'
-  },
-  linkButton: {
-    textDecoration: 'none'
-  },
-  createAccount: {
-    border: 1,
-    height: '56px',
-    minWidth: '224px',
-    width: {
-      xs: '100%',
-      md: '100%',
-      lg: '224px'
-    },
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    borderColor: 'black',
-    textTransform: 'uppercase',
-    color: 'black',
-    backgroundColor: '#FFF',
-    '&:hover': {
-      backgroundColor: `#9747FF`,
-      color: 'white'
-    }
-  },
-  tableContainer: {
-    minHeight: 540,
-    overflowX: 'auto'
-  },
-  paginationContainer: {
-    margin: '0 auto'
-  },
-  paginationContent: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center'
-  },
-  icon: {
-    fontSize: 12,
-    color: 'black'
-  },
-  text: {
-    color: 'black',
-    fontSize: 12
-  },
-  pageNumber: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 24,
-    height: 24,
-    borderRadius: 2,
-    marginLeft: 2,
-    marginRight: 2,
-    cursor: 'pointer'
-  },
-  searchContainer: {
-    padding: 5,
-    borderTop: '1px solid black'
-  },
-  cardHeader: {
-    margin: 0,
-    padding: 0
-  },
-  searchInput: {
-    display: 'flex',
-    flexDirection: {
-      xs: 'column',
-      md: 'column',
-      lg: 'row'
-    },
-    padding: 0,
-    gap: 5
-  },
-  fullWidth: {
-    width: '100%'
-  },
-  dataGrid: {
-    padding: 5
+    '& svg': { mr: 2 }
   }
 }
 

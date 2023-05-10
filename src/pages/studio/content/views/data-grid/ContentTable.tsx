@@ -22,7 +22,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import ContentService from '@/services/api/ContentService'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import { useTranslateString } from '@/utils/TranslateString';
+
+// ** BASE APIS Import
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** renders client column
 const renderClient = (params: GridRenderCellParams) => {
@@ -31,10 +34,10 @@ const renderClient = (params: GridRenderCellParams) => {
   const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
   const color = states[stateNum]
 
-  if (row.thumbnail_url.length) {
+  if (row?.thumbnail_url?.length) {
     return (
       <CustomAvatar
-        src={`${row.thumbnail_url.replace('http://localhost/', 'http://192.168.50.9/')}`}
+        src={FILE_SERVER_URL + params.row.thumbnail_url}
         sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
       />
     )
@@ -42,6 +45,9 @@ const renderClient = (params: GridRenderCellParams) => {
     return <></>
   }
 }
+
+// ** Types and Interfaces
+type StatusTypes = 'Approved' | 'Pending' | 'Declined' 
 
 interface IContentTable {}
 
@@ -62,6 +68,7 @@ const ContentTable = (props: IContentTable) => {
   })
   // desctruct the snack state
   const { vertical, horizontal, open } = snackState
+  const [approval, setApproval] = React.useState<StatusTypes>('Pending')
 
   // Access the client
   const queryClient = useQueryClient()
@@ -71,9 +78,8 @@ const ContentTable = (props: IContentTable) => {
   //Queries
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['contents', page, pageSize],
-    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize } }),
+    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize, approval  } }),
     onSuccess: data => {
-      console.log('data isss', data)
       setData(data.data)
       setRowCount(data.total)
       setPage(data.current_page)
@@ -90,41 +96,46 @@ const ContentTable = (props: IContentTable) => {
     },
   })
 
+  const TranslateString = useTranslateString()
 
-  const columns: GridColDef[] = [
+  const columns : GridColDef[] = [
     {
-      flex: 0.1,
-      minWidth: 150,
-      field: 'video_thumbnail',
-      headerName: 'Video Thumbnail',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return <Box sx={{ display: 'flex', alignItems: 'center' }}>{renderClient(params)}</Box>
-      }
-    },
-    {
-      flex: 0.15,
-      minWidth: 150,
-      field: 'full_name',
-      headerName: 'Content Creator',
+      flex: 0.02,
+      minWidth: 70,
+      field: 'thumbnail_url',
+      headerName: TranslateString("Video Thumbnail"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {params.row.user.username}
-              </Typography>
+              <CustomAvatar
+                src={FILE_SERVER_URL + params.row.thumbnail_url}
+                sx={{ borderRadius: '10px', mr: 3, width: '5.875rem', height: '3rem' }}
+              />
             </Box>
           </Box>
         )
       }
     },
     {
-      flex: 0.1,
-      minWidth: 120,
-      headerName: 'Title',
+      flex: 0.02,
+      minWidth: 90,
+      headerName: TranslateString("Content Creator"),
+      sortable: false,
+      field: 'content_creator',
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.user.username}
+        </Typography>
+      )
+    },
+    {
+      flex: 0.03,
+      minWidth: 60,
       field: 'title',
+      headerName: TranslateString("Title"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.title}
@@ -132,37 +143,23 @@ const ContentTable = (props: IContentTable) => {
       )
     },
     {
-      flex: 0.15,
-      minWidth: 110,
-      field: 'video_url',
-      align: 'center',
-      headerName: 'Video URL',
-      renderCell: (params: GridRenderCellParams) => (
-        <>
-          <Icon
-            onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls)}
-            icon='mdi:text-box-outline'
-            fontSize='1.4rem'
-          />
-        </>
-      )
-    },
-    {
-      flex: 0.13,
-      minWidth: 140,
-      field: 'tags',
-      headerName: 'Tags',
+      flex: 0.04,
+      field: 'tag',
+      minWidth: 80,
+      headerName: TranslateString("Tags"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.tags.join(', ')}
+          {params?.row?.tags?.join(', ')}
         </Typography>
       )
     },
     {
-      flex: 0.1,
+      flex: 0.04,
       minWidth: 140,
       field: 'last_update',
-      headerName: 'Last Update',
+      headerName: TranslateString("Last Update"),
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {formatDate(params.row.updated_at)}
@@ -171,26 +168,114 @@ const ContentTable = (props: IContentTable) => {
     },
     {
       flex: 0.01,
-      minWidth: 140,
-      field: 'status',
-      headerName: 'Status',
-      align: 'center',
-      headerAlign: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return <Typography color={params.row.approval === "Declined" ? "red" : undefined}>{params.row.approval}</Typography>
-      }
-    },
-    {
-      flex: 0.06,
-      minWidth: 50,
-      field: 'actions',
-      headerName: 'View',
-      align: 'center',
-      renderCell: (params: GridRenderCellParams) => {
-        return <ContentDialog param={params.row} />
-      }
+      minWidth: 60,
+      field: 'action',
+      headerName: TranslateString("Action"),
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => <ContentDialog param={params.row} />
     }
   ]
+
+  // const columns: GridColDef[] = [
+  //   {
+  //     flex: 0.1,
+  //     minWidth: 150,
+  //     field: 'video_thumbnail',
+  //     headerName: TranslateString("Video Thumbnail"),
+  //     align: 'center',
+  //     headerAlign: 'center',
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return <Box sx={{ display: 'flex', alignItems: 'center' }}>{renderClient(params)}</Box>
+  //     }
+  //   },
+  //   {
+  //     flex: 0.15,
+  //     minWidth: 150,
+  //     field: 'full_name',
+  //     headerName: TranslateString("Content Creator"),
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return (
+  //         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+  //           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+  //             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
+  //               {params.row.user.username}
+  //             </Typography>
+  //           </Box>
+  //         </Box>
+  //       )
+  //     }
+  //   },
+  //   {
+  //     flex: 0.1,
+  //     minWidth: 120,
+  //     headerName: TranslateString("Title"),
+  //     field: 'title',
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <Typography variant='body2' sx={{ color: 'text.primary' }}>
+  //         {params.row.title}
+  //       </Typography>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.15,
+  //     minWidth: 110,
+  //     field: 'video_url',
+  //     align: 'center',
+  //     headerName: TranslateString("Video") + " " + TranslateString("URL"),
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <>
+  //         <Icon
+  //           onClick={handleCopyToClipboard({ vertical: 'top', horizontal: 'right' }, params.row.trial_video_hls)}
+  //           icon='mdi:text-box-outline'
+  //           fontSize='1.4rem'
+  //         />
+  //       </>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.13,
+  //     minWidth: 140,
+  //     field: 'tags',
+  //     headerName: TranslateString("Tags"),
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <Typography variant='body2' sx={{ color: 'text.primary' }}>
+  //         {params?.row?.tags?.join(', ')}
+  //       </Typography>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.1,
+  //     minWidth: 140,
+  //     field: 'last_update',
+  //     headerName: TranslateString("Last Update"),
+  //     renderCell: (params: GridRenderCellParams) => (
+  //       <Typography variant='body2' sx={{ color: 'text.primary' }}>
+  //         {formatDate(params.row.updated_at)}
+  //       </Typography>
+  //     )
+  //   },
+  //   {
+  //     flex: 0.01,
+  //     minWidth: 140,
+  //     field: 'status',
+  //     headerName: TranslateString("Status"),
+  //     align: 'center',
+  //     headerAlign: 'center',
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return <Typography color={params.row.approval === "Declined" ? "red" : undefined}>{params.row.approval}</Typography>
+  //     }
+  //   },
+  //   {
+  //     flex: 0.06,
+  //     minWidth: 50,
+  //     field: 'actions',
+  //     headerName: TranslateString("View"),
+  //     align: 'center',
+  //     renderCell: (params: GridRenderCellParams) => {
+  //       return <ContentDialog param={params.row} />
+  //     }
+  //   }
+  // ]
 
   const handleCopyToClipboard = (newState: SnackbarOrigin, trialUrl: string) => () => {
     navigator.clipboard.writeText(trialUrl)
@@ -200,7 +285,7 @@ const ContentTable = (props: IContentTable) => {
   return (
     <>
       <Card>
-        <CardHeader title='THE STUDIO PAGE - CONTENT APPROVAL' />
+        <CardHeader sx={{textTransform:"uppercase"}} title={TranslateString("The Studio Page") + " - " + TranslateString("Content Approval")}/>
         <DataGrid
           loading={isLoading || isRefetching}
           getRowId={row => row._id}

@@ -1,6 +1,9 @@
 // ** React Imports
 import { useEffect, useState } from 'react'
 
+// ** Next Imports
+import Image from 'next/image'
+
 // ** MUI Imports
 import {
   Drawer,
@@ -14,9 +17,9 @@ import {
   MenuItem,
   FormHelperText
 } from '@mui/material'
-
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
+import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -24,98 +27,108 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
-import CustomAvatar from 'src/@core/components/mui/avatar'
 import Icon from 'src/@core/components/icon'
+
+// ** Hooks/Services Imports
 import WorkgroupService from '@/services/api/Workgroup'
-import WorkList from '../modal/WorkList'
-import { DataGrid, GridColumns, GridRenderCellParams } from '@mui/x-data-grid'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+
+// ** TanStack Imports
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import Image from 'next/image'
+
+// ** Utils/Lib Imports
+import { useTranslateString } from '@/utils/TranslateString'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
+// ** Project/Other Imports
+import Translations from '@/layouts/components/Translations'
+import WorkList from '../modal/WorkList'
+import CustomAvatar from 'src/@core/components/mui/avatar'
 
 const navData = [
   {
     value: 'selection',
-    text: 'selection'
+    text: 'Selection'
   },
   {
     value: 'latest',
-    text: 'latest'
+    text: 'Latest'
   },
   {
     value: 'original',
-    text: 'original'
+    text: 'Original'
   },
   {
     value: 'homemade',
-    text: 'homemade'
+    text: 'Homemade'
   },
   {
     value: 'hot',
-    text: 'hot'
+    text: 'Hot'
   },
   {
     value: 'local',
-    text: 'local'
+    text: 'Local'
   },
   {
     value: 'pornstar',
-    text: 'pornstar'
+    text: 'Pornstar'
   },
   {
     value: 'loli',
-    text: 'loli'
+    text: 'Loli'
   },
   {
     value: 'av',
-    text: 'av'
+    text: 'AV'
   },
   {
     value: 'animation',
-    text: 'animation'
+    text: 'Animation'
   }
 ]
 
 const templateData = [
   {
     value: 'videoSlider',
-    text: 'videoSlider',
+    text: 'Video Slider (minimum 6 videos)',
     image: '/images/template/videoSlider.png'
   },
   {
     value: 'reelslider',
-    text: 'reelSlider',
+    text: 'Reel Slider (minimum 6 videos)',
     image: '/images/template/reelSlider.png'
   },
   {
     value: 'singleVideoWithGrid',
-    text: 'singleVideoWithGrid',
+    text: 'Single Video With Grid (minimum 5 videos)',
     image: '/images/template/singleVideoWithGrid.png'
   },
   {
     value: 'singleVideoList',
-    text: 'singleVideoList',
+    text: 'Single Video List (minimum 10 videos)',
     image: '/images/template/singleVideoList.png'
   },
   {
     value: 'grid',
-    text: 'grid',
+    text: 'Grid (minimum 4 videos)',
     image: '/images/template/grid.png'
   }
 ]
 
-const columns: GridColumns = [
+const columns = [
   {
     flex: 0.02,
     minWidth: 70,
     field: 'thumbnail_url',
-    headerName: 'Video Thumbnail',
+    headerName: <Translations text='Video Thumbnail' />,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <CustomAvatar
-              src={params.row.thumbnail_url}
+              src={FILE_SERVER_URL + params.row.thumbnail_url}
               sx={{ borderRadius: '5px', mr: 3, width: '4.875rem', height: '3rem' }}
             />
           </Box>
@@ -126,7 +139,7 @@ const columns: GridColumns = [
   {
     flex: 0.02,
     minWidth: 90,
-    headerName: 'Content Creator',
+    headerName: <Translations text='Content Creator' />,
     field: 'content_creator',
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
@@ -139,7 +152,7 @@ const columns: GridColumns = [
     flex: 0.03,
     minWidth: 60,
     field: 'title',
-    headerName: 'Title',
+    headerName: <Translations text='Title' />,
     sortable: false,
     renderCell: (params: GridRenderCellParams) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -180,18 +193,20 @@ const RandomVideoPicker = (num: number, all: string[]) => {
 // ** title -> to set a default value for the edit
 // ** setTitle -> to reset the title
 const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: any) => {
-  // ** State
   const queryClient = useQueryClient()
+
+  const { handleError, getErrorResponse } = useErrorHandling()
+
+  // ** State
   const [navbar, setNavbar] = useState<string>('selection') // ** default value
   const [template, setTemplate] = useState<string>('videoSlider') // ** default value
   const [modalOpen, setModalOpen] = useState(false)
-  // const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
   const [allId, setAllId] = useState([])
-  const [modalData, setModalData] = useState([])
-  const { postWorkgroup, getSpecificWorkgroup, putWorkgroup, getAllWorkgroup } = WorkgroupService()
+  const [data, setData] = useState([])
+  const { getSpecificWorkgroup, putWorkgroup, getAllWorkgroup } = WorkgroupService()
 
   const { refetch: refetchSpecific } = useQuery({
     queryKey: ['edit-workgroup', sectionID],
@@ -204,26 +219,31 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     enabled: header === 'Edit'
   })
 
-  const { refetch: refetchAll, isLoading } = useQuery({
+  const {
+    refetch: refetchAll,
+    isLoading,
+    isRefetching
+  } = useQuery({
     queryKey: ['edit-allworks', sectionID, page],
-    queryFn: () => getAllWorkgroup({ workgroup_id: sectionID }),
+    queryFn: () => getAllWorkgroup({ workgroup_id: sectionID, page }),
     onSuccess: data => {
-      setModalData(data.data)
+      setData(data.data)
       setPageSize(data.per_page)
       setPage(data.current_page)
       setRowCount(data.total)
     },
+    onError: (e: any) => {
+      handleError(e, `getAllWorkgroup() WorkGroupDrawer`)
+    },
     enabled: header === 'Edit'
-  })
-
-  // ** use to POST new workgroup
-  const { mutate: mutateWorkgroup } = useMutation(postWorkgroup, {
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workgroup'] })
   })
 
   // ** use to PUT or update the workgroup
   const { mutate: mutateEditWorkgroup } = useMutation(putWorkgroup, {
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workgroup'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['search-workgroup'] }),
+    onError: (e: any) => {
+      handleError(e, `putWorkgroup() WorkGroupDrawer`)
+    }
   })
 
   // @ts-ignore
@@ -261,7 +281,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     setTemplate('videoSlider')
     setNavbar('selection')
     setAllId([])
-    setModalData([])
+    setData([])
     setOpen(false)
   }
 
@@ -271,37 +291,14 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage + 1)
+    console.log('page change!', newPage + 1)
   }
 
   const onSubmit = (data: any) => {
     // @ts-ignore
     const vid: string[] = layoutPattern(template)
-    if (header === 'Add') {
-      if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
-        mutateWorkgroup({
-          title: data.title,
-          navbar: navbar,
-          template_id: template,
-          single: vid[0],
-          multiple: vid?.slice(1),
-          all: allId
-        })
-      } else {
-        mutateWorkgroup({
-          title: data.title,
-          navbar: navbar,
-          template_id: template,
-          multiple: vid,
-          all: allId
-        })
-      }
-      reset()
-      setTemplate('videoSlider')
-      setNavbar('selection')
-      setAllId([])
-      setModalData([])
-      setOpen(false)
-    } else {
+
+    try {
       if ('singleVideoList' === template || 'singleVideoWithGrid' === template) {
         mutateEditWorkgroup({
           id: sectionID,
@@ -328,8 +325,10 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
       reset()
       setTemplate('videoSlider')
       setNavbar('selection')
-      setModalData([])
+      setData([])
       setOpen(false)
+    } catch (e: any) {
+      handleError(e, `putWorkgroup(), onSubmit function of WorkGroupDrawer`)
     }
   }
 
@@ -342,6 +341,8 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
     return () => setTitle('')
   }, [open])
 
+  const TranslateString = useTranslateString()
+
   return (
     <>
       <Drawer
@@ -353,7 +354,9 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
         sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 600 } } }}
       >
         <Header>
-          <Typography variant='h6'>{header} Workgroup</Typography>
+          <Typography variant='h6'>
+            {TranslateString(header)} {TranslateString('Workgroup')}
+          </Typography>
           <IconButton size='small' onClick={() => setOpen(false)} sx={{ color: 'text.primary' }}>
             <Icon icon='mdi:close' fontSize={20} />
           </IconButton>
@@ -368,7 +371,7 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                 render={({ field: { value, onChange } }) => (
                   <TextField
                     value={value}
-                    label='Title'
+                    label={TranslateString('Title')}
                     onChange={onChange}
                     placeholder='XXXXXX'
                     error={Boolean(errors.title)}
@@ -382,30 +385,30 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
               )}
             </FormControl>
             <FormControl fullWidth sx={{ mb: 6 }}>
-              <InputLabel id='role-select'>Navbar</InputLabel>
+              <InputLabel id='role-select'>{TranslateString('Navbar')}</InputLabel>
               <Select
                 fullWidth
                 value={navbar}
                 id='select-role'
-                label='Navbar'
+                label={TranslateString('Navbar')}
                 labelId='role-select'
                 onChange={e => setNavbar(e.target.value)}
                 inputProps={{ placeholder: 'Navbar' }}
               >
                 {navData.map((item, index) => (
                   <MenuItem key={index} value={item.value}>
-                    {item.text}
+                    {TranslateString(item.text)}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
             <FormControl fullWidth sx={{ mb: 6 }}>
-              <InputLabel id='role-select'>Template</InputLabel>
+              <InputLabel id='role-select'>{TranslateString('Template')}</InputLabel>
               <Select
                 fullWidth
                 value={template}
                 id='select-role'
-                label='Template'
+                label={TranslateString('Template')}
                 labelId='role-select'
                 onChange={e => setTemplate(e.target.value)}
                 inputProps={{ placeholder: 'Template' }}
@@ -414,38 +417,58 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
                   <MenuItem key={index} value={item.value}>
                     <Box display='flex' alignItems='center'>
                       <Image src={item.image} alt='dfs' width='24' height='24' style={{ marginRight: 10 }} />
-                      {item.text}
+                      {TranslateString(item.text)}
                     </Box>
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
             <Box sx={{ mb: 6 }}>
-              <Button size='large' variant='contained' sx={{ mr: 3 }} onClick={handleOpenModal}>
-                Select Content
-              </Button>
+              <Controller
+                name='title'
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value } }) => (
+                  <Button
+                    disabled={value.length === 0 || !!errors.title}
+                    size='large'
+                    variant='contained'
+                    sx={{ mr: 3 }}
+                    onClick={handleOpenModal}
+                  >
+                    {TranslateString('Select Content')}
+                  </Button>
+                )}
+              />
             </Box>
             <Box sx={{ mb: 6 }}>
               <DataGrid
                 rowCount={rowCount}
+                // @ts-ignore
                 columns={columns}
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
                 paginationMode='server'
                 autoHeight
                 pagination
-                rows={modalData}
-                loading={header === 'Edit' ? isLoading : false}
+                rows={data}
+                loading={header === 'Edit' ? isLoading || isRefetching : false}
                 getRowId={row => row._id}
                 disableColumnMenu
               />
             </Box>
+
+            {/* Error messages from backend */}
+            {getErrorResponse(12)}
+
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>
-                Submit
-              </Button>
+              {header === 'Edit' ? (
+                <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>
+                  Submit
+                </Button>
+              ) : null}
               <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
-                Cancel
+                {TranslateString('Cancel')}
               </Button>
             </Box>
           </form>
@@ -459,8 +482,14 @@ const WorkGroupDrawer = ({ open, setOpen, header, sectionID, title, setTitle }: 
           setModalOpen={setModalOpen}
           sectionID={sectionID}
           refetchAll={refetchAll}
-          setModalData={setModalData}
           header={header}
+          control={control}
+          navbar={navbar}
+          template={template}
+          reset={reset}
+          setNavbar={setNavbar}
+          setTemplate={setTemplate}
+          setOpen={setOpen}
         />
       ) : null}
     </>

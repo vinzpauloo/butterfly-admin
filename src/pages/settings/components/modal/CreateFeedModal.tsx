@@ -5,43 +5,169 @@ import React from 'react'
 import Image from 'next/image'
 
 // ** MUI Imports
-import { Dialog, DialogContent, Box, TextField, Button, DialogTitle } from '@mui/material'
-import CircularProgress from '@mui/material/CircularProgress'
+import {
+  Dialog,
+  DialogContent,
+  Box,
+  TextField,
+  Button,
+  DialogTitle,
+  LinearProgress,
+  Select,
+  MenuItem,
+  Skeleton,
+  Autocomplete,
+  Chip
+} from '@mui/material'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import IconButton from '@mui/material/IconButton'
+import { styled } from '@mui/material/styles'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Third Party Components
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
 
 // ** APIs
 import FeedsService from '@/services/api/FeedsService'
-import TUSService from '@/services/api/TusService'
+import VideoService from '@/services/api/VideoService'
+import { UserTableService } from '@/services/api/UserTableService'
+import { useQuery } from '@tanstack/react-query'
+
+import { useTranslateString } from '@/utils/TranslateString'
+
+// ** Auth
+import { useAuth } from '@/services/useAuth'
+
+// ** Uploady
+import {
+  useUploady,
+  useItemProgressListener,
+  useBatchAddListener,
+  useBatchProgressListener,
+  useBatchFinishListener
+} from '@rpldy/uploady'
+import { asUploadButton } from '@rpldy/upload-button'
+import { StudioContextType } from '@/pages/studio/upload'
+
+// ** Base Links
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+
+// Reuse
+import ProgressCircularWithLabel from '@/layouts/components/shared-components/ProgressCircular'
+
+// ** Next Router
+import { useRouter } from 'next/router'
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
+  context?: StudioContextType | null
 }
 
 type Inputs = {
   string_story: string
-  tags: string
+  tags: string[]
   'images[]'?: any
   video: any
+  user_id?: string
 }
 
 //maximum Images that can be uploaded
 const limitFiles = 9
 
-const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+// ** Styled components
+const CustomSelect = styled(Select)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: '5px',
+  '& .MuiSelect-select': {}
+}))
+
+// ** Custom Upload Button Component
+const UploadVideoButton = asUploadButton(
+  React.forwardRef((props, ref) => (
+    <Box {...props} sx={styles.button}>
+      <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
+      <Button sx={styles.upload}>Upload Video</Button>
+    </Box>
+  ))
+)
+
+const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => {
+  // ** Auth Hook
+  const auth = useAuth()
+
+  // ** STATES
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
   const [feedVideo, setFeedVideo] = React.useState<File[]>([])
+  const [videoUploading, setVideoUploading] = React.useState<boolean>(false)
+
+  // ** Router Hook
+  const router = useRouter()
+
+  // ** Uploady Hooks
+  const uploady = useUploady()
+
+  // ** Uploady Progress
+  const [progress, setProgress] = React.useState<number>(0)
+
+  const batch = useBatchProgressListener(batch => {})
+
+  // ** APIs and Tanstacks
+  const { getAllDataFromCreator } = UserTableService()
+  const { uploadFeed } = FeedsService()
+  const { uploadVideoURL } = VideoService()
+
+  // ** Effect Hooks
+  React.useEffect(() => {
+    return () => {
+      // do cleanup
+    }
+  }, [])
+
+  if (batch && batch.completed > progress && batch.completed < 100) {
+    console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
+    setProgress(() => batch.completed)
+  }
+
+  useBatchAddListener((batch, options) => {
+    console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
+    setProgress(0)
+    console.log('Start setProgress', progress)
+    //return false to cancel the batch
+  })
+
+  useBatchFinishListener(batch => {
+    console.log(`batch ${batch.id} finished uploading`)
+    setProgress(100)
+    toast.success('Successfully Uploaded Newsfeed with Video!', { position: 'top-center', duration: 4000 })
+
+    setTimeout(() => {
+      reset({
+        string_story: '',
+        tags: []
+      })
+      setVideoUploading(false)
+      setIsLoading(false)
+      onClose()
+
+      // redirect
+      if (auth.user?.role == 'CC') {
+        router.push('/studio/cc/post-status/')
+      }
+    }, 1500)
+  })
+
+  const getCCsQuery = useQuery({
+    queryKey: ['ccOptions'],
+    enabled : auth.user?.role != 'CC',
+    queryFn: () => getAllDataFromCreator()
+  })
 
   // ** Hooks
   const {
@@ -49,13 +175,20 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     getValues,
     setValue,
     reset,
+    resetField,
+    watch,
+    control,
+    setError,
     formState: { errors }
   } = useForm<Inputs>()
 
+  // ** React-Dropzone Image
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 9,
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+      'image/png': ['.png'],
+      'image/jpg': ['.jpg'],
+      'image/jpeg': ['.jpeg']
     },
     onDrop: (acceptedFiles: File[]) => {
       let imageFiles = acceptedFiles.map((file: File) => Object.assign(file))
@@ -69,99 +202,111 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
   })
 
-  //upload video
-  const { getRootProps: getVidRootProps, getInputProps: getVidInputProps } = useDropzone({
-    multiple: false,
-    accept: {
-      'video/*': ['.mp4', '.avi']
-    },
-    onDrop: (acceptedFiles: File[]) => {
-      let videoFile = acceptedFiles.map((file: File) => Object.assign(file))
-      setFeedVideo(videoFile)
-      setValue('video', videoFile[0])
-    },
-    onDropRejected: () => {
-      toast.error(`You can only upload ${limitFiles} images`, {
-        duration: 2000
-      })
-    }
-  })
-
-  //use api service
-  const { uploadFeed } = FeedsService()
+  // ** React-Dropzone Video
 
   const handleCancel = () => {
     onClose()
+
+    // ** Handle Reset/Clear Values
+
+    //  Remove any pending uploaded file
+    if (uploady.getInternalFileInput()?.current && uploady.getInternalFileInput()?.current?.value) {
+      uploady.getInternalFileInput()!.current!.value = ''
+    }
+
+    // resetLoaders
+    setIsLoading(false)
+    setVideoUploading(false)
+    reset()
   }
 
-  const handlePublish = () => {
-    const formData = createFormData(getValues())
-    const { video } = getValues()
+  const handlePublish = async () => {
+    setIsLoading(true)
 
-    if (video != undefined) {
+
+    let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
+    const formData = createFormData(getValues())
+    const hasVideoFile = uploady.getInternalFileInput()?.current?.value == '' ? false : true
+
+    if (hasVideoFile) {
       console.log('there is a video')
+      setVideoUploading(true)
+
+      let videoName = ''
+
+      // CORRECT THIS TYPESCRIPT NULL
+      if (uploady.getInternalFileInput()?.current == null || uploady.getInternalFileInput()?.current == undefined) {
+        videoName = ''
+      } else {
+        // @ts-ignore: Object is possibly 'null'.
+        videoName = uploady.getInternalFileInput()?.current?.files[0].name
+      }
 
       const feedHeaderData = {
-        user_id: '25',
-        file_name: video.name,
+        ...(hasUserID && { user_id: getValues()?.user_id }),
+        video_name: videoName,
         video_type: 'feed_video'
       }
 
-      const customOnProgress = (str: string) => {
-        console.log('string', str)
-      }
-      const customOnAfterResponse = (req: any, res: any) => {
-        console.log('response', res)
-        let xmlhttpreq = req.getUnderlyingObject()
-        console.log('xml', xmlhttpreq)
-        console.log('xmlhttpreq get all', xmlhttpreq.getAllResponseHeaders())
+      uploadVideoURL({ formData: feedHeaderData })
+        .then(res => {
+          const { uploadUrl } = res
+          const { feed_id } = res
 
-        if (xmlhttpreq.getAllResponseHeaders().indexOf('feed_id') != -1) {
-          // save to feed with video
-          console.log('SAVE HERE!!!!!!!!')
-
-          let data = JSON.parse(res.getHeader('works'))
-          console.log('data from feed header', data)
-          const { feed_id } = data.data
-
-          //Append to formData
+          //feedid
           formData.append('feed_id', feed_id)
+          formData.append('video', 'true')
+
+          // Choose PION upload
+          context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
 
           // upload the Feed With Video
           uploadFeed({ formData: formData }).then(data => {
             console.log('data from with video', data)
-            toast.success('Successfully Upload Newsfeed WITH VIDEO!', { position: 'top-center' })
-            onClose()
-            setIsLoading(false)
-            reset()
-          }) //end uploadFeed
-        }
-      }
 
-      //Start TUS Uplaod
-      const { upload } = TUSService(video, { customOnProgress, customOnAfterResponse }, feedHeaderData)
-      upload.start()
+            uploady.processPending({
+              destination: {
+                url: STREAMING_SERVER_URL + uploadUrl
+              }
+            })
+          })
+        })
+        .catch(err => {
+          toast.error('Error Uploading')
+          setIsLoading(false)
+          setVideoUploading(false)
+          reset()
+        })
     } else {
       // HAS NO VIDEO - continue upload Feed
 
-      uploadFeed({ formData: formData }).then(data => {
-        console.log('data', data)
-        toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
-        onClose()
-        setIsLoading(false)
-        reset()
-      })
+      uploadFeed({ formData: formData })
+        .then(data => {
+          console.log('data', data)
+          toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
+          onClose()
+          // TURN OF LOADING
+          setIsLoading(false)
+          reset()
+
+          // redirect if CC
+          setTimeout(() => {
+            if (auth.user?.role == 'CC') {
+              router.push('/studio/cc/post-status/')
+            }
+          }, 1500)
+        })
+        .catch(error => {
+          console.log('ERrror', error)
+          toast.error(`An error has occured ${error.data?.message}`, { duration: 3000 })
+          handleCancel()
+        })
     }
-
-    console.log(getValues())
-
-    setIsLoading(true)
   }
 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
     let formData = new FormData()
     // ** DUMMY VALUES
-    formData.append('user_id', '25') // should be content creator ID
     formData.append('is_Service', 'true')
 
     Object.keys(newsfeedFormData).forEach(key => {
@@ -219,79 +364,177 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     </ListItem>
   ))
 
+  const TranslateString = useTranslateString()
+
+  const uploadyStartUpload = () => {
+    let pendingFiles = uploady.getInternalFileInput()?.current?.files
+    if (!pendingFiles) {
+      console.log('NO FILE YET')
+      return
+    }
+    //start upload
+    uploady.processPending()
+  }
+
   return (
-    <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth={'sm'}>
+    <Dialog open={isOpen} fullWidth={true} maxWidth={'sm'}>
       <DialogContent sx={{ ...styles.dialogContent, bgcolor: theme => theme.customBflyColors.primary }}>
         <Box>
           <DialogTitle color={theme => theme.customBflyColors.primaryTextContrast} sx={styles.title}>
-            Upload NewsFeeds
+            {TranslateString('Upload NewsFeeds')}
           </DialogTitle>
         </Box>
-        {isLoading ? (
-          <Box sx={{ textAlign: 'center' }}>
-            <CircularProgress color='success' />
-          </Box>
-        ) : (
-          <>
+
+        <>
+          {auth?.user?.role != 'CC' && (
+            <Box sx={{ ...styles.textContainer, marginBlock: '1rem' }}>
+              {getCCsQuery.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+
+              {!isLoading && (
+                <Controller
+                  name='user_id'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <>
+                      {getCCsQuery?.isLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
+                      {getCCsQuery?.data && (
+                        <CustomSelect
+                          displayEmpty
+                          inputProps={{ 'aria-label': 'Without label' }}
+                          defaultValue=''
+                          id='contentCreator'
+                          labelId='cc-select-label'
+                          value={value}
+                          onBlur={onBlur}
+                          onChange={onChange}
+                          error={Boolean(errors.user_id)}
+                        >
+                          <MenuItem disabled value=''>
+                            Select Content Creator
+                          </MenuItem>
+                          {getCCsQuery?.data &&
+                            getCCsQuery?.data.map((cc: any) => (
+                              <MenuItem key={cc.id} value={cc.id}>
+                                {cc.username}
+                              </MenuItem>
+                            ))}
+                        </CustomSelect>
+                      )}
+                    </>
+                  )}
+                />
+              )}
+            </Box>
+          )}
+
+          {isLoading ? (
+            <Box sx={{ gap: '1rem', display: 'flex', flexDirection: 'column' }}>
+              <Skeleton
+                sx={{ backgroundColor: theme => theme.palette.background.paper }}
+                variant='rectangular'
+                width='100%'
+                height={20}
+              />
+            </Box>
+          ) : (
             <Box sx={styles.textContainer}>
               <TextField
-                label='Story'
+                label={TranslateString('Story')}
                 minRows={10}
                 multiline={true}
-                sx={styles.fullWidth}
+                sx={{
+                  ...styles.fullWidth,
+                  backgroundColor: theme => theme.palette.background.paper,
+                  borderRadius: '8px'
+                }}
                 {...register('string_story')}
               />
-              <TextField label='Tagging' sx={styles.fullWidth} {...register('tags')} />
+
+              <Autocomplete
+                multiple
+                id='tags-filled'
+                options={[]}
+                freeSolo
+                onChange={( event, value )=>{ setValue('tags', value) }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => 
+                  <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+                }
+                renderInput={params => (
+                  <TextField
+                    sx={{
+                      ...styles.fullWidth,
+                      backgroundColor: theme => theme.palette.background.paper,
+                      borderRadius: '8px'
+                    }}
+                    {...params}
+                    variant='filled'
+                    label='Tags'
+                    placeholder='Tags'
+                  />
+                )}
+              />
+            </Box>
+          )}
+
+          <Box sx={styles.buttonContainer}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: 3 }}>
+              {!videoUploading && !isLoading ? (
+                <UploadVideoButton autoUpload={false} clearPendingOnAdd={true} />
+              ) : (
+                <Box sx={{ textAlign: 'center', minWidth: '145px' }}>
+                  {videoUploading && <ProgressCircularWithLabel progress={progress} />}
+                </Box>
+              )}
             </Box>
 
-            <Box sx={styles.buttonContainer}>
-              <div {...getVidRootProps({ className: 'dropzone' })}>
-                <input {...getVidInputProps()} />
-                <Box sx={styles.button}>
-                  <Image src='/images/icons/upload-video.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>Upload Video</Button>
-                  {feedVideo.length != 0 ? <p>Selected 1 video</p> : null}
-                </Box>
-              </div>
-
+            {!isLoading && (
               <div {...getRootProps({ className: 'dropzone' })}>
                 <input {...getInputProps()} />
                 <Box sx={styles.button}>
                   <Image src='/images/icons/upload-photo.png' alt='upload video' width={50} height={50} />
-                  <Button sx={styles.upload}>Upload Photo</Button>
+                  <Button disabled={isLoading ? true : false} sx={styles.upload}>
+                    {TranslateString('Upload Photo')}
+                  </Button>
                 </Box>
               </div>
+            )}
 
-              <Box>
-                {multipleImages.length ? (
-                  <>
-                    <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
-                    <div className='buttons' style={{textAlign:'center'}}>
-                      <Button sx={{marginInline:'auto'}} color='error' variant='outlined' onClick={handleRemoveAllFiles}>
-                        Remove All
-                      </Button>
-                    </div>
-                  </>
-                ) : null}
-              </Box>
-
+            <Box>
+              {multipleImages.length ? (
+                <>
+                  <List sx={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', padding: 0 }}>{fileList}</List>
+                  <div className='buttons' style={{ textAlign: 'center' }}>
+                    <Button
+                      sx={{ marginInline: 'auto' }}
+                      color='error'
+                      variant='outlined'
+                      onClick={handleRemoveAllFiles}
+                    >
+                      {TranslateString('Remove All')}
+                    </Button>
+                  </div>
+                </>
+              ) : null}
             </Box>
+          </Box>
 
-            <Box sx={styles.bottomBtnContainer}>
-              <Button onClick={handleCancel} sx={styles.bottomBtn}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  handlePublish()
-                }}
-                sx={styles.bottomBtn}
-              >
-                Publish
-              </Button>
-            </Box>
-          </>
-        )}
+          <Box sx={styles.bottomBtnContainer}>
+            <Button disabled={isLoading ? true : false} onClick={handleCancel} sx={styles.bottomBtn}>
+              {TranslateString('Cancel')}
+            </Button>
+            <Button
+              disabled={isLoading ? true : false}
+              onClick={() => {
+                handlePublish()
+              }}
+              sx={styles.bottomBtn}
+            >
+              {TranslateString('Publish')}
+            </Button>
+          </Box>
+        </>
       </DialogContent>
     </Dialog>
   )
@@ -350,7 +593,10 @@ const styles = {
     borderRadius: '20px',
     fontSize: 11,
     width: 145,
-    height: 25
+    height: 25,
+    '&:hover': {
+      backgroundColor: '#FFF'
+    }
   },
   bottomBtnContainer: {
     display: 'flex',
@@ -369,7 +615,10 @@ const styles = {
     borderRadius: '20px',
     fontSize: 11,
     width: 125,
-    height: 35
+    height: 35,
+    '&:hover': {
+      backgroundColor: '#FFF'
+    }
   }
 }
 

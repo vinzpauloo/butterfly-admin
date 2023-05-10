@@ -1,205 +1,171 @@
-import React, { useEffect, useState } from 'react'
+// ** React Imports
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useState } from 'react'
 
+// ** Next Imports
+import Image from 'next/image'
+
+// ** MUI Imports
 import { Box, Button, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+
+// ** TanStack Imports
 import { useQuery } from '@tanstack/react-query'
 
+// ** Project/Other Imports
 import Container from './components/Container'
-import WorkgroupService from '@/services/api/Workgroup'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import WorkGroupDrawer from './components/drawer/WorkGroupDrawer'
-import Image from 'next/image'
+
+// ** Hooks/Services Imports
+import WorkgroupService from '@/services/api/Workgroup'
+import useDebounce from '@/hooks/useDebounce'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+
+// ** Utils Imports
+import { useTranslateString } from '@/utils/TranslateString'
 
 const navData = [
   {
     value: 'selection',
-    text: 'selection'
+    text: 'Selection'
   },
   {
     value: 'latest',
-    text: 'latest'
+    text: 'Latest'
   },
   {
     value: 'original',
-    text: 'original'
+    text: 'Original'
   },
   {
     value: 'homemade',
-    text: 'homemade'
+    text: 'Homemade'
   },
   {
     value: 'hot',
-    text: 'hot'
+    text: 'Hot'
   },
   {
     value: 'local',
-    text: 'local'
+    text: 'Local'
   },
   {
     value: 'pornstar',
-    text: 'pornstar'
+    text: 'Pornstar'
   },
   {
     value: 'loli',
-    text: 'loli'
+    text: 'Loli'
   },
   {
     value: 'av',
-    text: 'av'
+    text: 'AV'
   },
   {
     value: 'animation',
-    text: 'animation'
+    text: 'Animation'
   }
 ]
 
 const templateData = [
   {
     value: 'videoSlider',
-    text: 'videoSlider',
+    text: 'Video Slider',
     image: '/images/template/videoSlider.png'
   },
   {
     value: 'reelslider',
-    text: 'reelSlider',
+    text: 'Reel Slider',
     image: '/images/template/reelSlider.png'
   },
   {
     value: 'singleVideoWithGrid',
-    text: 'singleVideoWithGrid',
+    text: 'Single Video With Grid',
     image: '/images/template/singleVideoWithGrid.png'
   },
   {
     value: 'singleVideoList',
-    text: 'singleVideoList',
+    text: 'Single Video List',
     image: '/images/template/singleVideoList.png'
   },
   {
     value: 'grid',
-    text: 'grid',
+    text: 'Grid',
     image: '/images/template/grid.png'
   }
 ]
 
-const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
-
-const Header = ({ page, setData, setPage, setPageSize, setRowCount, setOpen, setHeader }: any) => {
-  const { getSearchWorkgroups } = WorkgroupService()
-  const [search_value, setTitle] = useState('')
-  const [navbar, setNavbar] = useState('')
-  const [template_id, setTemplate] = useState('')
-
-  const debouncedTitle = useDebounce(search_value, 1000)
-
-  const filterParams = () => {
-    const title = !!search_value && { search_value }
-    const nav = !!navbar && { navbar }
-    const template = !!template_id && { template_id }
-
-    return { ...title, ...nav, ...template }
-  }
-
-  const { refetch } = useQuery({
-    queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page],
-    queryFn: () =>
-      getSearchWorkgroups({
-        page: page,
-        search_by: 'title',
-        select: '_id,navbar,title,template_id',
-        ...filterParams()
-      }),
-    onSuccess: data => {
-      setData(data.data)
-      setRowCount(data.total)
-      setPageSize(data.per_page)
-      setPage(data.current_page)
-    },
-    enabled: !!debouncedTitle || !!template_id || !!navbar
-  })
-
+const Header = ({ setOpen, setHeader, title, navbar, template_id, setSearchValue, setNavbar, setTemplate }: any) => {
   const handleClick = () => {
     setHeader('Add')
     setOpen(true)
   }
 
   const handleClear = () => {
-    refetch()
-    setTitle('')
+    setSearchValue('')
     setNavbar('')
     setTemplate('')
   }
 
+  const TranslateString = useTranslateString()
+
   return (
     <Box mb={2}>
       <Typography variant='h4' component='h4' mb={5}>
-        Workgroup
+        {TranslateString('Workgroup')}
       </Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} gap={2.5} width={900}>
           <OutlinedInput
             fullWidth
-            style={{ marginRight: 10 }}
-            placeholder='Search'
+            placeholder={TranslateString('Search')}
             size='small'
-            value={search_value}
-            onChange={e => setTitle(e.target.value)}
+            value={title}
+            onChange={e => setSearchValue(e.target.value)}
           />
-          <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
-            <InputLabel id='demo-simple-select-label'>Navbar</InputLabel>
+          <FormControl fullWidth size='small'>
+            <InputLabel id='demo-simple-select-label'>{TranslateString('Navbar')}</InputLabel>
             <Select
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={navbar}
-              label='Navbar'
+              label={TranslateString('Navbar')}
               onChange={e => setNavbar(e.target.value)}
             >
               {navData.map((item, index) => (
                 <MenuItem key={index} value={item.value}>
-                  {item.text}
+                  {TranslateString(item.text)}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth size='small' style={{ marginRight: 10 }}>
-            <InputLabel id='demo-simple-select-label'>Template</InputLabel>
+          <FormControl fullWidth size='small'>
+            <InputLabel id='demo-simple-select-label'>{TranslateString('Template')}</InputLabel>
             <Select
               style={{ display: 'flex', alignItems: 'center' }}
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={template_id}
-              label='Template'
+              label={TranslateString('Template')}
               onChange={e => setTemplate(e.target.value)}
             >
               {templateData.map((item, index) => (
                 <MenuItem key={index} value={item.value} style={{ display: 'flex', alignItems: 'flex-start' }}>
                   <Box display='flex' alignItems='center'>
                     <Image src={item.image} alt='dfs' width='24' height='24' style={{ marginRight: 10 }} />
-                    {item.text}
+                    {TranslateString(item.text)}
                   </Box>
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Button variant='contained' color='error' onClick={handleClear}>
-            Clear
+          <Button variant='contained' color='error' sx={{ width: 150 }} onClick={handleClear}>
+            {TranslateString('Clear')}
           </Button>
         </Box>
         <Button variant='contained' onClick={handleClick}>
-          Add Workgroup
+          {TranslateString('Add Workgroup')}
         </Button>
       </Box>
     </Box>
@@ -218,22 +184,23 @@ const Table = ({
   setSectionID,
   setTitle
 }: any) => {
+  const TranslateString = useTranslateString()
   const columnData = [
     {
       field: 'title',
-      headerName: 'Title',
+      headerName: TranslateString('Title'),
       width: 650,
       sortable: false
     },
     {
       field: 'navbar',
-      headerName: 'Navbar',
+      headerName: TranslateString('Navbar'),
       width: 300,
       sortable: false
     },
     {
       field: 'template_id',
-      headerName: 'Template ID',
+      headerName: TranslateString('Template') + ' ID',
       width: 300,
       sortable: false,
       renderCell: (params: any) => {
@@ -253,7 +220,7 @@ const Table = ({
     },
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: TranslateString('Action'),
       width: 100,
       sortable: false,
       renderCell: (params: any) => {
@@ -306,6 +273,9 @@ const Table = ({
 
 function index() {
   const { getWorkgroup } = WorkgroupService()
+
+  const { handleError } = useErrorHandling()
+
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
@@ -314,18 +284,40 @@ function index() {
   const [header, setHeader] = useState('')
   const [sectionID, setSectionID] = useState('')
   const [title, setTitle] = useState('')
+  const [search_value, setSearchValue] = useState('')
+  const [navbar, setNavbar] = useState('')
+  const [template_id, setTemplate] = useState('')
+
+  const debouncedTitle = useDebounce(search_value, 1000)
+
+  const filterParams = () => {
+    const title = !!search_value && { search_value }
+    const nav = !!navbar && { navbar }
+    const template = !!template_id && { template_id }
+
+    return { ...title, ...nav, ...template }
+  }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['workgroup', page, pageSize],
-    queryFn: () => getWorkgroup({ page: page, paginate: pageSize }),
+    queryKey: ['search-workgroup', debouncedTitle, navbar, template_id, page, pageSize],
+    queryFn: () =>
+      getWorkgroup({
+        page: page,
+        paginate: pageSize,
+        sort: 'desc',
+        sort_by: 'updated_at',
+        search_by: 'title',
+        select: '_id,navbar,title,template_id,updated_at',
+        ...filterParams()
+      }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
       setPageSize(data.per_page)
       setPage(data.current_page)
     },
-    onError: err => {
-      console.log('workgroup error: ', err)
+    onError: (e: any) => {
+      handleError(e, `getWorkgroup() index of settings`)
     }
   })
 
@@ -333,13 +325,14 @@ function index() {
     <>
       <Container>
         <Header
-          setData={setData}
-          page={page}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          setRowCount={setRowCount}
           setOpen={setOpen}
           setHeader={setHeader}
+          title={search_value}
+          navbar={navbar}
+          template_id={template_id}
+          setSearchValue={setSearchValue}
+          setNavbar={setNavbar}
+          setTemplate={setTemplate}
         />
         <Table
           data={data}

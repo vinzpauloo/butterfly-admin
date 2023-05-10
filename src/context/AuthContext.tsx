@@ -13,6 +13,8 @@ import authConfig from 'src/configs/auth'
 // ** Types
 import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataType } from './types'
 
+import { getHeaders } from '@/lib/cryptoJs'
+
 // ** Defaults
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -61,12 +63,17 @@ const AuthProvider = ({ children }: Props) => {
     axios
       .post(`${baseUrl + authConfig.loginEndpoint}`, newParams, {
         headers: {
-          'X-Authorization': 'postman|0'
+          ...getHeaders()
         }
       })
       .then(async response => {
-        console.log('Login success!', response)
-        const tempUserData = { role: 'admin', username: params.email }
+        const tempUserData = {
+          id: response.data.data.id,
+          role: response.data.data.role,
+          username: params.email,
+          photo: response.data.data.photo,
+          site: response.data.data.site ? response.data.data.site[0] : null
+        }
 
         // setUser(tempUserData)
         params.rememberMe

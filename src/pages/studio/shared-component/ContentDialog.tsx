@@ -16,6 +16,7 @@ import DialogActions from '@mui/material/DialogActions'
 import { styled } from '@mui/material/styles'
 import InputAdornment from '@mui/material/InputAdornment'
 import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -28,6 +29,10 @@ import ReactPlayer from 'react-player'
 import { useForm, Controller } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import ContentService from '../../../services/api/ContentService'
+import { useTranslateString } from '@/utils/TranslateString';
+
+// ** BASE APIS Import
+import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
@@ -45,6 +50,8 @@ type ContentDialogType = {
     email: string
     tags: string[]
     trial_video_hls: string
+    full_video_hls : string
+    has_own_trial : boolean
     updated_at: string
     user: {
       username: string
@@ -96,63 +103,90 @@ const ContentDialog = ({ param }: ContentDialogType) => {
   // ** States
   const [show, setShow] = useState<boolean>(false)
   const [showNotes, setShowNotes] = useState<boolean>(false)
-  const [noteValue, setNoteValue] = useState<string>("")
+  const [noteValue, setNoteValue] = useState<string>('')
 
   // Get QueryClient from the context
-  const queryClient = useQueryClient();
-  const { approveContent } = ContentService();
+  const queryClient = useQueryClient()
+  const { approveContent } = ContentService()
 
   const { mutate, isLoading } = useMutation(approveContent, {
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: data => {
+      console.log(data)
       queryClient.invalidateQueries({
-        queryKey: ['contents'],
-      });
+        queryKey: ['contents']
+      })
       setShowNotes(false)
       setShow(false)
-      setNoteValue("")
+      setNoteValue('')
+      resetField('notes')
     },
-    onError: (error) => {
-      alert(error);
-    },
-  });
+    onError: error => {
+      alert(error)
+    }
+  })
 
   const handleApproveContent = () => {
     mutate({
       data: {
         foreign_id: param._id,
-        action: "Approved",
-        _method: "put"
-      },
+        action: 'Approved',
+        _method: 'put'
+      }
     })
   }
 
+  const handleNoteOnChange = (value: string) => {
+    if (value.length <= 0) {
+      setError('notes', { type: 'custom' })
+    } else {
+      clearErrors()
+    }
+    setNoteValue(value)
+  }
+
+  const setNoteError = () => {
+    setError('notes', { type: 'custom' })
+  }
+
+  const handleNoteDialogClose = () => {
+    resetField('notes')
+    setShowNotes(false)
+  }
 
   // ** React hook form
   const {
-    reset,
+    resetField,
+    setError,
+    watch,
     register,
     handleSubmit,
+    clearErrors,
     formState: { errors }
-  } = useForm({
-    mode: 'onBlur',
-  })
+  } = useForm()
 
   const mainContentForm = useForm({
-    mode : 'onBlur'
+    mode: 'onBlur'
   })
 
   const onSubmitNote = () => {
     // TO CONFIRM DECLINE OF WORK
-    mutate({
-      data: {
-        foreign_id: param._id,
-        action: "Declined",
-        note: noteValue,
-        _method: "put"
-      },
-    })
-  } 
+    let note = watch('notes')
+    if (note.length == 0) {
+      setNoteError()
+      return
+    } else {
+      mutate({
+        data: {
+          foreign_id: param._id,
+          action: 'Declined',
+          note: noteValue,
+          _method: 'put'
+        }
+      })
+    }
+  }
+
+  const TranslateString = useTranslateString()
 
   return (
     <>
@@ -196,8 +230,8 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                     '& svg': { mr: 2 }
                   }}
                 >
-                  <Typography variant='body1'>Content Creator : {param.user.username}</Typography>
-                  <Typography variant='body2'>Date Uploaded: {formatDate(param.updated_at)}</Typography>
+                  <Typography variant='body1'>{TranslateString("Content Creator")} : {param.user.username}</Typography>
+                  <Typography variant='body2'>{TranslateString("Date Uploaded")} : {formatDate(param.updated_at)}</Typography>
                 </Box>
               </Box>
             </Grid>
@@ -210,47 +244,52 @@ const ContentDialog = ({ param }: ContentDialogType) => {
                     width='100%'
                     height='100%'
                     controls={true}
-                    url={param.trial_video_hls}
+                    url={ param.has_own_trial ? STREAMING_SERVER_URL + param.trial_video_hls : STREAMING_SERVER_URL + param.full_video_hls }
                   />
                 </VideoBox>
               </Box>
             </Grid>
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '2rem' }}>
-                <TextField 
-                  disabled
-                  label='Video Title' 
-                  fullWidth placeholder='Title' 
-                  defaultValue={param.title} 
-                  { ...mainContentForm.register('videoTitle') }
-                  
-                  />
                 <TextField
                   disabled
-                  label='Description'
+                  label={TranslateString('Video Title')}
+                  fullWidth
+                  placeholder='Title'
+                  defaultValue={param.title}
+                  {...mainContentForm.register('videoTitle')}
+                />
+                <TextField
+                  disabled
+                  label={TranslateString('Description')}
                   multiline
                   rows={3}
                   fullWidth
                   placeholder='Description or Caption'
                   defaultValue={param.description}
-                  { ...mainContentForm.register('videoDescription') }
+                  {...mainContentForm.register('videoDescription')}
                 />
               </FormControl>
             </Grid>
 
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth sx={{ display: 'flex', gap: '.5rem' }}>
-                <TextField disabled multiline rows={2} fullWidth defaultValue={param.tags.join(', ')} />
+                <TextField label='Tags' disabled multiline rows={2} fullWidth defaultValue={param?.tags?.join(', ')} />
               </FormControl>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'center' }}>
           <Button variant='contained' color='error' sx={{ mr: 1 }} onClick={() => setShowNotes(true)}>
-            Decline
+            {TranslateString('Decline')}
           </Button>
-          <Button disabled={ isLoading ? true : false } variant='contained' color='primary' onClick={() => handleApproveContent()} >
-            { isLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Approve
+          <Button
+            disabled={isLoading ? true : false}
+            variant='contained'
+            color='primary'
+            onClick={() => handleApproveContent()}
+          >
+            {isLoading ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} {TranslateString('Approve')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -258,25 +297,27 @@ const ContentDialog = ({ param }: ContentDialogType) => {
       <Dialog
         maxWidth='sm'
         scroll='body'
-        onClose={() => setShowNotes(false)}
         TransitionComponent={Transition}
-        onBackdropClick={() => setShowNotes(false)}
         open={showNotes}
       >
         <DialogContent sx={{ pb: 8, px: { xs: 8, sm: 15 }, pt: { xs: 8, sm: 12.5 }, position: 'relative' }}>
           <form onSubmit={handleSubmit(onSubmitNote)}>
             <Grid container spacing={5}>
               <Grid item xs={12}>
-                { errors.notes && <span>Empty note</span>}
+                {errors.notes && (
+                  <Alert sx={{ mb: 5 }} severity='error'>
+                    Cannot leave an empty note
+                  </Alert>
+                )}
                 <TextField
-                  {...register('notes', { required: true})}
+                  {...register('notes')}
                   value={noteValue} //should be a state
-                  onChange={(event) => setNoteValue(event.target.value )}
+                  onChange={event => handleNoteOnChange(event.target.value)}
                   fullWidth
                   multiline
                   minRows={3}
-                  label='Note'
-                  placeholder="Dont't leave the note blank..."
+                  label={TranslateString('Note')}
+                  placeholder={TranslateString("Don't leave the note blank...")}
                   sx={{ '& .MuiOutlinedInput-root': { alignItems: 'baseline' } }}
                   InputProps={{
                     startAdornment: (
@@ -289,8 +330,14 @@ const ContentDialog = ({ param }: ContentDialogType) => {
               </Grid>
 
               <Grid display='flex' justifyContent='center' alignItems='center' item xs={12}>
-                <Button disabled={ (errors.notes || isLoading ) ? true : false } sx={{marginInline:'auto'}} type='submit' variant='contained' size='large'>
-                  { isLoading ? <CircularProgress sx={{mr: 3}} size={13} color='secondary' />  : null } Submit Note
+                <Button
+                  disabled={errors.notes || isLoading ? true : false}
+                  sx={{ marginInline: 'auto' }}
+                  type='submit'
+                  variant='contained'
+                  size='large'
+                >
+                  {isLoading ? <CircularProgress sx={{ mr: 3 }} size={13} color='secondary' /> : null} {TranslateString("Submit Note")}
                 </Button>
               </Grid>
             </Grid>

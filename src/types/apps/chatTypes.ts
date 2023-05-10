@@ -150,6 +150,7 @@ export type ChatLogType = {
     chat: ChatsObj
     contact: ContactType
     userContact: ProfileUserType
+    chats: any[]
   }
 }
 

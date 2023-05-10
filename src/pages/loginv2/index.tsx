@@ -180,7 +180,7 @@ const LoginPage = () => {
                         onChange={onChange}
                         error={Boolean(errors.email)}
                         placeholder=''
-                        sx={{ mb: 4, backgroundColor: theme.customBflyColors.grayInputBG }}
+                        sx={{ mb: 4 }}
                         variant='filled'
                       />
                     )}
@@ -195,7 +195,7 @@ const LoginPage = () => {
                       rules={{ required: true }}
                       render={({ field: { value, onChange, onBlur } }) => (
                         <OutlinedInput
-                          sx={{ backgroundColor: theme.customBflyColors.grayInputBG, marginTop: [4, 4, 4, 4, 6] }}
+                          sx={{ marginTop: [4, 4, 4, 4, 6] }}
                           value={value}
                           onBlur={onBlur}
                           label='Password'

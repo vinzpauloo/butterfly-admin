@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
@@ -11,7 +11,7 @@ import { styled } from '@mui/material/styles'
 // ** Third Party Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -22,27 +22,21 @@ import CreatedSuccessful from '../form/CreatedSuccessful'
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Hooks
-import { useUsersTable } from '@/services/api/useUsersTable'
+// ** Hooks/Services Imports
+import { UserTableService } from '@/services/api/UserTableService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   password: string
   password_confirmation: string
+  user_note: string
 }
 
-const schema = yup.object().shape({
-  password: yup.string().required('Please enter your desired new password.'),
-  password_confirmation: yup
-    .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Please re-enter your new password to confirm.')
-})
+const schema = yup.object().shape({})
 
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
-  roleId: any
-  userId: any
   data: any
 }
 
@@ -57,29 +51,38 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const EditCreatorDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
 
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
+
   // ** Props
   const { open, toggle } = props
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
-  const [formValue, setFormValue] = useState<FormValues>({
-    password: '',
-    password_confirmation: ''
-  })
 
   const {
-    register,
+    control,
     handleSubmit,
-    formState: { errors }
+    reset,
+    formState: { errors },
+    setValue
   } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      password: '*******',
-      password_confirmation: '*******'
-    }
+    resolver: yupResolver(schema)
   })
 
-  const { updateUser } = useUsersTable()
+  useEffect(() => {
+    if (props?.data) {
+      setValue('user_note', props?.data.note)
+    }
+  }, [props?.data, setValue])
+
+  const resetForm = () => {
+    reset({
+      password: '',
+      password_confirmation: ''
+    })
+  }
+
+  const { updateUser } = UserTableService()
   const mutation = useMutation(async (data: { id: any; data: any }) => {
     const response = await updateUser(data.id, data.data)
     if (response.ok) {
@@ -87,51 +90,37 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
     }
   })
 
-  const [responseError, setResponseError] = useState([])
-
-  const handleFormSubmit = async () => {
-    const { password, password_confirmation } = formValue
+  const handleFormSubmit = async (data: FormValues) => {
+    const { password, password_confirmation, user_note } = data
 
     if (password === password_confirmation) {
       try {
         await mutation.mutateAsync({
-          id: props.userId,
-          data: { password, password_confirmation, _method: 'put' }
+          id: props?.data.id,
+          data: { password, password_confirmation, _method: 'put', user_note }
         })
         setSubmitted(true)
 
         setTimeout(() => {
           toggle()
           setSubmitted(false)
-          setFormValue({
-            password: '',
-            password_confirmation: ''
-          })
+          resetForm()
+          clearErrorResponse()
 
           // Re-fetches UserTable and CSV exportation
           queryClient.invalidateQueries({ queryKey: ['allUsers'] })
           queryClient.invalidateQueries({ queryKey: ['UsersTableCSV'] })
         }, 1500)
       } catch (e: any) {
-        const {
-          data: { error }
-        } = e
-        setResponseError(error)
+        handleError(e, `updateUser() EditCreatorDrawer.tsx`)
       }
     }
   }
 
-  const handleFormInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-
-    setFormValue(prevState => ({
-      ...prevState,
-      [name]: value
-    }))
-  }
-
   const handleClose = () => {
     toggle()
+    resetForm()
+    clearErrorResponse()
   }
 
   return (
@@ -163,40 +152,52 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                     InputLabelProps={{
                       shrink: true
                     }}
-                    value={props?.data.username}
+                    value={props?.data.username || ''}
                     disabled
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Enter New Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password')}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Enter New Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        onChange={field.onChange}
+                        name='password'
+                        type='password'
+                        defaultValue={'********'}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
+                      />
+                    )}
                   />
                 </Box>
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Re-enter New Password'
-                    variant='outlined'
-                    fullWidth
-                    type='password'
-                    {...register('password_confirmation')}
-                    error={!!errors.password_confirmation}
-                    helperText={errors.password_confirmation?.message}
-                    onChange={handleFormInputChange}
+                  <Controller
                     name='password_confirmation'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Re-enter New Password'
+                        variant='outlined'
+                        fullWidth
+                        error={!!errors.password_confirmation}
+                        helperText={errors.password_confirmation?.message}
+                        onChange={field.onChange}
+                        name='password_confirmation'
+                        type='password'
+                        defaultValue={'********'}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
+                      />
+                    )}
                   />
                 </Box>
 
@@ -210,7 +211,7 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                       shrink: true
                     }}
                     disabled
-                    value={props?.data.mobile}
+                    value={props?.data.mobile || ''}
                   />
                 </Box>
 
@@ -224,36 +225,40 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                       shrink: true
                     }}
                     disabled
-                    value={props?.data.email}
+                    value={props?.data.email || ''}
                   />
                 </Box>
 
                 <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Note'
-                    variant='outlined'
-                    fullWidth
-                    multiline
-                    rows={4}
-                    name='note'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    disabled
-                    value={props?.data.note}
+                  <Controller
+                    name='user_note'
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label='Notes'
+                        variant='outlined'
+                        fullWidth
+                        multiline
+                        rows={4}
+                        error={!!errors.user_note}
+                        helperText={errors.user_note?.message}
+                        onChange={field.onChange}
+                        name='user_note'
+                        defaultValue={field.value}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
+                      />
+                    )}
                   />
                 </Box>
 
-                {responseError &&
-                  responseError?.map((item, index) => (
-                    <Typography key={index} color='red'>
-                      {item}
-                    </Typography>
-                  ))}
+                {/* Error messages from backend */}
+                {getErrorResponse(12)}
 
                 <Box sx={styles.formButtonContainer}>
                   <Box>
-                    <Button sx={styles.cancelButton}>
+                    <Button sx={styles.cancelButton} onClick={handleClose}>
                       <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>

@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { ReactNode } from 'react'
+import React from 'react'
 
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
@@ -19,7 +19,10 @@ import CreateFeedModal from '@/pages/settings/components/modal/CreateFeedModal'
 //* Context Import
 import { StudioContext } from '..'
 import { DisplayPage } from '..'
-import { Router } from 'next/router'
+import Translations from '@/layouts/components/Translations'
+
+// ** Hooks
+import { useAuth } from '@/services/useAuth'
 
 // ** Styled Components
 const UploadBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
@@ -41,6 +44,9 @@ const UploadMenu = (props: Props) => {
   const router = useRouter()
   const [feedModal, setFeedModal] = React.useState(false)
 
+  // ** Hooks
+  const auth = useAuth()
+
   const studioContext = React.useContext(StudioContext)
 
   const handleUploadButtonClick = () => {
@@ -53,7 +59,6 @@ const UploadMenu = (props: Props) => {
   }
 
   const handleNewsfeedsButtonClick = () => {
-    //studioContext?.setDisplayPage(DisplayPage.UploadNewsfeedsStep1)
     setFeedModal(true)
   }
 
@@ -63,16 +68,17 @@ const UploadMenu = (props: Props) => {
         variant='h6'
         sx={{
           marginInline: 'auto',
+          mt: ['1rem', 0],
           mb: 7,
           lineHeight: 1,
           fontWeight: 600,
           textTransform: 'uppercase',
-          fontSize: '1.5rem !important',
+          fontSize: ['1rem', '1.5rem !important'],
           textAlign: 'center'
         }}
         color={theme => theme.customBflyColors.primaryText}
       >
-        THE STUDIO PAGE - UPLOAD
+        <Translations text='THE STUDIO PAGE - UPLOAD' />
       </Typography>
 
       <BasicCard
@@ -90,31 +96,42 @@ const UploadMenu = (props: Props) => {
               sx={{
                 mb: 2,
                 textAlign: 'center',
-                fontWeight: 400
+                fontWeight: 400,
+                fontSize: ['.875rem', '1rem']
               }}
             >
-              Please Select content to upload
+              <Translations text='Please Select content to upload' />
             </Typography>
           </Grid>
           <Grid xs={12} item>
             <UploadBoxContainer>
-              <CustomButton onClick={handleUploadButtonClick}>Upload Video</CustomButton>
+              <CustomButton onClick={handleUploadButtonClick}>
+                <Translations text='Upload Video' />
+              </CustomButton>
             </UploadBoxContainer>
           </Grid>
-          <Grid xs={12} item>
-            <UploadBoxContainer>
-              <CustomButton onClick={handleUploadAlbumClick}>Upload Album</CustomButton>
-            </UploadBoxContainer>
-          </Grid>
+
+          {auth?.user?.role != 'CC' && (
+            <Grid xs={12} item>
+              <UploadBoxContainer>
+                <CustomButton onClick={handleUploadAlbumClick}>
+                  <Translations text='Upload Album' />
+                </CustomButton>
+              </UploadBoxContainer>
+            </Grid>
+          )}
+
           <Grid xs={12} item>
             <UploadBoxContainer sx={{ mt: '.5rem' }}>
-              <CustomButton onClick={handleNewsfeedsButtonClick}>Upload NEWSFEEDS</CustomButton>
-              <CreateFeedModal isOpen={feedModal} onClose={() => setFeedModal(false)} />
+              <CustomButton onClick={handleNewsfeedsButtonClick}>
+                <Translations text='Upload NEWSFEEDS' />
+              </CustomButton>
+              <CreateFeedModal context={studioContext} isOpen={feedModal} onClose={() => setFeedModal(false)} />
             </UploadBoxContainer>
           </Grid>
           <Grid xs={12} item>
             <Typography
-              fontSize='0.8125rem'
+              fontSize={['.72rem', '0.8125rem']}
               textAlign='center'
               sx={{ fontWeight: 'normal' }}
               color={theme => theme.customBflyColors.primaryTextContrast}

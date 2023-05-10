@@ -1,82 +1,63 @@
 // ** MUI Imports
-import { Box, Card, Grid, Tab } from '@mui/material'
+import { Box } from '@mui/material'
 
-import ToggleButton from '@/pages/user/components/button/ToggleButton'
-import formatDate from '@/utils/formatDate'
+// Project/Other Imports
 import EditBtn from '@/pages/user/components/button/EditButton'
 
 // ** Hooks
-import { useUsersTable } from '@/services/api/useUsersTable'
+import { ToggleAction } from '@/hooks/useToggleAction'
 
-// ** TanStack Query
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+// ** Zustand Store
+import { useUserTableStore } from '@/zustand/userTableStore'
 
-interface ToggleActionProps {
-  value: string
-  id: any
-}
+// ** Utils Imports
+import formatDate from '@/utils/formatDate'
 
-const ToggleAction = ({ value, id }: ToggleActionProps) => {
-  const queryClient = useQueryClient()
-  const { updateUser } = useUsersTable()
-  const mutation = useMutation(
-    async (data: { id: string; data: any }) => {
-      const response = await updateUser(data.id, data.data)
-      if (response.ok) {
-        await response.json()
+export const ContentCreatorColumns = () => {
+  const { handleOpenDrawer } = useUserTableStore(state => ({
+    handleOpenDrawer: state.handleOpenDrawer
+  }))
+
+  return [
+    { sortable: false, field: 'username', headerName: 'User Name', width: 200 },
+    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 200 },
+    { sortable: false, field: 'email', headerName: 'Email', width: 255 },
+    {
+      sortable: false,
+      field: 'created_at',
+      headerName: 'Date Created',
+      width: 285,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
       }
     },
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['allUsers']) // Updates the DataGrid
+      sortable: false,
+      field: 'updated_at',
+      headerName: 'Last Log In',
+      width: 285,
+      valueFormatter: (params: any) => {
+        return formatDate(params?.value)
+      }
+    },
+    {
+      sortable: false,
+      field: 'status',
+      headerName: 'Action',
+      width: 135,
+      renderCell: (params: any) => {
+        return (
+          <Box>
+            <ToggleAction id={params.row.id} value={params.value} />
+            <EditBtn
+              userId={params.row.id}
+              roleId={params.row.role_id}
+              data={params.row}
+              handleOpenDrawer={handleOpenDrawer}
+            />
+          </Box>
+        )
       }
     }
-  )
-
-  const handleToggle = async (newValue: boolean) => {
-    // Determine the new status
-    const newStatus = value === 'Applied' || value === 'Approved' ? 'Hold' : 'Approved'
-
-    // Update the status in the backend
-    await mutation.mutateAsync({ id, data: { status: newStatus, _method: 'put' } })
-  }
-
-  return (
-    <ToggleButton checked={value === 'Approved' || value === 'Applied'} onToggle={newValue => handleToggle(newValue)} />
-  )
+  ]
 }
-
-export const contentCreatorColumns = [
-  { field: 'username', headerName: 'User Name', width: 200 },
-  { field: 'mobile', headerName: 'Mobile Number', width: 200 },
-  { field: 'email', headerName: 'Email', width: 250 },
-  {
-    field: 'created_at',
-    headerName: 'Date Created',
-    width: 250,
-    valueFormatter: (params: any) => {
-      return formatDate(params?.value)
-    }
-  },
-  {
-    field: 'updated_at',
-    headerName: 'Last Log In',
-    width: 250,
-    valueFormatter: (params: any) => {
-      return formatDate(params?.value)
-    }
-  },
-  {
-    field: 'status',
-    headerName: 'Action',
-    width: 150,
-    renderCell: (params: any) => {
-      return (
-        <Box>
-          <ToggleAction id={params.row.id} value={params.value} />
-          <EditBtn userId={params.row.id} roleId={params.row.role_id} data={params.row} />
-        </Box>
-      )
-    }
-  }
-]

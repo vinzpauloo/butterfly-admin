@@ -12,9 +12,6 @@ import Layout from '@/layouts/UserLayoutNoPadding/Layout'
 // ** Navigation Imports
 import VerticalNavItems from 'src/navigation/verticalButterfly'
 
-// ** Icon
-import Icon from 'src/@core/components/icon'
-
 // ** Component Import
 // Uncomment the below line (according to the layout type) when using server-side menu
 // import ServerSideVerticalNavItems from './components/vertical/ServerSideNavItems'
@@ -24,9 +21,6 @@ import VerticalAppBarContent from '../components/vertical/AppBarContent'
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
-import AppBrand from '../components/AppBrand'
-import SidebarContent from '../components/vertical/SidebarContent'
-import SidebarFooter from '../components/vertical/SidebarFooter'
 
 interface Props {
   children: ReactNode
