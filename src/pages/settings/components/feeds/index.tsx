@@ -112,16 +112,20 @@ const SelectFeaturedFeeds = (props: Props) => {
   }
 
   const handleFeedItemClick = (feed: IFeedStory) => {
-    console.log('@@@@@@@@@ THE FEED ID', feed)
+    console.log('@@@@@@@@@ THE FEED ID FROM SETTINGS', feed)
     setFeedRow(feed)
     setOpen(true)
   }
+
+  const handleCardClick = (feed: IFeedStory) => {
+    
+  } 
 
   const getActiveTabContent = (step: number) => {
     if (data) {
       let flatMapDataArray = data.pages.flatMap(data => [data.data])
       let flatMap = flatMapDataArray.flatMap(data => [...data])
-      return <FeedList data={flatMap} handleFeedItemClick={handleFeedItemClick} />
+      return <FeedList data={flatMap} handleFeedItemClick={handleFeedItemClick} editable={false} handleCardClick={handleCardClick} />
     }
   }
 

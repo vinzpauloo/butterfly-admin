@@ -10,12 +10,12 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Box, { BoxProps } from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
-import Stack from '@mui/material/Stack'
+import Alert from '@mui/material/Alert'
 import Chip from '@mui/material/Chip'
 import Autocomplete from '@mui/material/Autocomplete'
 
 // ** Third Party Imports
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch  } from 'react-hook-form'
 import ReactPlayer from 'react-player'
 import toast from 'react-hot-toast'
 
@@ -34,6 +34,7 @@ import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Base Links
 import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+import { setTag } from '@sentry/nextjs'
 
 interface SidebarEditType {
   open: boolean
@@ -67,6 +68,10 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
   // ** Props
   const { open, toggle, row } = props
 
+  // States
+  const [ tagArrayState, setTagArrayState ] = React.useState<string[]>([])
+  const [ disableButton, setDisableButton ] = React.useState<boolean>(true)
+
   // tanstack
   const queryClient = useQueryClient()
   const { updateVideoByWorkId } = VideoService()
@@ -86,8 +91,6 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
     }
   })
 
-  // ** State ---
-
   // ** React Hook Form
   const {
     getValues,
@@ -98,35 +101,51 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
     setValue,
     handleSubmit,
     watch,
+    clearErrors,
     setError,
-    formState: { errors }
+    formState: { errors, isValid, isSubmitted }
   } = useForm<IFeedStory>({
-    mode: 'onBlur',
     defaultValues : {
       tags : row.tags
-    }
+    },
+    criteriaMode : 'all'
   })
 
+
   const onSubmit = (data: IFeedStory) => {
+    console.log('call submit')
+
+
+  }
+console.log('@@@@@',isValid)
+  const handleValidations = (name : string) => {
+
+    switch (name) {
+      case 'tags' : 
+            setError('tags', { type : 'custom', message : 'Tag is required.' });
+            break;
+      case 'string_story' : 
+            setError('string_story', { type : 'custom', message : 'Minimum of 5 characters' });
+            break; 
+      
+      default : break;
+    }
+
 
   }
 
   const handleClose = () => {
-    reset()
     toggle()
   }
 
-
-
-  // manually set the default values
-  // because useForm caches the defaults on first render
   React.useEffect(() => {
 
     //setValues
-    console.log('CALL THIS tags',row.tags)
-
     setValue('tags', row?.tags)
     setValue('string_story', row?.string_story)
+
+    //set state
+    setTagArrayState(row?.tags)
 
   }, [row])
 
@@ -135,6 +154,7 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
   if (row == undefined) return <></>
 
   if (row) {
+
     return (
       <Drawer
         open={open}
@@ -160,26 +180,41 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
         
         <Box sx={{ p: 5 }}>
           <form onSubmit={event => event.preventDefault()}>
-            <FormControl fullWidth sx={{ mb: 6 }}>
+
+          { errors.string_story && <Alert sx={{mb:5}} variant='outlined' severity='error'>{ errors.string_story.message }</Alert> }
+
               <TextField
+                sx={{mb:5}}
                 {...register('string_story')}
-                label={TranslateString('Title')}
+                label={TranslateString('Story')}
                 placeholder='Story'
-                defaultValue={row.string_story}
-                error={Boolean(errors.string_story)}
+                fullWidth
                 multiline={true}
                 rows={5}
+                onChange={ (e) => { 
+                  const text = e.target.value
+                  setValue('string_story', text)
+                  getValues('string_story').length < 5 ? handleValidations('string_story') : clearErrors('string_story')
+                } }
               />
-            </FormControl>
 
 
+            { errors.tags && <Alert sx={{mb:5}} variant='outlined' severity='error'>{ errors.tags.message }</Alert> }
             <Autocomplete
                 multiple
                 options={[]}
                 freeSolo
-                
+                value={tagArrayState}
                 sx={{ mb:10 }}
-                onChange={( event, value )=>{ setValue('tags', value as string[]) }}
+                onChange={( event, value )=>{ 
+                  setValue('tags', value as string[]) 
+                  // store the array of tags in the state
+                  setTagArrayState( getValues('tags') )
+                  console.log('asdasdasdas', getValues('tags').length)
+                  // validate
+                  getValues('tags').length ? clearErrors('tags') : handleValidations('tags')
+
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => 
                   <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
@@ -191,7 +226,6 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                       borderRadius: '8px'
                     }}
                     {...params}
-                    {...register('tags')}
                   />
                 )}
               />
@@ -206,12 +240,11 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                 type='submit'
                 variant='contained'
                 sx={{ mr: 3 }}
-                disabled={isEditLoading ? true : false}
+                disabled={ !isSubmitted || isValid || isEditLoading ? true : false }
               >
                 {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString("Submit")}
               </Button>
               <Button
-                disabled={isEditLoading ? true : false}
                 size='large'
                 variant='outlined'
                 color='secondary'

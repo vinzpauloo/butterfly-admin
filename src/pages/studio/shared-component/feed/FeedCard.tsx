@@ -38,7 +38,7 @@ interface FeedCardProps {
   handleEditButtonClick? : () => void
 }
 
-const FeedCard = ({ string_story, user, children, datePublished, editable=false, handleEditButtonClick }: FeedCardProps) => {
+const FeedCard = ({ string_story, user, children, datePublished, editable, handleEditButtonClick }: FeedCardProps) => {
   // ** Hook
   const theme = useTheme()
 
