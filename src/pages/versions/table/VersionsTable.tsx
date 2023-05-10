@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useEffect, useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { DataGrid } from '@mui/x-data-grid'
 
@@ -17,25 +14,26 @@ import { useQuery } from '@tanstack/react-query'
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
 import { useAuth } from '@/services/useAuth'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 type SortType = 'asc' | 'desc' | undefined | null
 
 const VersionsTable = () => {
-  const router = useRouter()
-  const currentLocation = router.asPath
-
-  const { selectedSite } = useSiteContext()
+  // ** Hooks/Services
   const { getAllApks } = ApkService()
+  const { handleError } = useErrorHandling()
+  const { user } = useAuth()
+
+  // ** Context
+  const { selectedSite } = useSiteContext()
+
   const { columns } = MenuItemData()
 
+  // ** States
   const [rowData, setRowData] = useState<[]>([])
   const [siteId, setSiteId] = useState<string>('1')
-
   const [sort] = useState<SortType>('desc')
   const [sortName] = useState<string>('created_at')
-
-  const { user } = useAuth()
 
   useEffect(() => {
     if (user?.role === 'GOD') {
@@ -57,14 +55,7 @@ const VersionsTable = () => {
       setRowData(data?.data)
     },
     onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} getAllApks() VersionsTable`)
-        })
-      }
+      handleError(e, `getAllApks() Versions Table`)
     }
   })
 

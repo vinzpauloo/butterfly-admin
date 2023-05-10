@@ -1,10 +1,7 @@
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** Utils Import
 import formatDate from '@/utils/formatDate'
 
-// ** TanStack Import
+// ** TanStack Imports
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 
 // ** Project Imports
@@ -12,7 +9,7 @@ import ToggleButton from '@/pages/user/components/button/ToggleButton'
 
 // ** Hooks/Services Imports
 import { WalletService } from '@/services/api/WalletService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface ToggleActionProps {
   value: number
@@ -20,11 +17,14 @@ interface ToggleActionProps {
 }
 
 const ToggleAction = ({ value, id }: ToggleActionProps) => {
+  // ** TanStack
   const queryClient = useQueryClient()
-  const { editWallet } = WalletService()
-  const router = useRouter()
-  const currentLocation = router.asPath
 
+  // ** Hooks/Services
+  const { editWallet } = WalletService()
+  const { handleError } = useErrorHandling()
+
+  // ** API Methods
   const mutation = useMutation(
     async (data: { id: string; data: any }) => {
       const response = await editWallet(data.id, data.data)
@@ -48,14 +48,7 @@ const ToggleAction = ({ value, id }: ToggleActionProps) => {
       // Update the status in the backend
       await mutation.mutateAsync({ id, data: { active: newStatus, _method: 'put' } })
     } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, editWallet() PaymentsColumns`)
-        })
-      }
+      handleError(e, `editWallet() handleToggle function in Payments Column`)
     }
   }
 

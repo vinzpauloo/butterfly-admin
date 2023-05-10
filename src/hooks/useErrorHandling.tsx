@@ -2,15 +2,14 @@
 import React from 'react'
 import toast from 'react-hot-toast'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { Typography } from '@mui/material'
 
 // ** Hooks Imports
 import { captureError } from '@/services/Sentry'
-
-interface ErrorActions {
-  currentLocation: string
-}
 
 interface ErrorMessage {
   data: {
@@ -19,9 +18,15 @@ interface ErrorMessage {
   }
 }
 
-export const useErrorHandling = ({ currentLocation }: ErrorActions) => {
+export const useErrorHandling = () => {
+  // ** Router
+  const router = useRouter()
+  const currentLocation = router.asPath
+
+  // ** State Variables
   const [errorResponse, setErrorResponse] = React.useState<string>()
 
+  // ** Functions
   const handleError = (e: ErrorMessage, customMessage: string) => {
     const {
       data: { message, error }

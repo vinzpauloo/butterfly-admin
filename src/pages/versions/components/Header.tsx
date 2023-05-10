@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Box, FormControl, InputLabel, MenuItem, Select, Typography, Button } from '@mui/material'
 import { SelectChangeEvent } from '@mui/material/Select'
@@ -14,14 +11,14 @@ import { useTranslateString } from '@/utils/TranslateString'
 // ** Other Imports
 import { useSiteContext } from '../../../context/SiteContext'
 import VersionsDrawer from './CreateDrawer'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { ApkService } from '@/services/api/ApkService'
-import { FILE_SERVER_URL } from '@/lib/baseUrls'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface SiteNameProps {
   name: string
@@ -30,15 +27,31 @@ interface SiteNameProps {
 }
 
 const Header = () => {
-  const router = useRouter()
-  const currentLocation = router.asPath
-
+  // ** Context
   const { selectedSite, setSelectedSite } = useSiteContext()
+
+  // ** State Variables
   const [openDrawer, setOpenDrawer] = useState(false)
   const [siteName, setSiteName] = useState<SiteNameProps[]>([])
 
+  // ** Hooks/Services
+  const { handleError } = useErrorHandling()
   const { getAllSites } = ApkService()
+
+  // ** Utilities
   const TranslateString = useTranslateString()
+
+  // ** API methods
+  useQuery({
+    queryKey: ['getAllSites'],
+    queryFn: () => getAllSites(),
+    onSuccess: (data: any) => {
+      setSiteName(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getAllSites() Versions Header, Select Site`)
+    }
+  })
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedSite(event.target.value as string)
@@ -47,24 +60,6 @@ const Header = () => {
   const handleDrawerToggle = () => {
     setOpenDrawer(isDrawerOpen => !isDrawerOpen)
   }
-
-  useQuery({
-    queryKey: ['getAllSites'],
-    queryFn: () => getAllSites(),
-    onSuccess: (data: any) => {
-      setSiteName(data)
-    },
-    onError: (e: any) => {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, getAllSites() Versions Header component`)
-        })
-      }
-    }
-  })
 
   return (
     <Box mb={5}>
@@ -85,9 +80,6 @@ const Header = () => {
               sx: { ...styles.menuList }
             }}
           >
-            {/* <MenuItem value='' sx={{ ...styles.menuItem, fontWeight: '600', textTransform: 'uppercase' }}>
-              <em>None</em>
-            </MenuItem> */}
             {siteName &&
               siteName?.map((item, index) => (
                 <MenuItem key={index} value={item.id}>
@@ -132,10 +124,6 @@ const styles = {
       xs: '100%',
       lg: '25%'
     }
-  },
-  menuItem: {
-    display: 'flex',
-    justifyContent: 'space-between'
   },
   buttonWrapper: {
     mt: {

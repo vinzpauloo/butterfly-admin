@@ -1,16 +1,24 @@
+// ** React Imports
 import React, { useState } from 'react'
-import Switch from '@mui/material/Switch'
+
+// ** MUI Imports
+import { Button, CircularProgress, Modal, Stack, Switch } from '@mui/material'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import Grid, { GridProps } from '@mui/material/Grid'
 import { Icon, IconProps } from '@mui/material'
-import Stack from '@mui/material/Stack'
-import Button from '@mui/material/Button'
-import Modal from '@mui/material/Modal'
+
+// ** Project/Other Imports
 import VIPBundleModal from './VIPBundleModal'
-import CircularProgress from '@mui/material/CircularProgress'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import BundlesService from '@/services/api/BundlesService'
 import IconList from './IconList'
+
+// ** TanStack Imports
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
+import BundlesService from '@/services/api/BundlesService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+
+// ** Utils Imports
 import { useTranslateString } from '@/utils/TranslateString'
 
 type Props = {
@@ -51,6 +59,8 @@ const VIPBundleItem = (props: Props) => {
   const [open, setOpen] = useState(false)
   const handleClose = () => setOpen(false)
 
+  const { handleError } = useErrorHandling()
+
   // Get QueryClient from the context
   const queryClient = useQueryClient()
   const { deleteVIPBundle, editVIPBundle } = BundlesService()
@@ -62,8 +72,8 @@ const VIPBundleItem = (props: Props) => {
         queryKey: ['allVIPBundles']
       })
     },
-    onError: error => {
-      alert(error)
+    onError: (e: any) => {
+      handleError(e, `deleteVIPBundle() VIPBundleItem`)
     }
   })
 
@@ -74,8 +84,8 @@ const VIPBundleItem = (props: Props) => {
         queryKey: ['allVIPBundles']
       })
     },
-    onError: error => {
-      alert(error)
+    onError: (e: any) => {
+      handleError(e, `editVIPBundle() VIPBundleItem`)
     }
   })
 

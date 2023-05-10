@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Drawer, Button, TextField, IconButton, Typography, MenuItem } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -64,9 +61,6 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const VersionsDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
-  const router = useRouter()
-
-  const currentLocation = router.asPath
 
   // ** Props
   const { open, toggle } = props
@@ -98,9 +92,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
 
   const { selectedSite } = useSiteContext()
 
-  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling({
-    currentLocation
-  })
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   const handleFormSubmit = async (data: FormValues) => {
     const formData = new FormData()

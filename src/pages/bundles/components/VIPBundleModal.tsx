@@ -1,9 +1,6 @@
 // ** React Imports
 import React, { useState } from 'react'
 
-// ** Next Imports
-import { useRouter } from 'next/router'
-
 // ** MUI Imports
 import { Button, CircularProgress, Icon, IconProps, Menu, MenuItem, Switch, TextField } from '@mui/material'
 import Typography, { TypographyProps } from '@mui/material/Typography'
@@ -45,9 +42,6 @@ type Props = {
 }
 
 const VIPBundleModal = (props: Props) => {
-  const router = useRouter()
-  const currentLocation = router.asPath
-
   const [bundleName, setBundleName] = useState(props.bundleName ?? '')
   const [bundleNameError, setBundleNameError] = useState(false)
 
@@ -163,9 +157,7 @@ const VIPBundleModal = (props: Props) => {
   const queryClient = useQueryClient()
   const { addVIPBundle, editVIPBundle } = BundlesService()
 
-  const { handleError, getErrorResponse } = useErrorHandling({
-    currentLocation
-  })
+  const { handleError, getErrorResponse } = useErrorHandling()
 
   const {
     mutate: mutateAddNewVIPBundle,
