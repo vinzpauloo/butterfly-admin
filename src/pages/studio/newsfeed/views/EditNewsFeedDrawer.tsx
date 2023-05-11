@@ -15,7 +15,7 @@ import Chip from '@mui/material/Chip'
 import Autocomplete from '@mui/material/Autocomplete'
 
 // ** Third Party Imports
-import { useForm, useWatch  } from 'react-hook-form'
+import { useForm, Controller} from 'react-hook-form'
 import ReactPlayer from 'react-player'
 import toast from 'react-hot-toast'
 
@@ -34,7 +34,6 @@ import { useTranslateString } from '@/utils/TranslateString';
 
 // ** Base Links
 import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
-import { setTag } from '@sentry/nextjs'
 
 interface SidebarEditType {
   open: boolean
@@ -68,6 +67,25 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
   // ** Props
   const { open, toggle, row } = props
 
+  // ** React Hook Form
+  const {
+    getValues,
+    reset,
+    resetField,
+    trigger,
+    register,
+    control,
+    setValue,
+    handleSubmit,
+    watch,
+    clearErrors,
+    setError,
+    formState: { errors, isValid, isSubmitted, isDirty }
+  } = useForm<IFeedStory>({
+    defaultValues : row,
+    mode : 'onChange'
+  })
+
   // States
   const [ tagArrayState, setTagArrayState ] = React.useState<string[]>([])
   const [ disableButton, setDisableButton ] = React.useState<boolean>(true)
@@ -91,62 +109,33 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
     }
   })
 
-  // ** React Hook Form
-  const {
-    getValues,
-    reset,
-    resetField,
-    register,
-    control,
-    setValue,
-    handleSubmit,
-    watch,
-    clearErrors,
-    setError,
-    formState: { errors, isValid, isSubmitted }
-  } = useForm<IFeedStory>({
-    defaultValues : {
-      tags : row.tags
-    },
-    criteriaMode : 'all'
-  })
-
 
   const onSubmit = (data: IFeedStory) => {
     console.log('call submit')
 
 
   }
-console.log('@@@@@',isValid)
-  const handleValidations = (name : string) => {
 
+  const handleValidations = (name : string) => {
     switch (name) {
+
       case 'tags' : 
             setError('tags', { type : 'custom', message : 'Tag is required.' });
             break;
-      case 'string_story' : 
-            setError('string_story', { type : 'custom', message : 'Minimum of 5 characters' });
-            break; 
-      
       default : break;
+
     }
-
-
   }
 
   const handleClose = () => {
-    toggle()
+    // toggle()
+    // reset()
+    trigger('tags')
   }
 
   React.useEffect(() => {
-
-    //setValues
-    setValue('tags', row?.tags)
-    setValue('string_story', row?.string_story)
-
-    //set state
-    setTagArrayState(row?.tags)
-
+    // reset to default values of feedrow
+    reset(row)
   }, [row])
 
   const TranslateString = useTranslateString()
@@ -185,52 +174,67 @@ console.log('@@@@@',isValid)
 
               <TextField
                 sx={{mb:5}}
-                {...register('string_story')}
+                {...register('string_story', {
+                  required : {
+                    value : true,
+                    message : "Cannot have an empty story."
+                  },
+                  minLength : {
+                    value : 10,
+                    message : "At least 10 characters"
+                  }
+                })}
                 label={TranslateString('Story')}
                 placeholder='Story'
                 fullWidth
                 multiline={true}
                 rows={5}
-                onChange={ (e) => { 
-                  const text = e.target.value
-                  setValue('string_story', text)
-                  getValues('string_story').length < 5 ? handleValidations('string_story') : clearErrors('string_story')
-                } }
               />
 
 
             { errors.tags && <Alert sx={{mb:5}} variant='outlined' severity='error'>{ errors.tags.message }</Alert> }
-            <Autocomplete
-                multiple
-                options={[]}
-                freeSolo
-                value={tagArrayState}
-                sx={{ mb:10 }}
-                onChange={( event, value )=>{ 
-                  setValue('tags', value as string[]) 
-                  // store the array of tags in the state
-                  setTagArrayState( getValues('tags') )
-                  console.log('asdasdasdas', getValues('tags').length)
-                  // validate
-                  getValues('tags').length ? clearErrors('tags') : handleValidations('tags')
-
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => 
-                  <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
-                }
-                renderInput={params => (
-                  <TextField
-                    sx={{
-                      backgroundColor: theme => theme.palette.background.paper,
-                      borderRadius: '8px'
-                    }}
-                    {...params}
-                  />
+            <Controller
+                name='tags'
+                control={control}
+                render={({ field: { value, onChange, onBlur } }) => (
+                    <Autocomplete
+                      multiple
+                      value={value}
+                      options={[]}
+                      freeSolo
+                      sx={{ mb:10 }}
+                      onChange={( event, value )=>{ 
+                        setValue('tags', value as string[]) 
+                        //getValues('tags').length ? clearErrors('tags') : handleValidations('tags')
+                      }}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => 
+                        <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+                      }
+                      renderInput={params => (
+                        <TextField
+                          sx={{
+                            backgroundColor: theme => theme.palette.background.paper,
+                            borderRadius: '8px'
+                          }}
+                          {...params}
+                        />
+                      )}
+                    />
                 )}
-              />
-
-
+                rules={{ 
+                  required: {
+                    value : true, 
+                    message : 'Cannot leave empty tags' 
+                  },
+                  validate : (fieldValue) => {
+                    return ( 
+                      fieldValue.length == 0  || 
+                      'Dont leave empty tags' )
+                  }
+                }}
+            />
+            
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button
                 onClick={() => {
@@ -240,7 +244,7 @@ console.log('@@@@@',isValid)
                 type='submit'
                 variant='contained'
                 sx={{ mr: 3 }}
-                disabled={ !isSubmitted || isValid || isEditLoading ? true : false }
+                disabled={ !isDirty || !isValid }
               >
                 {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString("Submit")}
               </Button>
