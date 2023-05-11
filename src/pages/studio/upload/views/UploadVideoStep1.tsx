@@ -426,16 +426,20 @@ const UploadVideoStep1 = (props: Props) => {
     setGroupings(filteredGroupings as [])
   }
   const handleStartUpload = () => {
+    
     setContextTags()
     setContextGroups()
 
     // Validations
     if (auth?.user?.role == 'CC') {
     } else {
+
       if (!watch('contentCreator')) {
         toast.error('Content Creator is required', { position: 'top-center' })
         return
       }
+
+      console.log('Admin is uploading')
     }
 
     if (watch('title')?.length < 10) {
@@ -464,9 +468,17 @@ const UploadVideoStep1 = (props: Props) => {
     }
 
     if( trialUploadSwitch == false ) {
-      watch('startTime') == '' && toast.error('Please input a trailer start time', { position: 'top-center' })
-      return
+
+       if ( watch('startTime') == '' ) {
+        toast.error('Please input a trailer start time', { position: 'top-center' })
+        return
+       }
+      
+    } else {
+      console.log('has Trial Upload')
     }
+
+    
 
     //get fields from react hook form
     const { title, contentCreator, description } = getValues()
@@ -774,10 +786,6 @@ const UploadVideoStep1 = (props: Props) => {
                                 id='start'
                                 placeholder={`Start time`}
                                 {...register('startTime', { 
-                                  required : {
-                                    value : trialUploadSwitch,
-                                    message: 'Start Time is required '
-                                  },
                                   onChange : event => { checkStartTimeValidity(event) } })}
                               />
                             </FormGroup>
