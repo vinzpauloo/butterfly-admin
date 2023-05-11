@@ -26,6 +26,9 @@ import { FILE_SERVER_URL } from '@/lib/baseUrls'
 // ** AuthContext
 import { useAuth } from '@/services/useAuth'
 
+// ** Error Handling
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+
 const navData = [
   {
     value: 'selection',
@@ -115,7 +118,6 @@ const Header = ({ searchCreator, setSearchCreator, searchTitle, setSearchTitle, 
       </Typography>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} width={900}>
-          
           {auth.user?.role != 'CC' && (
             <OutlinedInput
               fullWidth
@@ -281,6 +283,7 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
 }
 
 function TableVideos() {
+  const { handleError } = useErrorHandling()
   const { getWorkgroup } = WorkgroupService()
   const { getAllVideos } = VideoService()
   const [data, setData] = useState([])
@@ -306,7 +309,8 @@ function TableVideos() {
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['videosList', page, pageSize, debouncedCreator, debouncedTitle, debouncedTag, postStatus],
-    queryFn: () => getAllVideos({ data: { with: 'user', page, approval : postStatus, paginate: pageSize, ...filterParams() } }),
+    queryFn: () =>
+      getAllVideos({ data: { with: 'user', page, approval: postStatus, paginate: pageSize, ...filterParams() } }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -314,8 +318,8 @@ function TableVideos() {
       setPage(data.current_page)
       console.log('@@@', data)
     },
-    onError: err => {
-      console.log('videosList error: ', err)
+    onError: (e: any) => {
+      handleError(e, `getAllVideos() video-list/table/TableVideos.tsx`)
     }
   })
 

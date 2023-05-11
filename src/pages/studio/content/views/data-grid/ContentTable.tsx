@@ -20,9 +20,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Apis
 import ContentService from '@/services/api/ContentService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** Icon Imports
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** BASE APIS Import
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
@@ -47,7 +48,7 @@ const renderClient = (params: GridRenderCellParams) => {
 }
 
 // ** Types and Interfaces
-type StatusTypes = 'Approved' | 'Pending' | 'Declined' 
+type StatusTypes = 'Approved' | 'Pending' | 'Declined'
 
 interface IContentTable {}
 
@@ -74,36 +75,45 @@ const ContentTable = (props: IContentTable) => {
   const queryClient = useQueryClient()
 
   const { getContents } = ContentService()
+  const { handleError } = useErrorHandling()
 
   //Queries
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['contents', page, pageSize],
-    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize, approval  } }),
+    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize, approval } }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
       setPage(data.current_page)
       console.log('@@@', data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getContents() The Studio Page-Content Approval studio/content/views/data-grid/ContentTable.tsx`)
     }
   })
 
   // Mutations
   const mutation = useMutation({
-    mutationFn: () => { return new Promise(resolve => {}) },
+    mutationFn: () => {
+      return new Promise(resolve => {})
+    },
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['contents'] })
     },
+    onError: (e: any) => {
+      handleError(e, `mutation() Studio Page-Content Approval`)
+    }
   })
 
   const TranslateString = useTranslateString()
 
-  const columns : GridColDef[] = [
+  const columns: GridColDef[] = [
     {
       flex: 0.02,
       minWidth: 70,
       field: 'thumbnail_url',
-      headerName: TranslateString("Video Thumbnail"),
+      headerName: TranslateString('Video Thumbnail'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => {
         return (
@@ -121,7 +131,7 @@ const ContentTable = (props: IContentTable) => {
     {
       flex: 0.02,
       minWidth: 90,
-      headerName: TranslateString("Content Creator"),
+      headerName: TranslateString('Content Creator'),
       sortable: false,
       field: 'content_creator',
       renderCell: (params: GridRenderCellParams) => (
@@ -134,7 +144,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.03,
       minWidth: 60,
       field: 'title',
-      headerName: TranslateString("Title"),
+      headerName: TranslateString('Title'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -146,7 +156,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.04,
       field: 'tag',
       minWidth: 80,
-      headerName: TranslateString("Tags"),
+      headerName: TranslateString('Tags'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -158,7 +168,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.04,
       minWidth: 140,
       field: 'last_update',
-      headerName: TranslateString("Last Update"),
+      headerName: TranslateString('Last Update'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -170,7 +180,7 @@ const ContentTable = (props: IContentTable) => {
       flex: 0.01,
       minWidth: 60,
       field: 'action',
-      headerName: TranslateString("Action"),
+      headerName: TranslateString('Action'),
       sortable: false,
       renderCell: (params: GridRenderCellParams) => <ContentDialog param={params.row} />
     }
@@ -285,7 +295,10 @@ const ContentTable = (props: IContentTable) => {
   return (
     <>
       <Card>
-        <CardHeader sx={{textTransform:"uppercase"}} title={TranslateString("The Studio Page") + " - " + TranslateString("Content Approval")}/>
+        <CardHeader
+          sx={{ textTransform: 'uppercase' }}
+          title={TranslateString('The Studio Page') + ' - ' + TranslateString('Content Approval')}
+        />
         <DataGrid
           loading={isLoading || isRefetching}
           getRowId={row => row._id}
