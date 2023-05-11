@@ -15,6 +15,7 @@ import Container from '@/pages/components/Container'
 // ** Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
 import useDebounce from '@/hooks/useDebounce'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** Utils Imports
 import { useTranslateString } from '@/utils/TranslateString'
@@ -37,6 +38,7 @@ const TableAlbums = () => {
 
   // ** Service
   const { getAlbums } = AlbumService()
+  const { handleError } = useErrorHandling()
 
   // ** Utilities
   const TranslateString = useTranslateString()
@@ -69,6 +71,9 @@ const TableAlbums = () => {
       setRowCount(response?.total)
       setPageSize(response?.per_page)
       setPage(response?.current_page)
+    },
+    onError: (e: any) => {
+      handleError(e, `getAlbums() TableAlbums.tsx`)
     }
   })
 

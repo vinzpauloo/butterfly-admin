@@ -13,6 +13,8 @@ interface DashboardProps {
         sort?: string;
         limit?: string;
         paginate?: string;
+        top_donators?: string;
+        with?: string;
     }
 }
 
@@ -97,6 +99,21 @@ export const DashboardService = () => {
         })
     }
 
+    const getTopDonators = (params: DashboardProps) => {
+        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+        return request({
+            headers: {
+                ...getHeaders(),
+                 'ngrok-skip-browser-warning': '69420', // only for dev
+                Authorization: `Bearer ${accessToken}`
+            },
+            url: '/admin/donations',
+            method: 'GET',
+            params: params.data
+        })
+    }
+
     // Video Bar Chart
     const getVideoBarChart = (params: VideoBarChartProps) => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -136,6 +153,7 @@ export const DashboardService = () => {
         getMostFollowedCreator,
         getTopDownloadedVideos,
         getVideoBarChart,
-        getVIPandGuestChart
+        getVIPandGuestChart,
+        getTopDonators
   }
 }
