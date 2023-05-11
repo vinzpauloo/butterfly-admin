@@ -12,9 +12,7 @@ interface TopDownloadedVideos {
 
 interface TopDonators {
   id: string
-  customers: {
-    username: string
-  }
+  username: string
 }
 
 interface DashboardContextProps {
