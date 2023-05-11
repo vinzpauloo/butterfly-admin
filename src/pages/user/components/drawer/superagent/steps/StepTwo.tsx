@@ -25,7 +25,7 @@ type SAStepTwoProps = {
 
 export type FQDNData = {
   site: number
-  fqdns: {name?: string, type?: 'Api' | 'Streaming' | 'Photo'}[]
+  fqdns: { name?: string; type?: 'Api' | 'Streaming' | 'Photo' }[]
 }
 
 const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: any) => {
@@ -73,14 +73,17 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
 
     if (hasEmptyvalues) {
       console.log('has empty values dont submit')
+
       return
     }
 
     // structure
-    const apiArray = formAPIRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'API'} ) ) 
-    const photoArray = formPhotosRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'Photo'} ) ) 
-    const streamingArray = formStreamRef.current.getFormData().map( (name : any) => ( { 'name' : name.value, type : 'Streaming'} ) ) 
-    const fqdnsObject = { "fqdns" : [ ...apiArray, ...photoArray, ...streamingArray ] }
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'API' }))
+    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Photo' }))
+    const streamingArray = formStreamRef.current
+      .getFormData()
+      .map((name: any) => ({ name: name.value, type: 'Streaming' }))
+    const fqdnsObject = { fqdns: [...apiArray, ...photoArray, ...streamingArray] }
 
     console.log('START SUBMIT fqdnsObject', fqdnsObject)
 
@@ -88,8 +91,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
     submitFQDN(fqdnsObject as FQDNData)
   }
 
-  const submitFQDN = async (fqdnsObject  : FQDNData) => {
-
+  const submitFQDN = async (fqdnsObject: FQDNData) => {
     // start stepper loader
     setIsLoading(true)
 
@@ -97,6 +99,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
 
     if (Object.keys(fqdnsObject)?.length == 0) {
       toast.error('FQDN is required')
+
       return
     } else {
       console.log('allFQDNData', fqdnsObject)
@@ -106,7 +109,6 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
       await fqdnM.mutateAsync({
         data: fqdnsObject
       })
-      
     }
 
     setTimeout(() => {

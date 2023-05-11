@@ -40,7 +40,7 @@ export const useErrorHandling = () => {
         error[key].forEach((value: any) => {
           captureError(currentLocation, `${value}, Custom MSG: ${customMessage}`)
           toast.error(`Error ${value}`, {
-            duration: 2000
+            duration: 8000
           })
           errorMessages.push(value)
         })
@@ -51,7 +51,7 @@ export const useErrorHandling = () => {
     else if (message) {
       captureError(currentLocation, `${message}, Custom MSG: ${customMessage}`)
       toast.error(`Error ${message}`, {
-        duration: 2000
+        duration: 8000
       })
       errorMessages.push(message)
     }
