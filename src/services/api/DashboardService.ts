@@ -7,6 +7,12 @@ interface DashboardProps {
         role?: string;
         count?: string;
         most_followed?: string;
+        top_downloaded?: string;
+        select?: string;
+        sort_By?: string;
+        sort?: string;
+        limit?: string;
+        paginate?: string;
     }
 }
 
@@ -76,6 +82,21 @@ export const DashboardService = () => {
         })
     }
 
+    const getTopDownloadedVideos = (params: DashboardProps) => {
+        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+        return request({
+            headers: {
+                ...getHeaders(),
+                 'ngrok-skip-browser-warning': '69420', // only for dev
+                Authorization: `Bearer ${accessToken}`
+            },
+            url: '/admin/works',
+            method: 'GET',
+            params: params.data
+        })
+    }
+
     // Video Bar Chart
     const getVideoBarChart = (params: VideoBarChartProps) => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -113,6 +134,7 @@ export const DashboardService = () => {
         getMostActiveContentCreatorCount,
         getMostActiveUsers,
         getMostFollowedCreator,
+        getTopDownloadedVideos,
         getVideoBarChart,
         getVIPandGuestChart
   }

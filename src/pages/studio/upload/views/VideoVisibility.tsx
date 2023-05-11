@@ -40,17 +40,13 @@ import { PublishSchedule } from '..'
 
 // ** Services Import
 import VideoService from '@/services/api/VideoService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** react-hook-form
-import { useFormContext  } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 
 // ** Uploady
-import {
-  useUploady,
-  useAbortBatch,
-  UploadyContext,
-  UPLOADER_EVENTS
-} from '@rpldy/uploady'
+import { useUploady, useAbortBatch, UploadyContext, UPLOADER_EVENTS } from '@rpldy/uploady'
 
 // ** Import base link
 import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
@@ -98,10 +94,11 @@ const VideoVisibility = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [workVideo, setWorkVideo] = React.useState<string | null>(null)
   const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
-  const [ videoTypeUploaded, setVideoTypeUploaded ] = React.useState<'full_video' | 'trial_video'>('full_video')
+  const [videoTypeUploaded, setVideoTypeUploaded] = React.useState<'full_video' | 'trial_video'>('full_video')
 
   // ** SERVICES CALLS
   const { uploadVideoURL } = VideoService()
+  const { handleError } = useErrorHandling()
 
   // ** Context ReactHookForm
   const { getValues, setValue } = useFormContext()
@@ -120,14 +117,15 @@ const VideoVisibility = () => {
     formData.append('title', title)
     formData.append('description', description)
     formData.append('orientation', 'Landscape') // HardCoded
-    formData.append('startTimeSeconds', startTime)
     formData.append('_method', 'put')
 
     if (thumbnailFile?.length) {
       formData.append('thumbnail', thumbnailFile[0])
     }
 
+    // if we have a trial
     formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
+    hasTrialCheck && formData.append('startTimeSeconds', startTime )
 
     if (studioContext?.tags.length) {
       studioContext?.tags.map(tag => formData.append('tags[]', tag))
@@ -138,8 +136,6 @@ const VideoVisibility = () => {
 
     return formData
   } // end handleFormData Fxn
-
-  
 
   // Context
   const uploadyContext = React.useContext(UploadyContext)
@@ -153,25 +149,23 @@ const VideoVisibility = () => {
   }, [])
 
   React.useEffect(() => {
-
-    const eventBatchStart = (batch : any, options : any ) => {
+    const eventBatchStart = (batch: any, options: any) => {
       console.log('EVENT BATCH START batch', batch)
       console.log('EVENT BATCH START options', options)
     }
 
     const eventProgress = (item: any) => {
       //console.log('CALL PROGRESS EVENT', item)
-      const { videoType }  = getValues()
+      const { videoType } = getValues()
       console.log('call in event progress', videoType)
 
-      if ( videoType == 'full_video' ) {
+      if (videoType == 'full_video') {
         studioContext?.setWorkProgress(item.completed)
-      } 
+      }
 
-      if ( videoType == 'trial_video' ) {
+      if (videoType == 'trial_video') {
         studioContext?.setTrialProgress(item.completed)
       }
-      
     }
 
     const eventPreSend = async (items: any, options: any) => {
@@ -184,7 +178,6 @@ const VideoVisibility = () => {
       console.log('EVENTPRESEND VALUES', getValues())
 
       if (options?.params?.video_type == 'full_video') {
-
         // use react-hook-form context
         setValue('videoType', 'full_video')
 
@@ -194,28 +187,37 @@ const VideoVisibility = () => {
           video_name: title
         }
 
-        const result = await uploadVideoURL({ formData: passFullVideoData })
-        const { uploadUrl, work_id } = result
-        console.log('RESULT', result)
-        //set a work ID
-        studioContext?.setWorkId(work_id)
-        setWorkVideo(work_id)
-        setValue('work_id', work_id)
+        try {
+          const result = await uploadVideoURL({ formData: passFullVideoData })
+          const { uploadUrl, work_id } = result
+          console.log('RESULT', result)
 
-        // update the form
-        updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+          //set a work ID
+          studioContext?.setWorkId(work_id)
+          setWorkVideo(work_id)
+          setValue('work_id', work_id)
 
-        return uploadUrl
-          ? //set the new URL for this upload
-            { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-          : //not valid URL, cancel the upload
-            false
+          try {
+            // update the form
+            await updateVideoByWorkId({ formData: handleFormData(work_id, hasTrialVideo) })
+          } catch (e: any) {
+            handleError(e, `updateVideoByWorkId() VideoVisibility.tsx`)
+            console.log(`ERROR updateVideoByWorkId()`, e)
+          }
 
-      
+          return uploadUrl
+            ? //set the new URL for this upload
+              { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+            : //not valid URL, cancel the upload
+              false
+        } catch (e: any) {
+          handleError(e, `uploadVideoURL() w/o Trial Video VideoVisiblity.tsx`)
+          console.log(`ERROR uploadVideoURL()`, e)
+        }
       } else if (options?.params?.video_type == 'trial_video') {
         // we have a trial video
         hasTrialVideo = true
-        
+
         // use react-hook-form context
         setValue('videoType', 'trial_video')
 
@@ -227,32 +229,41 @@ const VideoVisibility = () => {
           video_name: title,
           work_id: work_id
         }
-        const result = await uploadVideoURL({ formData: passTrailerVideoData })
-        console.log('result trailer', result)
-        const { uploadUrl } = result
-        // update the form
-        updateVideoByWorkId({ formData: handleFormData( work_id as unknown as string, hasTrialVideo) })
 
-        return uploadUrl
-          ? //set the new URL for this upload
-            { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
-          : //not valid URL, cancel the upload  
-            false
+        try {
+          const result = await uploadVideoURL({ formData: passTrailerVideoData })
+          console.log('result trailer', result)
+          const { uploadUrl } = result
 
+          try {
+            // update the form
+            await updateVideoByWorkId({ formData: handleFormData(work_id as unknown as string, hasTrialVideo) })
+          } catch (e: any) {
+            handleError(e, `updateVideoByWorkId() w/ Trial Video VideoVisibility.tsx`)
+            console.log(`ERROR updateVideoByWorkId()`, e)
+          }
+
+          return uploadUrl
+            ? //set the new URL for this upload
+              { options: { destination: { url: STREAMING_SERVER_URL + uploadUrl } } }
+            : //not valid URL, cancel the upload
+              false
+        } catch (e: any) {
+          handleError(e, `uploadVideoURL() w/ Trial Video VideoVisibility.tsx`)
+          console.log(`ERROR uploadVideoURL() VideoVisibility.tsx`, e)
+        }
       }
-
     }
 
     uploadyContext.on(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
     uploadyContext.on(UPLOADER_EVENTS.REQUEST_PRE_SEND, eventPreSend)
-    uploadyContext.on(UPLOADER_EVENTS.BATCH_START, eventBatchStart);
+    uploadyContext.on(UPLOADER_EVENTS.BATCH_START, eventBatchStart)
 
     return () => {
       uploadyContext.off(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
       uploadyContext.off(UPLOADER_EVENTS.BATCH_START, eventBatchStart)
     }
-  }, [uploadyContext])
-
+  }, [uploadyContext, handleError])
 
   // ** Query apis
   const { updateVideoByWorkId } = VideoService()
@@ -331,7 +342,6 @@ const VideoVisibility = () => {
   const setStudioPublishDate = (publish: PublishSchedule) => {
     studioContext?.setPublishDate(publish)
   }
-
 
   return (
     <Box
