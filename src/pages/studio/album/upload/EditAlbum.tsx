@@ -26,7 +26,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 // ** API Hooks/Services
 import { AlbumService } from '@/services/api/AlbumService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   title: string
@@ -298,9 +298,10 @@ interface AlbumDataProps {
 
 const EditAlbum = () => {
   const router = useRouter()
-  const currentLocation = router.asPath
   const { query } = router
   const albumId = Object.keys(query)
+
+  const { handleError } = useErrorHandling()
 
   // Use albumId[0] to get the specific id
 
@@ -314,6 +315,9 @@ const EditAlbum = () => {
       }),
     onSuccess: (data: any) => {
       setAlbumData(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getSpecificAlbum() album/upload/EditAlbum.tsx`)
     }
   })
 
@@ -400,14 +404,7 @@ const EditAlbum = () => {
         router.push(`/studio/album/album-list`)
       }, 1000)
     } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} queryFn: editAlbum()`)
-        })
-      }
+      handleError(e, `editAlbum() album/upload/EditAlbum.tsx`)
     }
   }
 
