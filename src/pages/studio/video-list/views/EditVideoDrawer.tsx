@@ -201,7 +201,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
               width='100%' 
               height='100%' 
               controls={true} 
-              url={ row.has_own_trial ? STREAMING_SERVER_URL + row.trial_video_hls : STREAMING_SERVER_URL + row.full_video_hls } />
+              url={ STREAMING_SERVER_URL + row.trial_video_hls } />
           </VideoBox>
         </Box>
         <Box sx={{ p: 5 }}>
