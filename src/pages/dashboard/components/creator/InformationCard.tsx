@@ -27,35 +27,34 @@ interface DataType {
 }
 
 interface SalesDataProps {
-  mostActiveContentCreatorCount?: string
-  mostActiveUsers?: string
-  topFollowedContentCreators?: { name: string }[]
+  earnedDonations?: string
+  topDonators?: { _id: string; username: string }[]
 }
 
 const salesData = (props: SalesDataProps): DataType[] => {
-  const { mostActiveContentCreatorCount, mostActiveUsers, topFollowedContentCreators = [] } = props
+  const { earnedDonations, topDonators = [] } = props
 
   return [
     {
-      stats: mostActiveContentCreatorCount || '0',
+      stats: earnedDonations || '0',
       title: 'Earned Donations',
       color: 'info',
       icon: <Image src='/images/icons/content-creators.png' width={30} height={30} alt='Content Creators' />
     },
     {
-      stats: mostActiveUsers || '0',
+      stats: earnedDonations || '0',
       title: 'Earned Commissions',
       color: 'warning',
       icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
     },
     {
-      stats: mostActiveUsers || '0',
+      stats: earnedDonations || '0',
       title: 'Most Favorite Video',
       color: 'warning',
       icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
     },
     {
-      stats: mostActiveUsers || '0',
+      stats: earnedDonations || '0',
       title: 'Most Liked Video',
       color: 'warning',
       icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
@@ -63,18 +62,19 @@ const salesData = (props: SalesDataProps): DataType[] => {
     {
       stats: '',
       color: 'success',
-      title: 'Active Donators',
+      title: 'Top Donators',
       icon: <Image src='/images/icons/top-followed.png' width={30} height={30} alt='Top Followed' />,
-      details:
-        topFollowedContentCreators.map((creator, index) => `#${index + 1} ${creator.name}`) ||
-        'List is currently empty.'
+      details: topDonators.map((donator, index) => `#${index + 1} ${donator.username}`) || 'List is currently empty.'
     }
   ]
 }
 
 const RenderStats = () => {
-  const { mostActiveContentCreatorCount, mostActiveUsers, topFollowedContentCreators } = useCreatorDashboardContext()
-  const data = salesData({ mostActiveContentCreatorCount, mostActiveUsers, topFollowedContentCreators })
+  const { earnedDonations, topDonators } = useCreatorDashboardContext()
+  const data = salesData({
+    earnedDonations,
+    topDonators
+  })
 
   return (
     <>
@@ -112,47 +112,40 @@ const RenderStats = () => {
 }
 
 const InformationCard = () => {
-  const { getMostActiveContentCreatorCount, getMostActiveUsers, getMostFollowedCreator } = DashboardService()
-  const { setMostActiveContentCreatorCount, setMostActiveUsers, setTopFollowedContentCreators } =
-    useCreatorDashboardContext()
+  const { getTopDonators } = DashboardService()
+  const { setEarnedDonations, setTopDonators } = useCreatorDashboardContext()
 
+  // Earned Donations
   useQuery({
-    queryKey: [`mostActiveCreatorCount`],
+    queryKey: [`creatorEarnedDonations`],
     queryFn: () =>
-      getMostActiveContentCreatorCount({
+      getTopDonators({
         data: {
-          role: 'CC',
-          count: 'true'
+          sum: 'coin_amount'
         }
       }),
     onSuccess: (data: any) => {
-      setMostActiveContentCreatorCount(data)
+      setEarnedDonations(data)
     }
   })
 
+  //Top Donators
   useQuery({
-    queryKey: [`mostActiveUserCount`],
-    queryFn: () => getMostActiveUsers(),
-    onSuccess: (data: any) => {
-      setMostActiveUsers(data?.total_active)
-    }
-  })
-
-  useQuery({
-    queryKey: [`mostFollowed`],
+    queryKey: [`creatorTopDonators`],
     queryFn: () =>
-      getMostFollowedCreator({
+      getTopDonators({
         data: {
-          role: 'CC',
-          most_followed: 'true'
+          top_donators: 'true',
+          paginate: 'false',
+          with: 'customers'
         }
       }),
     onSuccess: (data: any) => {
-      setTopFollowedContentCreators(
-        data?.data.map((item: any, index: number) => {
+      setTopDonators(
+        data?.map((item: any, index: number) => {
           return {
             rank: index + 1,
-            name: item?.username
+            username: item?.customers.username
           }
         })
       )
