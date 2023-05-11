@@ -105,8 +105,9 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
       console.log('allFQDNData', fqdnsObject)
 
       setIsLoading(true)
-
+      
       await fqdnM.mutateAsync({
+        siteId : siteID as number,
         data: fqdnsObject
       })
     }

@@ -15,6 +15,7 @@ interface DashboardProps {
         paginate?: string;
         top_donators?: string;
         with?: string;
+        sum?: string;
     }
 }
 
@@ -26,6 +27,7 @@ interface VideoBarChartProps {
         daily?: string;
         monthly?: string;
         yearly?: string;
+        select?: string;
     }
 }
 
@@ -35,6 +37,8 @@ interface VIPandGuestChartProps {
         to?: string;
         sort?: any;
         sort_by?: string;
+        daily?: string;
+        select?: string;
     }
 }
 
@@ -114,7 +118,7 @@ export const DashboardService = () => {
         })
     }
 
-    // Video Bar Chart
+    // Video Bar Chart, Downloads for Creator
     const getVideoBarChart = (params: VideoBarChartProps) => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -130,7 +134,7 @@ export const DashboardService = () => {
         })
     }
 
-     // VIP Members and Guest Chart
+     // VIP Members and Guest Chart 
     const getVIPandGuestChart = (params: VIPandGuestChartProps) => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -145,7 +149,6 @@ export const DashboardService = () => {
             params: params.data
         })
     }
-
 
     return {
         getMostActiveContentCreatorCount,
