@@ -117,14 +117,15 @@ const VideoVisibility = () => {
     formData.append('title', title)
     formData.append('description', description)
     formData.append('orientation', 'Landscape') // HardCoded
-    formData.append('startTimeSeconds', startTime)
     formData.append('_method', 'put')
 
     if (thumbnailFile?.length) {
       formData.append('thumbnail', thumbnailFile[0])
     }
 
+    // if we have a trial
     formData.append('has_own_trial', hasTrialCheck ? 'true' : 'false')
+    hasTrialCheck && formData.append('startTimeSeconds', startTime )
 
     if (studioContext?.tags.length) {
       studioContext?.tags.map(tag => formData.append('tags[]', tag))

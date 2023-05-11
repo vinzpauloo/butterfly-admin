@@ -178,7 +178,7 @@ const defaultValues = {
   title: '',
   description: '',
   contentCreator: '',
-  startTime: '',
+  startTime: 0,
   multiTags: ''
 }
 
@@ -222,20 +222,15 @@ const UploadVideoStep1 = (props: Props) => {
   console.log('THE BATCH', batch)
   if (batch && batch.completed > studioContext!.workProgress && batch.completed < 100) {
     console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
-    //studioContext?.setWorkProgress(() => batch.completed)
   }
 
   useBatchAddListener((batch, options) => {
     console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
-    //studioContext?.setWorkProgress(0)
     console.log('Start setProgress', studioContext?.workProgress)
   })
 
   useBatchFinishListener(batch => {
     console.log(`batch ${batch.id} finished uploading`)
-    //studioContext?.setWorkProgress(100)
-    //toast.success('Successfully Uploaded the Video!', { position: 'top-center', duration: 4000 })
-
     //close BD
     setOpenBD(false)
 
@@ -245,8 +240,6 @@ const UploadVideoStep1 = (props: Props) => {
   })
 
   useBatchAddListener((batch, options) => {
-    // console.log(`batch ${batch.id} was just added with ${batch.items.length} items`);
-    // console.log('batch OPTIONS', options)
 
     const { params } = options
 
@@ -381,6 +374,7 @@ const UploadVideoStep1 = (props: Props) => {
     studioContext?.setDisplayPage(DisplayPage.MainPage)
   }
 
+
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.code == 'Enter') {
       // handle add to Chip
@@ -449,6 +443,11 @@ const UploadVideoStep1 = (props: Props) => {
       return
     }
 
+    if (watch('description')?.length < 10) {
+      toast.error('Description is required and must be a minimum of 10 characters', { position: 'top-center' })
+      return
+    }
+
     if (!watch('thumbnailFile')) {
       toast.error('Please upload a thumbnail', { position: 'top-center' })
       return
@@ -461,6 +460,11 @@ const UploadVideoStep1 = (props: Props) => {
 
     if (!hasFullVideo) {
       toast.error('Please upload a video', { position: 'top-center' })
+      return
+    }
+
+    if( trialUploadSwitch == false ) {
+      watch('startTime') == '' && toast.error('Please input a trailer start time', { position: 'top-center' })
       return
     }
 
@@ -759,20 +763,28 @@ const UploadVideoStep1 = (props: Props) => {
                               color='error'
                             />
                           </FormGroup>
+                              
                           {!trialUploadSwitch && (
                             <FormGroup sx={{ rowGap: '1rem' }} row>
+                              {errors.startTime && errors.startTime.message}
                               <TextField
-                                onChange={event => {
-                                  checkStartTimeValidity(event)
-                                }}
                                 type='number'
                                 InputProps={{ inputProps: { min: 0, max: 10 } }}
                                 fullWidth
                                 id='start'
-                                placeholder='Start time'
+                                placeholder={`Start time`}
+                                {...register('startTime', { 
+                                  required : {
+                                    value : trialUploadSwitch,
+                                    message: 'Start Time is required '
+                                  },
+                                  onChange : event => { checkStartTimeValidity(event) } })}
                               />
                             </FormGroup>
                           )}
+
+                            
+                          
                         </CardContent>
 
                         <CardActions sx={{ display: 'flex', justifyContent: 'center' }} className='card-action-dense'>
@@ -791,38 +803,6 @@ const UploadVideoStep1 = (props: Props) => {
                 </div>
               </Box>
 
-              {files?.length ? (
-                <Box className='uploadShortVidBox' sx={{ mt: 10 }}>
-                  <Card>
-                    <CardContent sx={{ paddingBlock: '1rem' }}>
-                      <FormGroup sx={{ justifyContent: 'space-between', alignItems: 'center' }} row>
-                        <Typography fontSize={12}>Do you want to upload your own trailer video?</Typography>
-                        <Switch
-                          onClick={() => {
-                            setTrialUploadSwitch(!trialUploadSwitch)
-                          }}
-                          checked={trialUploadSwitch}
-                          color='error'
-                        />
-                      </FormGroup>
-                      {!trialUploadSwitch && (
-                        <FormGroup sx={{ rowGap: '1rem' }} row>
-                          <TextField
-                            onChange={event => {
-                              checkStartTimeValidity(event)
-                            }}
-                            type='number'
-                            InputProps={{ inputProps: { min: 0, max: 10 } }}
-                            fullWidth
-                            id='start'
-                            placeholder='Start time'
-                          />
-                        </FormGroup>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Box>
-              ) : null}
             </Box>
           </Grid>
         </Grid>
