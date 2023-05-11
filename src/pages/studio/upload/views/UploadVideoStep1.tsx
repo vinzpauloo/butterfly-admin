@@ -28,6 +28,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import useGroupingService from '@/services/useGroupings'
 import { UserTableService } from '@/services/api/UserTableService'
 import VideoService from '@/services/api/VideoService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
@@ -182,7 +183,6 @@ const defaultValues = {
 }
 
 const UploadVideoStep1 = (props: Props) => {
-
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -202,8 +202,7 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** UseEffect
   React.useEffect(() => {
-
-    const eventBatchStart = (batch : any, options : any ) => {
+    const eventBatchStart = (batch: any, options: any) => {
       console.log('step 1 - EVENT BATCH START batch', batch)
       console.log('step 1 - EVENT BATCH START options', options)
       if (options?.params?.video_type == 'full_video') {
@@ -318,6 +317,9 @@ const UploadVideoStep1 = (props: Props) => {
   const { updateVideoByWorkId } = VideoService()
   const { getAllDataFromCreator } = UserTableService()
 
+  // ** Error Handling
+  const { handleError } = useErrorHandling()
+
   // load groupings
   const { isLoading: isGrpLoading } = useQuery({
     queryKey: ['groupingsOptions'],
@@ -325,7 +327,11 @@ const UploadVideoStep1 = (props: Props) => {
       return getGroupings({ data: { all: 'true' } })
     },
     onSuccess: (data: any) => {
+      console.log(data)
       setGroupingsOptions(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getGroupings() UploadVideoStep1.tsx`)
     }
   })
 
@@ -338,6 +344,9 @@ const UploadVideoStep1 = (props: Props) => {
     onSuccess: (data: any) => {
       console.log('data CcOptions', data)
       setCCOptions(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getAllDataFromCreator() UploadVideoStep1.tsx`)
     }
   })
 
@@ -376,7 +385,7 @@ const UploadVideoStep1 = (props: Props) => {
     if (e.code == 'Enter') {
       // handle add to Chip
       let tagWord = (e.target as HTMLInputElement).value as string
-      console.log('@@@@@@@', watch('multiTags') )
+      console.log('@@@@@@@', watch('multiTags'))
       if (tagWord == '') {
         return
       }
@@ -389,7 +398,7 @@ const UploadVideoStep1 = (props: Props) => {
       let insertTagArray = [tagWord]
       let newTagsArray = [...(tags as []), ...insertTagArray]
       setTags(newTagsArray as [])
-      setValue('tags',newTagsArray)
+      setValue('tags', newTagsArray)
 
       //reset multiTags
       resetField('multiTags')
@@ -409,10 +418,10 @@ const UploadVideoStep1 = (props: Props) => {
 
     setValue('startTime', target.value)
   }
-  
+
   const handleTaggingsDelete = (tag: string) => {
     let filteredTags = tags?.filter(e => e !== tag)
-    setValue('tags',filteredTags)
+    setValue('tags', filteredTags)
     setTags(filteredTags as [])
   }
   const handleGroupingsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -426,29 +435,26 @@ const UploadVideoStep1 = (props: Props) => {
     setContextTags()
     setContextGroups()
 
-
     // Validations
     if (auth?.user?.role == 'CC') {
-      
     } else {
-      
       if (!watch('contentCreator')) {
         toast.error('Content Creator is required', { position: 'top-center' })
         return
       }
     }
 
-    if ( watch('title')?.length < 10 ) {
+    if (watch('title')?.length < 10) {
       toast.error('Title is required and must be a minimum of 10 characters', { position: 'top-center' })
       return
     }
 
-    if ( !watch('thumbnailFile') ) {
+    if (!watch('thumbnailFile')) {
       toast.error('Please upload a thumbnail', { position: 'top-center' })
       return
     }
 
-    if ( !watch('tags') || !watch('tags').length ) {
+    if (!watch('tags') || !watch('tags').length) {
       toast.error('Please enter at least 1 tag', { position: 'top-center' })
       return
     }
