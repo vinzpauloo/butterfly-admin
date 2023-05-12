@@ -68,7 +68,7 @@ type SortType = 'asc' | 'desc' | undefined | null
 
 const VipAndGuestsData = (props: VerticalBarProps) => {
   const { info, warning, labelColor, borderColor } = props
-  const { getVIPandGuestChart } = DashboardService()
+  const { getVIPandGuestChart, getVideoBarChart } = DashboardService()
 
   const [fromDate, setFromDate] = useState<string | undefined>()
   const [toDate, setToDate] = useState<string | undefined>()
@@ -80,20 +80,21 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
   const [sortName] = useState<string>('created_at')
 
   useQuery({
-    queryKey: [`VIPandGuest`, fromDate, toDate, sort, sortName],
+    queryKey: [`CreatorTotalDownloads`, fromDate, toDate],
     queryFn: () =>
-      getVIPandGuestChart({
+      getVideoBarChart({
         data: {
           from: fromDate,
           to: toDate,
-          sort: sort,
-          sort_by: sortName
+          daily: 'true',
+          select: 'total_downloads,created_at'
         }
       }),
     onSuccess: (data: any) => {
+      console.log(data)
       const date = data?.map((item: any) => item?.created_at)
       const guest = data?.map((item: any) => item?.total_new_guest)
-      const vip = data?.map((item: any) => item?.total_new_vip)
+      const vip = data?.map((item: any) => item?.total_downloads)
       setChartData(generateChartData(startDate, endDate, warning, info, date, guest, vip))
     }
   })
