@@ -127,10 +127,18 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
     }
   }
 
+  const checkIfEmptyErrors = () => {
+
+    console.log('ERRORS OBJECT', errors)
+    console.log('errors length', Object.keys(errors).length)
+
+    return false
+  }
+  
+
   const handleClose = () => {
-    // toggle()
-    // reset()
-    trigger('tags')
+    toggle()
+    reset()
   }
 
   React.useEffect(() => {
@@ -205,7 +213,7 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                       sx={{ mb:10 }}
                       onChange={( event, value )=>{ 
                         setValue('tags', value as string[]) 
-                        //getValues('tags').length ? clearErrors('tags') : handleValidations('tags')
+                        getValues('tags').length ? clearErrors('tags') : handleValidations('tags')
                       }}
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => 
@@ -222,17 +230,6 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                       )}
                     />
                 )}
-                rules={{ 
-                  required: {
-                    value : true, 
-                    message : 'Cannot leave empty tags' 
-                  },
-                  validate : (fieldValue) => {
-                    return ( 
-                      fieldValue.length == 0  || 
-                      'Dont leave empty tags' )
-                  }
-                }}
             />
             
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -244,7 +241,7 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                 type='submit'
                 variant='contained'
                 sx={{ mr: 3 }}
-                disabled={ !isDirty || !isValid }
+                disabled={ !isDirty }
               >
                 {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString("Submit")}
               </Button>
