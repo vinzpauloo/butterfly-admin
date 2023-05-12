@@ -27,9 +27,11 @@ import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
 type StoryProps = {
   data?: any
   handleFeedItemClick?: (story: IFeedStory) => void
+  editable? : boolean
+  handleCardClick? : (story: IFeedStory) => void
 }
 
-const FeedList = ({ data, handleFeedItemClick }: StoryProps) => {
+const FeedList = ({ data, handleFeedItemClick, editable=false, handleCardClick }: StoryProps) => {
   if (data?.length == 0) {
     return <NoPostsFound />
   }
@@ -42,14 +44,14 @@ const FeedList = ({ data, handleFeedItemClick }: StoryProps) => {
         <Grid container spacing={10}>
           {stories &&
             stories?.map((story: IFeedStory) => (
-              <Grid key={story._id} item sm={6}>
+              <Grid key={story._id} item sm={6} onClick={ handleCardClick ? () => handleCardClick(story) : ()=>{} }>
                 <FeedCard
                   _id={story._id}
                   datePublished={formatDate(story.created_at)}
                   string_story={story.string_story}
                   {...(story.user && { user: story.user })}
-                  editable={true}
-                  handleEditButtonClick={() => handleFeedItemClick!(story)}
+                  editable={editable}
+                  handleEditButtonClick={ handleFeedItemClick ? () => handleFeedItemClick(story) : () => {} }
                 >
                   {story && story?.tags && (
                     <FeedAttachments>
@@ -68,6 +70,7 @@ const FeedList = ({ data, handleFeedItemClick }: StoryProps) => {
                       <FeedVideoCard source={STREAMING_SERVER_URL + story.videos.url} />
                     </FeedAttachments>
                   )}
+                  
                   <FeedAttachments>
                     {story.images && (
                       <PhotoGridCard cols={story!.images!.length > 3 ? 3 : story?.images?.length}>
@@ -79,6 +82,7 @@ const FeedList = ({ data, handleFeedItemClick }: StoryProps) => {
                       </PhotoGridCard>
                     )}
                   </FeedAttachments>
+
                 </FeedCard>
               </Grid>
             ))}

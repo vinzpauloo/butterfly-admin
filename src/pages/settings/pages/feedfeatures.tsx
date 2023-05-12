@@ -12,11 +12,12 @@ import Translations from '@/layouts/components/Translations'
 
 // ** Style Imports
 
-type ModalType = 'select' | 'create' | null
-
 import ToggleButton from '@/pages/user/components/button/ToggleButton'
 import EditBtn from '@/pages/user/components/button/EditButton'
 import EditFeedModal from '../components/modal/EditFeedModal'
+
+// ** global featured feed store
+import { useFeaturedFeedStore } from '@/zustand/featuredFeedGlobalStore'
 
 interface feedFeatureData {
   id: any
@@ -105,13 +106,13 @@ const feedFeatureColumns = [
 ]
 
 const FeedFeatures = () => {
+  
+  // feed features
+  const { toggleFeedModal, isFeedModalOpen } = useFeaturedFeedStore()
+
   const [pageSize, setPageSize] = useState<number>(10)
 
-  const [openModal, setOpenModal] = useState<ModalType>(null)
 
-  const handleModalToggle = (modalType: ModalType) => {
-    setOpenModal(prevModal => (prevModal === modalType ? null : modalType))
-  }
 
   const TranslateString = useTranslateString()
 
@@ -125,12 +126,8 @@ const FeedFeatures = () => {
             </Box>
 
             <Box sx={styles.buttonContainer}>
-              <Button sx={styles.button} onClick={() => handleModalToggle('select')}>
+              <Button sx={styles.button} onClick={() => toggleFeedModal()}>
                 {TranslateString('Select Featured Feeds')}
-              </Button>
-
-              <Button sx={styles.button} onClick={() => handleModalToggle('create')}>
-                {TranslateString('Create Feed')}
               </Button>
             </Box>
           </Box>
@@ -148,7 +145,7 @@ const FeedFeatures = () => {
           />
         </Card>
       </Grid>
-      <SelectFeedsModal isOpen={openModal === 'select'} onClose={() => handleModalToggle('select')} />
+      <SelectFeedsModal isOpen={isFeedModalOpen} onClose={() => toggleFeedModal()} />
     </Grid>
   )
 }

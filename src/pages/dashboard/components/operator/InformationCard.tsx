@@ -211,9 +211,9 @@ const InformationCard = () => {
     queryFn: () =>
       getTopDownloadedVideos({
         data: {
-          top_downloaded: 'true',
+          most_download: 'true',
           select: 'title',
-          sort_By: 'downloads',
+          sort_by: 'downloads',
           sort: 'asc',
           limit: '10',
           paginate: 'false'

@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { DashboardService } from '@/services/api/DashboardService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface DataType {
   stats: string
@@ -113,6 +114,8 @@ const RenderStats = () => {
 
 const InformationCard = () => {
   const { getTopDonators } = DashboardService()
+  const { handleError } = useErrorHandling()
+
   const { setEarnedDonations, setTopDonators } = useCreatorDashboardContext()
 
   // Earned Donations
@@ -126,6 +129,9 @@ const InformationCard = () => {
       }),
     onSuccess: (data: any) => {
       setEarnedDonations(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getTopDonators() Earned Donations creator/InformationCard.tsx`)
     }
   })
 
@@ -149,6 +155,9 @@ const InformationCard = () => {
           }
         })
       )
+    },
+    onError: (e: any) => {
+      handleError(e, `getTopDonators() Top Donators creator/InformationCard.tsx`)
     }
   })
 

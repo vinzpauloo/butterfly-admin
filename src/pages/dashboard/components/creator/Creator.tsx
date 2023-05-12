@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles'
 import 'chart.js/auto'
 import InformationCard from './InformationCard'
 import VideoContentsBarChart from './VideoContentsBarChart'
-import VipAndGuestsData from './VipAndGuestsData'
+import DownloadsAndWatchedChart from './DownloadsAndWatchedChart'
 import { CreatorDashboardProvider } from '@/context/CreatorDashboardContext'
 
 // Vars
@@ -32,7 +32,7 @@ const CreatorDashboard = () => {
             legendColor={legendColor}
             warning={warningColorShade}
           />
-          <VipAndGuestsData
+          <DownloadsAndWatchedChart
             labelColor={labelColor}
             info={horizontalBarInfo}
             borderColor={borderColor}
