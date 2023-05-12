@@ -6,7 +6,7 @@ import { getHeaders } from '@/lib/cryptoJs'
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import { DashboardProps, ChartProps } from '@/types/apps/dashboardTypes'
+import { AllDashboardDataProps,DashboardProps, ChartProps } from '@/types/apps/dashboardTypes'
 
 export const DashboardService = () => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -33,7 +33,7 @@ export const DashboardService = () => {
     const getMostActiveUsers = () => apiRequest('/admin/customers?most_active=true');
     const getMostFollowedCreator = (params: DashboardProps) => apiRequest('/users', params.data);
     const getTopDownloadedVideos = (params: DashboardProps) => apiRequest('/admin/works', params.data);
-    const getTopDonators = (params: DashboardProps) => apiRequest('/admin/donations', params.data);
+    const getTopDonators = (params: AllDashboardDataProps) => apiRequest('/admin/donations', params.data);
     const getVideoBarChart = (params: ChartProps) => apiRequest('/statistics', params.data);
     const getVIPandGuestChart = (params: ChartProps) => apiRequest('/admin/customers', params.data);
 

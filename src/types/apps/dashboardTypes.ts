@@ -11,10 +11,12 @@ export type DashboardData = BaseData & {
     role?: string
     count?: string
     most_followed?: string
-    top_downloaded?: string
+    most_liked?: string
+    most_download?: string
     limit?: string
     paginate?: string
     top_donators?: string
+    top_downloaded?: string
     sum?: string
 }
 
@@ -31,4 +33,9 @@ export type DashboardProps = {
 
 export type ChartProps = {
     data: ChartData
+}
+
+export type AllDashboardData = BaseData & ChartData & DashboardData;
+export type AllDashboardDataProps = {
+    data: AllDashboardData
 }
