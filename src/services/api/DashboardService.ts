@@ -20,7 +20,7 @@ export const DashboardService = () => {
         Authorization: `Bearer ${accessToken}`
     }
 
-    const apiRequest = <Params>(url: string, params?: Params) => {
+    const apiRequest = <Params>(url: string, params?: Params | undefined): Promise<Params> => {
         return request({
             headers,
             url,
