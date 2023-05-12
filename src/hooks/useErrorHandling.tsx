@@ -28,35 +28,46 @@ export const useErrorHandling = () => {
 
   // ** Functions
   const handleError = (e: ErrorMessage, customMessage: string) => {
-    const {
-      data: { message, error }
-    } = e
+    // Check if 'data' property exists
+    if (e.data) {
+      const {
+        data: { message, error }
+      } = e
 
-    const errorMessages: string[] = []
+      const errorMessages: string[] = []
 
-    // Catch backend error messages
-    if (error) {
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, Custom MSG: ${customMessage}`)
-          toast.error(`Error ${value}`, {
-            duration: 8000
+      // Catch backend error messages
+      if (error) {
+        for (const key in error) {
+          error[key].forEach((value: any) => {
+            captureError(currentLocation, `${value}, Custom MSG: ${customMessage}`)
+            toast.error(`Error ${value}`, {
+              duration: 8000
+            })
+            errorMessages.push(value)
           })
-          errorMessages.push(value)
-        })
+        }
       }
+
+      // Catch SQL error messages
+      else if (message) {
+        captureError(currentLocation, `${message}, Custom MSG: ${customMessage}`)
+        toast.error(`Error ${message}`, {
+          duration: 8000
+        })
+        errorMessages.push(message)
+      }
+
+      setErrorResponse(errorMessages.join('\n'))
     }
 
-    // Catch SQL error messages
-    else if (message) {
-      captureError(currentLocation, `${message}, Custom MSG: ${customMessage}`)
-      toast.error(`Error ${message}`, {
+    // Handle cases where the data property does not exist
+    else {
+      captureError(currentLocation, `${e}, Custom MSG: ${customMessage}, `)
+      toast.error(`Error ${e}`, {
         duration: 8000
       })
-      errorMessages.push(message)
     }
-
-    setErrorResponse(errorMessages.join('\n'))
   }
 
   const getErrorResponse = (fontSize: number) => {
