@@ -19,8 +19,9 @@ interface IGetSuperAgentFQDNParams {
 }
 
 interface IAddFQDNParams {
-  siteId : number,
+  siteId? : number,
   data?: {
+    site?: number,
     fqdns?: {name?: string, type?: 'Api' | 'Streaming' | 'Photo'}[]
   }
 }
