@@ -124,6 +124,7 @@ const SelectFeaturedFeeds = (props: Props) => {
   }
 
   const handleCardClick = (feed: IFeedStory) => {
+    console.log('STORE THE CLICKED FEED IN THE FEED GLOBAL STORE', feed)
     setFeed(feed)
   } 
 
