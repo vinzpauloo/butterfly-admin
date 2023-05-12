@@ -2,153 +2,69 @@ import request from '../../lib/request'
 import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
+interface BaseData {
+    from?: string
+    to?: string
+    select?: string
+    sort_By?: string
+    sort?: string
+    with?: string
+}
+
+interface DashboardData extends BaseData {
+    role?: string
+    count?: string
+    most_followed?: string
+    top_downloaded?: string
+    limit?: string
+    paginate?: string
+    top_donators?: string
+    sum?: string
+}
+
+interface ChartData extends BaseData {
+    weekly?: string
+    daily?: string
+    monthly?: string
+    yearly?: string
+}
+
 interface DashboardProps {
-    data: {
-        role?: string;
-        count?: string;
-        most_followed?: string;
-        top_downloaded?: string;
-        select?: string;
-        sort_By?: string;
-        sort?: string;
-        limit?: string;
-        paginate?: string;
-        top_donators?: string;
-        with?: string;
-        sum?: string;
-    }
+    data: DashboardData
 }
 
-interface VideoBarChartProps {
-    data: {
-        from?: string;
-        to?: string;
-        weekly?: string;
-        daily?: string;
-        monthly?: string;
-        yearly?: string;
-        select?: string;
-    }
-}
-
-interface VIPandGuestChartProps {
-    data: {
-        from?: string;
-        to?: string;
-        sort?: any;
-        sort_by?: string;
-        daily?: string;
-        select?: string;
-    }
+interface ChartProps {
+    data: ChartData
 }
 
 export const DashboardService = () => {
-
-  const getMostActiveContentCreatorCount = (params: DashboardProps) => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!accessToken) {
+        throw new Error('No access token found');
+    }
 
+    const headers = {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+    }
+
+    const apiRequest = <Params>(url: string, params?: Params) => {
         return request({
-            headers: {
-                ...getHeaders(),
-                 'ngrok-skip-browser-warning': '69420', // only for dev
-                Authorization: `Bearer ${accessToken}`
-            },
-            url: '/users',
+            headers,
+            url,
             method: 'GET',
-            params: params.data
-        })
-    }
-    
-    const getMostActiveUsers = () => {
-        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
-        return request({
-            headers: {
-                ...getHeaders(),
-                 'ngrok-skip-browser-warning': '69420', // only for dev
-                Authorization: `Bearer ${accessToken}`
-            },
-            url: '/admin/customers?most_active=true',
-            method: 'GET'
+            params
         })
     }
 
-    const getMostFollowedCreator = (params: DashboardProps) => {
-    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
-        return request({
-            headers: {
-                ...getHeaders(),
-                 'ngrok-skip-browser-warning': '69420', // only for dev
-                Authorization: `Bearer ${accessToken}`
-            },
-            url: '/users',
-            method: 'GET',
-            params: params.data
-        })
-    }
-
-    const getTopDownloadedVideos = (params: DashboardProps) => {
-        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
-        return request({
-            headers: {
-                ...getHeaders(),
-                 'ngrok-skip-browser-warning': '69420', // only for dev
-                Authorization: `Bearer ${accessToken}`
-            },
-            url: '/admin/works',
-            method: 'GET',
-            params: params.data
-        })
-    }
-
-    const getTopDonators = (params: DashboardProps) => {
-        const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
-        return request({
-            headers: {
-                ...getHeaders(),
-                 'ngrok-skip-browser-warning': '69420', // only for dev
-                Authorization: `Bearer ${accessToken}`
-            },
-            url: '/admin/donations',
-            method: 'GET',
-            params: params.data
-        })
-    }
-
-    // Video Bar Chart, Downloads for Creator
-    const getVideoBarChart = (params: VideoBarChartProps) => {
-    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
-        return request({
-            headers: {
-                ...getHeaders(),
-                 'ngrok-skip-browser-warning': '69420', // only for dev
-                Authorization: `Bearer ${accessToken}`
-            },
-            url: '/statistics',
-            method: 'GET',
-            params: params.data
-        })
-    }
-
-     // VIP Members and Guest Chart 
-    const getVIPandGuestChart = (params: VIPandGuestChartProps) => {
-    const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
-        return request({
-            headers: {
-                ...getHeaders(),
-                 'ngrok-skip-browser-warning': '69420', // only for dev
-                Authorization: `Bearer ${accessToken}`
-            },
-            url: '/admin/customers',
-            method: 'GET',
-            params: params.data
-        })
-    }
+    const getMostActiveContentCreatorCount = (params: DashboardProps) => apiRequest('/users', params);
+    const getMostActiveUsers = () => apiRequest('/admin/customers?most_active=true');
+    const getMostFollowedCreator = (params: DashboardProps) => apiRequest('/users', params);
+    const getTopDownloadedVideos = (params: DashboardProps) => apiRequest('/admin/works', params);
+    const getTopDonators = (params: DashboardProps) => apiRequest('/admin/donations', params);
+    const getVideoBarChart = (params: ChartProps) => apiRequest('/statistics', params);
+    const getVIPandGuestChart = (params: ChartProps) => apiRequest('/admin/customers', params);
 
     return {
         getMostActiveContentCreatorCount,
@@ -158,5 +74,5 @@ export const DashboardService = () => {
         getVideoBarChart,
         getVIPandGuestChart,
         getTopDonators
-  }
+    }
 }
