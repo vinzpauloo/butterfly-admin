@@ -64,20 +64,15 @@ const generateChartData = (
   }
 }
 
-type SortType = 'asc' | 'desc' | undefined | null
-
 const VipAndGuestsData = (props: VerticalBarProps) => {
   const { info, warning, labelColor, borderColor } = props
-  const { getVIPandGuestChart, getVideoBarChart } = DashboardService()
+  const { getVideoBarChart } = DashboardService()
 
   const [fromDate, setFromDate] = useState<string | undefined>()
   const [toDate, setToDate] = useState<string | undefined>()
 
   const [startDate, setStartDate] = useState(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
   const [endDate, setEndDate] = useState(new Date())
-
-  const [sort] = useState<SortType>('asc')
-  const [sortName] = useState<string>('created_at')
 
   useQuery({
     queryKey: [`CreatorTotalDownloads`, fromDate, toDate],

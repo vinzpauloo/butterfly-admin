@@ -1,41 +1,12 @@
+// ** Lib Imports
 import request from '../../lib/request'
-import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
-interface BaseData {
-    from?: string
-    to?: string
-    select?: string
-    sort_By?: string
-    sort?: string
-    with?: string
-}
+// ** Authentication
+import authConfig from 'src/configs/auth'
 
-interface DashboardData extends BaseData {
-    role?: string
-    count?: string
-    most_followed?: string
-    top_downloaded?: string
-    limit?: string
-    paginate?: string
-    top_donators?: string
-    sum?: string
-}
-
-interface ChartData extends BaseData {
-    weekly?: string
-    daily?: string
-    monthly?: string
-    yearly?: string
-}
-
-interface DashboardProps {
-    data: DashboardData
-}
-
-interface ChartProps {
-    data: ChartData
-}
+// ** Types
+import { DashboardProps, ChartProps } from '@/types/apps/dashboardTypes'
 
 export const DashboardService = () => {
     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -58,13 +29,13 @@ export const DashboardService = () => {
         })
     }
 
-    const getMostActiveContentCreatorCount = (params: DashboardProps) => apiRequest('/users', params);
+    const getMostActiveContentCreatorCount = (params: DashboardProps) => apiRequest('/users', params.data);
     const getMostActiveUsers = () => apiRequest('/admin/customers?most_active=true');
-    const getMostFollowedCreator = (params: DashboardProps) => apiRequest('/users', params);
-    const getTopDownloadedVideos = (params: DashboardProps) => apiRequest('/admin/works', params);
-    const getTopDonators = (params: DashboardProps) => apiRequest('/admin/donations', params);
-    const getVideoBarChart = (params: ChartProps) => apiRequest('/statistics', params);
-    const getVIPandGuestChart = (params: ChartProps) => apiRequest('/admin/customers', params);
+    const getMostFollowedCreator = (params: DashboardProps) => apiRequest('/users', params.data);
+    const getTopDownloadedVideos = (params: DashboardProps) => apiRequest('/admin/works', params.data);
+    const getTopDonators = (params: DashboardProps) => apiRequest('/admin/donations', params.data);
+    const getVideoBarChart = (params: ChartProps) => apiRequest('/statistics', params.data);
+    const getVIPandGuestChart = (params: ChartProps) => apiRequest('/admin/customers', params.data);
 
     return {
         getMostActiveContentCreatorCount,
