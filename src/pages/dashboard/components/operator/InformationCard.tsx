@@ -213,7 +213,7 @@ const InformationCard = () => {
         data: {
           top_downloaded: 'true',
           select: 'title',
-          sort_By: 'downloads',
+          sort_by: 'downloads',
           sort: 'asc',
           limit: '10',
           paginate: 'false'

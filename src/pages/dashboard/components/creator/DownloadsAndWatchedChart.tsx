@@ -12,10 +12,13 @@ import { ChartData, ChartOptions } from 'chart.js'
 // ** Project/Other Imports
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import PickersComponent from '@/layouts/components/shared-components/Picker/CustomPickerInput'
-import { DashboardService } from '@/services/api/DashboardService'
 
 // ** TanStack Query Imports
 import { useQuery } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
+import { DashboardService } from '@/services/api/DashboardService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface VerticalBarProps {
   info: string
@@ -31,8 +34,8 @@ const generateChartData = (
   warning: string,
   info: string,
   date: string[] = [],
-  guest: number[] = [],
-  vip: number[] = []
+  downloads: number[] = [],
+  watched: number[] = []
 ) => {
   const labels = date?.map(d => {
     const currentMonth = new Date(d)
@@ -51,22 +54,23 @@ const generateChartData = (
         label: 'Downloads',
         backgroundColor: warning,
         borderColor: 'transparent',
-        data: vip
+        data: downloads
       },
       {
         maxBarThickness: 45,
         backgroundColor: info,
-        label: 'Likes',
+        label: 'Watched',
         borderColor: 'transparent',
-        data: guest
+        data: watched
       }
     ]
   }
 }
 
-const VipAndGuestsData = (props: VerticalBarProps) => {
+const DownloadsAndWatchedChart = (props: VerticalBarProps) => {
   const { info, warning, labelColor, borderColor } = props
   const { getVideoBarChart } = DashboardService()
+  const { handleError } = useErrorHandling()
 
   const [fromDate, setFromDate] = useState<string | undefined>()
   const [toDate, setToDate] = useState<string | undefined>()
@@ -82,15 +86,17 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
           from: fromDate,
           to: toDate,
           daily: 'true',
-          select: 'total_downloads,created_at'
+          select: 'total_downloads,created_at,total_watched'
         }
       }),
     onSuccess: (data: any) => {
-      console.log(data)
       const date = data?.map((item: any) => item?.created_at)
-      const guest = data?.map((item: any) => item?.total_new_guest)
-      const vip = data?.map((item: any) => item?.total_downloads)
-      setChartData(generateChartData(startDate, endDate, warning, info, date, guest, vip))
+      const watched = data?.map((item: any) => item?.total_watched)
+      const downloads = data?.map((item: any) => item?.total_downloads)
+      setChartData(generateChartData(startDate, endDate, warning, info, date, downloads, watched))
+    },
+    onError: (e: any) => {
+      handleError(e, `getVideoBarChart() creator/DownloadsAndWatchedChart.tsx`)
     }
   })
 
@@ -145,7 +151,7 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
     <DatePickerWrapper>
       <Card>
         <Box sx={styles.headerWrapper}>
-          <CardHeader title='Videos - Downloads - Likes' />
+          <CardHeader title='Videos - Downloads - Watched' />
           <Box sx={styles.datePicker}>
             <Box>
               <DatePicker
@@ -212,4 +218,4 @@ const styles = {
   }
 }
 
-export default VipAndGuestsData
+export default DownloadsAndWatchedChart
