@@ -12,9 +12,9 @@ import { Typography } from '@mui/material'
 import { captureError } from '@/services/Sentry'
 
 interface ErrorMessage {
-  data: {
-    message: string
-    error: Record<string, string[]>
+  data?: {
+    message?: string
+    error?: Record<string, string[]>
   }
 }
 
@@ -27,9 +27,18 @@ export const useErrorHandling = () => {
   const [errorResponse, setErrorResponse] = React.useState<string>()
 
   // ** Functions
-  const handleError = (e: ErrorMessage, customMessage: string) => {
+  const handleError = (e: ErrorMessage | undefined, customMessage: string) => {
+    if (!e) {
+      captureError(currentLocation, `Undefined error`)
+      toast.error(`Error: Error is undefined`, {
+        duration: 8000
+      })
+
+      return
+    }
+
     // Check if 'data' property exists
-    if (e.data) {
+    if (e?.data) {
       const {
         data: { message, error }
       } = e
@@ -63,8 +72,8 @@ export const useErrorHandling = () => {
 
     // Handle cases where the data property does not exist
     else {
-      captureError(currentLocation, `${e}, Custom MSG: ${customMessage}, `)
-      toast.error(`Error ${e}`, {
+      captureError(currentLocation, `${JSON.stringify(e)}, Custom MSG: ${customMessage}, `)
+      toast.error(`Error ${JSON.stringify(e)}`, {
         duration: 8000
       })
     }
