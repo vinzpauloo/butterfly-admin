@@ -54,7 +54,7 @@ const NotificationsPage = () => {
   const [page, setPage] = useState<number>(1)
   const [hasNextPage, setHasNextPage] = useState<boolean>(false)
 
-  const { getAllAdminNotifs, makeNotificationSeen } = NotificationService()
+  const { getAllAdminNotifs, makeNotificationSeen, markAllNotifisAsRead } = NotificationService()
   const { isLoading } = useQuery({
     queryKey: ['allAdminNotifs', page],
     queryFn: () => getAllAdminNotifs({ data: { with: 'from', page: page } }),
@@ -80,6 +80,18 @@ const NotificationsPage = () => {
     }
   })
 
+  const { mutate: muateMarkAllAsRead, isLoading: markAllReadLoading } = useMutation(markAllNotifisAsRead, {
+    onSuccess: data => {
+      console.log(data)
+      setData([])
+      queryClient.invalidateQueries({ queryKey: ['allAdminNotifs'] })
+      queryClient.invalidateQueries({ queryKey: ['newNotifsCount'] })
+    },
+    onError: (e: any) => {
+      handleError(e, `markAllNotifisAsRead() notifications/index.tsx`)
+    }
+  })
+
   const seeNotification = (id: string, type: string) => {
     mutateMakeNotificationSeen({ id: id, data: { _method: 'put' } })
 
@@ -88,9 +100,7 @@ const NotificationsPage = () => {
   }
 
   const markAllAsRead = () => {
-    data.map((item: response) => {
-      console.log('PUT as READ', item?._id)
-    })
+    muateMarkAllAsRead({data: {_method: 'put', all: true}})
   }
 
   return (
@@ -143,7 +153,7 @@ const NotificationsPage = () => {
                 {index < data.length - 1 && <Divider />}
               </React.Fragment>
             ))}
-            {isLoading && (
+            {isLoading || markAllReadLoading && (
               <Stack direction='row' justifyContent='center' py={6}>
                 <CircularProgress />
               </Stack>
