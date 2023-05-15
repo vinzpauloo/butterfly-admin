@@ -25,7 +25,7 @@ import { useMutation } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import { AlbumService } from '@/services/api/AlbumService'
-import { captureError } from '@/services/Sentry'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   title: string
@@ -223,7 +223,7 @@ const FileUploaderMultiple = ({ onFilesChange, files }: { onFilesChange?: (files
 
 const UploadAlbum = () => {
   const router = useRouter()
-  const currentLocation = router.asPath
+  const { handleError } = useErrorHandling()
 
   /* States */
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
@@ -304,14 +304,7 @@ const UploadAlbum = () => {
         router.push(`/studio/album/album-list`)
       }, 1000)
     } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value} queryFn: postAlbum()`)
-        })
-      }
+      handleError(e, `postAlbum() album/upload/index.tsx`)
     }
   }
 

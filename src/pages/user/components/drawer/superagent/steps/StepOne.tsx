@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { CreateAccount } from '@/services/api/CreateAccount'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 type StepOneProps = {
   toggle: () => void
@@ -93,8 +94,6 @@ const SAStepOne = (
   {
     resetKey,
     handleClose,
-    responseError,
-    setResponseError,
     fileName,
     setFileName,
     setSiteID,
@@ -106,6 +105,7 @@ const SAStepOne = (
   ref: any
 ) => {
   const queryClient = useQueryClient()
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   // ** State
   const [submitted, setSubmitted] = React.useState<boolean>()
@@ -161,11 +161,13 @@ const SAStepOne = (
     onSuccess: response => {
       console.log('mutateStepOne onSuccess response', response)
       setSiteID(response?.partner?.site?.id)
+      setIsLoading(true)
+      setSubmitted(true)
 
       setTimeout(() => {
         resetForm()
         setFileName('')
-        setResponseError({})
+        clearErrorResponse()
         setIsLoading(false)
         handleNext()
 
@@ -180,9 +182,8 @@ const SAStepOne = (
       console.log('mutateStepOne onSettled response', response)
       setIsLoading(false)
     },
-    onError: error => {
-      console.log('mutateStepOne onError response', error)
-      alert(error)
+    onError: (e: any) => {
+      handleError(e, `createUser() Step One Super Agent`)
     }
   })
 
@@ -220,58 +221,24 @@ const SAStepOne = (
       data: formData
     }
 
-    setIsLoading(true)
-    setSubmitted(true)
     mutateStepOne(form)
-
-    try {
-      // console.log('above mutate')
-      // mutation.mutate(form, {
-      //   onSuccess: response => {
-      //     console.log('response', response)
-      //     setSiteID(response?.partner?.site?.id)
-      //   },
-      //   onSettled: () => {
-      //     setIsLoading(false)
-      //   }
-      // })
-      // console.log('below mutate')
-      // setTimeout(() => {
-      //   //toggle()
-      //   resetForm()
-      //   setFileName('')
-      //   setResponseError({})
-      //   setIsLoading(false)
-      //   //setSubmitted(false)
-      //   handleNext()
-      //   console.log('Insite setTimeout')
-      //   // Re-fetches UserTable and CSV exportation
-      //   queryClient.invalidateQueries({ queryKey: ['allUsers'] })
-      //   queryClient.invalidateQueries({ queryKey: ['UsersTableCSV'] })
-      // }, 1500)
-    } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      setResponseError(error)
-    }
   }
 
-  const displayErrors = () => {
-    const errorElements: any = []
+  // const displayErrors = () => {
+  //   const errorElements: any = []
 
-    for (const key in responseError) {
-      responseError[key].forEach((value: any) => {
-        errorElements.push(
-          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
-            {value}
-          </Typography>
-        )
-      })
-    }
+  //   for (const key in responseError) {
+  //     responseError[key].forEach((value: any) => {
+  //       errorElements.push(
+  //         <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
+  //           {value}
+  //         </Typography>
+  //       )
+  //     })
+  //   }
 
-    return errorElements
-  }
+  //   return errorElements
+  // }
 
   return (
     <>
@@ -619,7 +586,9 @@ const SAStepOne = (
                 />
               </Box>
 
-              {displayErrors()}
+              {/* Error messages from backend */}
+              {getErrorResponse(12)}
+
               <Box sx={styles.formButtonContainer}>
                 <Box>
                   <Button sx={styles.cancelButton} onClick={handleClose}>

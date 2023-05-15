@@ -12,9 +12,9 @@ import { Typography } from '@mui/material'
 import { captureError } from '@/services/Sentry'
 
 interface ErrorMessage {
-  data: {
-    message: string
-    error: Record<string, string[]>
+  data?: {
+    message?: string
+    error?: Record<string, string[]>
   }
 }
 
@@ -27,36 +27,68 @@ export const useErrorHandling = () => {
   const [errorResponse, setErrorResponse] = React.useState<string>()
 
   // ** Functions
-  const handleError = (e: ErrorMessage, customMessage: string) => {
-    const {
-      data: { message, error }
-    } = e
-
-    const errorMessages: string[] = []
-
-    // Catch backend error messages
-    if (error) {
-      for (const key in error) {
-        error[key].forEach((value: any) => {
-          captureError(currentLocation, `${value}, Custom MSG: ${customMessage}`)
-          toast.error(`Error ${value}`, {
-            duration: 2000
-          })
-          errorMessages.push(value)
-        })
-      }
-    }
-
-    // Catch SQL error messages
-    else if (message) {
-      captureError(currentLocation, `${message}, Custom MSG: ${customMessage}`)
-      toast.error(`Error ${message}`, {
-        duration: 2000
+  const handleError = (e: ErrorMessage | undefined, customMessage: string) => {
+    if (!e) {
+      captureError(currentLocation, `Undefined error`)
+      toast.error(`Error: Error is undefined`, {
+        duration: 3000
       })
-      errorMessages.push(message)
+
+      return
     }
 
-    setErrorResponse(errorMessages.join('\n'))
+    // Check if 'data' property exists
+    if (e?.data) {
+      const {
+        data: { message, error }
+      } = e
+
+      const errorMessages: string[] = []
+
+      // Catch backend error messages
+      if (error) {
+        for (const key in error) {
+          if (Array.isArray(error[key])) {
+            error[key].forEach((value: any) => {
+              captureError(currentLocation, `${value}, Custom MSG: ${customMessage}`)
+              toast.error(`Error ${value}`, {
+                duration: 3000
+              })
+              errorMessages.push(value)
+            })
+          } else if (error.error) {
+            captureError(currentLocation, `${error.error}`)
+            toast.error(`Error ${error.error}`, {
+              duration: 3000
+            })
+          } else if (error.message) {
+            captureError(currentLocation, `${error.message}`)
+            toast.error(`Error ${error.message}`, {
+              duration: 3000
+            })
+          }
+        }
+      }
+
+      // Catch SQL error messages
+      else if (message) {
+        captureError(currentLocation, `${message}, Custom MSG: ${customMessage}`)
+        toast.error(`Error ${message}`, {
+          duration: 3000
+        })
+        errorMessages.push(message)
+      }
+
+      setErrorResponse(errorMessages.join('\n'))
+    }
+
+    // Handle cases where the data property does not exist
+    else {
+      captureError(currentLocation, `${JSON.stringify(e)}, Custom MSG: ${customMessage}, `)
+      toast.error(`Error ${JSON.stringify(e)}`, {
+        duration: 3000
+      })
+    }
   }
 
   const getErrorResponse = (fontSize: number) => {

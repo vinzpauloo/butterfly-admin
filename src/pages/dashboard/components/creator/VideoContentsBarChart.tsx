@@ -53,12 +53,13 @@ interface VideoContentDataProps {
   week: number
   month: number
   year: number
+  coin_amount: string
 }
 
 const VideoContentsBarChart = (props: VerticalBarProps) => {
   const { warning, labelColor, borderColor, legendColor } = props
 
-  const { getVideoBarChart } = DashboardService()
+  const { getTopDonators } = DashboardService()
 
   const [fromDate, setFromDate] = useState<string | undefined>()
   const [toDate, setToDate] = useState<string | undefined>()
@@ -71,24 +72,37 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
   const [showLoadingText, setShowLoadingText] = useState(false)
 
   const [videoContentData, setVideoContentData] = useState<VideoContentDataProps[]>([])
+  const [paginate, setPaginate] = useState('')
 
   useQuery({
     queryKey: [`VideoBarChart`, fromDate, toDate, isDaily, isWeekly, isMonthly, isYearly],
     queryFn: () =>
-      getVideoBarChart({
+      getTopDonators({
         data: {
           from: fromDate,
           to: toDate,
           weekly: isWeekly,
           daily: isDaily,
           monthly: isMonthly,
-          yearly: isYearly
+          yearly: isYearly,
+          select: 'coin_amount,created_at',
+          paginate: paginate
         }
       }),
     onSuccess: (data: any) => {
-      setVideoContentData(data)
+      if (data.data) {
+        setVideoContentData(
+          data?.data.map((item: any) => {
+            return item
+          })
+        )
+      } else {
+        setVideoContentData(data)
+      }
     }
   })
+
+  console.log(videoContentData)
 
   const [active, setActive] = useState<string>('daily')
   const handleActive = (event: React.MouseEvent<HTMLElement>, newActive: string) => {
@@ -136,20 +150,30 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         const dayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' })
         const dateFormatter = new Intl.DateTimeFormat(['ban', 'id'])
 
-        const isValidDate = (dateString: any) => {
-          const timestamp = Date.parse(dateString)
+        // const isValidDate = (dateString: any) => {
+        //   const timestamp = Date.parse(dateString)
 
-          return !isNaN(timestamp)
-        }
+        //   return !isNaN(timestamp)
+        // }
 
-        if (videoContentData.length > 0 && isValidDate(videoContentData[0]?.created_at)) {
+        if (
+          videoContentData.length > 0
+
+          // isValidDate(
+          //   videoContentData?.map(item => {
+          //     console.log(`@@@`, item?.created_at)
+
+          //     return item?.created_at
+          //   })
+          // )
+        ) {
           newData.labels = videoContentData.map((item: VideoContentDataProps) => {
             const date = new Date(item?.created_at)
 
             return dateFormatter.format(date) + ' ' + dayFormatter.format(date)
           })
           newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
-            parseFloat(item?.total_watched)
+            parseFloat(item?.coin_amount)
           )
         }
 
@@ -162,6 +186,7 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         setIsWeekly('true')
         setIsMonthly(undefined)
         setIsYearly(undefined)
+        setPaginate('false')
 
         newData.labels = videoContentData.map((item: VideoContentDataProps) => {
           return `Week` + ` ` + item.week

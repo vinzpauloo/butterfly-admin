@@ -32,6 +32,7 @@ interface SalesDataProps {
   mostActiveUsers?: string
   topFollowedContentCreators?: { name: string }[]
   topDownloadedVideos?: { title: string }[]
+  topDonators?: { id: string; username: string }[]
 }
 
 const salesData = (props: SalesDataProps): DataType[] => {
@@ -39,7 +40,8 @@ const salesData = (props: SalesDataProps): DataType[] => {
     mostActiveContentCreatorCount,
     mostActiveUsers,
     topFollowedContentCreators = [],
-    topDownloadedVideos = []
+    topDownloadedVideos = [],
+    topDonators = []
   } = props
 
   return [
@@ -74,21 +76,28 @@ const salesData = (props: SalesDataProps): DataType[] => {
     {
       stats: '',
       color: 'info',
-      title: 'Top Most Shared Videos',
+      title: 'Top Donators',
       icon: <Image src='/images/icons/top-shared.png' width={30} height={30} alt='Top Shared' />,
-      details: ['#1 睡眠射精', '#2 性感野兽', '#3 性或巧克力', '#4 他妈的在角落里', '#5 狗的风格版本']
+      details: topDonators.map((item, index) => `#${index + 1} ${item.username}`) || 'List is currently empty.'
     }
   ]
 }
 
 const RenderStats = () => {
-  const { mostActiveContentCreatorCount, mostActiveUsers, topFollowedContentCreators, topDownloadedVideos } =
-    useDashboardContext()
+  const {
+    mostActiveContentCreatorCount,
+    mostActiveUsers,
+    topFollowedContentCreators,
+    topDownloadedVideos,
+    topDonators
+  } = useDashboardContext()
+
   const data = salesData({
     mostActiveContentCreatorCount,
     mostActiveUsers,
     topFollowedContentCreators,
-    topDownloadedVideos
+    topDownloadedVideos,
+    topDonators
   })
 
   return (
@@ -127,14 +136,20 @@ const RenderStats = () => {
 }
 
 const InformationCard = () => {
-  const { getMostActiveContentCreatorCount, getMostActiveUsers, getMostFollowedCreator, getTopDownloadedVideos } =
-    DashboardService()
+  const {
+    getMostActiveContentCreatorCount,
+    getMostActiveUsers,
+    getMostFollowedCreator,
+    getTopDownloadedVideos,
+    getTopDonators
+  } = DashboardService()
 
   const {
     setMostActiveContentCreatorCount,
     setMostActiveUsers,
     setTopFollowedContentCreators,
-    setTopDownloadedVideos
+    setTopDownloadedVideos,
+    setTopDonators
   } = useDashboardContext()
 
   const { handleError } = useErrorHandling()
@@ -196,9 +211,9 @@ const InformationCard = () => {
     queryFn: () =>
       getTopDownloadedVideos({
         data: {
-          top_downloaded: 'true',
+          most_download: 'true',
           select: 'title',
-          sort_By: 'downloads',
+          sort_by: 'downloads',
           sort: 'asc',
           limit: '10',
           paginate: 'false'
@@ -216,6 +231,28 @@ const InformationCard = () => {
     },
     onError: (e: any) => {
       handleError(e, `getTopDownloadedVideos() operator/InformationCard.tsx`)
+    }
+  })
+
+  useQuery({
+    queryKey: [`topDonators`],
+    queryFn: () =>
+      getTopDonators({
+        data: {
+          limit: '10',
+          paginate: 'false',
+          top_donators: 'true',
+          with: 'customers'
+        }
+      }),
+    onSuccess: (data: any) => {
+      setTopDonators(
+        data?.map((item: any) => {
+          return {
+            username: item?.customers.username
+          }
+        })
+      )
     }
   })
 

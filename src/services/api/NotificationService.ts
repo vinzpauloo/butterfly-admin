@@ -9,6 +9,7 @@ interface INotificationParams {
     page?: number
     _method?: 'put'
     count_unseen?: boolean
+    all?: boolean
   },
 }
 
@@ -43,7 +44,23 @@ const NotificationService = () => {
     });
   };
 
-  return { getAllAdminNotifs, makeNotificationSeen };
+  const markAllNotifisAsRead = (params: INotificationParams) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        "ngrok-skip-browser-warning": "69420", // only for dev
+        "Accept": "application/json",
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: "/admin/notifications",
+      method: "POST",
+      params: params.data,
+    });
+  };
+
+
+
+  return { getAllAdminNotifs, makeNotificationSeen, markAllNotifisAsRead };
 };
 
 export default NotificationService;

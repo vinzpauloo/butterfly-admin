@@ -10,6 +10,11 @@ interface TopDownloadedVideos {
   title: string
 }
 
+interface TopDonators {
+  id: string
+  username: string
+}
+
 interface DashboardContextProps {
   mostActiveContentCreatorCount: string
   setMostActiveContentCreatorCount: (count: string) => void
@@ -19,6 +24,8 @@ interface DashboardContextProps {
   setTopFollowedContentCreators: (contentCreators: TopFollowedContentCreator[]) => void
   topDownloadedVideos: TopDownloadedVideos[]
   setTopDownloadedVideos: (topDownloadedVideos: TopDownloadedVideos[]) => void
+  topDonators: TopDonators[]
+  setTopDonators: (topDonators: TopDonators[]) => void
 }
 
 const DashboardContext = createContext<DashboardContextProps>({
@@ -29,7 +36,9 @@ const DashboardContext = createContext<DashboardContextProps>({
   topFollowedContentCreators: [],
   setTopFollowedContentCreators: () => [],
   topDownloadedVideos: [],
-  setTopDownloadedVideos: () => []
+  setTopDownloadedVideos: () => [],
+  topDonators: [],
+  setTopDonators: () => []
 })
 
 export const useDashboardContext = (): DashboardContextProps => useContext(DashboardContext)
@@ -41,6 +50,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const [topFollowedContentCreators, setTopFollowedContentCreators] = useState<TopFollowedContentCreator[]>([])
   const [topDownloadedVideos, setTopDownloadedVideos] = useState<TopDownloadedVideos[]>([])
+  const [topDonators, setTopDonators] = useState<TopDonators[]>([])
 
   return (
     <DashboardContext.Provider
@@ -52,7 +62,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         topFollowedContentCreators,
         setTopFollowedContentCreators,
         topDownloadedVideos,
-        setTopDownloadedVideos
+        setTopDownloadedVideos,
+        topDonators,
+        setTopDonators
       }}
     >
       {children}

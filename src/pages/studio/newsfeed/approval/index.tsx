@@ -21,6 +21,7 @@ import TableNewsFeedApproval from '../views/TableNewsFeedApproval'
 // ** Custom Hooks
 import useDebounce from '@/hooks/useDebounce'
 import { useTranslateString } from '@/utils/TranslateString'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** Struct
 const ButtonFilters = [
@@ -47,8 +48,16 @@ const ButtonFilters = [
 ]
 
 // ** Custom Components Inside
-const Header = ({ handleFilterFeedTypeClick, buttonSelectedId, searchCreator, setSearchCreator, searchTitle, setSearchTitle, searchTag, setSearchTag }: any) => {
-  
+const Header = ({
+  handleFilterFeedTypeClick,
+  buttonSelectedId,
+  searchCreator,
+  setSearchCreator,
+  searchTitle,
+  setSearchTitle,
+  searchTag,
+  setSearchTag
+}: any) => {
   const handleClear = () => {
     setSearchCreator('')
     setSearchTitle('')
@@ -82,7 +91,6 @@ const Header = ({ handleFilterFeedTypeClick, buttonSelectedId, searchCreator, se
               </Button>
             ))}
           </Box>
-
         </Box>
       </Box>
     </Box>
@@ -103,6 +111,8 @@ const NewsFeedApproval = () => {
   const [specificType, setSpecificType] = React.useState<{} | null>(null)
   const [searchBy, setSearchBy] = React.useState<string>('username') //data columns
   const [sortBy, setSortBy] = React.useState<string>('username') //data columns
+
+  const { handleError } = useErrorHandling()
 
   const handleSetSort = (sort: GridSortDirection) => {
     setSort(sort as any)
@@ -132,6 +142,9 @@ const NewsFeedApproval = () => {
     onSuccess: response => {
       setRowData(response.data)
       setTotal(response.total)
+    },
+    onError: (e: any) => {
+      handleError(e, `getFeeds() newsfeed/approval/index.tsx`)
     }
   })
 

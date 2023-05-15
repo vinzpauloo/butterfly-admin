@@ -19,6 +19,7 @@ interface IGetSuperAgentFQDNParams {
 }
 
 interface IAddFQDNParams {
+  siteId? : number,
   data?: {
     site?: number,
     fqdns?: {name?: string, type?: 'Api' | 'Streaming' | 'Photo'}[]
@@ -74,7 +75,7 @@ const FQDNService = () => {
         "Accept": "application/json",
         Authorization: `Bearer ${accessToken}`
       },
-      url: `/admin/sites/${params.data?.site}/fqdn`,
+      url: `/admin/sites/${params.siteId}/fqdn`,
       method: 'PUT',
       data: params.data,
   })

@@ -37,6 +37,7 @@ import FeedsService from '@/services/api/FeedsService'
 import VideoService from '@/services/api/VideoService'
 import { UserTableService } from '@/services/api/UserTableService'
 import { useQuery } from '@tanstack/react-query'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 import { useTranslateString } from '@/utils/TranslateString'
 
@@ -44,13 +45,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 import { useAuth } from '@/services/useAuth'
 
 // ** Uploady
-import {
-  useUploady,
-  useItemProgressListener,
-  useBatchAddListener,
-  useBatchProgressListener,
-  useBatchFinishListener
-} from '@rpldy/uploady'
+import { useUploady, useBatchAddListener, useBatchProgressListener, useBatchFinishListener } from '@rpldy/uploady'
 import { asUploadButton } from '@rpldy/upload-button'
 import { StudioContextType } from '@/pages/studio/upload'
 
@@ -101,6 +96,9 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   // ** Auth Hook
   const auth = useAuth()
 
+  // ** Error Handling Hook
+  const { handleError } = useErrorHandling()
+
   // ** STATES
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [multipleImages, setMultipleImages] = React.useState<File[]>([])
@@ -139,6 +137,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     console.log(`LISTENER batch ${batch.id} was just added with ${batch.items.length} items`)
     setProgress(0)
     console.log('Start setProgress', progress)
+
     //return false to cancel the batch
   })
 
@@ -165,7 +164,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
 
   const getCCsQuery = useQuery({
     queryKey: ['ccOptions'],
-    enabled : auth.user?.role != 'CC',
+    enabled: auth.user?.role != 'CC',
     queryFn: () => getAllDataFromCreator()
   })
 
@@ -175,10 +174,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     getValues,
     setValue,
     reset,
-    resetField,
-    watch,
     control,
-    setError,
     formState: { errors }
   } = useForm<Inputs>()
 
@@ -191,7 +187,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
       'image/jpeg': ['.jpeg']
     },
     onDrop: (acceptedFiles: File[]) => {
-      let imageFiles = acceptedFiles.map((file: File) => Object.assign(file))
+      const imageFiles = acceptedFiles.map((file: File) => Object.assign(file))
       setMultipleImages(acceptedFiles.map((file: File) => Object.assign(file)))
       setValue('images[]', imageFiles)
     },
@@ -223,8 +219,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   const handlePublish = async () => {
     setIsLoading(true)
 
-
-    let hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
+    const hasUserID = getValues().hasOwnProperty('user_id') // check if Operator selected a userID
     const formData = createFormData(getValues())
     const hasVideoFile = uploady.getInternalFileInput()?.current?.value == '' ? false : true
 
@@ -248,64 +243,57 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
         video_type: 'feed_video'
       }
 
-      uploadVideoURL({ formData: feedHeaderData })
-        .then(res => {
-          const { uploadUrl } = res
-          const { feed_id } = res
+      try {
+        const result = await uploadVideoURL({ formData: feedHeaderData })
+        const { uploadUrl, feed_id } = result
+        console.log(`RESULT`, result)
 
-          //feedid
-          formData.append('feed_id', feed_id)
-          formData.append('video', 'true')
+        formData.append('feed_id', feed_id)
+        formData.append('video', 'true')
 
-          // Choose PION upload
-          context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
+        context?.setUploadURL(STREAMING_SERVER_URL + uploadUrl)
 
-          // upload the Feed With Video
-          uploadFeed({ formData: formData }).then(data => {
-            console.log('data from with video', data)
-
-            uploady.processPending({
-              destination: {
-                url: STREAMING_SERVER_URL + uploadUrl
-              }
-            })
+        try {
+          await uploadFeed({ formData: formData })
+          uploady.processPending({
+            destination: {
+              url: STREAMING_SERVER_URL + uploadUrl
+            }
           })
-        })
-        .catch(err => {
-          toast.error('Error Uploading')
-          setIsLoading(false)
-          setVideoUploading(false)
-          reset()
-        })
+        } catch (e: any) {
+          handleError(e, `uploadFeed() CreateFeedModal`)
+          onClose()
+        }
+      } catch (e: any) {
+        handleError(e, `uploadVideoURL() CreateFeedModal`)
+        setIsLoading(false)
+        setVideoUploading(false)
+        reset()
+        onClose()
+      }
     } else {
       // HAS NO VIDEO - continue upload Feed
-
-      uploadFeed({ formData: formData })
-        .then(data => {
-          console.log('data', data)
-          toast.success('Successfully Upload Newsfeed!', { position: 'top-center' })
-          onClose()
-          // TURN OF LOADING
-          setIsLoading(false)
-          reset()
-
-          // redirect if CC
-          setTimeout(() => {
-            if (auth.user?.role == 'CC') {
-              router.push('/studio/cc/post-status/')
-            }
-          }, 1500)
-        })
-        .catch(error => {
-          console.log('ERrror', error)
-          toast.error(`An error has occured ${error.data?.message}`, { duration: 3000 })
-          handleCancel()
-        })
+      try {
+        const result = await uploadFeed({ formData: formData })
+        console.log(`RESULT NO VIDEO!!!!`, result)
+        onClose()
+        setIsLoading(false)
+        reset()
+        setTimeout(() => {
+          if (auth.user?.role === 'CC') {
+            router.push('/studio/cc/post-status')
+          }
+        }, 1500)
+      } catch (e: any) {
+        handleError(e, `uploadFeed() CreateFeedModal`)
+        handleCancel()
+      }
     }
   }
 
   const createFormData = (newsfeedFormData: { [key: string]: any }) => {
-    let formData = new FormData()
+    const formData = new FormData()
+
     // ** DUMMY VALUES
     formData.append('is_Service', 'true')
 
@@ -322,6 +310,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
         formData.append(key, newsfeedFormData[key])
       }
     })
+
     return formData
   }
 
@@ -337,7 +326,7 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
     const uploadedFiles = multipleImages
     const filtered = uploadedFiles.filter((i: any) => i.name !== file.name)
     setMultipleImages([...filtered])
-    let currentImages = [...filtered]
+    const currentImages = [...filtered]
     if (!currentImages.length) {
       console.log('no images')
       setValue('images[]', null)
@@ -367,11 +356,13 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
   const TranslateString = useTranslateString()
 
   const uploadyStartUpload = () => {
-    let pendingFiles = uploady.getInternalFileInput()?.current?.files
+    const pendingFiles = uploady.getInternalFileInput()?.current?.files
     if (!pendingFiles) {
       console.log('NO FILE YET')
+
       return
     }
+
     //start upload
     uploady.processPending()
   }
@@ -456,10 +447,12 @@ const CreateFeedModal: React.FC<ModalProps> = ({ isOpen, onClose, context }) => 
                 id='tags-filled'
                 options={[]}
                 freeSolo
-                onChange={( event, value )=>{ setValue('tags', value) }}
+                onChange={(event, value) => {
+                  setValue('tags', value)
+                }}
                 renderTags={(value, getTagProps) =>
-                  value.map((option, index) => 
-                  <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+                  // eslint-disable-next-line react/jsx-key
+                  value.map((option, index) => <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
                 }
                 renderInput={params => (
                   <TextField
