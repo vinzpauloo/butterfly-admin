@@ -60,7 +60,7 @@ const sideBarContent = [
 
 const settingsSubMenu = [
   { id: 1, title: 'Work Groupings', link: '/settings' },
-  { id: 2, title: 'Feed Features', link: '/settings/pages/feedfeatures' },
+  { id: 2, title: 'Featured Feeds', link: '/settings/pages/featuredfeeds' },
   { id: 3, title: 'Advertisements', link: '/settings/pages/ads' },
   { id: 4, title: 'Announcements', link: '/settings/pages/announcements' },
   { id: 5, title: 'Privacy Policy', link: '/settings/pages/privacypolicy' },
