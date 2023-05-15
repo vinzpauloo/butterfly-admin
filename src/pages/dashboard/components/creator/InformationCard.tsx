@@ -30,10 +30,11 @@ interface DataType {
 interface SalesDataProps {
   earnedDonations?: string
   topDonators?: { _id: string; username: string }[]
+  mostLiked?: { _id: string; title: string }[]
 }
 
 const salesData = (props: SalesDataProps): DataType[] => {
-  const { earnedDonations, topDonators = [] } = props
+  const { earnedDonations, topDonators = [], mostLiked = [] } = props
 
   return [
     {
@@ -55,10 +56,11 @@ const salesData = (props: SalesDataProps): DataType[] => {
       icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
     },
     {
-      stats: earnedDonations || '0',
-      title: 'Most Liked Video',
+      stats: '',
+      title: 'Most Liked Videos',
       color: 'warning',
-      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
+      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />,
+      details: mostLiked.map((like, index) => `#${index + 1} ${like.title}`) || 'List is currently empty.'
     },
     {
       stats: '',
@@ -71,10 +73,11 @@ const salesData = (props: SalesDataProps): DataType[] => {
 }
 
 const RenderStats = () => {
-  const { earnedDonations, topDonators } = useCreatorDashboardContext()
+  const { earnedDonations, topDonators, mostLiked } = useCreatorDashboardContext()
   const data = salesData({
     earnedDonations,
-    topDonators
+    topDonators,
+    mostLiked
   })
 
   return (
@@ -113,10 +116,10 @@ const RenderStats = () => {
 }
 
 const InformationCard = () => {
-  const { getTopDonators } = DashboardService()
+  const { getTopDonators, getTopDownloadedVideos } = DashboardService()
   const { handleError } = useErrorHandling()
 
-  const { setEarnedDonations, setTopDonators } = useCreatorDashboardContext()
+  const { setEarnedDonations, setTopDonators, setMostLiked } = useCreatorDashboardContext()
 
   // Earned Donations
   useQuery({
@@ -158,6 +161,33 @@ const InformationCard = () => {
     },
     onError: (e: any) => {
       handleError(e, `getTopDonators() Top Donators creator/InformationCard.tsx`)
+    }
+  })
+
+  //Most Liked
+  useQuery({
+    queryKey: [`creatorMostLiked`],
+    queryFn: () =>
+      getTopDownloadedVideos({
+        data: {
+          most_liked: 'true',
+          paginate: 'false',
+          select: 'title',
+          limit: '10'
+        }
+      }),
+    onSuccess: (data: any) => {
+      setMostLiked(
+        data?.map((item: any, index: number) => {
+          return {
+            rank: index + 1,
+            title: item?.title
+          }
+        })
+      )
+    },
+    onError: (e: any) => {
+      handleError(e, `getTopDownloadedVideos() Most Liked creator/InformationCard.tsx`)
     }
   })
 

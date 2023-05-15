@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles'
 // ** Custom Components Imports
 import 'chart.js/auto'
 import InformationCard from './InformationCard'
-import VideoContentsBarChart from './VideoContentsBarChart'
+import DonationStatisticsBarChart from './DonationStatisticsBarChart'
 import DownloadsAndWatchedChart from './DownloadsAndWatchedChart'
 import { CreatorDashboardProvider } from '@/context/CreatorDashboardContext'
 
@@ -25,7 +25,7 @@ const CreatorDashboard = () => {
       <Box sx={styles.container}>
         <InformationCard />
         <Box width='100%'>
-          <VideoContentsBarChart
+          <DonationStatisticsBarChart
             labelColor={labelColor}
             info={horizontalBarInfo}
             borderColor={borderColor}
