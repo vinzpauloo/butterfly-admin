@@ -34,30 +34,32 @@ const FeaturedFeedsToolbar = (props: Props) => {
 
   return (
     <Box sx={styles.container}>
-      <TextField
-        size='small'
-        value={props.titleValue ?? ''}
-        onChange={props.onTitleChange}
-        placeholder={TranslateString('Search') + ' ' + TranslateString('Title') + '...'}
-        InputProps={{
-          startAdornment: (
-            <Box sx={{ mr: 2, display: 'flex' }}>
-              <Icon icon='mdi:magnify' fontSize={20} />
-            </Box>
-          ),
-          endAdornment: props?.titleValue ? (
-            <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
-              <Icon icon='mdi:close' fontSize={20} />
-            </IconButton>
-          ) : (
-            false
-          )
-        }}
-        sx={styles.textField}
-      />
-      <Button variant='contained' color='error' sx={styles.button} onClick={handleClear}>
-        {TranslateString('Clear')}
-      </Button>
+      <Box sx={{ display: 'flex' }}>
+        <TextField
+          size='small'
+          value={props.titleValue ?? ''}
+          onChange={props.onTitleChange}
+          placeholder={TranslateString('Search') + ' ' + TranslateString('Title') + '...'}
+          InputProps={{
+            startAdornment: (
+              <Box sx={{ mr: 2, display: 'flex' }}>
+                <Icon icon='mdi:magnify' fontSize={20} />
+              </Box>
+            ),
+            endAdornment: props?.titleValue ? (
+              <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearSearch}>
+                <Icon icon='mdi:close' fontSize={20} />
+              </IconButton>
+            ) : (
+              false
+            )
+          }}
+          sx={styles.textField}
+        />
+        <Button variant='contained' color='error' sx={styles.button} onClick={handleClear}>
+          {TranslateString('Clear')}
+        </Button>
+      </Box>
       <Button variant='contained' color='primary' sx={styles.button} onClick={props.toggleFeedModal}>
         {TranslateString('Select Feeds')}
       </Button>
@@ -74,17 +76,19 @@ const styles = {
       lg: 'row'
     },
     mb: 2,
-    gap: 5
+    gap: 5,
+    justifyContent: 'space-between'
   },
   textField: {
     width: {
       xs: 1,
       sm: 'auto',
-      lg: '45%'
+      lg: '500px'
     },
     '& .MuiInputBase-root > svg': {
       mr: 2
-    }
+    },
+    mr: 2
   },
   button: {
     width: {

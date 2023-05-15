@@ -27,23 +27,37 @@ type User = {
   username: string
 }
 interface FeedCardProps {
-  _id? : string
+  _id?: string
   user?: User
-  editable? : boolean
+  editable?: boolean
   string_story?: string
   datePublished?: string
   children?:
     | (React.ReactNode & React.ReactElement<typeof FeedAttachments>)
     | (React.ReactNode & React.ReactElement<typeof FeedAttachments>[])
-  handleEditButtonClick? : () => void
+  handleEditButtonClick?: () => void
+  selected?: boolean
 }
 
-const FeedCard = ({ string_story, user, children, datePublished, editable, handleEditButtonClick }: FeedCardProps) => {
+const FeedCard = ({
+  string_story,
+  user,
+  children,
+  datePublished,
+  editable,
+  handleEditButtonClick,
+  selected
+}: FeedCardProps) => {
   // ** Hook
   const theme = useTheme()
 
   return (
-    <Box>
+    <Box
+      sx={{
+        border: selected ? `7px solid #56ca00` : ``,
+        borderRadius: selected ? `14px` : ``
+      }}
+    >
       <Card
         variant='elevation'
         sx={{
@@ -75,14 +89,13 @@ const FeedCard = ({ string_story, user, children, datePublished, editable, handl
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 3.5, '& svg': { mr: 1.25 } }}>
               <img src='/images/icons/chat.png' />
             </Box>
-            {
-              editable && handleEditButtonClick && 
+            {editable && handleEditButtonClick && (
               <Box>
-                <IconButton onClick={ handleEditButtonClick }>
-                  <Icon icon='mdi:pencil' fontSize={20} color={ theme.palette.common.white } />
+                <IconButton onClick={handleEditButtonClick}>
+                  <Icon icon='mdi:pencil' fontSize={20} color={theme.palette.common.white} />
                 </IconButton>
               </Box>
-            }
+            )}
           </Box>
         </Box>
 
