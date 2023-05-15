@@ -31,10 +31,12 @@ interface SalesDataProps {
   earnedDonations?: string
   topDonators?: { _id: string; username: string }[]
   mostLiked?: { _id: string; title: string }[]
+  mostFavorite?: { _id: string; title: string }[]
+  mostViewed?: { _id: string; title: string }[]
 }
 
 const salesData = (props: SalesDataProps): DataType[] => {
-  const { earnedDonations, topDonators = [], mostLiked = [] } = props
+  const { earnedDonations, topDonators = [], mostLiked = [], mostFavorite = [], mostViewed = [] } = props
 
   return [
     {
@@ -44,16 +46,18 @@ const salesData = (props: SalesDataProps): DataType[] => {
       icon: <Image src='/images/icons/content-creators.png' width={30} height={30} alt='Content Creators' />
     },
     {
-      stats: earnedDonations || '0',
-      title: 'Earned Commissions',
+      stats: '',
+      title: 'Most Viewed',
       color: 'warning',
-      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
+      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />,
+      details: mostViewed.map((view, index) => `#${index + 1} ${view.title}`) || 'List is currently empty.'
     },
     {
-      stats: earnedDonations || '0',
+      stats: '',
       title: 'Most Favorite Video',
       color: 'warning',
-      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />
+      icon: <Image src='/images/icons/active-users.png' width={30} height={30} alt='Active Users' />,
+      details: mostFavorite.map((favorite, index) => `#${index + 1} ${favorite.title}`) || 'List is currently empty.'
     },
     {
       stats: '',
@@ -73,11 +77,13 @@ const salesData = (props: SalesDataProps): DataType[] => {
 }
 
 const RenderStats = () => {
-  const { earnedDonations, topDonators, mostLiked } = useCreatorDashboardContext()
+  const { earnedDonations, topDonators, mostLiked, mostFavorite, mostViewed } = useCreatorDashboardContext()
   const data = salesData({
     earnedDonations,
     topDonators,
-    mostLiked
+    mostLiked,
+    mostFavorite,
+    mostViewed
   })
 
   return (
@@ -119,7 +125,8 @@ const InformationCard = () => {
   const { getTopDonators, getTopDownloadedVideos } = DashboardService()
   const { handleError } = useErrorHandling()
 
-  const { setEarnedDonations, setTopDonators, setMostLiked } = useCreatorDashboardContext()
+  const { setEarnedDonations, setTopDonators, setMostLiked, setMostFavorite, setMostViewed } =
+    useCreatorDashboardContext()
 
   // Earned Donations
   useQuery({
@@ -188,6 +195,60 @@ const InformationCard = () => {
     },
     onError: (e: any) => {
       handleError(e, `getTopDownloadedVideos() Most Liked creator/InformationCard.tsx`)
+    }
+  })
+
+  //Most Favorite
+  useQuery({
+    queryKey: [`creatorMostFavorite`],
+    queryFn: () =>
+      getTopDownloadedVideos({
+        data: {
+          most_favorite: 'true',
+          paginate: 'false',
+          select: 'title',
+          limit: '10'
+        }
+      }),
+    onSuccess: (data: any) => {
+      setMostFavorite(
+        data?.map((item: any, index: number) => {
+          return {
+            rank: index + 1,
+            title: item?.title
+          }
+        })
+      )
+    },
+    onError: (e: any) => {
+      handleError(e, `getTopDownloadedVideos() Most Favorite creator/InformationCard.tsx`)
+    }
+  })
+
+  //Most Viewed
+  useQuery({
+    queryKey: [`creatorMostViewed`],
+    queryFn: () =>
+      getTopDownloadedVideos({
+        data: {
+          most_viewed: 'true',
+          paginate: 'false',
+          select: 'title',
+          limit: '10'
+        }
+      }),
+    onSuccess: (data: any) => {
+      setMostViewed(
+        data?.map((item: any, index: number) => {
+          return {
+            rank: index + 1,
+            title: item?.title
+          }
+        })
+      )
+    },
+    onError: (e: any) => {
+      handleError(e, `getTopDownloadedVideos() Most Viewed creator/InformationCard.tsx`)
     }
   })
 

@@ -10,7 +10,7 @@ interface TopDonators {
   username: string
 }
 
-interface MostLiked {
+interface MostFavoriteMostLikedMostViewed {
   _id: string
   title: string
 }
@@ -22,8 +22,12 @@ interface CreatorDashboardContextProps {
   setEarnedDonations: (count: string) => void
   topDonators: TopDonators[]
   setTopDonators: (topDonators: TopDonators[]) => void
-  mostLiked: MostLiked[]
-  setMostLiked: (mostLiked: MostLiked[]) => void
+  mostLiked: MostFavoriteMostLikedMostViewed[]
+  setMostLiked: (mostLiked: MostFavoriteMostLikedMostViewed[]) => void
+  mostFavorite: MostFavoriteMostLikedMostViewed[]
+  setMostFavorite: (mostFavorite: MostFavoriteMostLikedMostViewed[]) => void
+  mostViewed: MostFavoriteMostLikedMostViewed[]
+  setMostViewed: (mostViewed: MostFavoriteMostLikedMostViewed[]) => void
 }
 
 const CreatorDashboardContext = createContext<CreatorDashboardContextProps>({
@@ -34,7 +38,11 @@ const CreatorDashboardContext = createContext<CreatorDashboardContextProps>({
   topDonators: [],
   setTopDonators: () => [],
   mostLiked: [],
-  setMostLiked: () => []
+  setMostLiked: () => [],
+  mostFavorite: [],
+  setMostFavorite: () => [],
+  mostViewed: [],
+  setMostViewed: () => []
 })
 
 export const useCreatorDashboardContext = (): CreatorDashboardContextProps => useContext(CreatorDashboardContext)
@@ -44,7 +52,9 @@ export const CreatorDashboardProvider: React.FC<{ children: React.ReactNode }> =
   const [earnedDonations, setEarnedDonations] = useState('')
 
   const [topDonators, setTopDonators] = useState<TopDonators[]>([])
-  const [mostLiked, setMostLiked] = useState<MostLiked[]>([])
+  const [mostLiked, setMostLiked] = useState<MostFavoriteMostLikedMostViewed[]>([])
+  const [mostFavorite, setMostFavorite] = useState<MostFavoriteMostLikedMostViewed[]>([])
+  const [mostViewed, setMostViewed] = useState<MostFavoriteMostLikedMostViewed[]>([])
 
   return (
     <CreatorDashboardContext.Provider
@@ -56,7 +66,11 @@ export const CreatorDashboardProvider: React.FC<{ children: React.ReactNode }> =
         topDonators,
         setTopDonators,
         mostLiked,
-        setMostLiked
+        setMostLiked,
+        mostFavorite,
+        setMostFavorite,
+        mostViewed,
+        setMostViewed
       }}
     >
       {children}
