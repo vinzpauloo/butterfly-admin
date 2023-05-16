@@ -91,7 +91,9 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
           from: fromDate,
           to: toDate,
           sort: sort,
-          sort_by: sortName
+          sort_by: sortName,
+          select: 'total_new_vip,total_new_guest,created_at',
+          daily: 'true'
         }
       }),
     onSuccess: (data: any) => {

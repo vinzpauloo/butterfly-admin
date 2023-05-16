@@ -1,127 +1,87 @@
 // ** React Imports
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent } from 'react'
 
 // ** MUI Imports
-import { Box, Button, Typography } from '@mui/material'
+import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
 // ** Project/Other Imports
+import { FeaturedFeedsColumns } from '@/data/FeaturedFeedsColumns'
 import SelectFeedsModal from '../components/modal/SelectFeedsModal'
-import ToggleButton from '@/pages/user/components/button/ToggleButton'
 import Container from '@/pages/components/Container'
 import FeaturedFeedsToolbar from '../components/toolbar/FeaturedFeedsToolbar'
 
 // ** Zustand Store
 import { useFeaturedFeedStore } from '@/zustand/featuredFeedGlobalStore'
 
-interface feedFeatureData {
-  id: any
-  title: string
-  username: any
-  feed_type: string
-  dateCreated: any
-}
+// ** Hooks/Services
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+import FeedsService from '@/services/api/FeedsService'
+import { ApkService } from '@/services/api/ApkService'
+import useDebounce from '@/hooks/useDebounce'
 
-function createFeedFeatureData(
-  id: any,
-  title: string,
-  username: string,
-  feed_type: string,
-  dateCreated: number
-): feedFeatureData {
-  const date = new Date(dateCreated)
-  const hours = date.getHours()
-  const formattedHours = (hours % 12 || 12).toString().padStart(2, '0')
-  const formattedDateCreated = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date
-    .getDate()
-    .toString()
-    .padStart(2, '0')} ${formattedHours}:${date.getMinutes().toString().padStart(2, '0')}:${date
-    .getSeconds()
-    .toString()
-    .padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`
+// ** Utils Imports
+import { useTranslateString } from '@/utils/TranslateString'
 
-  return {
-    id,
-    title,
-    username,
-    feed_type,
-    dateCreated: formattedDateCreated
-  }
-}
+// ** TanStack Imports
+import { useQuery } from '@tanstack/react-query'
 
-const feedFeatureRows = [
-  { ...createFeedFeatureData(1, 'Title 1', `JokkakeUdon`, `Story Feed`, 1641812403000) },
-  { ...createFeedFeatureData(2, 'Title 2', `MarketsuShabu`, `Photo Feed`, 1641812403000) },
-  { ...createFeedFeatureData(3, 'Title 3', `Dex@CC`, `Video Feed`, 1661640621000) },
-  { ...createFeedFeatureData(4, 'Title 4', `Mark@CC`, `Video with Photos`, 1645137632000) },
-  { ...createFeedFeatureData(5, 'Title 5', `Liyan@CC`, `Story Feed`, 1648314258000) }
-]
-
-const feedFeatureColumns = [
-  { flex: 0.04, minWidth: 220, sortable: false, field: 'title', headerName: `Title` },
-  { flex: 0.02, minWidth: 150, sortable: false, field: 'username', headerName: `Username` },
-  { flex: 0.02, minWidth: 160, sortable: false, field: 'feed_type', headerName: `Feed Type` },
-  { flex: 0.02, minWidth: 200, sortable: false, field: 'dateCreated', headerName: `Date Created` },
-  {
-    flex: 0.02,
-    minWidth: 150,
-    sortable: false,
-    field: 'action',
-    headerName: `Action`,
-    renderCell: () => (
-      <Box>
-        <ToggleButton />
-        <Button>
-          <DeleteOutlineIcon color='secondary' />
-        </Button>
-      </Box>
-    )
-  }
-]
+// ** Lib Imports
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 const FeaturedFeeds = () => {
-  // feed features
-  const { toggleFeedModal, isFeedModalOpen } = useFeaturedFeedStore()
+  // ** Services
+  const { getFeaturedFeeds } = FeedsService()
+  const { handleError } = useErrorHandling()
 
-  const [pageSize] = useState<number>(10)
-  const [titleSearchValue, setTitleSearchValue] = useState<string | undefined>(undefined)
-  const [search, setSearch] = useState<string | undefined>(undefined)
+  // ** Data
+  const { columns } = FeaturedFeedsColumns()
 
-  const handleSearch = React.useCallback((value: string, type: string) => {
-    setSearch(type)
-    switch (type) {
-      case 'title':
-        setTitleSearchValue(value || undefined)
-        break
+  // ** Zustand Store
+  const { toggleFeedModal, isFeedModalOpen, selectedSite, pageSize, rowData, setRowData, titleSearchValue } =
+    useFeaturedFeedStore()
+  const handleSearch = useFeaturedFeedStore(state => state.handleSearch)
+
+  // ** Debounce Service
+  const debouncedTitle = useDebounce(titleSearchValue, 1000)
+
+  // ** API Methods
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: [`featuredFeeds`, selectedSite, debouncedTitle],
+    queryFn: () =>
+      getFeaturedFeeds({
+        site_id: selectedSite,
+        search: debouncedTitle
+      }),
+    onSuccess: data => {
+      setRowData(data?.data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getFeaturedFeeds() settings/pages/featuredfeeds.tsx`)
     }
-  }, [])
+  })
 
   return (
     <Container>
-      <Box sx={styles.buttonContainer}>
-        <Typography variant='h4' component='h4'>
-          Featured Feeds
-        </Typography>
-      </Box>
+      <Typography variant='h4' component='h4'>
+        Featured Feeds
+      </Typography>
+
+      <SelectSite />
 
       <DataGrid
         disableColumnMenu
-        // loading={isLoading || isRefetching}
+        loading={isLoading || isRefetching}
         checkboxSelection={false}
         disableSelectionOnClick
         paginationMode='server'
         sortingMode='server'
         autoHeight
-        rows={feedFeatureRows ?? []}
-        // rows={albumData ?? []}
-        // getRowId={(row: AlbumData) => row?._id}
-        // columns={albumColumns}
-        columns={feedFeatureColumns}
+        rows={rowData ?? []}
+        getRowId={(row: any) => row?.featured_id}
+        columns={columns}
         pageSize={pageSize || 10}
         pagination
-        // onPageChange={handlePageChange}
-        // rowCount={rowCount || 10}
         rowsPerPageOptions={[10]}
         components={{ Toolbar: FeaturedFeedsToolbar }}
         componentsProps={{
@@ -140,6 +100,64 @@ const FeaturedFeeds = () => {
   )
 }
 
+function SelectSite() {
+  // ** Service
+  const { getAllSites } = ApkService()
+
+  // ** Hooks
+  const { handleError } = useErrorHandling()
+
+  // ** Utils
+  const TranslateString = useTranslateString()
+
+  // ** Zustand Store
+  const { selectedSite, siteName, setSiteName } = useFeaturedFeedStore()
+  const handleChange = useFeaturedFeedStore(state => state.handleChange)
+
+  // ** API methods
+  useQuery({
+    queryKey: ['getAllSites'],
+    queryFn: () => getAllSites(),
+    onSuccess: (data: any) => {
+      setSiteName(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getAllSites() Feature Feeds, Select Site`)
+    }
+  })
+
+  return (
+    <Box mt={5} sx={styles.wrapper}>
+      <FormControl size='small' sx={styles.formControl}>
+        <InputLabel id='demo-simple-select-label'>{TranslateString('Select Site')}</InputLabel>
+        <Select
+          labelId='demo-simple-select-label'
+          id='demo-simple-select'
+          label='Select Site'
+          value={selectedSite ?? ''}
+          onChange={handleChange}
+          sx={styles.menuSelect}
+          MenuProps={{
+            sx: { ...styles.menuList }
+          }}
+        >
+          {siteName &&
+            siteName?.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.logo ? (
+                  <img src={FILE_SERVER_URL + item.logo} alt='Logo' width={40} />
+                ) : (
+                  <img src='/images/studio/butterfly_file_upload.png' alt='Placeholder Logo' width={40} />
+                )}
+                {item.name}
+              </MenuItem>
+            ))}
+        </Select>
+      </FormControl>
+    </Box>
+  )
+}
+
 const styles = {
   buttonContainer: {
     display: 'flex',
@@ -155,6 +173,47 @@ const styles = {
       lg: 'space-between'
     },
     mb: 5
+  },
+
+  //
+  wrapper: {
+    mb: 4
+  },
+  formControl: {
+    width: {
+      xs: '100%',
+      lg: '25%'
+    }
+  },
+  buttonWrapper: {
+    mt: {
+      xs: 2,
+      sm: 2,
+      md: 2,
+      lg: 0
+    }
+  },
+  button: {
+    width: {
+      xs: 'auto',
+      sm: 'auto',
+      md: 'auto',
+      lg: 150
+    },
+    float: 'right'
+  },
+  menuSelect: {
+    '& .MuiSelect-select': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }
+  },
+  menuList: {
+    '& .MuiMenuItem-root': {
+      display: 'flex',
+      justifyContent: 'space-between'
+    }
   }
 }
 

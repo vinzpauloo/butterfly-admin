@@ -1,8 +1,9 @@
 // ** React Imporst
 import React from 'react'
+import toast from 'react-hot-toast'
 
 // ** MUI Imports
-import { Box, Button, CircularProgress, Grid, InputAdornment, TextField } from '@mui/material'
+import { Box, Button, CircularProgress, Grid, InputAdornment, TextField, Typography } from '@mui/material'
 
 // ** Step Components
 import FeedList from '@/pages/studio/newsfeed/views/FeedList'
@@ -15,7 +16,7 @@ import Translations from '@/layouts/components/Translations'
 import EditNewsFeedDrawer from '@/pages/studio/newsfeed/views/EditNewsFeedDrawer'
 
 // ** TanStack Imports
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services Imports
 import FeedsService from '@/services/api/FeedsService'
@@ -133,8 +134,46 @@ const SelectFeaturedFeeds = (props: Props) => {
     setFeed(feed)
   }
 
+  const { postFeaturedFeeds } = FeedsService()
+  const { mutate: mutatePostFeaturedFeeds } = useMutation(postFeaturedFeeds, {
+    onSuccess: data => {
+      console.log(`SUCCESS POST FEATURED FEDS`, data)
+    },
+    onError: (e: any) => {
+      handleError(e, `postFeaturedFeeds() settings/components/feeds/index.tsx`)
+    }
+  })
+
+  const { selectedFeed, selectedSite, description, title, setTitle } = useFeaturedFeedStore()
+  const handleTitleChange = useFeaturedFeedStore(state => state.handleTitleChange)
+  const queryClient = useQueryClient()
+
+  // POST METHOD TO ADD FEED
   const handleSelectFeed = () => {
-    toggleFeedModal()
+    if (title !== '') {
+      mutatePostFeaturedFeeds({
+        data: {
+          title: title as string,
+          description: description as string,
+          feed_id: selectedFeed as string,
+          active: 'true'
+        },
+        params: {
+          site_id: selectedSite
+        }
+      })
+
+      setTimeout(() => {
+        setTitle('')
+        toggleFeedModal()
+
+        queryClient.invalidateQueries({ queryKey: ['featuredFeeds'] })
+      }, 1500)
+    } else {
+      toast.error(`Please input a title.`, {
+        duration: 3000
+      })
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -165,8 +204,17 @@ const SelectFeaturedFeeds = (props: Props) => {
       <Box sx={{ mb: 10 }}>
         <form>
           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-            <TextField required label='Featured Feed Title' />
-            <Button sx={{ minWidth: 100 }} color='success' size='small' variant='contained' onClick={handleSelectFeed}>
+            <Box>
+              <TextField required label='Featured Feed Title' value={title} onChange={handleTitleChange} />
+              {title === '' && <Typography color='error'>***Title is required</Typography>}
+            </Box>
+            <Button
+              sx={{ minWidth: 140, height: 50 }}
+              color='success'
+              size='small'
+              variant='contained'
+              onClick={handleSelectFeed}
+            >
               Save
             </Button>
           </Box>
