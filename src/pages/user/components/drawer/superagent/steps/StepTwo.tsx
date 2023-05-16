@@ -1,20 +1,19 @@
+// ** React Imports
 import React from 'react'
-
-// ** Import MUI
-import { Box, Button } from '@mui/material'
-
-// ** Import component
-import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
-
-// Zustand SuperAgentStore
-import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
-
-// ** Import third party components
 import toast from 'react-hot-toast'
 
-// ** Tanstack and services
-import FQDNService from '@/services/api/FQDNService'
+// ** MUI Imports
+import { Box, Button } from '@mui/material'
+
+// ** Project/Other Imports
+import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
+
+// ** Tanstack Imports
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// ** Hooks/Services Imports
+import FQDNService from '@/services/api/FQDNService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** types
 type SAStepTwoProps = {
@@ -28,6 +27,7 @@ export type FQDNData = {
   fqdns: { name?: string; type?: 'Api' | 'Streaming' | 'Photo' }[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: any) => {
   // ** State
   const [isLoading] = React.useState<boolean>(false)
@@ -50,9 +50,10 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
     }
   })
 
-  const handleFinish = () => {
-    const allDataArray = []
+  // ** Error Handling Hooks
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
+  const handleFinish = () => {
     // check for empty values handleVALIDATIONS
     let hasEmptyvalues = false
     hasEmptyvalues = formAPIRef.current.getFormData().some((item: { value: string }) => {
@@ -92,30 +93,32 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
   }
 
   const submitFQDN = async (fqdnsObject: FQDNData) => {
-    // start stepper loader
-    setIsLoading(true)
+    try {
+      //Do submissions!!
 
-    //Do submissions!!
+      if (Object.keys(fqdnsObject)?.length == 0) {
+        toast.error('FQDN is required')
 
-    if (Object.keys(fqdnsObject)?.length == 0) {
-      toast.error('FQDN is required')
+        return
+      } else {
+        console.log('allFQDNData', fqdnsObject)
 
-      return
-    } else {
-      console.log('allFQDNData', fqdnsObject)
+        await fqdnM.mutateAsync({
+          siteId: siteID as number,
+          data: fqdnsObject
+        })
+      }
 
       setIsLoading(true)
-      
-      await fqdnM.mutateAsync({
-        siteId : siteID as number,
-        data: fqdnsObject
-      })
-    }
 
-    setTimeout(() => {
-      setIsLoading(false)
-      handleNext()
-    }, 1500)
+      setTimeout(() => {
+        setIsLoading(false)
+        clearErrorResponse()
+        handleNext()
+      }, 1500)
+    } catch (e: any) {
+      handleError(e, `createFQDN() StepTwo.tsx Super Agent`)
+    }
   }
 
   return (
@@ -163,6 +166,9 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
             isLoading={isLoading}
             disableSaveButton={true}
           />
+
+          {/* Error Messages from backend */}
+          {getErrorResponse(12)}
 
           <div className='button-wrapper' style={{ paddingTop: '1rem', textAlign: 'center' }}>
             <Button

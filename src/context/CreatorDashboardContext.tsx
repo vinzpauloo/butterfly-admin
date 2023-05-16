@@ -10,6 +10,11 @@ interface TopDonators {
   username: string
 }
 
+interface MostFavoriteMostLikedMostViewed {
+  _id: string
+  title: string
+}
+
 interface CreatorDashboardContextProps {
   topFollowedContentCreators: TopFollowedContentCreator[]
   setTopFollowedContentCreators: (contentCreators: TopFollowedContentCreator[]) => void
@@ -17,6 +22,12 @@ interface CreatorDashboardContextProps {
   setEarnedDonations: (count: string) => void
   topDonators: TopDonators[]
   setTopDonators: (topDonators: TopDonators[]) => void
+  mostLiked: MostFavoriteMostLikedMostViewed[]
+  setMostLiked: (mostLiked: MostFavoriteMostLikedMostViewed[]) => void
+  mostFavorite: MostFavoriteMostLikedMostViewed[]
+  setMostFavorite: (mostFavorite: MostFavoriteMostLikedMostViewed[]) => void
+  mostViewed: MostFavoriteMostLikedMostViewed[]
+  setMostViewed: (mostViewed: MostFavoriteMostLikedMostViewed[]) => void
 }
 
 const CreatorDashboardContext = createContext<CreatorDashboardContextProps>({
@@ -25,7 +36,13 @@ const CreatorDashboardContext = createContext<CreatorDashboardContextProps>({
   earnedDonations: '',
   setEarnedDonations: () => '',
   topDonators: [],
-  setTopDonators: () => []
+  setTopDonators: () => [],
+  mostLiked: [],
+  setMostLiked: () => [],
+  mostFavorite: [],
+  setMostFavorite: () => [],
+  mostViewed: [],
+  setMostViewed: () => []
 })
 
 export const useCreatorDashboardContext = (): CreatorDashboardContextProps => useContext(CreatorDashboardContext)
@@ -35,6 +52,9 @@ export const CreatorDashboardProvider: React.FC<{ children: React.ReactNode }> =
   const [earnedDonations, setEarnedDonations] = useState('')
 
   const [topDonators, setTopDonators] = useState<TopDonators[]>([])
+  const [mostLiked, setMostLiked] = useState<MostFavoriteMostLikedMostViewed[]>([])
+  const [mostFavorite, setMostFavorite] = useState<MostFavoriteMostLikedMostViewed[]>([])
+  const [mostViewed, setMostViewed] = useState<MostFavoriteMostLikedMostViewed[]>([])
 
   return (
     <CreatorDashboardContext.Provider
@@ -44,7 +64,13 @@ export const CreatorDashboardProvider: React.FC<{ children: React.ReactNode }> =
         earnedDonations,
         setEarnedDonations,
         topDonators,
-        setTopDonators
+        setTopDonators,
+        mostLiked,
+        setMostLiked,
+        mostFavorite,
+        setMostFavorite,
+        mostViewed,
+        setMostViewed
       }}
     >
       {children}

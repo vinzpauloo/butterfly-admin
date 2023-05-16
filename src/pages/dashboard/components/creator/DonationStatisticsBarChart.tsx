@@ -56,7 +56,7 @@ interface VideoContentDataProps {
   coin_amount: string
 }
 
-const VideoContentsBarChart = (props: VerticalBarProps) => {
+const DonationStatisticsBarChart = (props: VerticalBarProps) => {
   const { warning, labelColor, borderColor, legendColor } = props
 
   const { getTopDonators } = DashboardService()
@@ -71,11 +71,12 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
 
   const [showLoadingText, setShowLoadingText] = useState(false)
 
-  const [videoContentData, setVideoContentData] = useState<VideoContentDataProps[]>([])
+  const [donationData, setDonationData] = useState<VideoContentDataProps[]>([])
   const [paginate, setPaginate] = useState('')
+  const [select, setSelect] = useState('coin_amount,created_at')
 
   useQuery({
-    queryKey: [`VideoBarChart`, fromDate, toDate, isDaily, isWeekly, isMonthly, isYearly],
+    queryKey: [`DonationStatisticsBarChart`, fromDate, toDate, isDaily, isWeekly, isMonthly, isYearly, select],
     queryFn: () =>
       getTopDonators({
         data: {
@@ -85,24 +86,22 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
           daily: isDaily,
           monthly: isMonthly,
           yearly: isYearly,
-          select: 'coin_amount,created_at',
+          select: select,
           paginate: paginate
         }
       }),
     onSuccess: (data: any) => {
       if (data.data) {
-        setVideoContentData(
+        setDonationData(
           data?.data.map((item: any) => {
             return item
           })
         )
       } else {
-        setVideoContentData(data)
+        setDonationData(data)
       }
     }
   })
-
-  console.log(videoContentData)
 
   const [active, setActive] = useState<string>('daily')
   const handleActive = (event: React.MouseEvent<HTMLElement>, newActive: string) => {
@@ -114,7 +113,7 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
     datasets: [
       {
         maxBarThickness: 200,
-        label: 'Total Views',
+        label: 'Total Donations',
         backgroundColor: warning,
         borderColor: 'transparent',
         data: []
@@ -128,7 +127,7 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
       datasets: [
         {
           maxBarThickness: 200,
-          label: 'Total Views',
+          label: 'Total Donations',
           backgroundColor: warning,
           borderColor: 'transparent',
           data: []
@@ -147,34 +146,20 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         setIsYearly(undefined)
         setFromDate(dailyStartDate?.toISOString().slice(0, 10))
         setToDate(new Date().toISOString().slice(0, 10))
-        const dayFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' })
-        const dateFormatter = new Intl.DateTimeFormat(['ban', 'id'])
+        setSelect('coin_amount,created_at')
 
-        // const isValidDate = (dateString: any) => {
-        //   const timestamp = Date.parse(dateString)
+        if (donationData.length > 0) {
+          newData.labels = donationData
+            .filter((item: VideoContentDataProps) => item?.created_at)
+            .map((item: VideoContentDataProps) => {
+              const date = new Date(item.created_at)
 
-        //   return !isNaN(timestamp)
-        // }
+              return date.toISOString().slice(0, 10)
+            })
 
-        if (
-          videoContentData.length > 0
-
-          // isValidDate(
-          //   videoContentData?.map(item => {
-          //     console.log(`@@@`, item?.created_at)
-
-          //     return item?.created_at
-          //   })
-          // )
-        ) {
-          newData.labels = videoContentData.map((item: VideoContentDataProps) => {
-            const date = new Date(item?.created_at)
-
-            return dateFormatter.format(date) + ' ' + dayFormatter.format(date)
-          })
-          newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
-            parseFloat(item?.coin_amount)
-          )
+          newData.datasets[0].data = donationData
+            .filter((item: VideoContentDataProps) => item?.created_at)
+            .map((item: VideoContentDataProps) => parseFloat(item.coin_amount))
         }
 
         break
@@ -187,14 +172,13 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         setIsMonthly(undefined)
         setIsYearly(undefined)
         setPaginate('false')
+        setSelect('coin_amount,week,month,year')
 
-        newData.labels = videoContentData.map((item: VideoContentDataProps) => {
+        newData.labels = donationData.map((item: VideoContentDataProps) => {
           return `Week` + ` ` + item.week
         })
 
-        newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
-          parseFloat(item?.total_watched)
-        )
+        newData.datasets[0].data = donationData.map((item: VideoContentDataProps) => parseFloat(item?.coin_amount))
 
         break
 
@@ -205,12 +189,11 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         setIsWeekly(undefined)
         setIsMonthly('true')
         setIsYearly(undefined)
+        setSelect('coin_amount,month,year')
 
-        newData.labels = videoContentData.map((item: VideoContentDataProps) => getMonthName(item?.month))
+        newData.labels = donationData.map((item: VideoContentDataProps) => getMonthName(item?.month))
 
-        newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
-          parseFloat(item?.total_watched)
-        )
+        newData.datasets[0].data = donationData.map((item: VideoContentDataProps) => parseFloat(item?.coin_amount))
 
         break
 
@@ -221,12 +204,11 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         setIsWeekly(undefined)
         setIsMonthly(undefined)
         setIsYearly('true')
+        setSelect('coin_amount,year')
 
-        newData.labels = videoContentData.map((item: VideoContentDataProps) => item?.year)
+        newData.labels = donationData.map((item: VideoContentDataProps) => item?.year)
 
-        newData.datasets[0].data = videoContentData.map((item: VideoContentDataProps) =>
-          parseFloat(item?.total_watched)
-        )
+        newData.datasets[0].data = donationData.map((item: VideoContentDataProps) => parseFloat(item?.coin_amount))
 
         break
     }
@@ -242,7 +224,7 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
     return () => {
       clearTimeout(timer)
     }
-  }, [active, toDate, videoContentData, warning])
+  }, [active, toDate, donationData, warning])
 
   const options: ChartOptions<'bar'> = {
     indexAxis: 'x',
@@ -281,28 +263,26 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
   }
 
   const weeklyTitle =
-    videoContentData.length > 0
-      ? [`Week ${videoContentData[0]?.week} - Week ${videoContentData[videoContentData.length - 1]?.week}`]
+    donationData.length > 0
+      ? [`Week ${donationData[0]?.week} - Week ${donationData[donationData.length - 1]?.week}`]
       : []
 
   const monthlyTitle =
-    videoContentData.length > 0
+    donationData.length > 0
       ? [
-          `${getMonthName(videoContentData[0]?.month)} - ${getMonthName(
-            videoContentData[videoContentData.length - 1]?.month
-          )} of ${videoContentData[0]?.year}`
+          `${getMonthName(donationData[0]?.month)} - ${getMonthName(donationData[donationData.length - 1]?.month)} of ${
+            donationData[0]?.year
+          }`
         ]
       : []
 
   const yearlyTitle =
-    videoContentData.length > 0
-      ? [`${videoContentData[0]?.year} - ${videoContentData[videoContentData.length - 1]?.year}`]
-      : []
+    donationData.length > 0 ? [`${donationData[0]?.year} - ${donationData[donationData.length - 1]?.year}`] : []
 
   return (
     <Card>
       <CardHeader
-        title='Statistics'
+        title='Donation Statistics'
         subheader={
           showLoadingText
             ? 'Loading...'
@@ -343,4 +323,4 @@ const styles = {
   }
 }
 
-export default VideoContentsBarChart
+export default DonationStatisticsBarChart

@@ -13,6 +13,8 @@ export type DashboardData = BaseData & {
     most_followed?: string
     most_liked?: string
     most_download?: string
+    most_favorite?: string
+    most_viewed?: string
     limit?: string
     paginate?: string
     top_donators?: string

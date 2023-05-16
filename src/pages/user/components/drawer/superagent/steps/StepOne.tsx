@@ -224,22 +224,6 @@ const SAStepOne = (
     mutateStepOne(form)
   }
 
-  // const displayErrors = () => {
-  //   const errorElements: any = []
-
-  //   for (const key in responseError) {
-  //     responseError[key].forEach((value: any) => {
-  //       errorElements.push(
-  //         <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
-  //           {value}
-  //         </Typography>
-  //       )
-  //     })
-  //   }
-
-  //   return errorElements
-  // }
-
   return (
     <>
       {!submitted ? (

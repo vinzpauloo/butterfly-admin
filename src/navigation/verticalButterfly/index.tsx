@@ -145,8 +145,8 @@ const Navigation = (): VerticalNavItemsType => {
           path: '/settings'
         },
         {
-          title: 'Feed Features',
-          path: '/settings/pages/feedfeatures'
+          title: 'Featured Feeds',
+          path: '/settings/pages/featuredfeeds'
         },
         {
           title: 'Advertisement',

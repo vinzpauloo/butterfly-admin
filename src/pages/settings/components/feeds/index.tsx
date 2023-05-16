@@ -2,29 +2,28 @@
 import React from 'react'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import CircularProgress from '@mui/material/CircularProgress'
+import { Box, Button, CircularProgress, Grid, InputAdornment, TextField } from '@mui/material'
 
 // ** Step Components
 import FeedList from '@/pages/studio/newsfeed/views/FeedList'
-import TextField from '@mui/material/TextField'
-import InputAdornment from '@mui/material/InputAdornment'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
+// ** Project/Other Imports
+import Translations from '@/layouts/components/Translations'
+import EditNewsFeedDrawer from '@/pages/studio/newsfeed/views/EditNewsFeedDrawer'
+
+// ** TanStack Imports
+import { useInfiniteQuery } from '@tanstack/react-query'
+
 // ** Hooks/Services Imports
-import { useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import FeedsService from '@/services/api/FeedsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 // ** Utils
 import createSkeleton from '@/utils/createSkeleton'
 import { useTranslateString } from '@/utils/TranslateString'
-import Translations from '@/layouts/components/Translations'
-import EditNewsFeedDrawer from '@/pages/studio/newsfeed/views/EditNewsFeedDrawer'
 
 // ** Types
 import { IFeedStory } from '@/context/types'
@@ -65,8 +64,10 @@ type Props = {
 // ** Feeds Params
 const defaultParams = { with: 'user', page: 1, approval: 'Approved' }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SelectFeaturedFeeds = (props: Props) => {
   const { handleError } = useErrorHandling()
+
   // ** States
   const [activeTab, setActiveTab] = React.useState<number>(0)
   const [feedParams, setFeedParams] = React.useState<{}>({ ...defaultParams, story_feeds_only: true })
@@ -84,18 +85,22 @@ const SelectFeaturedFeeds = (props: Props) => {
 
   // ** QueryAPI
   const { getFeeds } = FeedsService()
-  const { isLoading, data, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } = useInfiniteQuery({
+  const { isLoading, data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['getFeeds', feedParams],
     getNextPageParam: (prevData: any) => {
       // TBR any
-      let nextData = prevData.next_page_url
+      const nextData = prevData.next_page_url
       if (nextData == undefined) {
         return undefined
       }
-      let searchParams = new URLSearchParams(nextData.split('?')[1]) // extracts the query string and creates a URLSearchParams object
-      let page = searchParams.get('page') // retrieves the value of the 'page' parameter
-      let myObj = feedParams
-      let nextParams = { ...myObj, page: page }
+
+      // extracts the query string and creates a URLSearchParams object
+      const searchParams = new URLSearchParams(nextData.split('?')[1])
+
+      const page = searchParams.get('page') // retrieves the value of the 'page' parameter
+      const myObj = feedParams
+      const nextParams = { ...myObj, page: page }
+
       return nextParams
     },
     queryFn: ({ pageParam = { ...feedParams } }) => {
@@ -126,17 +131,26 @@ const SelectFeaturedFeeds = (props: Props) => {
   const handleCardClick = (feed: IFeedStory) => {
     console.log('STORE THE CLICKED FEED IN THE FEED GLOBAL STORE', feed)
     setFeed(feed)
-  } 
+  }
 
   const handleSelectFeed = () => {
     toggleFeedModal()
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getActiveTabContent = (step: number) => {
     if (data) {
-      let flatMapDataArray = data.pages.flatMap(data => [data.data])
-      let flatMap = flatMapDataArray.flatMap(data => [...data])
-      return <FeedList data={flatMap} handleFeedItemClick={handleFeedItemClick} editable={false} handleCardClick={handleCardClick} />
+      const flatMapDataArray = data.pages.flatMap(data => [data.data])
+      const flatMap = flatMapDataArray.flatMap(data => [...data])
+
+      return (
+        <FeedList
+          data={flatMap}
+          handleFeedItemClick={handleFeedItemClick}
+          editable={false}
+          handleCardClick={handleCardClick}
+        />
+      )
     }
   }
 
@@ -148,12 +162,13 @@ const SelectFeaturedFeeds = (props: Props) => {
 
   return (
     <Box sx={{ marginInline: 'auto', marginTop: '2rem', paddingBottom: '4rem', alignItems: 'center' }}>
-      
-      <Box sx={{mb:10}}>
+      <Box sx={{ mb: 10 }}>
         <form>
-          <Box sx={{ display:'flex', flexDirection:'row', justifyContent:'space-between' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
             <TextField required label='Featured Feed Title' />
-            <Button sx={{minWidth : 100}} color='success' size='small' variant='contained' onClick={ handleSelectFeed }>Save</Button>
+            <Button sx={{ minWidth: 100 }} color='success' size='small' variant='contained' onClick={handleSelectFeed}>
+              Save
+            </Button>
           </Box>
         </form>
       </Box>

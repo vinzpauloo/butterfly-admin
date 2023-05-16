@@ -1,3 +1,4 @@
+// ** React Imports
 import React from 'react'
 
 // ** MUI Imports
@@ -17,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks/Services
 import { PaymentService } from '@/services/api/PaymentService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 type StepOneProps = {
   toggle: () => void
@@ -44,23 +46,16 @@ interface FormValues {
 const schema = yup.object().shape({})
 
 const SAStepThree = (
-  {
-    resetKey,
-    responseError,
-    setResponseError,
-    setFileName,
-    setSiteID,
-    handleNext,
-    setIsLoading,
-    siteID,
-    handleClose
-  }: StepOneProps,
+  { resetKey, setFileName, setSiteID, handleNext, setIsLoading, siteID, handleClose }: StepOneProps,
   ref: any
 ) => {
   const queryClient = useQueryClient()
 
   // ** State
   const [submitted, setSubmitted] = React.useState<boolean>()
+
+  // ** Error Handling Hook
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   const {
     control,
@@ -90,11 +85,13 @@ const SAStepThree = (
     onSuccess: response => {
       console.log('mutateStepThree onSuccess response', response)
       setSiteID(response?.partner?.site?.id)
+      setIsLoading(true)
+      setSubmitted(true)
 
       setTimeout(() => {
         resetForm()
         setFileName('')
-        setResponseError({})
+        clearErrorResponse()
         setIsLoading(false)
         handleNext()
 
@@ -107,9 +104,8 @@ const SAStepThree = (
       console.log('mutateStepThree onSettled response', response)
       setIsLoading(false)
     },
-    onError: error => {
-      console.log('mutateStepThree onError response', error)
-      alert(error)
+    onError: (e: any) => {
+      handleError(e, `createUser() StepThree.tsx Super Agent`)
     }
   })
 
@@ -146,33 +142,7 @@ const SAStepThree = (
       data: formData
     }
 
-    setIsLoading(true)
-    setSubmitted(true)
     mutateStepThree(form)
-
-    try {
-    } catch (e: any) {
-      const {
-        data: { error }
-      } = e
-      setResponseError(error)
-    }
-  }
-
-  const displayErrors = () => {
-    const errorElements: any = []
-
-    for (const key in responseError) {
-      responseError[key].forEach((value: any) => {
-        errorElements.push(
-          <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
-            {value}
-          </Typography>
-        )
-      })
-    }
-
-    return errorElements
   }
 
   return (
@@ -261,7 +231,9 @@ const SAStepThree = (
                 />
               </Box>
 
-              {displayErrors()}
+              {/* Error messages from backend */}
+              {getErrorResponse(12)}
+
               <Box sx={styles.formButtonContainer}>
                 <Box>
                   <Button sx={styles.cancelButton} onClick={handleClose}>
