@@ -23,6 +23,7 @@ interface Props {
   titleValue: string
   onTitleChange: (e: ChangeEvent) => void
   toggleFeedModal: () => void
+  search: string
 }
 
 const FeaturedFeedsToolbar = (props: Props) => {

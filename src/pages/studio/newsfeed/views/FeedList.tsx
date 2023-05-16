@@ -2,9 +2,7 @@
 import React from 'react'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
+import { Box, Grid, Typography } from '@mui/material'
 
 // ** Custom Components
 import FeedCard from '../../shared-component/feed/FeedCard'
@@ -23,6 +21,7 @@ import NoPostsFound from './NoPostsFound'
 
 // ** Base Links
 import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+import { useFeaturedFeedStore } from '@/zustand/featuredFeedGlobalStore'
 
 type StoryProps = {
   data?: any
@@ -31,10 +30,9 @@ type StoryProps = {
   handleCardClick?: (story: IFeedStory) => void
 }
 
-const FeedList = ({ data, handleFeedItemClick, editable = false, handleCardClick }: StoryProps) => {
-  const [selectedFeed, setSelectedFeed] = React.useState<string | null>(null)
-
-  console.log(`SELECTED FEED`, selectedFeed)
+const FeedList = ({ data, editable = false }: StoryProps) => {
+  const { selectedFeed } = useFeaturedFeedStore()
+  const handleSelectSpecificFeed = useFeaturedFeedStore(state => state.handleSelectSpecificFeed)
 
   if (data?.length == 0) {
     return <NoPostsFound />
@@ -48,7 +46,7 @@ const FeedList = ({ data, handleFeedItemClick, editable = false, handleCardClick
         <Grid container spacing={10}>
           {stories &&
             stories?.map((story: IFeedStory) => (
-              <Grid key={story._id} item sm={6} onClick={() => setSelectedFeed(story._id)}>
+              <Grid key={story._id} item sm={6} onClick={() => handleSelectSpecificFeed(story._id, story.string_story)}>
                 <FeedCard
                   _id={story._id}
                   datePublished={formatDate(story.created_at)}

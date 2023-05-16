@@ -47,6 +47,20 @@ interface IUpdateFeedParams {
   }
 }
 
+interface FeaturedFeedsParams {
+  site_id?: string
+  search?: string
+  featured_id?: string
+  active?: string
+}
+
+interface PostFeaturedFeedsProps {
+  title: string,
+  description: string,
+  feed_id: string,
+  active?: string
+}
+
 const FeedsService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
@@ -118,7 +132,47 @@ const FeedsService = () => {
 
   }
 
-  return { uploadFeed, getFeeds, approveNewsFeedContent, getFeedsByCC, updateFeedViaID }
+  const getFeaturedFeeds = (params: FeaturedFeedsParams) => {
+
+    return request({
+      headers: {
+        ...getHeaders(),
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `admin/feature/feeds`,
+      method: 'GET',
+      params: params
+    })
+  }
+
+  const postFeaturedFeeds = ({data, params}: {data: PostFeaturedFeedsProps, params: FeaturedFeedsParams}) => {
+
+    return request({
+      headers: {
+        ...getHeaders(),
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `admin/feature/feeds`,
+      method: 'POST',
+      data: data,
+      params: params
+    })
+  }
+
+  const deleteFeaturedFeeds = (params:FeaturedFeedsParams) => {
+
+    return request({
+      headers: {
+        ...getHeaders(),
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `admin/feature/feeds`,
+      method: 'DELETE',
+      params: params
+    })
+  }
+
+  return { uploadFeed, getFeeds, approveNewsFeedContent, getFeedsByCC, updateFeedViaID, getFeaturedFeeds, postFeaturedFeeds, deleteFeaturedFeeds }
 }
 
 export default FeedsService
