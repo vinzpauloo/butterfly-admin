@@ -85,7 +85,7 @@ export const FeaturedFeedsColumns = () => {
 
         return (
           <Box>
-            <ToggleButton />
+            <ToggleAction featured_id={params?.row.featured_id} value={params?.row.active} />
             <Button onClick={() => handleDeleteFeaturedFeed()}>
               <DeleteOutlineIcon color='secondary' />
             </Button>
@@ -96,4 +96,50 @@ export const FeaturedFeedsColumns = () => {
   ]
 
   return { columns }
+}
+
+interface ToggleActionProps {
+  value?: string | boolean
+  featured_id?: string
+}
+
+function useToggleAction({ value, featured_id }: ToggleActionProps) {
+  const queryClient = useQueryClient()
+  const { toggleFeaturedFeeds } = FeedsService()
+  const { selectedSite } = useFeaturedFeedStore()
+  const { handleError } = useErrorHandling()
+
+  const { mutate: mutateEditFeaturedFeeds } = useMutation(toggleFeaturedFeeds, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['featuredFeeds'])
+    },
+    onError: (e: any) => {
+      handleError(e, `toggleFeaturedFeeds() FeaturedFeedsColumns.tsx`)
+    }
+  })
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleToggle = async (newValue: boolean) => {
+    // Determine the new status
+    const newStatus = value === true ? false : true
+
+    await mutateEditFeaturedFeeds({
+      data: {
+        _method: 'put',
+        active: newStatus
+      },
+      params: {
+        site_id: selectedSite,
+        featured_id: featured_id
+      }
+    })
+  }
+
+  return handleToggle
+}
+
+function ToggleAction({ value, featured_id }: ToggleActionProps) {
+  const handleToggle = useToggleAction({ value, featured_id })
+
+  return <ToggleButton checked={value === true} onToggle={newValue => handleToggle(newValue)} />
 }

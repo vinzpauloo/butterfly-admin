@@ -55,10 +55,11 @@ interface FeaturedFeedsParams {
 }
 
 interface PostFeaturedFeedsProps {
-  title: string,
-  description: string,
-  feed_id: string,
-  active?: string
+  title?: string,
+  description?: string,
+  feed_id?: string,
+  active?: string | boolean
+  _method?: string
 }
 
 const FeedsService = () => {
@@ -172,7 +173,23 @@ const FeedsService = () => {
     })
   }
 
-  return { uploadFeed, getFeeds, approveNewsFeedContent, getFeedsByCC, updateFeedViaID, getFeaturedFeeds, postFeaturedFeeds, deleteFeaturedFeeds }
+  const toggleFeaturedFeeds = ({data,params}:{data: PostFeaturedFeedsProps, params: FeaturedFeedsParams}) => {
+
+    return request({
+      headers: {
+        ...getHeaders(),
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `admin/feature/feeds`,
+      'Content-Type': 'multipart/form-data',
+      method: 'POST',
+      data: data,
+      params: params
+      
+    })
+  }
+
+  return { uploadFeed, getFeeds, approveNewsFeedContent, getFeedsByCC, updateFeedViaID, getFeaturedFeeds, postFeaturedFeeds, deleteFeaturedFeeds, toggleFeaturedFeeds }
 }
 
 export default FeedsService
