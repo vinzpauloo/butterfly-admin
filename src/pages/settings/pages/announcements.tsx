@@ -45,7 +45,13 @@ const Announcements = () => {
   const { getAllAnnouncement, updateAnnouncement, deleteAnnouncement } = AnnouncementsService()
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['allAnnouncement'],
-    queryFn: () => getAllAnnouncement({ data: {} }),
+    queryFn: () =>
+      getAllAnnouncement({
+        data: {
+          sort: 'desc',
+          sort_by: 'created_at'
+        }
+      }),
     onSuccess: data => {
       setData(data?.data)
     },
