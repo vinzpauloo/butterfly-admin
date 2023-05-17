@@ -1,6 +1,9 @@
 // ** React imports
 import React from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
 import { Box, Grid, Typography } from '@mui/material'
 
@@ -30,9 +33,11 @@ type StoryProps = {
   handleCardClick?: (story: IFeedStory) => void
 }
 
-const FeedList = ({ data, editable = false }: StoryProps) => {
+const FeedList = ({ data, editable = false, handleFeedItemClick }: StoryProps) => {
   const { selectedFeed } = useFeaturedFeedStore()
   const handleSelectSpecificFeed = useFeaturedFeedStore(state => state.handleSelectSpecificFeed)
+  const router = useRouter()
+  const currentLocation = router.asPath
 
   if (data?.length == 0) {
     return <NoPostsFound />
@@ -53,7 +58,15 @@ const FeedList = ({ data, editable = false }: StoryProps) => {
                   string_story={story.string_story}
                   {...(story.user && { user: story.user })}
                   editable={editable}
-                  selected={selectedFeed === story._id ? true : false}
+                  selected={
+                    currentLocation === '/settings/pages/featuredfeeds/' && selectedFeed === story._id ? true : false
+                  }
+                  handleEditButtonClick={
+                    currentLocation === '/studio/newsfeed/' && handleFeedItemClick
+                      ? () => handleFeedItemClick(story)
+                      : // eslint-disable-next-line @typescript-eslint/no-empty-function
+                        () => {}
+                  }
                 >
                   {story && story?.tags && (
                     <FeedAttachments>

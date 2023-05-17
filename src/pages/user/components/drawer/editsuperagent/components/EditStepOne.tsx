@@ -1,13 +1,11 @@
 // ** React Imports
 import { useRef, useState, useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 
 // ** MUI Imports
 import { Box, Button, TextField, Typography, MenuItem, InputAdornment } from '@mui/material'
 
-// ** Third Party Imports
-import { Controller, useForm } from 'react-hook-form'
-
-// ** Other Imports
+// ** Project/Other Imports
 import CreatedSuccessful from '../../../form/CreatedSuccessful'
 
 // ** TanStack Query
@@ -18,6 +16,9 @@ import { UserTableService } from '@/services/api/UserTableService'
 
 // ** Zustand Imports
 import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
+
+// ** Lib Imports
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 interface FormValues {
   [key: string]: string | number | File | null
@@ -483,7 +484,9 @@ const EditStepOne = (props: SidebarAddUserType) => {
               </Box>
 
               <Box sx={styles.fullWidth}>
-                {siteData[0]?.logo && <img width={340} height={300} src={siteData[0]?.logo} alt='Super Agent Logo' />}
+                {siteData[0]?.logo && (
+                  <img width={265} height={250} src={FILE_SERVER_URL + siteData[0]?.logo} alt='Super Agent Logo' />
+                )}
                 <Controller
                   name='logo'
                   control={control}

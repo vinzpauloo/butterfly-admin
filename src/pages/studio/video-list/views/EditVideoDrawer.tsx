@@ -32,12 +32,20 @@ import { CircularProgress } from '@mui/material'
 import { useTranslateString } from '@/utils/TranslateString'
 
 // ** BASE APIS Import
-import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+
+interface StreamType {
+  ready_to_stream: boolean
+}
+
+interface RowType {
+  trial?: StreamType
+}
 
 interface SidebarEditVideoType {
   open: boolean
   toggle: () => void
-  row: IVideoRow
+  row: IVideoRow & RowType
 }
 
 interface UserData {
@@ -50,7 +58,7 @@ interface UserData {
   groups?: string[]
 }
 
-const VideoBox = styled(Box)(({ theme }) => ({
+const VideoBox = styled(Box)(({}) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
   gap: '.5rem',
@@ -100,10 +108,8 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
   // ** React Hook Form
   const {
     getValues,
-    reset,
     resetField,
     register,
-    control,
     setValue,
     handleSubmit,
     watch,
@@ -137,8 +143,8 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.code == 'Enter') {
       // handle add to Chip
-      let tagWord = (e.target as HTMLInputElement).value as string
-      let hasDuplicate = watch('tags')?.includes(tagWord)
+      const tagWord = (e.target as HTMLInputElement).value as string
+      const hasDuplicate = watch('tags')?.includes(tagWord)
 
       if (hasDuplicate || tagWord == '') {
         //handle Errors
@@ -146,11 +152,13 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
         setError('tags', { type: 'custom', message: 'Tag cannot empty or duplicate' })
         e.preventDefault()
       } else {
-        let insertTagArray = [tagWord]
-        let newTagsArray =
+        const insertTagArray = [tagWord]
+        const newTagsArray =
           getValues('tags') == undefined ? [...insertTagArray] : [...getValues('tags'), ...insertTagArray]
+
         //setTags(newTagsArray as [])
         setValue('tags', newTagsArray)
+
         //reset multiTags
         resetField('tagTextField')
         e.preventDefault()
@@ -160,10 +168,10 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
 
   const TranslateString = useTranslateString()
 
-  console.log(`TEST ROW`, row?.trial)
+  console.log(`TRIAL READY TO STREAM`, row?.trial)
 
   const handleTagDelete = (tag: string) => {
-    let filteredTags = getValues('tags')?.filter(e => e !== tag)
+    const filteredTags = getValues('tags')?.filter(e => e !== tag)
     setValue('tags', filteredTags as [])
   }
 
@@ -196,7 +204,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
           </IconButton>
         </Header>
         <Box>
-          {row && row?.trial ? (
+          {row && row?.trial.ready_to_stream === true ? (
             <VideoBox>
               <ReactPlayer
                 className='reactPlayer'
@@ -269,7 +277,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 rowGap={2}
               >
                 {watch('tags') &&
-                  getValues('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
+                  getValues('tags').map(tag => <Chip key={tag} label={tag} onDelete={() => handleTagDelete(tag)} />)}
               </Stack>
             </FormControl>
 
