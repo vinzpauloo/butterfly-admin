@@ -26,8 +26,8 @@ type ExpandoFormProps = {
   fileType: string
   handleExpandoSubmit?: (data: FormInputs) => void
   isLoading?: boolean
-  disableSaveButton? : boolean
-  getData? : () => any
+  disableSaveButton?: boolean
+  getData?: () => any
 }
 
 type FormInputs = {
@@ -36,12 +36,25 @@ type FormInputs = {
   }[]
 }
 
-const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = false, disableSaveButton = false, getData }: ExpandoFormProps, ref : any) => {
-
+const ExpandoForm = (
+  {
+    pageHeader,
+    fileType,
+    handleExpandoSubmit,
+    isLoading = false,
+    disableSaveButton = false,
+    getData
+  }: ExpandoFormProps,
+  ref: any
+) => {
   // forward to parent the resetForm function by calling reset
-  React.useImperativeHandle(ref, () => {
-    return { getFormData : () => getFormData() }
-  }, [])
+  React.useImperativeHandle(
+    ref,
+    () => {
+      return { getFormData: () => getFormData() }
+    },
+    []
+  )
 
   // ** UseForm
   const {
@@ -91,24 +104,32 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
             <Grid className='expandoGrid' container spacing={5}>
               {fields.map((field, index) => (
                 <Grid key={field.id} item xs={12}>
-                  <FormControl 
-                    
-                    fullWidth
-                  >
+                  <FormControl fullWidth>
                     <OutlinedInput
                       className='expandoInput'
-                      {...register(`expando.${index}.value`, {required : true})} 
+                      {...register(`expando.${index}.value`, { required: true })}
                       error={Boolean(errors.expando)}
                       placeholder={`Option ${index + 1}`}
+                      defaultValue={`TEST`}
                       type={fileType}
                       endAdornment={
                         index >= 3 ? (
                           <InputAdornment position='end'>
-                            <IconButton edge='end' onClick={() => { remove(index) }} onMouseDown={() => { remove(index) }}>
+                            <IconButton
+                              edge='end'
+                              onClick={() => {
+                                remove(index)
+                              }}
+                              onMouseDown={() => {
+                                remove(index)
+                              }}
+                            >
                               <Icon color='red' icon='mdi:close' />
                             </IconButton>
                           </InputAdornment>
-                        ) : <></>
+                        ) : (
+                          <></>
+                        )
                       }
                     />
                   </FormControl>
@@ -126,13 +147,11 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
                   >
                     Add More
                   </Button>
-                  {
-                    !disableSaveButton && 
+                  {!disableSaveButton && (
                     <Button disabled={isLoading ? true : false} type='submit' variant='contained' color='primary'>
-                    {isLoading ? <CircularProgress size={12} sx={{ mr: 2 }} /> : null} Save
-                  </Button>
-                  }
-                  
+                      {isLoading ? <CircularProgress size={12} sx={{ mr: 2 }} /> : null} Save
+                    </Button>
+                  )}
                 </Box>
               </Grid>
             </Grid>

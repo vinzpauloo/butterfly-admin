@@ -203,6 +203,7 @@ const EditStepThree = (props: ToggleProps) => {
                       value={field.value || siteData[0]?.yuanhua_member_id}
                       onChange={field.onChange}
                       name='merchant_id'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />
@@ -221,6 +222,7 @@ const EditStepThree = (props: ToggleProps) => {
                       value={field.value || rsaData?.yuanhua_md5_key}
                       onChange={field.onChange}
                       name='key'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />
@@ -241,6 +243,7 @@ const EditStepThree = (props: ToggleProps) => {
                       value={field.value || rsaData?.yuanhua_rsa_private}
                       onChange={field.onChange}
                       name='rsa_private'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />
@@ -261,6 +264,7 @@ const EditStepThree = (props: ToggleProps) => {
                       value={field.value || rsaData?.yuanhua_rsa_public}
                       onChange={field.onChange}
                       name='rsa_public'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />

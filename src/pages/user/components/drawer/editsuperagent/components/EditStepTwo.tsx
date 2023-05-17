@@ -8,7 +8,7 @@ import { Box, Button, Typography } from '@mui/material'
 import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
 
 // ** API queries
-import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import FQDNService from '@/services/api/FQDNService'
 
 // ** Zustand Imports
@@ -25,7 +25,7 @@ export type FQDNData = {
 
 const EditStepTwo = (props: SidebarAddUserType) => {
   // ** Tanstack and services
-  const { addFQDN } = FQDNService()
+  const { addFQDN, getSuperAgentFQDNList } = FQDNService()
   const queryClient = useQueryClient()
   const fqdnM = useMutation({
     mutationFn: addFQDN,
@@ -37,13 +37,34 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     }
   })
 
+  interface FQDNProps {
+    Api: []
+    Photo: []
+    Streaming: []
+  }
+
+  const [fqdnList, setFqdnList] = React.useState<FQDNProps>()
+
+  useQuery({
+    queryKey: [`editSuperAgentStepTwoFQDN`],
+    queryFn: () =>
+      getSuperAgentFQDNList({
+        site: siteData[0]?.id
+      }),
+    onSuccess: data => {
+      setFqdnList(data)
+    }
+  })
+
+  console.log(fqdnList?.Api)
+
   const { siteData } = editSuperAgentStore()
 
   const { data } = props
-  console.log(`PROPS DATA`, data)
 
-  console.log(`STEP 2 SITE DATA`, siteData[0])
-  console.log(`STEP 2 Site Data ID`, siteData[0]?.id)
+  // console.log(`PROPS DATA`, data)
+  // console.log(`STEP 2 SITE DATA`, siteData[0])
+  // console.log(`STEP 2 Site Data ID`, siteData[0]?.id)
 
   // ** State
   const [isLoading] = React.useState<boolean>(false)
@@ -84,10 +105,8 @@ const EditStepTwo = (props: SidebarAddUserType) => {
   }
 
   const handleSubmit = async () => {
-
     // TODO ** edit fqdns waiting for api changes
     return
-
   }
 
   return (
@@ -111,13 +130,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
         }
       }}
     >
-      <ExpandoForm
-        ref={formAPIRef}
-        fileType='text'
-        pageHeader="API's"
-        isLoading={isLoading}
-        disableSaveButton={true}
-      />
+      <ExpandoForm ref={formAPIRef} fileType='text' pageHeader="API's" isLoading={isLoading} disableSaveButton={true} />
       <ExpandoForm
         ref={formStreamRef}
         fileType='text'

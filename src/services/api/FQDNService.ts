@@ -62,9 +62,8 @@ const FQDNService = () => {
         ...getHeaders(),
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/server-lists',
+      url: `admin/sites/${params.site}/fqdn`,
       method: 'GET',
-      params: params
     })
   }
 
