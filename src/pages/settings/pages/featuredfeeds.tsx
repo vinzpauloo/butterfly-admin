@@ -74,8 +74,6 @@ const FeaturedFeeds = () => {
         loading={isLoading || isRefetching}
         checkboxSelection={false}
         disableSelectionOnClick
-        paginationMode='server'
-        sortingMode='server'
         autoHeight
         rows={rowData ?? []}
         getRowId={(row: any) => row?.featured_id}

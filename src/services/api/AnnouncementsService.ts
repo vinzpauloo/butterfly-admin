@@ -16,6 +16,8 @@ interface IAnnouncementParams {
     _method?: "put"
     active?: 0 | 1
     exclude?: number
+    sort?: string
+    sort_by?: string
   }
   token?: string
 }
