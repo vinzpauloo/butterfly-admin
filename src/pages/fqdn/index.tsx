@@ -58,9 +58,9 @@ const FQDN = () => {
 
   const saveChanges = () => {
     setHasGetDone(false)
-    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Api' }))
-    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Photo' }))
-    const streamingArray = formStreamRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Streaming' }))
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'api' }))
+    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'photo' }))
+    const streamingArray = formStreamRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'streaming' }))
 
     mutate({
       siteId: auth?.user?.site,
