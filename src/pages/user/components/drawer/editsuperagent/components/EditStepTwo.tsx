@@ -84,7 +84,9 @@ const EditStepTwo = (props: SidebarAddUserType) => {
   // ** Used to set default values for Expando Forms
   const apiDefaultValues = fqdnList?.API
     ? fqdnList.API.map(value => ({ value }))
-    : fqdnList?.Api?.map(value => ({ value })) || []
+    : fqdnList?.Api
+    ? fqdnList.Api.map(value => ({ value }))
+    : []
   const streamDefaultValues = fqdnList?.Streaming.map(value => ({ value })) || []
   const photoDefaultValues = fqdnList?.Photo.map(value => ({ value })) || []
 
@@ -183,7 +185,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
             }
           }}
         >
-          {fqdnList?.API && (
+          {fqdnList?.Api ? (
             <ExpandoForm
               ref={formAPIRef}
               fileType='text'
@@ -192,6 +194,17 @@ const EditStepTwo = (props: SidebarAddUserType) => {
               disableSaveButton={true}
               defaultValues={{ expando: apiDefaultValues }}
             />
+          ) : fqdnList?.API ? (
+            <ExpandoForm
+              ref={formAPIRef}
+              fileType='text'
+              pageHeader="API's"
+              isLoading={isLoading}
+              disableSaveButton={true}
+              defaultValues={{ expando: apiDefaultValues }}
+            />
+          ) : (
+            false
           )}
           {fqdnList?.Streaming && (
             <ExpandoForm
