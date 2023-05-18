@@ -25,17 +25,16 @@ interface SidebarAddUserType {
 }
 
 interface FQDNProps {
-  Api: []
-  API: []
-  Photo: []
-  Streaming: []
+  api: []
+  photo: []
+  streaming: []
 }
 
 export type FQDNData = {
   name: string
   values: [{ value: string }]
   site: number
-  fqdns: { name?: string; type?: 'Api' | 'Streaming' | 'Photo' }[]
+  fqdns: { name?: string; type?: 'api' | 'streaming' | 'photo' }[]
 }
 
 const EditStepTwo = (props: SidebarAddUserType) => {
@@ -82,13 +81,9 @@ const EditStepTwo = (props: SidebarAddUserType) => {
   })
 
   // ** Used to set default values for Expando Forms
-  const apiDefaultValues = fqdnList?.API
-    ? fqdnList.API.map(value => ({ value }))
-    : fqdnList?.Api
-    ? fqdnList.Api.map(value => ({ value }))
-    : []
-  const streamDefaultValues = fqdnList?.Streaming.map(value => ({ value })) || []
-  const photoDefaultValues = fqdnList?.Photo.map(value => ({ value })) || []
+  const apiDefaultValues = fqdnList?.api.map(value => ({ value })) || []
+  const streamDefaultValues = fqdnList?.streaming.map(value => ({ value })) || []
+  const photoDefaultValues = fqdnList?.photo.map(value => ({ value })) || []
 
   // References
   const formAPIRef = React.useRef<any>()
@@ -121,11 +116,11 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     }
 
     // structure
-    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'API' }))
-    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Photo' }))
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'api' }))
+    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'photo' }))
     const streamingArray = formStreamRef.current
       .getFormData()
-      .map((name: any) => ({ name: name.value, type: 'Streaming' }))
+      .map((name: any) => ({ name: name.value, type: 'streaming' }))
     const fqdnsObject = { fqdns: [...apiArray, ...photoArray, ...streamingArray] }
 
     console.log('START SUBMIT fqdnsObject', fqdnsObject)
@@ -185,7 +180,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
             }
           }}
         >
-          {fqdnList?.Api ? (
+          {fqdnList?.api && (
             <ExpandoForm
               ref={formAPIRef}
               fileType='text'
@@ -194,19 +189,8 @@ const EditStepTwo = (props: SidebarAddUserType) => {
               disableSaveButton={true}
               defaultValues={{ expando: apiDefaultValues }}
             />
-          ) : fqdnList?.API ? (
-            <ExpandoForm
-              ref={formAPIRef}
-              fileType='text'
-              pageHeader="API's"
-              isLoading={isLoading}
-              disableSaveButton={true}
-              defaultValues={{ expando: apiDefaultValues }}
-            />
-          ) : (
-            false
           )}
-          {fqdnList?.Streaming && (
+          {fqdnList?.streaming && (
             <ExpandoForm
               ref={formStreamRef}
               fileType='text'
@@ -216,7 +200,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
               defaultValues={{ expando: streamDefaultValues }}
             />
           )}
-          {fqdnList?.Photo && (
+          {fqdnList?.photo && (
             <ExpandoForm
               ref={formPhotosRef}
               fileType='text'

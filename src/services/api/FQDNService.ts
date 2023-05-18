@@ -15,7 +15,7 @@ interface IAddFQDNParams {
   siteId? : number,
   data?: {
     site?: number,
-    fqdns?: {name?: string, type?: 'Api' | 'Streaming' | 'Photo'}[]
+    fqdns?: {name?: string, type?: 'api' | 'streaming' | 'photo'}[]
   }
 }
 

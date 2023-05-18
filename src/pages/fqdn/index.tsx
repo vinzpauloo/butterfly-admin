@@ -19,7 +19,7 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)({
 
 type postObject = {
   name: string
-  type: 'Api' | 'Photo' | 'Streaming'
+  type: 'api' | 'photo' | 'streaming'
 }
 
 const FQDN = () => {
@@ -36,17 +36,20 @@ const FQDN = () => {
 
   const { getSuperAgentFQDNList, addFQDN } = FQDNService()
   const { isLoading } = useQuery({
-    queryKey : ['fqdns'],
-    queryFn: () => getSuperAgentFQDNList({
-      site: auth?.user?.site,
-     }),
+    queryKey: ['fqdns'],
+    queryFn: () =>
+      getSuperAgentFQDNList({
+        site: auth?.user?.site
+      }),
     onSuccess: data => {
       console.log(data?.data)
       setAPIFQDNS(data?.Api)
       setStreamingFQDNS(data?.Streaming)
       setPhotoFQDNS(data?.Photo)
     },
-    onError: error => { console.log(error) }
+    onError: error => {
+      console.log(error)
+    }
   })
 
   const queryClient = useQueryClient()
@@ -58,20 +61,22 @@ const FQDN = () => {
       setNewStreamingFQDNS([])
       queryClient.invalidateQueries({ queryKey: ['fqdns'] })
     },
-    onError: error => { console.log(error) },
-  },)
+    onError: error => {
+      console.log(error)
+    }
+  })
 
   const saveChanges = () => {
     const AllAPIFQDNS: postObject[] = APIFQDNS.concat(newAPIFQDNS).map(item => {
-      return { name: item, type: 'Api' }
+      return { name: item, type: 'api' }
     })
 
     const AllphotoFQDNS: postObject[] = photoFQDNS.concat(newPhotoFQDNS).map(item => {
-      return { name: item, type: 'Photo' }
+      return { name: item, type: 'photo' }
     })
 
     const AllstreamingFQDNS: postObject[] = streamingFQDNS.concat(newStreamingFQDNS).map(item => {
-      return { name: item, type: 'Streaming' }
+      return { name: item, type: 'streaming' }
     })
 
     mutate({
@@ -88,19 +93,33 @@ const FQDN = () => {
       <Grid maxWidth='sm' container spacing={6}>
         <PageHeader title={<Typography variant='h5'>FQDN</Typography>} />
         <Grid item xs={12}>
-          <Button variant='outlined' onClick={saveChanges}>Save Changes</Button>
+          <Button variant='outlined' onClick={saveChanges}>
+            Save Changes
+          </Button>
           <Stack gap={20}>
-            <LinksContainer type='Api' isLoading={isLoading || updateLoading}
-              data={APIFQDNS} dataSetter={setAPIFQDNS}
-              newData={newAPIFQDNS} newDataSetter={setNewAPIFQDNS}
+            <LinksContainer
+              type='Api'
+              isLoading={isLoading || updateLoading}
+              data={APIFQDNS}
+              dataSetter={setAPIFQDNS}
+              newData={newAPIFQDNS}
+              newDataSetter={setNewAPIFQDNS}
             />
-            <LinksContainer type='Photo' isLoading={isLoading || updateLoading}
-              data={photoFQDNS} dataSetter={setPhotoFQDNS}
-              newData={newPhotoFQDNS} newDataSetter={setNewPhotoFQDNS}
+            <LinksContainer
+              type='Photo'
+              isLoading={isLoading || updateLoading}
+              data={photoFQDNS}
+              dataSetter={setPhotoFQDNS}
+              newData={newPhotoFQDNS}
+              newDataSetter={setNewPhotoFQDNS}
             />
-            <LinksContainer type='Streaming' isLoading={isLoading || updateLoading}
-              data={streamingFQDNS} dataSetter={setStreamingFQDNS}
-              newData={newStreamingFQDNS} newDataSetter={setNewStreamingFQDNS}
+            <LinksContainer
+              type='Streaming'
+              isLoading={isLoading || updateLoading}
+              data={streamingFQDNS}
+              dataSetter={setStreamingFQDNS}
+              newData={newStreamingFQDNS}
+              newDataSetter={setNewStreamingFQDNS}
             />
           </Stack>
         </Grid>

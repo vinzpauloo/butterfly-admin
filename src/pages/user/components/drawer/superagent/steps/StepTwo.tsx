@@ -24,7 +24,7 @@ type SAStepTwoProps = {
 
 export type FQDNData = {
   site: number
-  fqdns: { name?: string; type?: 'Api' | 'Streaming' | 'Photo' }[]
+  fqdns: { name?: string; type?: 'api' | 'streaming' | 'photo' }[]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -79,11 +79,11 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
     }
 
     // structure
-    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Api' }))
-    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Photo' }))
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'api' }))
+    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'photo' }))
     const streamingArray = formStreamRef.current
       .getFormData()
-      .map((name: any) => ({ name: name.value, type: 'Streaming' }))
+      .map((name: any) => ({ name: name.value, type: 'streaming' }))
     const fqdnsObject = { fqdns: [...apiArray, ...photoArray, ...streamingArray] }
 
     console.log('START SUBMIT fqdnsObject', fqdnsObject)
