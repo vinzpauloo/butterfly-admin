@@ -19,13 +19,12 @@ export const SuperAgentColumns = () => {
   }))
 
   return [
-    { sortable: false, field: 'username', headerName: 'Super Agent', width: 200 },
+    { field: 'username', headerName: 'Super Agent', width: 200 },
 
     // { field: 'SiteName', headerName: 'Site Name', width: 250 },
-    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 210 },
-    { sortable: false, field: 'email', headerName: 'Email', width: 250 },
+    { field: 'mobile', headerName: 'Mobile Number', width: 210 },
+    { field: 'email', headerName: 'Email', width: 250 },
     {
-      sortable: false,
       field: 'created_at',
       headerName: 'Date Created',
       width: 285,
@@ -34,7 +33,6 @@ export const SuperAgentColumns = () => {
       }
     },
     {
-      sortable: false,
       field: 'updated_at',
       headerName: 'Last Log In',
       width: 285,
@@ -45,7 +43,6 @@ export const SuperAgentColumns = () => {
 
     // { field: 'SecurityFunds', headerName: 'Security Funds', width: 250 },
     {
-      sortable: false,
       field: 'status',
       headerName: 'Action',
       width: 135,

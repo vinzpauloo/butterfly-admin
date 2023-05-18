@@ -3,7 +3,7 @@ import React, { useEffect, ChangeEvent } from 'react'
 
 // ** MUI Imports
 import { Box, Card, Grid, Tab } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
@@ -197,12 +197,21 @@ const UserTable = () => {
     ]
   })
 
+  const handleSortModel = (newModel: GridSortModel) => {
+    if (newModel.length) {
+      setSort(newModel[0].sort)
+      setSortName(newModel[0].field)
+    } else {
+      setSort('asc')
+      setSortName('username')
+    }
+  }
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <UserTabs />
-
           <DataGrid
             page={activeTab === 'SUPERVISOR' ? supervisorPage - 1 : activeTab === 'SA' ? saPage - 1 : ccPage - 1}
             disableColumnMenu
@@ -211,6 +220,7 @@ const UserTable = () => {
             disableSelectionOnClick
             paginationMode='server'
             sortingMode='server'
+            onSortModelChange={handleSortModel}
             autoHeight
             rows={rowData ?? []}
             columns={filteredColumns}

@@ -20,7 +20,6 @@ export const OperatorColumns = () => {
 
   return [
     {
-      sortable: false,
       field: 'role',
       headerName: 'Role',
       width: 150,
@@ -28,11 +27,10 @@ export const OperatorColumns = () => {
         return params?.row.role ? params?.row.role.name : ''
       }
     },
-    { sortable: false, field: 'username', headerName: 'User Profile', width: 180 },
-    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 150 },
-    { sortable: false, field: 'email', headerName: 'Email', width: 250 },
+    { field: 'username', headerName: 'User Profile', width: 180 },
+    { field: 'mobile', headerName: 'Mobile Number', width: 150 },
+    { field: 'email', headerName: 'Email', width: 250 },
     {
-      sortable: false,
       field: 'created_at',
       headerName: 'Date Created',
       width: 250,
@@ -41,7 +39,6 @@ export const OperatorColumns = () => {
       }
     },
     {
-      sortable: false,
       field: 'updated_at',
       headerName: 'Last Log In',
       width: 250,
@@ -50,7 +47,6 @@ export const OperatorColumns = () => {
       }
     },
     {
-      sortable: false,
       field: 'status',
       headerName: 'Action',
       width: 135,
