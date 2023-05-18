@@ -15,7 +15,7 @@ import Chip from '@mui/material/Chip'
 import Autocomplete from '@mui/material/Autocomplete'
 
 // ** Third Party Imports
-import { useForm, Controller} from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import ReactPlayer from 'react-player'
 import toast from 'react-hot-toast'
 
@@ -30,10 +30,11 @@ import VideoService from '@/services/api/VideoService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircularProgress } from '@mui/material'
 
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Base Links
 import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+import FeedsService from '@/services/api/FeedsService'
 
 interface SidebarEditType {
   open: boolean
@@ -82,21 +83,39 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
     setError,
     formState: { errors, isValid, isSubmitted, isDirty }
   } = useForm<IFeedStory>({
-    defaultValues : row,
-    mode : 'onChange'
+    defaultValues: row,
+    mode: 'onChange'
   })
 
   // States
-  const [ tagArrayState, setTagArrayState ] = React.useState<string[]>([])
-  const [ disableButton, setDisableButton ] = React.useState<boolean>(true)
+  const [tagArrayState, setTagArrayState] = React.useState<string[]>([])
+  const [disableButton, setDisableButton] = React.useState<boolean>(true)
 
   // tanstack
   const queryClient = useQueryClient()
   const { updateVideoByWorkId } = VideoService()
-  const { mutate: mutateEditVideo, isLoading: isEditLoading } = useMutation(updateVideoByWorkId, {
+
+  // const { mutate: mutateEditVideo, isLoading: isEditLoading } = useMutation(updateVideoByWorkId, {
+  //   onSuccess: data => {
+  //     console.log('success', data)
+  //     queryClient.invalidateQueries({ queryKey: ['videosList'] })
+  //   },
+  //   onMutate: () => {
+  //     console.log('start mutate')
+  //   },
+  //   onError: error => {
+  //     toast.error(`Error ${error}`)
+  //   },
+  //   onSettled: () => {
+  //     toggle()
+  //   }
+  // })
+
+  const { updateFeedViaID } = FeedsService()
+  const { mutate: mutateEditFeed, isLoading: isEditLoading } = useMutation(updateFeedViaID, {
     onSuccess: data => {
       console.log('success', data)
-      queryClient.invalidateQueries({ queryKey: ['videosList'] })
+      queryClient.invalidateQueries({ queryKey: ['getFeeds'] })
     },
     onMutate: () => {
       console.log('start mutate')
@@ -109,32 +128,44 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
     }
   })
 
-
   const onSubmit = (data: IFeedStory) => {
-    console.log('call submit')
+    // console.log('call submit', data)
 
+    const formData = new FormData()
 
+    const { _id, string_story, tags } = data
+
+    try {
+      mutateEditFeed({
+        id: _id,
+        data: {
+          string_story,
+          resubmit: 'true',
+          _method: 'put',
+          tags: tags
+        }
+      })
+    } catch (e: any) {
+      console.log(`ERROR!!!`, e)
+    }
   }
 
-  const handleValidations = (name : string) => {
+  const handleValidations = (name: string) => {
     switch (name) {
-
-      case 'tags' : 
-            setError('tags', { type : 'custom', message : 'Tag is required.' });
-            break;
-      default : break;
-
+      case 'tags':
+        setError('tags', { type: 'custom', message: 'Tag is required.' })
+        break
+      default:
+        break
     }
   }
 
   const checkIfEmptyErrors = () => {
-
     console.log('ERRORS OBJECT', errors)
     console.log('errors length', Object.keys(errors).length)
 
     return false
   }
-  
 
   const handleClose = () => {
     toggle()
@@ -151,7 +182,6 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
   if (row == undefined) return <></>
 
   if (row) {
-
     return (
       <Drawer
         open={open}
@@ -166,72 +196,82 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
             <Icon icon='mdi:close' fontSize={20} />
           </IconButton>
         </Header>
-        {
-          row?.type?.includes('video') &&
+        {row?.type?.includes('video') && (
           <Box>
             <VideoBox>
-              <ReactPlayer className='reactPlayer' width='100%' height='100%' controls={true} url={ STREAMING_SERVER_URL + row.videos.url} />
+              <ReactPlayer
+                className='reactPlayer'
+                width='100%'
+                height='100%'
+                controls={true}
+                url={STREAMING_SERVER_URL + row.videos.url}
+              />
             </VideoBox>
           </Box>
-        }
-        
+        )}
+
         <Box sx={{ p: 5 }}>
           <form onSubmit={event => event.preventDefault()}>
+            {errors.string_story && (
+              <Alert sx={{ mb: 5 }} variant='outlined' severity='error'>
+                {errors.string_story.message}
+              </Alert>
+            )}
 
-          { errors.string_story && <Alert sx={{mb:5}} variant='outlined' severity='error'>{ errors.string_story.message }</Alert> }
-
-              <TextField
-                sx={{mb:5}}
-                {...register('string_story', {
-                  required : {
-                    value : true,
-                    message : "Cannot have an empty story."
-                  },
-                  minLength : {
-                    value : 10,
-                    message : "At least 10 characters"
-                  }
-                })}
-                label={TranslateString('Story')}
-                placeholder='Story'
-                fullWidth
-                multiline={true}
-                rows={5}
-              />
-
-
-            { errors.tags && <Alert sx={{mb:5}} variant='outlined' severity='error'>{ errors.tags.message }</Alert> }
-            <Controller
-                name='tags'
-                control={control}
-                render={({ field: { value, onChange, onBlur } }) => (
-                    <Autocomplete
-                      multiple
-                      value={value}
-                      options={[]}
-                      freeSolo
-                      sx={{ mb:10 }}
-                      onChange={( event, value )=>{ 
-                        setValue('tags', value as string[]) 
-                        getValues('tags').length ? clearErrors('tags') : handleValidations('tags')
-                      }}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => 
-                        <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
-                      }
-                      renderInput={params => (
-                        <TextField
-                          sx={{
-                            backgroundColor: theme => theme.palette.background.paper,
-                            borderRadius: '8px'
-                          }}
-                          {...params}
-                        />
-                      )}
-                    />
-                )}
+            <TextField
+              sx={{ mb: 5 }}
+              {...register('string_story', {
+                required: {
+                  value: true,
+                  message: 'Cannot have an empty story.'
+                },
+                minLength: {
+                  value: 10,
+                  message: 'At least 10 characters'
+                }
+              })}
+              label={TranslateString('Story')}
+              placeholder='Story'
+              fullWidth
+              multiline={true}
+              rows={5}
             />
-            
+
+            {errors.tags && (
+              <Alert sx={{ mb: 5 }} variant='outlined' severity='error'>
+                {errors.tags.message}
+              </Alert>
+            )}
+            <Controller
+              name='tags'
+              control={control}
+              render={({ field: { value, onChange, onBlur } }) => (
+                <Autocomplete
+                  multiple
+                  value={value}
+                  options={[]}
+                  freeSolo
+                  sx={{ mb: 10 }}
+                  onChange={(event, value) => {
+                    setValue('tags', value as string[])
+                    getValues('tags').length ? clearErrors('tags') : handleValidations('tags')
+                  }}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => <Chip variant='outlined' label={option} {...getTagProps({ index })} />)
+                  }
+                  renderInput={params => (
+                    <TextField
+                      sx={{
+                        backgroundColor: theme => theme.palette.background.paper,
+                        borderRadius: '8px'
+                      }}
+                      {...params}
+                    />
+                  )}
+                />
+              )}
+            />
+
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button
                 onClick={() => {
@@ -241,17 +281,12 @@ const EditNewsFeedDrawer = (props: SidebarEditType) => {
                 type='submit'
                 variant='contained'
                 sx={{ mr: 3 }}
-                disabled={ !isDirty }
+                disabled={!isDirty}
               >
-                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString("Submit")}
+                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString('Submit')}
               </Button>
-              <Button
-                size='large'
-                variant='outlined'
-                color='secondary'
-                onClick={handleClose}
-              >
-                {TranslateString("Cancel")}
+              <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
+                {TranslateString('Cancel')}
               </Button>
             </Box>
           </form>
