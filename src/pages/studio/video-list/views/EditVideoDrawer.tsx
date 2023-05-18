@@ -35,7 +35,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
 
 interface StreamType {
-  ready_to_stream: boolean
+  ready_to_stream?: boolean
 }
 
 interface RowType {
