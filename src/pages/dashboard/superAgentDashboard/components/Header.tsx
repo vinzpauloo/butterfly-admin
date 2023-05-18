@@ -4,16 +4,20 @@ import React from 'react'
 // ** MUI Imports
 import { Stack, Typography, Box } from '@mui/material'
 
+import { useGreeting } from '@/hooks/useGreeting'
+
 interface HeaderProps {
   username: string | undefined
 }
 
 const Header = ({ username }: HeaderProps) => {
+  const { ShowGreeting } = useGreeting()
+
   return (
     <Stack sx={styles.wrapper}>
       <Box>
         <Typography fontWeight={500} variant='h5'>
-          Good Morning, {username} !
+          {ShowGreeting()}, {username} !
         </Typography>
         <Typography variant='subtitle1'>Welcome back, nice to see you again!</Typography>
       </Box>

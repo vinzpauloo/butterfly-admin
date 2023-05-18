@@ -11,11 +11,14 @@ import MonthlyProgressBarChart from './components/MonthlyProgress'
 import UsersGrowthDonutChart from './components/UsersGrowth'
 import CommissionDataBarChart from './components/CommissionData'
 import TopDonatorsLinearProgress from './components/TopDonatorsLinearProgress'
+import { useAuth } from '@/services/useAuth'
 
 const AgentDashboard = () => {
+  const { user } = useAuth()
+
   return (
     <Stack>
-      <Header />
+      <Header username={user?.username} />
       <Stack direction={styles.direction} gap={styles.gap246}>
         <Stack width={styles.width} gap={styles.gap244}>
           <SalesAndAddedUsers />
