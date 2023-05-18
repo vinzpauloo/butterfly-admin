@@ -1,14 +1,13 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import PageHeader from 'src/@core/components/page-header'
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import FQDNService from '@/services/api/FQDNService'
 import { useAuth } from '@/services/useAuth'
-import { Button, Stack } from '@mui/material'
-import LinksContainer from './components/LinksContainer'
+import { Button, CircularProgress, Stack } from '@mui/material'
+import ExpandoForm from './views/ExpandoForm'
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   height: '80vh',
@@ -17,23 +16,16 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   display: 'flex'
 })
 
-type postObject = {
-  name: string
-  type: 'api' | 'photo' | 'streaming'
-}
-
 const FQDN = () => {
   const [APIFQDNS, setAPIFQDNS] = useState<string[]>([])
-  const [newAPIFQDNS, setNewAPIFQDNS] = useState<string[]>([])
-
   const [photoFQDNS, setPhotoFQDNS] = useState<string[]>([])
-  const [newPhotoFQDNS, setNewPhotoFQDNS] = useState<string[]>([])
-
   const [streamingFQDNS, setStreamingFQDNS] = useState<string[]>([])
-  const [newStreamingFQDNS, setNewStreamingFQDNS] = useState<string[]>([])
-
+  const [hasGetDone, setHasGetDone] = useState<boolean>(false)
+  const formAPIRef = useRef<any>()
+  const formPhotosRef = useRef<any>()
+  const formStreamRef = useRef<any>()
   const auth = useAuth()
-
+  
   const { getSuperAgentFQDNList, addFQDN } = FQDNService()
   const { isLoading } = useQuery({
     queryKey: ['fqdns'],
@@ -43,9 +35,10 @@ const FQDN = () => {
       }),
     onSuccess: data => {
       console.log(data?.data)
-      setAPIFQDNS(data?.Api)
-      setStreamingFQDNS(data?.Streaming)
-      setPhotoFQDNS(data?.Photo)
+      setAPIFQDNS(data?.api)
+      setPhotoFQDNS(data?.photo)
+      setStreamingFQDNS(data?.streaming)
+      setHasGetDone(true)
     },
     onError: error => {
       console.log(error)
@@ -56,9 +49,6 @@ const FQDN = () => {
   const { mutate, isLoading: updateLoading } = useMutation(addFQDN, {
     onSuccess: data => {
       console.log(data)
-      setNewAPIFQDNS([])
-      setNewPhotoFQDNS([])
-      setNewStreamingFQDNS([])
       queryClient.invalidateQueries({ queryKey: ['fqdns'] })
     },
     onError: error => {
@@ -67,23 +57,16 @@ const FQDN = () => {
   })
 
   const saveChanges = () => {
-    const AllAPIFQDNS: postObject[] = APIFQDNS.concat(newAPIFQDNS).map(item => {
-      return { name: item, type: 'api' }
-    })
-
-    const AllphotoFQDNS: postObject[] = photoFQDNS.concat(newPhotoFQDNS).map(item => {
-      return { name: item, type: 'photo' }
-    })
-
-    const AllstreamingFQDNS: postObject[] = streamingFQDNS.concat(newStreamingFQDNS).map(item => {
-      return { name: item, type: 'streaming' }
-    })
+    setHasGetDone(false)
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'api' }))
+    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'photo' }))
+    const streamingArray = formStreamRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'streaming' }))
 
     mutate({
       siteId: auth?.user?.site,
       data: {
         site: auth?.user?.site,
-        fqdns: AllAPIFQDNS.concat(AllphotoFQDNS).concat(AllstreamingFQDNS)
+        fqdns: apiArray.concat(photoArray).concat(streamingArray)
       }
     })
   }
@@ -91,38 +74,45 @@ const FQDN = () => {
   return (
     <PerfectScrollbar>
       <Grid maxWidth='sm' container spacing={6}>
-        <PageHeader title={<Typography variant='h5'>FQDN</Typography>} />
-        <Grid item xs={12}>
-          <Button variant='outlined' onClick={saveChanges}>
-            Save Changes
-          </Button>
-          <Stack gap={20}>
-            <LinksContainer
-              type='Api'
-              isLoading={isLoading || updateLoading}
-              data={APIFQDNS}
-              dataSetter={setAPIFQDNS}
-              newData={newAPIFQDNS}
-              newDataSetter={setNewAPIFQDNS}
-            />
-            <LinksContainer
-              type='Photo'
-              isLoading={isLoading || updateLoading}
-              data={photoFQDNS}
-              dataSetter={setPhotoFQDNS}
-              newData={newPhotoFQDNS}
-              newDataSetter={setNewPhotoFQDNS}
-            />
-            <LinksContainer
-              type='Streaming'
-              isLoading={isLoading || updateLoading}
-              data={streamingFQDNS}
-              dataSetter={setStreamingFQDNS}
-              newData={newStreamingFQDNS}
-              newDataSetter={setNewStreamingFQDNS}
-            />
-          </Stack>
-        </Grid>
+        {isLoading || updateLoading ?
+          <Grid item xs={12} my={24} display='flex' alignItems='center' justifyContent='center'>
+            <CircularProgress />
+          </Grid>
+        : null}
+        {hasGetDone &&
+          <Grid item xs={12}>
+            <Stack direction='row' alignItems='center' justifyContent='space-between' py={4}>
+              <Typography variant='h5'>FQDN</Typography>
+              <Button variant='outlined' onClick={saveChanges}>Save Changes</Button>
+            </Stack>
+            <Stack gap={20}>
+              <ExpandoForm
+                ref={formAPIRef}
+                fileType='text'
+                pageHeader="API's"
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{ expando: APIFQDNS.map((value: string) => ({ value })) }}
+              />
+              <ExpandoForm
+                ref={formPhotosRef}
+                fileType='text'
+                pageHeader="PHOTOS"
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{ expando: photoFQDNS.map((value: string) => ({ value })) }}
+              />
+              <ExpandoForm
+                ref={formStreamRef}
+                fileType='text'
+                pageHeader="STREAMING"
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{ expando: streamingFQDNS.map((value: string) => ({ value })) }}
+              />
+            </Stack>
+          </Grid>
+        }
       </Grid>
     </PerfectScrollbar>
   )
