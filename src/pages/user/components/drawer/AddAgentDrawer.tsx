@@ -23,6 +23,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { CreateAccount } from '@/services/api/CreateAccount'
+import { useAuth } from '@/services/useAuth'
 
 interface FormValues {
   [key: string]: any
@@ -64,6 +65,8 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const AddAgentDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
 
+  const { user } = useAuth()
+
   // ** Props
   const { open, toggle } = props
 
@@ -94,16 +97,48 @@ const AddAgentDrawer = (props: SidebarAddUserType) => {
   const { createUser } = CreateAccount()
   const mutation = useMutation(createUser)
 
+  function isFile(value: any): value is File {
+    return value instanceof File
+  }
+
   const handleFormSubmit = async (data: FormValues) => {
-    const userData = {
-      data: {
-        ...data,
-        role_id: '5'
+    const formData = new FormData()
+
+    /* Iterates through 'formValue' to check if the key is 'logo' and if the value is a file. */
+    for (const key in data) {
+      const value = data[key]
+
+      /* If true, it appends the file to the 'FormData' object with the key and the file name. */
+      if (key === 'logo' && isFile(value)) {
+        formData.append(key, value, value.name)
+
+        /* If the key is 'amount', parse the value as a number and append it to the `FormData` object with the key. */
+      } else if (key === 'amount' && value) {
+        formData.append(key, Number(value).toString())
+
+        /* If the value is a string
+      or a number, it appends the value as a string to the `FormData` object with the key. */
+      } else if (typeof value === 'string' || typeof value === 'number') {
+        formData.append(key, value.toString())
       }
     }
 
+    // const userData = {
+    //   data: {
+    //     ...data,
+    //     role_id: '5'
+    //   }
+    // }
+
+    formData.append('role_id', '5')
+    formData.append('superagent_id', `${user?.id}`)
+
+    const form: any = {
+      data: formData
+    }
+
     try {
-      await mutation.mutateAsync(userData)
+      await mutation.mutateAsync(form)
       setSubmitted(true)
 
       setTimeout(() => {
