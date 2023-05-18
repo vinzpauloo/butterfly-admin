@@ -1,14 +1,19 @@
+// ** React Imports
 import React from 'react'
 import toast from 'react-hot-toast'
 
-// ** Import MUI
+// ** MUI Imports
 import { Box, Button, Typography } from '@mui/material'
 
 // ** Import component
 import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
+import CreatedSuccessful from '../../../form/CreatedSuccessful'
 
 // ** API queries
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
+
+// ** Hooks/Services
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 import FQDNService from '@/services/api/FQDNService'
 
 // ** Zustand Imports
@@ -16,16 +21,37 @@ import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
 
 interface SidebarAddUserType {
   data: any
+  toggle: () => void
+}
+
+interface FQDNProps {
+  API: []
+  Photo: []
+  Streaming: []
 }
 
 export type FQDNData = {
   name: string
   values: [{ value: string }]
+  site: number
+  fqdns: { name?: string; type?: 'Api' | 'Streaming' | 'Photo' }[]
 }
 
 const EditStepTwo = (props: SidebarAddUserType) => {
+  // ** Props
+  const { toggle } = props
+
+  // ** Store
+  const { siteData } = editSuperAgentStore()
+
+  // ** States
+  const [fqdnList, setFqdnList] = React.useState<FQDNProps>()
+  const [submitted, setSubmitted] = React.useState<boolean>()
+  const [isLoading] = React.useState<boolean>(false)
+
   // ** Tanstack and services
   const { addFQDN, getSuperAgentFQDNList } = FQDNService()
+  const { handleError, getErrorResponse } = useErrorHandling()
   const queryClient = useQueryClient()
   const fqdnM = useMutation({
     mutationFn: addFQDN,
@@ -34,16 +60,11 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries(['fqdns'])
+    },
+    onError: (e: any) => {
+      handleError(e, `addFQDN() EditStepTwo.tsx`)
     }
   })
-
-  interface FQDNProps {
-    Api: []
-    Photo: []
-    Streaming: []
-  }
-
-  const [fqdnList, setFqdnList] = React.useState<FQDNProps>()
 
   useQuery({
     queryKey: [`editSuperAgentStepTwoFQDN`],
@@ -53,24 +74,16 @@ const EditStepTwo = (props: SidebarAddUserType) => {
       }),
     onSuccess: data => {
       setFqdnList(data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getSuperAgentFQDNList() EditStepTwo.tsx`)
     }
   })
 
   // ** Used to set default values for Expando Forms
-  const apiDefaultValues = fqdnList?.Api.map(value => ({ value })) || []
+  const apiDefaultValues = fqdnList?.API.map(value => ({ value })) || []
   const streamDefaultValues = fqdnList?.Streaming.map(value => ({ value })) || []
   const photoDefaultValues = fqdnList?.Photo.map(value => ({ value })) || []
-
-  const { siteData } = editSuperAgentStore()
-
-  // const { data } = props
-
-  // console.log(`PROPS DATA`, data)
-  // console.log(`STEP 2 SITE DATA`, siteData[0])
-  // console.log(`STEP 2 Site Data ID`, siteData[0]?.id)
-
-  // ** State
-  const [isLoading] = React.useState<boolean>(false)
 
   // References
   const formAPIRef = React.useRef<any>()
@@ -78,96 +91,142 @@ const EditStepTwo = (props: SidebarAddUserType) => {
   const formStreamRef = React.useRef<any>()
 
   const handleFinish = () => {
-    const allDataArray = []
-
     // check for empty values handleVALIDATIONS
-    let noEmptyvalues = false
-    noEmptyvalues = formAPIRef.current.getFormData().some((item: { value: string }) => {
+    let hasEmptyvalues = false
+    hasEmptyvalues = formAPIRef.current.getFormData().some((item: { value: string }) => {
       return item.value.length < 3
     })
       ? true
       : false
-    noEmptyvalues = formStreamRef.current.getFormData().some((item: { value: string }) => {
+    hasEmptyvalues = formStreamRef.current.getFormData().some((item: { value: string }) => {
       return item.value.length < 3
     })
       ? true
       : false
-    noEmptyvalues = formPhotosRef.current.getFormData().some((item: { value: string }) => {
+    hasEmptyvalues = formPhotosRef.current.getFormData().some((item: { value: string }) => {
       return item.value.length < 3
     })
       ? true
       : false
 
-    if (noEmptyvalues) return []
+    if (hasEmptyvalues) {
+      console.log('has empty values dont submit')
 
-    allDataArray.push({ name: 'API', values: formAPIRef.current.getFormData() })
-    allDataArray.push({ name: 'Photo', values: formPhotosRef.current.getFormData() })
-    allDataArray.push({ name: 'Streaming', values: formStreamRef.current.getFormData() })
+      return
+    }
 
-    return allDataArray
+    // structure
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'API' }))
+    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Photo' }))
+    const streamingArray = formStreamRef.current
+      .getFormData()
+      .map((name: any) => ({ name: name.value, type: 'Streaming' }))
+    const fqdnsObject = { fqdns: [...apiArray, ...photoArray, ...streamingArray] }
+
+    console.log('START SUBMIT fqdnsObject', fqdnsObject)
+
+    //submit FQDN
+    handleSubmit(fqdnsObject as FQDNData)
   }
 
-  const handleSubmit = async () => {
-    // TODO ** edit fqdns waiting for api changes
-    return
+  const handleSubmit = async (fqdnsObject: FQDNData) => {
+    try {
+      //Do submissions!!
+
+      if (Object.keys(fqdnsObject)?.length == 0) {
+        toast.error('FQDN is required')
+
+        return
+      } else {
+        console.log('allFQDNData', fqdnsObject)
+
+        await fqdnM.mutateAsync({
+          siteId: siteData[0]?.id,
+          data: fqdnsObject
+        })
+
+        setSubmitted(true)
+      }
+
+      setTimeout(() => {
+        setSubmitted(false)
+        toggle()
+      }, 1500)
+    } catch (e: any) {
+      handleError(e, `createFQDN() EditStepTwo.tsx Super Agent`)
+    }
   }
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '1rem',
-        '& .MuiPaper-root': {
-          boxShadow: 'none'
-        },
-        '& .MuiCardContent-root': {
-          paddingTop: '0'
-        },
-        '& .expandoGrid .MuiGrid-item': {
-          paddingLeft: 0
-        },
-        '& .expandoGrid .expandoInput input': {
-          height: '8px'
-        }
-      }}
-    >
-      {fqdnList?.Api && (
-        <ExpandoForm
-          ref={formAPIRef}
-          fileType='text'
-          pageHeader="API's"
-          isLoading={isLoading}
-          disableSaveButton={true}
-          defaultValues={{ expando: apiDefaultValues }}
-        />
-      )}
-      {fqdnList?.Streaming && (
-        <ExpandoForm
-          ref={formStreamRef}
-          fileType='text'
-          pageHeader='STREAMING'
-          isLoading={isLoading}
-          disableSaveButton={true}
-          defaultValues={{ expando: streamDefaultValues }}
-        />
-      )}
-      {fqdnList?.Photo && (
-        <ExpandoForm
-          ref={formPhotosRef}
-          fileType='text'
-          pageHeader='PHOTOS'
-          isLoading={isLoading}
-          disableSaveButton={true}
-          defaultValues={{ expando: photoDefaultValues }}
-        />
-      )}
+    <>
+      {!submitted ? (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            '& .MuiPaper-root': {
+              boxShadow: 'none'
+            },
+            '& .MuiCardContent-root': {
+              paddingTop: '0'
+            },
+            '& .expandoGrid .MuiGrid-item': {
+              paddingLeft: 0
+            },
+            '& .expandoGrid .expandoInput input': {
+              height: '8px'
+            }
+          }}
+        >
+          {fqdnList?.API && (
+            <ExpandoForm
+              ref={formAPIRef}
+              fileType='text'
+              pageHeader="API's"
+              isLoading={isLoading}
+              disableSaveButton={true}
+              defaultValues={{ expando: apiDefaultValues }}
+            />
+          )}
+          {fqdnList?.Streaming && (
+            <ExpandoForm
+              ref={formStreamRef}
+              fileType='text'
+              pageHeader='STREAMING'
+              isLoading={isLoading}
+              disableSaveButton={true}
+              defaultValues={{ expando: streamDefaultValues }}
+            />
+          )}
+          {fqdnList?.Photo && (
+            <ExpandoForm
+              ref={formPhotosRef}
+              fileType='text'
+              pageHeader='PHOTOS'
+              isLoading={isLoading}
+              disableSaveButton={true}
+              defaultValues={{ expando: photoDefaultValues }}
+            />
+          )}
 
-      <Button sx={styles.submitButton} onClick={handleSubmit}>
-        <Typography sx={styles.text}>Submit</Typography>
-      </Button>
-    </Box>
+          {/* Error Response from backend */}
+          {getErrorResponse(12)}
+
+          <Button
+            sx={styles.submitButton}
+            onClick={() => {
+              handleFinish()
+            }}
+          >
+            <Typography sx={styles.text}>Submit</Typography>
+          </Button>
+        </Box>
+      ) : (
+        <CreatedSuccessful update />
+      )}
+    </>
   )
 }
 

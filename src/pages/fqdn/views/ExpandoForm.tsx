@@ -1,6 +1,7 @@
+// ** React Imports
 import React from 'react'
 
-// ** MUI
+// ** MUI Imports
 import {
   Box,
   Button,
@@ -110,7 +111,6 @@ const ExpandoForm = (
                       {...register(`expando.${index}.value`, { required: true })}
                       error={Boolean(errors.expando)}
                       placeholder={`Option ${index + 1}`}
-                      defaultValue={`TEST`}
                       type={fileType}
                       endAdornment={
                         index >= 3 ? (

@@ -59,7 +59,7 @@ const Steps = () => {
     {
       title: 'Configure FQDN Info',
       subtitle: 'Modify Setup',
-      component: <EditStepTwo data={drawerData} />
+      component: <EditStepTwo data={drawerData} toggle={() => setDrawerRole(null)} />
     },
     {
       title: 'Modify Integration',

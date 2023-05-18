@@ -132,7 +132,7 @@ const SADrawer = (props: SidebarAddUserType) => {
       title: 'FQDNS Info',
       subtitle: 'Setup FQDNS',
       component: <SAStepTwo setIsLoading={setIsLoading} siteID={siteID} ref={stepTwoRef} handleNext={handleNext} />,
-      hideStepperButton : true,
+      hideStepperButton: true
     },
     {
       title: 'Integration',
@@ -190,8 +190,8 @@ const SADrawer = (props: SidebarAddUserType) => {
                     {!isLoading ? (
                       <>
                         {step.component}
-                        
-                        {  step.hideStepperButton == undefined && index > 0 && (
+
+                        {/* {  step.hideStepperButton == undefined && index > 0 && (
                           <div className='button-wrapper' style={{ paddingTop: '1rem', textAlign: 'center' }}>
                             <Button
                               style={styles.cancelButton}
@@ -203,7 +203,7 @@ const SADrawer = (props: SidebarAddUserType) => {
                               {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                             </Button>
                           </div>
-                        )}
+                        )} */}
                       </>
                     ) : (
                       <LinearProgress />
