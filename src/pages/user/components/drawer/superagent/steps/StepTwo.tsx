@@ -79,7 +79,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
     }
 
     // structure
-    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'API' }))
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Api' }))
     const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'Photo' }))
     const streamingArray = formStreamRef.current
       .getFormData()

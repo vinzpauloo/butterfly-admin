@@ -25,6 +25,7 @@ interface SidebarAddUserType {
 }
 
 interface FQDNProps {
+  Api: []
   API: []
   Photo: []
   Streaming: []
@@ -81,7 +82,9 @@ const EditStepTwo = (props: SidebarAddUserType) => {
   })
 
   // ** Used to set default values for Expando Forms
-  const apiDefaultValues = fqdnList?.API.map(value => ({ value })) || []
+  const apiDefaultValues = fqdnList?.API
+    ? fqdnList.API.map(value => ({ value }))
+    : fqdnList?.Api?.map(value => ({ value })) || []
   const streamDefaultValues = fqdnList?.Streaming.map(value => ({ value })) || []
   const photoDefaultValues = fqdnList?.Photo.map(value => ({ value })) || []
 
