@@ -37,6 +37,24 @@ export type FQDNData = {
   fqdns: { name?: string; type?: 'api' | 'streaming' | 'photo' }[]
 }
 
+// ** Used to handle the Object key of FQDN array retured by backend
+function normalizeData(data: FQDNProps) {
+  const normalizedData: { [key: string]: Array<{ value: string }> } = {
+    api: [],
+    photo: [],
+    streaming: []
+  }
+
+  Object.keys(data).forEach(key => {
+    const lowerKey = key.toLowerCase()
+    if (normalizedData[lowerKey] !== undefined) {
+      normalizedData[lowerKey] = normalizedData[lowerKey].concat(data[key as keyof FQDNProps].map(value => ({ value })))
+    }
+  })
+
+  return normalizedData
+}
+
 const EditStepTwo = (props: SidebarAddUserType) => {
   // ** Props
   const { toggle } = props
@@ -80,10 +98,11 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     }
   })
 
-  // ** Used to set default values for Expando Forms
-  const apiDefaultValues = fqdnList?.api.map(value => ({ value })) || []
-  const streamDefaultValues = fqdnList?.streaming.map(value => ({ value })) || []
-  const photoDefaultValues = fqdnList?.photo.map(value => ({ value })) || []
+  let normalizedData
+
+  if (fqdnList !== undefined) {
+    normalizedData = normalizeData(fqdnList)
+  }
 
   // References
   const formAPIRef = React.useRef<any>()
@@ -180,34 +199,34 @@ const EditStepTwo = (props: SidebarAddUserType) => {
             }
           }}
         >
-          {fqdnList?.api && (
+          {normalizedData?.api && (
             <ExpandoForm
               ref={formAPIRef}
               fileType='text'
               pageHeader="API's"
               isLoading={isLoading}
               disableSaveButton={true}
-              defaultValues={{ expando: apiDefaultValues }}
+              defaultValues={{ expando: normalizedData?.api || [] }}
             />
           )}
-          {fqdnList?.streaming && (
+          {normalizedData?.streaming && (
             <ExpandoForm
               ref={formStreamRef}
               fileType='text'
               pageHeader='STREAMING'
               isLoading={isLoading}
               disableSaveButton={true}
-              defaultValues={{ expando: streamDefaultValues }}
+              defaultValues={{ expando: normalizedData?.streaming || [] }}
             />
           )}
-          {fqdnList?.photo && (
+          {normalizedData?.photo && (
             <ExpandoForm
               ref={formPhotosRef}
               fileType='text'
               pageHeader='PHOTOS'
               isLoading={isLoading}
               disableSaveButton={true}
-              defaultValues={{ expando: photoDefaultValues }}
+              defaultValues={{ expando: normalizedData?.photo || [] }}
             />
           )}
 
