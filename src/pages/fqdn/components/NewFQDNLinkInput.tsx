@@ -1,16 +1,15 @@
-import { OutlinedInput, InputAdornment, IconButton, Stack, CircularProgress, Tooltip } from '@mui/material';
+import { OutlinedInput, InputAdornment, IconButton, Stack, Tooltip } from '@mui/material';
 import Icon from 'src/@core/components/icon'
 import React, { Dispatch, SetStateAction, useState } from 'react'
 
 type Props = {
   newInputs: string[]
   index: number
-  isLoading: boolean
   setNewInputs: Dispatch<SetStateAction<string[]>>
 }
 
 const NewFQDNLinkInput = (props: Props) => {
-  const { newInputs, index, isLoading, setNewInputs } = props
+  const { newInputs, index, setNewInputs } = props
   const [inputValue, setInputValue] = useState<string>('')
   const [inputError, setInputError] = useState<boolean>(false)
 
@@ -25,12 +24,13 @@ const NewFQDNLinkInput = (props: Props) => {
     catch (err) { setInputError(true) }
   }
 
+  const deleteInput = () => {
+    console.log("WIP")
+  }
+
   return (
     <Stack position='relative'>
-      {isLoading && <CircularProgress size={24} sx={{ position: 'absolute', margin: 'auto', top: 0, left: 0, right: 0, bottom: 0 }} />}
       <OutlinedInput
-        sx={isLoading ? { opacity: 0.5 } : undefined}
-        disabled={isLoading}
         onPasteCapture={(event: React.ClipboardEvent) => {
           handleItemStateChange(event.clipboardData.getData('text'))
           isValidUrl(event.clipboardData.getData('text'))
@@ -47,10 +47,8 @@ const NewFQDNLinkInput = (props: Props) => {
         placeholder='new link'
         endAdornment={
           <InputAdornment position='end'>
-            <Tooltip title="Delete">
-              <IconButton edge='end' disabled={isLoading} sx={{ '&:hover': { color: "red" } }} onClick={() => {
-                setNewInputs((item: any) => item.filter((_: string, index: number) => index !== 0));
-              }}>
+            <Tooltip title="Remove">
+              <IconButton edge='end' sx={{ '&:hover': { color: "red" } }} onClick={deleteInput}>
                 <Icon icon='mdi:close' />
               </IconButton>
             </Tooltip>
