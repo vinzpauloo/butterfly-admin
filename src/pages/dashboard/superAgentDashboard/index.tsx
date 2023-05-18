@@ -10,6 +10,7 @@ import SalesAndAddedUsers from './components/SalesAndAddedUsers'
 import UsersGrowthDonutChart from './components/UsersGrowth'
 import CommissionDataBarChart from './components/CommissionData'
 import RechartsAreaChart from './components/charts/AreaChart'
+import { useAuth } from '@/services/useAuth'
 
 // FAKE DATA
 const Donators = [
@@ -93,9 +94,11 @@ const Donators = [
 ]
 
 const AgentDashboard = () => {
+  const { user } = useAuth()
+
   return (
     <Stack>
-      <Header />
+      <Header username={user?.username} />
       <Stack sx={styles.container}>
         {/* First Column Start */}
         <Stack sx={styles.leftWrap} gap={styles.gap244}>

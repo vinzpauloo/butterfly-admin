@@ -61,54 +61,6 @@ const data = [
     Sales: 40,
     Clicks: 80,
     Visits: 130
-  },
-  {
-    name: '12/12',
-    Sales: 60,
-    Clicks: 80,
-    Visits: 160
-  },
-  {
-    name: '13/12',
-    Sales: 50,
-    Clicks: 100,
-    Visits: 140
-  },
-  {
-    name: '14/12',
-    Sales: 140,
-    Clicks: 90,
-    Visits: 240
-  },
-  {
-    name: '15/12',
-    Sales: 120,
-    Clicks: 180,
-    Visits: 220
-  },
-  {
-    name: '16/12',
-    Sales: 100,
-    Clicks: 160,
-    Visits: 180
-  },
-  {
-    name: '17/12',
-    Sales: 140,
-    Clicks: 140,
-    Visits: 270
-  },
-  {
-    name: '18/12',
-    Sales: 180,
-    Clicks: 200,
-    Visits: 280
-  },
-  {
-    name: '19/12',
-    Sales: 220,
-    Clicks: 220,
-    Visits: 375
   }
 ]
 
