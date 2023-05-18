@@ -53,29 +53,29 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
               saveSettings({ ...settings, direction: 'ltr' })
             }
           }
-        },
-        {
-          text: 'French',
-          menuItemProps: {
-            sx: { py: 2 },
-            selected: i18n.language === 'fr',
-            onClick: () => {
-              handleLangItemClick('fr')
-              saveSettings({ ...settings, direction: 'ltr' })
-            }
-          }
-        },
-        {
-          text: 'Arabic',
-          menuItemProps: {
-            sx: { py: 2 },
-            selected: i18n.language === 'ar',
-            onClick: () => {
-              handleLangItemClick('ar')
-              saveSettings({ ...settings, direction: 'rtl' })
-            }
-          }
         }
+        // {
+        //   text: 'French',
+        //   menuItemProps: {
+        //     sx: { py: 2 },
+        //     selected: i18n.language === 'fr',
+        //     onClick: () => {
+        //       handleLangItemClick('fr')
+        //       saveSettings({ ...settings, direction: 'ltr' })
+        //     }
+        //   }
+        // },
+        // {
+        //   text: 'Arabic',
+        //   menuItemProps: {
+        //     sx: { py: 2 },
+        //     selected: i18n.language === 'ar',
+        //     onClick: () => {
+        //       handleLangItemClick('ar')
+        //       saveSettings({ ...settings, direction: 'rtl' })
+        //     }
+        //   }
+        // }
       ]}
     />
   )
