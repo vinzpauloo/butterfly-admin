@@ -96,6 +96,8 @@ const Donators = [
 const AgentDashboard = () => {
   const { user } = useAuth()
 
+  const maxAmount = Math.max(...Donators.map(donator => donator.amount))
+
   return (
     <Stack>
       <Header username={user?.username} />
@@ -105,21 +107,23 @@ const AgentDashboard = () => {
           <SalesAndAddedUsers />
           <CommissionDataBarChart />
           <Stack sx={styles.linearProgressWrapper}>
-            {Donators.map((item, index) => (
-              <Stack key={index} direction='row' gap={4}>
-                <Avatar src={item?.image} />
-                <Box width='100%'>
-                  <Typography>{item.name}</Typography>
-                  <LinearProgress
-                    valueBuffer={100}
-                    variant='buffer'
-                    color={index === 0 ? 'primary' : 'secondary'}
-                    value={item.amount}
-                    sx={styles.linearProgress}
-                  />
-                </Box>
-              </Stack>
-            ))}
+            {[...Donators]
+              .sort((a, b) => b.amount - a.amount)
+              .map((item, index) => (
+                <Stack key={index} direction='row' gap={4}>
+                  <Avatar src={item?.image} />
+                  <Box width='100%'>
+                    <Typography>{item.name}</Typography>
+                    <LinearProgress
+                      valueBuffer={100}
+                      variant='buffer'
+                      color={item.amount === maxAmount ? 'primary' : 'secondary'}
+                      value={item.amount}
+                      sx={styles.linearProgress}
+                    />
+                  </Box>
+                </Stack>
+              ))}
           </Stack>
         </Stack>
         {/* First Column End */}
