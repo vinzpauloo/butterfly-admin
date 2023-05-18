@@ -27,7 +27,7 @@ type ExpandoFormProps = {
   handleExpandoSubmit?: (data: FormInputs) => void
   isLoading?: boolean
   disableSaveButton?: boolean
-  getData?: () => any
+  defaultValues?: FormInputs
 }
 
 type FormInputs = {
@@ -43,7 +43,9 @@ const ExpandoForm = (
     handleExpandoSubmit,
     isLoading = false,
     disableSaveButton = false,
-    getData
+    defaultValues = {
+      expando: [{ value: '' }, { value: '' }, { value: '' }]
+    }
   }: ExpandoFormProps,
   ref: any
 ) => {
@@ -64,9 +66,7 @@ const ExpandoForm = (
     handleSubmit,
     formState: { errors }
   } = useForm<FormInputs>({
-    defaultValues: {
-      expando: [{ value: '' }, { value: '' }, { value: '' }]
-    }
+    defaultValues
   })
   const { fields, append, remove } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)

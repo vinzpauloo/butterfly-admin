@@ -56,11 +56,14 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     }
   })
 
-  console.log(fqdnList?.Api)
+  // ** Used to set default values for Expando Forms
+  const apiDefaultValues = fqdnList?.Api.map(value => ({ value })) || []
+  const streamDefaultValues = fqdnList?.Streaming.map(value => ({ value })) || []
+  const photoDefaultValues = fqdnList?.Photo.map(value => ({ value })) || []
 
   const { siteData } = editSuperAgentStore()
 
-  const { data } = props
+  // const { data } = props
 
   // console.log(`PROPS DATA`, data)
   // console.log(`STEP 2 SITE DATA`, siteData[0])
@@ -130,21 +133,36 @@ const EditStepTwo = (props: SidebarAddUserType) => {
         }
       }}
     >
-      <ExpandoForm ref={formAPIRef} fileType='text' pageHeader="API's" isLoading={isLoading} disableSaveButton={true} />
-      <ExpandoForm
-        ref={formStreamRef}
-        fileType='text'
-        pageHeader='STREAMING'
-        isLoading={isLoading}
-        disableSaveButton={true}
-      />
-      <ExpandoForm
-        ref={formPhotosRef}
-        fileType='text'
-        pageHeader='PHOTOS'
-        isLoading={isLoading}
-        disableSaveButton={true}
-      />
+      {fqdnList?.Api && (
+        <ExpandoForm
+          ref={formAPIRef}
+          fileType='text'
+          pageHeader="API's"
+          isLoading={isLoading}
+          disableSaveButton={true}
+          defaultValues={{ expando: apiDefaultValues }}
+        />
+      )}
+      {fqdnList?.Streaming && (
+        <ExpandoForm
+          ref={formStreamRef}
+          fileType='text'
+          pageHeader='STREAMING'
+          isLoading={isLoading}
+          disableSaveButton={true}
+          defaultValues={{ expando: streamDefaultValues }}
+        />
+      )}
+      {fqdnList?.Photo && (
+        <ExpandoForm
+          ref={formPhotosRef}
+          fileType='text'
+          pageHeader='PHOTOS'
+          isLoading={isLoading}
+          disableSaveButton={true}
+          defaultValues={{ expando: photoDefaultValues }}
+        />
+      )}
 
       <Button sx={styles.submitButton} onClick={handleSubmit}>
         <Typography sx={styles.text}>Submit</Typography>
