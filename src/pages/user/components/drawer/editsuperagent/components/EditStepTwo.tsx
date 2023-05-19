@@ -15,6 +15,7 @@ import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
 // ** Hooks/Services
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 import FQDNService from '@/services/api/FQDNService'
+import { useFQDNdata } from '@/hooks/useFQDNdata'
 
 // ** Zustand Imports
 import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
@@ -35,24 +36,6 @@ export type FQDNData = {
   values: [{ value: string }]
   site: number
   fqdns: { name?: string; type?: 'api' | 'streaming' | 'photo' }[]
-}
-
-// ** Used to handle the Object key of FQDN array retured by backend
-function normalizeData(data: FQDNProps) {
-  const normalizedData: { [key: string]: Array<{ value: string }> } = {
-    api: [],
-    photo: [],
-    streaming: []
-  }
-
-  Object.keys(data).forEach(key => {
-    const lowerKey = key.toLowerCase()
-    if (normalizedData[lowerKey] !== undefined) {
-      normalizedData[lowerKey] = normalizedData[lowerKey].concat(data[key as keyof FQDNProps].map(value => ({ value })))
-    }
-  })
-
-  return normalizedData
 }
 
 const EditStepTwo = (props: SidebarAddUserType) => {
@@ -98,10 +81,13 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     }
   })
 
-  let normalizedData
+  // ** Helper function
+  const { formatFQDNdata } = useFQDNdata()
 
+  // ** Format the returned Object key of the FQDN fetched data
+  let normalizedData
   if (fqdnList !== undefined) {
-    normalizedData = normalizeData(fqdnList)
+    normalizedData = formatFQDNdata(fqdnList)
   }
 
   // References
