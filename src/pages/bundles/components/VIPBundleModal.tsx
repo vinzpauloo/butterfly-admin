@@ -379,7 +379,7 @@ const VIPBundleModal = (props: Props) => {
             />
           </Stack>
         </Stack>
-        <Stack bgcolor='#D9D9D9' borderRadius={0.5} p={2} width={300} height='max-content'>
+        <Stack bgcolor='#454B5E' borderRadius={0.5} p={2} width={300} height='max-content'>
           <Stack
             bgcolor='white'
             borderRadius={0.5}
@@ -408,7 +408,7 @@ const VIPBundleModal = (props: Props) => {
       </Stack>
 
       <Stack flexDirection='row' gap={2} mt={4}>
-        <Button variant='contained' color='error' onClick={props.onClose} fullWidth>
+        <Button sx={{ backgroundColor: '#F03663' }} variant='contained' color='error' onClick={props.onClose} fullWidth>
           {TranslateString('Cancel')}
         </Button>
         <Button
@@ -429,7 +429,7 @@ export default VIPBundleModal
 // STYLINGS
 const modalContainer: StackProps = {
   sx: {
-    backgroundColor: theme => theme.customBflyColors.alwaysPrimary,
+    backgroundColor: '#202833',
     transform: 'translate(-50%, -50%)'
   },
   position: 'absolute',
@@ -458,7 +458,7 @@ const typographyItemProps: TypographyProps = {
 }
 
 const cardContainer: StackProps = {
-  bgcolor: '#D9D9D9',
+  bgcolor: '#454B5E',
   borderRadius: 0.5,
   p: 2,
   gap: 2
@@ -470,7 +470,7 @@ const textFieldStyle = {
   '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
     WebkitAppearance: 'none',
     margin: 0
-  }
+  },
 }
 
 const loaderStyle = {
