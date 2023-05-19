@@ -23,12 +23,12 @@ const AgentDashboard = () => {
         <Stack width={styles.width} gap={styles.gap244}>
           <SalesAndAddedUsers />
           <MonthlyProgressBarChart />
-          <Stack direction={styles.direction} gap={styles.gap246}>
+          {/* <Stack direction={styles.direction} gap={styles.gap246}>
             <UsersGrowthDonutChart />
             <CommissionDataBarChart />
-          </Stack>
+          </Stack> */}
         </Stack>
-        <TopDonatorsLinearProgress />
+        {/* <TopDonatorsLinearProgress /> */}
       </Stack>
     </Stack>
   )
@@ -36,7 +36,7 @@ const AgentDashboard = () => {
 
 const styles = {
   direction: ['column', 'column', 'row', 'row'] as ('column' | 'row' | 'row-reverse' | 'column-reverse' | null)[],
-  width: ['100%', '100%', '70%'],
+  width: ['100%', '100%', '100%'],
   gap246: [2, 4, 6],
   gap244: [2, 4, 4],
   wrapper: {
