@@ -1,4 +1,4 @@
-export type BaseData =  {
+interface BaseData {
     from?: string
     to?: string
     select?: string
@@ -29,15 +29,10 @@ export type ChartData = BaseData & {
     yearly?: string
 }
 
-export type DashboardProps = {
-    data: DashboardData
+type ExtendedData = DashboardData | ChartData;
+
+export type DataProps<T extends BaseData> = {
+    data: T;
 }
 
-export type ChartProps = {
-    data: ChartData
-}
-
-export type AllDashboardData = BaseData & ChartData & DashboardData;
-export type AllDashboardDataProps = {
-    data: AllDashboardData
-}
+export type AllDashboardData = BaseData & ExtendedData;
