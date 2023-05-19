@@ -1,15 +1,18 @@
+// ** React Imports
 import React from 'react'
-import { Stack } from '@mui/material'
-import ReportsTable from '../components/ReportsTable'
-import FilterButtons from '../components/FilterButtons'
+
+// ** Project/Component Imports
+import Container from '@/pages/components/Container'
+import Header from './components/Header'
+import SecurityFundsTable from './table/SecurityFundsTable'
 
 const SecurityFundsReport = () => {
-	return (
-		<Stack gap={6}>
-			<FilterButtons />
-			<ReportsTable />
-		</Stack>
-	)
+  return (
+    <Container>
+      <Header />
+      <SecurityFundsTable />
+    </Container>
+  )
 }
 
 export default SecurityFundsReport
