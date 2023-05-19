@@ -54,7 +54,8 @@ const ChatContent = (props: ChatContentType) => {
     sidebarWidth,
     handleLeftSidebarToggle,
     activeChat,
-    activeChannel
+    activeChannel,
+    isRefetchingAllChats
   } = props
 
   // ** Hooks
@@ -79,27 +80,30 @@ const ChatContent = (props: ChatContentType) => {
     enabled: !!activeChat?._id
   })
 
-  useEffect(() => {
-    if (activeChannel) initializeChatChannel()
-    console.log('useEffect activeChannel', activeChannel)
-    console.log('useEffect activeChat', activeChat)
-  }, [activeChannel])
+  /*
+    REVISION: No need for 2nd subscribe (May, 19, 2023)
+  */
+  // useEffect(() => {
+  //   if (activeChannel) initializeChatChannel()
+  //   console.log('useEffect activeChannel', activeChannel)
+  //   console.log('useEffect activeChat', activeChat)
+  // }, [activeChannel])
 
-  const initializeChatChannel = () => {
-    console.log('initializeChatChannel')
-    console.log('activeChannel', activeChannel)
+  // const initializeChatChannel = () => {
+  //   console.log('initializeChatChannel')
+  //   console.log('activeChannel', activeChannel)
 
-    const eventName = 'message'
-    const callback = (data: any) => {
-      const callbackData = JSON.parse(data.message)
-      // queryClient.invalidateQueries({ queryKey: ['singleChat', activeChannel] })
-      queryClient.invalidateQueries({ queryKey: ['chats'] })
+  //   const eventName = 'message'
+  //   const callback = (data: any) => {
+  //     const callbackData = JSON.parse(data.message)
+  //     // queryClient.invalidateQueries({ queryKey: ['singleChat', activeChannel] })
+  //     queryClient.invalidateQueries({ queryKey: ['chats'] })
 
-      console.log(`Callback for channel ${activeChannel}`, callbackData)
-    }
+  //     console.log(`Callback for channel ${activeChannel}`, callbackData)
+  //   }
 
-    subscribeToChannel(activeChannel, eventName, callback)
-  }
+  //   subscribeToChannel(activeChannel, eventName, callback)
+  // }
 
   const handleStartConversation = () => {
     if (!mdAbove) {
@@ -229,6 +233,7 @@ const ChatContent = (props: ChatContentType) => {
           chat={singleChatData?.data || []}
           isLoading={isLoading}
           isRefetching={isRefetching}
+          isRefetchingAllChats={isRefetchingAllChats}
         />
 
         <SendMsgForm
