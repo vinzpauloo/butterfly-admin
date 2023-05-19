@@ -78,7 +78,6 @@ const RechartsAreaChart = ({ direction }: Props) => {
           }
         }),
       onSuccess: (data: any) => {
-        console.log(`SUCCESS USERMONITOR`, data)
         setChartData(data)
       },
       onError: (e: any) => {
@@ -159,7 +158,7 @@ const RechartsAreaChart = ({ direction }: Props) => {
             <Typography variant='body2'>New Guests</Typography>
           </Box>
         </Box>
-        <Box sx={{ height: 300 }}>
+        <Box sx={{ height: 420 }}>
           <ResponsiveContainer>
             <AreaChart height={300} data={chartData} style={{ direction }} margin={{ left: -20 }}>
               <CartesianGrid />

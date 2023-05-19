@@ -3,8 +3,46 @@ import React from 'react'
 
 // ** MUI Imports
 import { Stack, Typography, Box } from '@mui/material'
+import { useAuth } from '@/services/useAuth'
 
-const SalesAndAddedUsers = () => {
+interface SalesAndAddedUsersProps {
+  income: string | undefined
+}
+
+const SalesAndAddedUsers = (props: SalesAndAddedUsersProps) => {
+  const [formatDate, setFormatDate] = React.useState('')
+
+  const { income } = props
+
+  const { user } = useAuth()
+
+  const currentDate = new Date()
+  const sevenDaysAgo = new Date()
+
+  // Subtract 7 days from the current date
+  sevenDaysAgo.setDate(currentDate.getDate() - 7)
+
+  const [testDate] = React.useState(sevenDaysAgo)
+
+  // Function to format the date
+  const updateDate = () => {
+    const date = new Date()
+    const time = date.toLocaleTimeString()
+    const formattedDate = date.toISOString().slice(0, 10) + ' ' + time
+    setFormatDate(formattedDate)
+  }
+
+  // Run once on initial render
+  React.useEffect(() => {
+    updateDate()
+
+    // Update every second (1000 milliseconds)
+    const interval = setInterval(updateDate, 1000)
+
+    // Cleanup function to clear the interval
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <Stack sx={styles.wrapper}>
       <Box sx={styles.containers}>
@@ -14,18 +52,18 @@ const SalesAndAddedUsers = () => {
         </Stack>
         <Stack sx={styles.textWrapper}>
           <Typography fontWeight={500} variant='h6'>
-            ¥125,000
+            ¥{user?.id}
           </Typography>
           {/* <Typography fontWeight={500} variant='h6'>
             ¥2,500
           </Typography> */}
         </Stack>
-        <Typography variant='subtitle2'>Date Deposited: 2023-03-01 12:00:00</Typography>
+        <Typography variant='subtitle2'>Date Deposited: {testDate.toISOString().slice(0, 10)}</Typography>
       </Box>
       <Box sx={styles.containers}>
         <Typography variant='subtitle2'>Income (VIP and Gold coins)</Typography>
-        <Typography variant='h6'>¥30,000</Typography>
-        <Typography variant='subtitle2'>As of 2023-03-01 12:00:00</Typography>
+        <Typography variant='h6'>¥{income}</Typography>
+        <Typography variant='subtitle2'>As of {formatDate}</Typography>
       </Box>
       {/* <Box sx={styles.containers}>
         <Typography variant='subtitle2'>Live update of the Added Users</Typography>

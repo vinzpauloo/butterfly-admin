@@ -11,6 +11,8 @@ import UsersGrowthDonutChart from './components/UsersGrowth'
 import CommissionDataBarChart from './components/CommissionData'
 import RechartsAreaChart from './components/charts/AreaChart'
 import { useAuth } from '@/services/useAuth'
+import { useQuery } from '@tanstack/react-query'
+import { DashboardService } from '@/services/api/DashboardService'
 
 // FAKE DATA
 const Donators = [
@@ -78,25 +80,49 @@ const Donators = [
     amount: 20,
     image:
       'https://media.herworld.com/public/2020/07/kbeauty-korean-beauty-hack-hair-parting-768x768.jpg?compress=true&quality=80&w=480&dpr=2.6'
-  },
-  {
-    name: 'Agent 13',
-    amount: 20,
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvSQvywDf_ApoJc4W9bn6ZNku1aRrBel7nCeNpk5eFdPHSbe-ep8KMD0o8h6DU8xEV9rs&usqp=CAU'
-  },
-  {
-    name: 'Agent 14',
-    amount: 20,
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-hxY4Vwo3czP2bnzFcBmqmo_nShaoTI4OMfO25LQoAx3m3Hgw8pUN8uh8YepJvKaLp4g&usqp=CAU'
   }
 ]
+
+interface IncomeData {
+  money_amount: string
+}
+
+interface IncomeProps {
+  data: IncomeData[]
+}
 
 const AgentDashboard = () => {
   const { user } = useAuth()
 
   const maxAmount = Math.max(...Donators.map(donator => donator.amount))
+
+  // ** FAKE DATA
+  const [mostActiveUsers, setMostActiveUsers] = React.useState()
+  const [earnedIncome, setEarnedIncome] = React.useState<IncomeProps>()
+
+  const { getMostActiveUsers } = DashboardService()
+  const { getTopDonators } = DashboardService()
+
+  useQuery({
+    queryKey: [`superAgentNewUsers`],
+    queryFn: () => getMostActiveUsers(),
+    onSuccess: (data: any) => {
+      setMostActiveUsers(data)
+    }
+  })
+
+  useQuery({
+    queryKey: [`superAgentIncome`],
+    queryFn: () =>
+      getTopDonators({
+        data: {
+          sum: 'coin_amount'
+        }
+      }),
+    onSuccess: (data: any) => {
+      setEarnedIncome(data)
+    }
+  })
 
   return (
     <Stack>
@@ -104,10 +130,10 @@ const AgentDashboard = () => {
       <Stack sx={styles.container}>
         {/* First Column Start */}
         <Stack sx={styles.leftWrap} gap={styles.gap244}>
-          <SalesAndAddedUsers />
+          <SalesAndAddedUsers income={earnedIncome?.data[0].money_amount} />
           <CommissionDataBarChart />
           <Stack sx={styles.linearProgressWrapper}>
-            {[...Donators]
+            {/* {[...Donators]
               .sort((a, b) => b.amount - a.amount)
               .map((item, index) => (
                 <Stack key={index} direction='row' gap={4}>
@@ -123,7 +149,7 @@ const AgentDashboard = () => {
                     />
                   </Box>
                 </Stack>
-              ))}
+              ))} */}
           </Stack>
         </Stack>
         {/* First Column End */}
@@ -131,11 +157,11 @@ const AgentDashboard = () => {
         <Stack sx={styles.rightWrap} gap={styles.gap244}>
           <Box sx={styles.containers}>
             <Typography variant='subtitle2'>Live update of the Added Users</Typography>
-            <Typography variant='h6'>New Users: 500</Typography>
-            <Typography fontWeight={500}>Total Users: 2500</Typography>
+            <Typography variant='h6'>New Users: {mostActiveUsers}</Typography>
+            <Typography fontWeight={500}>Total Users: {mostActiveUsers}</Typography>
           </Box>
           <RechartsAreaChart direction='ltr' />
-          <UsersGrowthDonutChart />
+          {/* <UsersGrowthDonutChart /> */}
         </Stack>
         {/* End of Second Column */}
       </Stack>

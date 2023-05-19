@@ -179,7 +179,7 @@ const DatePickerBarChart = (props: VerticalBarProps) => {
             </Box>
           </Box>
         </Box>
-        <CardContent>
+        <CardContent sx={{ height: 510 }}>
           <Bar data={chartData} height={248} options={options} />
         </CardContent>
       </Card>
