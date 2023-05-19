@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
 import NotesDrawer from './NotesDrawer'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
@@ -40,25 +40,19 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'contentCreator',
+      field: 'content creator',
       headerName: TranslateString('Content Creator'),
       flex: 1,
       minWidth: 193,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.users.username}
-        </Typography>
+      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username
     },
     {
-      field: 'referenceID',
+      field: 'reference id',
       headerName: TranslateString('Reference') + ' ID',
       minWidth: 250,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => 
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.customers._id}
-        </Typography>
+      valueGetter: (params: GridRenderCellParams) => params.row?.customers?._id
     },
     {
       field: 'watched',
@@ -67,11 +61,7 @@ function index() {
       align: 'center',
       minWidth: 110,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.coin_amount.slice(0, -3)}
-        </Typography>
-
+      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount?.slice(0, -3)
     },
     {
       field: 'amount',
@@ -80,30 +70,21 @@ function index() {
       align: 'center',
       minWidth: 110,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.money_amount.slice(0, -3)}
-        </Typography>
+      valueGetter: (params: GridRenderCellParams) => params.row?.money_amount?.slice(0, -3)
     },
     {
-      field: 'dateCreated',
+      field: 'date created',
       headerName: TranslateString('Date Created'),
       minWidth: 225,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.created_at)}
-        </Typography>
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
     },
     {
-      field: 'lastUpdate',
+      field: 'last update',
       headerName: TranslateString('Last Update'),
       minWidth: 225,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.updated_at)}
-        </Typography>
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.updated_at)
     },
     {
       field: 'notes',
@@ -111,7 +92,7 @@ function index() {
       headerAlign: 'center',
       align: 'center',
       minWidth: 110,
-      sortable: true,
+      sortable: false,
       renderCell: () => {
         const handleClick = () => {
           setOpenDrawer(true)
