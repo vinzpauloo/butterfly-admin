@@ -21,6 +21,10 @@ interface IAddFQDNParams {
   }
 }
 
+type IAddFQDNParamsWithoutInnerFQDNAdmin = Omit<IAddFQDNParams, 'data'> & {
+  data?: Omit<IAddFQDNParams['data'], 'fqdn_admin'>
+};
+
 const FQDNService = () => {
 
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -36,7 +40,7 @@ const FQDNService = () => {
     })
   }
 
-  const addFQDN = (params : IAddFQDNParams) => {
+  const addFQDN = (params : IAddFQDNParams | IAddFQDNParamsWithoutInnerFQDNAdmin) => {
     return request({
       headers: {
         ...getHeaders(),
