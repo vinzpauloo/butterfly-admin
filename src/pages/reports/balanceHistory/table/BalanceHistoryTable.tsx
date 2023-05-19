@@ -45,9 +45,9 @@ const BalanceHistoryTable = () => {
     queryFn: () =>
       getSecurityFunds({
         params: {
-          sort: `desc`,
-          sort_by: `created_at`,
-          site_id: siteId
+          //   sort: `desc`,
+          //   sort_by: `created_at`
+          //   site_id: siteId
         }
       }),
     onSuccess: (data: any) => {

@@ -20,6 +20,13 @@ const statusObj: StatusObj = {
 export const BalanceHistoryColumns = () => {
   const columns = [
     {
+      flex: 0.01,
+      minWidth: 120,
+      sortable: false,
+      field: 'id',
+      headerName: 'User ID'
+    },
+    {
       flex: 0.02,
       minWidth: 200,
       sortable: false,
@@ -32,6 +39,26 @@ export const BalanceHistoryColumns = () => {
         console.log(params?.row)
 
         return <Typography>¥{adjust.slice(0, 3)}</Typography>
+      }
+    },
+    {
+      flex: 0.01,
+      minWidth: 120,
+      sortable: false,
+      field: 'type',
+      headerName: 'Type',
+      renderCell: (params: GridRenderCellParams) => {
+        const status = statusObj[params?.value]
+
+        return (
+          <CustomChip
+            size='small'
+            skin='light'
+            color={status?.color}
+            label={status?.title}
+            sx={{ '& .MuiChip-label': { textTransform: 'capitalize' } }}
+          />
+        )
       }
     },
     {
@@ -51,8 +78,8 @@ export const BalanceHistoryColumns = () => {
       }
     },
     {
-      flex: 0.01,
-      minWidth: 120,
+      flex: 0.02,
+      minWidth: 220,
       sortable: false,
       field: 'updated_at',
       headerName: 'Last Updated',
@@ -60,26 +87,6 @@ export const BalanceHistoryColumns = () => {
         return formatDate(params?.value)
       }
     }
-    // {
-    //   flex: 0.01,
-    //   minWidth: 120,
-    //   sortable: false,
-    //   field: 'type',
-    //   headerName: 'Type',
-    //   renderCell: (params: GridRenderCellParams) => {
-    //     const status = statusObj[params?.value]
-
-    //     return (
-    //       <CustomChip
-    //         size='small'
-    //         skin='light'
-    //         color={status?.color}
-    //         label={status?.title}
-    //         sx={{ '& .MuiChip-label': { textTransform: 'capitalize' } }}
-    //       />
-    //     )
-    //   }
-    // }
   ]
 
   return { columns }
