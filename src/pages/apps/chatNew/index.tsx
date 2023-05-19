@@ -67,9 +67,9 @@ const AppChat = () => {
 
   // ** React Query
   const { getAllChats } = ChatService()
-  const { data: chatsList } = useQuery({
+  const { data: chatsList, isRefetching: isRefetchingAllChats } = useQuery({
     queryKey: ['chats'],
-    queryFn: () => getAllChats({ params: { page: 1, paginate: 1000 } }),
+    queryFn: () => getAllChats({ params: { page: 1, paginate: 15 } }),
     onSuccess: data => {
       console.log('getAllChats success', data)
     },
@@ -87,13 +87,16 @@ const AppChat = () => {
   const initializeNotificationChannel = () => {
     const channel = auth.user && auth.user.id ? auth.user.id.toString() : ''
 
-    console.log('initializeNotificationChannel')
-    console.log('channel', channel)
+    console.log('initializeNotificationChannel', channel)
 
-    const eventName = 'notification'
+    const eventName = 'message'
     const callback = (data: any) => {
-      const callbackData = JSON.parse(data.message)
+      // const callbackData = JSON.parse(data.message)
+      const callbackData = data.message
+      const thisChannelId = callbackData.from_id + '-' + callbackData.to_id
+
       queryClient.invalidateQueries({ queryKey: ['chats'] })
+      queryClient.invalidateQueries({ queryKey: ['singleChat', thisChannelId] })
 
       console.log(`Callback for channel ${channel}`, callbackData)
     }
@@ -147,6 +150,7 @@ const AppChat = () => {
         handleLeftSidebarToggle={handleLeftSidebarToggle}
         activeChat={activeChat}
         activeChannel={activeChannel}
+        isRefetchingAllChats={isRefetchingAllChats}
       />
     </Box>
   )

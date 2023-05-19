@@ -4,11 +4,11 @@ import { getHeaders } from '@/lib/cryptoJs'
 // ** Configs
 import authConfig from 'src/configs/auth'
 
-interface IDonationsParams {
-  data: {
-    with: string
-    page: number
-    paginate: number
+interface ITransaction {
+  data?: {
+    with?: string
+    page?: number
+    paginate?: number
     user_username?: string
     customer_username?: string
     site_name?: string
@@ -18,7 +18,7 @@ interface IDonationsParams {
 const TransactionsService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
-  const getDonations = (params: IDonationsParams) => {
+  const getDonations = (params: ITransaction) => {
     return request({
       headers: {
         ...getHeaders(),
@@ -31,7 +31,20 @@ const TransactionsService = () => {
     })
   }
 
-  return { getDonations }
+  const getSecurityFunds = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/security/funds',
+      method: 'GET',
+      params: params.data
+    })
+  }
+
+  return { getDonations, getSecurityFunds }
 }
 
 export default TransactionsService

@@ -98,6 +98,7 @@ export type ChatContentType = {
   handleUserProfileRightSidebarToggle: () => void
   activeChat: IChatsList | null
   activeChannel: string
+  isRefetchingAllChats: boolean
 }
 
 export interface IChatsList {
@@ -166,6 +167,7 @@ export type ChatLogType = {
   chat: MessageType[]
   isLoading: boolean
   isRefetching: boolean
+  isRefetchingAllChats: boolean
 }
 
 export type MessageType = {

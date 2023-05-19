@@ -40,25 +40,19 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'contentCreator',
+      field: 'content creator',
       headerName: TranslateString('Content Creator'),
       flex: 1,
       minWidth: 170,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.users.username}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username
     },
     {
-      field: 'siteName',
+      field: 'site name',
       headerName: TranslateString('Site Name'),
       minWidth: 150,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.sites.name}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.sites?.name
     },
     {
       field: 'amount',
@@ -66,43 +60,34 @@ function index() {
       headerAlign: 'center',
       align: 'center',
       minWidth: 110,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.coin_amount}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount
     },
     {
-      field: 'paymentMethod',
+      field: 'payment method',
       headerName: TranslateString('Payment Method'),
       headerAlign: 'center',
       align: 'center',
       minWidth: 150,
-      sortable: false,
+      sortable: true,
       renderCell: () =>
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {/* {params.row.users.username} */} Deposit
         </Typography>
     },
     {
-      field: 'requestDate',
+      field: 'request date',
       headerName: TranslateString('Request Date'),
       minWidth: 200,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.created_at)}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
     },
     {
-      field: 'lastUpdate',
+      field: 'last update',
       headerName: TranslateString('Last Update'),
       minWidth: 200,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.updated_at)}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.updated_at)
     },
     {
       field: 'status',
@@ -110,7 +95,7 @@ function index() {
       headerAlign: 'center',
       align: 'center',
       minWidth: 120,
-      sortable: false,
+      sortable: true,
       renderCell: () => (
         <Typography color='green'>
           {/* {params.row.users.username} */} Approved
@@ -118,16 +103,13 @@ function index() {
       )
     },
     {
-      field: 'approvedBy',
+      field: 'approved by',
       headerName: TranslateString('Approved By'),
       headerAlign: 'center',
       align: 'center',
       minWidth: 140,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.customers.username}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.customers?.username
     },
     {
       field: 'view',

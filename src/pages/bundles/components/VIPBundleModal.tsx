@@ -2,14 +2,11 @@
 import React, { useState } from 'react'
 
 // ** MUI Imports
-import { Button, CircularProgress, Icon, IconProps, Menu, MenuItem, Switch, TextField } from '@mui/material'
+import { Button, CircularProgress, Menu, MenuItem, Switch, TextField } from '@mui/material'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import Stack, { StackProps } from '@mui/material/Stack'
 import Grid, { GridProps } from '@mui/material/Grid'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-
-// ** Project/Other Imports
-import IconList from './IconList'
 
 // ** Utils Imports
 import { useTranslateString } from '@/utils/TranslateString'
@@ -78,44 +75,60 @@ const VIPBundleModal = (props: Props) => {
   const openDurationMenu = (event: React.MouseEvent<HTMLButtonElement>) => setDurationAnchorEl(event.currentTarget)
   const closeDurationMenu = () => setDurationAnchorEl(null)
 
-  const featuresList = [
+  const perksList = [
     {
-      featureName: 'Video',
+      includedSrc: '/images/vipBundle/videos.png',
+      src: '/images/vipBundle/videos_white.png',
+      featureName: 'Videos',
       isIncluded: isVideoIncluded,
       setFunction: () => setIsVideoIsIncluded(prev => !prev)
     },
     {
+      includedSrc: '/images/vipBundle/photos.png',
+      src: '/images/vipBundle/photos_white.png',
       featureName: 'Photos',
       isIncluded: isPhotosIncluded,
       setFunction: () => setIsPhotosIncluded(prev => !prev)
     },
     {
-      featureName: 'Live Stream',
+      includedSrc: '/images/vipBundle/live.png',
+      src: '/images/vipBundle/live_white.png',
+      featureName: 'Live',
       isIncluded: isLiveStreamIncluded,
       setFunction: () => setIsLiveStreamIncluded(prev => !prev)
     },
     {
+      includedSrc: '/images/vipBundle/videocall.png',
+      src: '/images/vipBundle/videocall_white.png',
       featureName: 'Video Call',
       isIncluded: isVideoCallIncluded,
       setFunction: () => setIsVideoCallIncluded(prev => !prev)
     },
     {
+      includedSrc: '/images/vipBundle/liveChat.png',
+      src: '/images/vipBundle/liveChat_white.png',
       featureName: 'Live Chat',
       isIncluded: isLiveChatIncluded,
       setFunction: () => setIsLiveChatIncluded(prev => !prev)
     },
     {
       featureName: 'Forever VIP',
+      includedSrc: '/images/vipBundle/foreverVIP.png',
+      src: '/images/vipBundle/foreverVIP_white.png',
       isIncluded: isVIPIncluded,
       setFunction: () => setIsVIPIncluded(prev => !prev)
     },
     {
       featureName: 'Download',
+      includedSrc: '/images/vipBundle/download.png',
+      src: '/images/vipBundle/download_white.png',
       isIncluded: isDownloadIncluded,
       setFunction: () => setIsDownloadIncluded(prev => !prev)
     },
     {
       featureName: 'Watch Ticket',
+      includedSrc: '/images/vipBundle/watchTicket.png',
+      src: '/images/vipBundle/watchTicket_white.png',
       isIncluded: isWatchTicketIncluded,
       setFunction: () => setIsWatchTicketIncluded(prev => !prev)
     }
@@ -144,7 +157,7 @@ const VIPBundleModal = (props: Props) => {
 
       return false
     }
-    if (featuresList.every(item => item.isIncluded === false)) {
+    if (perksList.every(item => item.isIncluded === false)) {
       setFeaturesSelectionError(true)
 
       return false
@@ -204,15 +217,15 @@ const VIPBundleModal = (props: Props) => {
           description: bundleDescription,
           duration_days: bundleDurations[selectedDurationIndex].days,
           active: isBundleActive,
-          videos: featuresList[0].isIncluded,
-          photos: featuresList[1].isIncluded,
-          live_streaming: featuresList[2].isIncluded,
-          video_call: featuresList[3].isIncluded,
-          live_chat: featuresList[4].isIncluded,
-          forever_vip: featuresList[5].isIncluded,
-          download: featuresList[6].isIncluded,
-          watch_ticket: featuresList[7].isIncluded,
-          offline_benefit: featuresList[8]?.isIncluded || false
+          videos: perksList[0].isIncluded,
+          photos: perksList[1].isIncluded,
+          live_streaming: perksList[2].isIncluded,
+          video_call: perksList[3].isIncluded,
+          live_chat: perksList[4].isIncluded,
+          forever_vip: perksList[5].isIncluded,
+          download: perksList[6].isIncluded,
+          watch_ticket: perksList[7].isIncluded,
+          offline_benefit: perksList[8]?.isIncluded || false
         }
       })
     }
@@ -228,15 +241,15 @@ const VIPBundleModal = (props: Props) => {
           description: bundleDescription,
           duration_days: bundleDurations[selectedDurationIndex].days,
           active: isBundleActive,
-          videos: featuresList[0].isIncluded,
-          photos: featuresList[1].isIncluded,
-          live_streaming: featuresList[2].isIncluded,
-          video_call: featuresList[3].isIncluded,
-          live_chat: featuresList[4].isIncluded,
-          forever_vip: featuresList[5].isIncluded,
-          download: featuresList[6].isIncluded,
-          watch_ticket: featuresList[7].isIncluded,
-          offline_benefit: featuresList[8]?.isIncluded || false
+          videos: perksList[0].isIncluded,
+          photos: perksList[1].isIncluded,
+          live_streaming: perksList[2].isIncluded,
+          video_call: perksList[3].isIncluded,
+          live_chat: perksList[4].isIncluded,
+          forever_vip: perksList[5].isIncluded,
+          download: perksList[6].isIncluded,
+          watch_ticket: perksList[7].isIncluded,
+          offline_benefit: perksList[8]?.isIncluded || false
         }
       })
     }
@@ -378,9 +391,9 @@ const VIPBundleModal = (props: Props) => {
               {TranslateString('Select')} {TranslateString('Features')}
             </Typography>
             <Grid container gap={2.5}>
-              {featuresList.map((item, index) => (
+              {perksList.map((item, index) => (
                 <Grid style={{ cursor: 'pointer' }} onClick={item.setFunction} item key={index} {...gridItemProps}>
-                  <Icon component={IconList(index, item.isIncluded)} {...iconItemProps} />
+                  <img src={item.isIncluded ? item.includedSrc : item.src} alt='' style={{ width: 32, height: 32 }} /> 
                   <Typography {...typographyItemProps}>{item.featureName}</Typography>
                 </Grid>
               ))}
@@ -432,6 +445,7 @@ const gridItemProps: GridProps = {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  gap: 2,
   xs: 3.7
 }
 
@@ -439,14 +453,8 @@ const typographyItemProps: TypographyProps = {
   textAlign: 'center',
   variant: 'subtitle1',
   borderRadius: 0.5,
-  fontSize: 10
-}
-
-const iconItemProps: IconProps = {
-  sx: {
-    height: 32,
-    width: 32
-  }
+  fontSize: 10,
+  textTransform: 'uppercase'
 }
 
 const cardContainer: StackProps = {

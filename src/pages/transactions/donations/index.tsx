@@ -77,86 +77,58 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'content_creator',
+      field: 'content creator',
       headerName: TranslateString('Content Creator'),
       flex: 1,
       minWidth: 170,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.users.username}
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username
     },
     {
       field: 'customer',
       headerName: TranslateString('Customer'),
       minWidth: 170,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.customers.username}
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.customers?.username
     },
     {
-      field: 'site',
+      field: 'site name',
       headerName: TranslateString('Site Name'),
       minWidth: 170,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.sites.name}
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.sites?.name
     },
     {
-      field: 'coin_amount',
+      field: 'coin amount',
       headerName: TranslateString('Amount (Gold)'),
       headerAlign: 'center',
       align: 'center',
       minWidth: 150,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.coin_amount}
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount
     },
     {
-      field: 'money_amount',
+      field: 'money amount',
       headerName: TranslateString('Amount (CNY)'),
       headerAlign: 'center',
       align: 'center',
       minWidth: 150,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.money_amount}
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.money_amount
     },
     {
-      field: 'created_at',
+      field: 'created at',
       headerName: TranslateString('Date Created'),
       minWidth: 225,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.created_at)}
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.created_at
     },
     {
       field: 'updated_at',
       headerName: TranslateString('Last Update'),
       minWidth: 225,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.updated_at)}
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.updated_at
     }
   ]
 
