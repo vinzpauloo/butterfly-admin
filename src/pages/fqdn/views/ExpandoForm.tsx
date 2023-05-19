@@ -29,6 +29,7 @@ type ExpandoFormProps = {
   isLoading?: boolean
   disableSaveButton?: boolean
   defaultValues?: FormInputs
+  multipleInputs?: boolean
 }
 
 type FormInputs = {
@@ -46,7 +47,8 @@ const ExpandoForm = (
     disableSaveButton = false,
     defaultValues = {
       expando: [{ value: '' }, { value: '' }, { value: '' }]
-    }
+    },
+    multipleInputs
   }: ExpandoFormProps,
   ref: any
 ) => {
@@ -107,6 +109,13 @@ const ExpandoForm = (
                 <Grid key={field.id} item xs={12}>
                   <FormControl fullWidth>
                     <OutlinedInput
+                      sx={{
+                        width: {
+                          sm: '300px',
+                          md: '300px',
+                          lg: '300px'
+                        }
+                      }}
                       className='expandoInput'
                       {...register(`expando.${index}.value`, { required: true })}
                       error={Boolean(errors.expando)}
@@ -137,16 +146,18 @@ const ExpandoForm = (
               ))}
               <Grid item xs={12}>
                 <Box display='flex' justifyContent='space-evenly'>
-                  <Button
-                    disabled={isLoading ? true : false}
-                    variant='contained'
-                    color='info'
-                    onClick={() => {
-                      handleAddMore()
-                    }}
-                  >
-                    Add More
-                  </Button>
+                  {multipleInputs && (
+                    <Button
+                      disabled={isLoading ? true : false}
+                      variant='contained'
+                      color='info'
+                      onClick={() => {
+                        handleAddMore()
+                      }}
+                    >
+                      Add More
+                    </Button>
+                  )}
                   {!disableSaveButton && (
                     <Button disabled={isLoading ? true : false} type='submit' variant='contained' color='primary'>
                       {isLoading ? <CircularProgress size={12} sx={{ mr: 2 }} /> : null} Save

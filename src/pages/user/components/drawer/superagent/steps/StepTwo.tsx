@@ -3,7 +3,7 @@ import React from 'react'
 import toast from 'react-hot-toast'
 
 // ** MUI Imports
-import { Box, Button } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 
 // ** Project/Other Imports
 import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
@@ -25,6 +25,7 @@ type SAStepTwoProps = {
 export type FQDNData = {
   site: number
   fqdns: { name?: string; type?: 'api' | 'streaming' | 'photo' }[]
+  fqdn_admin: { name?: string }[]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,6 +37,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
   const formAPIRef = React.useRef<any>()
   const formPhotosRef = React.useRef<any>()
   const formStreamRef = React.useRef<any>()
+  const formAdminFQDNRef = React.useRef<any>()
 
   // ** Hooks
   const { addFQDN } = FQDNService()
@@ -52,6 +54,7 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
 
   // ** Error Handling Hooks
   const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
+  const [validation, setValidation] = React.useState<string>()
 
   const handleFinish = () => {
     // check for empty values handleVALIDATIONS
@@ -72,8 +75,15 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
       ? true
       : false
 
+    hasEmptyvalues = formAdminFQDNRef.current.getFormData().some((item: { value: string }) => {
+      return item.value.length < 1
+    })
+      ? true
+      : false
+
     if (hasEmptyvalues) {
       console.log('has empty values dont submit')
+      setValidation('Please input all fields.')
 
       return
     }
@@ -84,7 +94,14 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
     const streamingArray = formStreamRef.current
       .getFormData()
       .map((name: any) => ({ name: name.value, type: 'streaming' }))
-    const fqdnsObject = { fqdns: [...apiArray, ...photoArray, ...streamingArray] }
+    const [fqdnAdmin] = formAdminFQDNRef.current
+      .getFormData()
+      .map((name: any) => name.value)
+      .filter(Boolean)
+    const fqdnsObject = {
+      fqdns: [...apiArray, ...photoArray, ...streamingArray],
+      fqdn_admin: fqdnAdmin
+    }
 
     console.log('START SUBMIT fqdnsObject', fqdnsObject)
 
@@ -167,6 +184,16 @@ const SAStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: an
             disableSaveButton={true}
           />
 
+          <ExpandoForm
+            ref={formAdminFQDNRef}
+            fileType='text'
+            pageHeader='ADMIN FQDN'
+            isLoading={isLoading}
+            disableSaveButton={true}
+            defaultValues={{ expando: [{ value: '' }] }}
+          />
+
+          <Typography color='error'>{validation}</Typography>
           {/* Error Messages from backend */}
           {getErrorResponse(12)}
 

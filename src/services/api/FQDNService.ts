@@ -12,6 +12,7 @@ interface IGetSuperAgentFQDNParams {
 }
 
 interface IAddFQDNParams {
+  fqdn_admin?: string,
   siteId? : number,
   data?: {
     site?: number,

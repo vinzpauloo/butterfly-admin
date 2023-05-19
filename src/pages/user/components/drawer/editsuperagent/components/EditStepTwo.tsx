@@ -29,6 +29,7 @@ interface FQDNProps {
   api: []
   photo: []
   streaming: []
+  fqdn_admin: string
 }
 
 export type FQDNData = {
@@ -36,6 +37,7 @@ export type FQDNData = {
   values: [{ value: string }]
   site: number
   fqdns: { name?: string; type?: 'api' | 'streaming' | 'photo' }[]
+  fqdn_admin: { name?: string }[]
 }
 
 const EditStepTwo = (props: SidebarAddUserType) => {
@@ -90,10 +92,13 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     normalizedData = formatFQDNdata(fqdnList)
   }
 
+  console.log(fqdnList?.fqdn_admin)
+
   // References
   const formAPIRef = React.useRef<any>()
   const formPhotosRef = React.useRef<any>()
   const formStreamRef = React.useRef<any>()
+  const formAdminFQDNRef = React.useRef<any>()
 
   const handleFinish = () => {
     // check for empty values handleVALIDATIONS
@@ -114,6 +119,12 @@ const EditStepTwo = (props: SidebarAddUserType) => {
       ? true
       : false
 
+    hasEmptyvalues = formAdminFQDNRef.current.getFormData().some((item: { value: string }) => {
+      return item.value.length < 1
+    })
+      ? true
+      : false
+
     if (hasEmptyvalues) {
       console.log('has empty values dont submit')
 
@@ -126,7 +137,11 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     const streamingArray = formStreamRef.current
       .getFormData()
       .map((name: any) => ({ name: name.value, type: 'streaming' }))
-    const fqdnsObject = { fqdns: [...apiArray, ...photoArray, ...streamingArray] }
+    const [fqdnAdmin] = formAdminFQDNRef.current
+      .getFormData()
+      .map((name: any) => name.value)
+      .filter(Boolean)
+    const fqdnsObject = { fqdns: [...apiArray, ...photoArray, ...streamingArray], fqdn_admin: fqdnAdmin }
 
     console.log('START SUBMIT fqdnsObject', fqdnsObject)
 
@@ -187,6 +202,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
         >
           {normalizedData?.api && (
             <ExpandoForm
+              multipleInputs={true}
               ref={formAPIRef}
               fileType='text'
               pageHeader="API's"
@@ -197,6 +213,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
           )}
           {normalizedData?.streaming && (
             <ExpandoForm
+              multipleInputs={true}
               ref={formStreamRef}
               fileType='text'
               pageHeader='STREAMING'
@@ -207,12 +224,24 @@ const EditStepTwo = (props: SidebarAddUserType) => {
           )}
           {normalizedData?.photo && (
             <ExpandoForm
+              multipleInputs={true}
               ref={formPhotosRef}
               fileType='text'
               pageHeader='PHOTOS'
               isLoading={isLoading}
               disableSaveButton={true}
               defaultValues={{ expando: normalizedData?.photo || [] }}
+            />
+          )}
+
+          {fqdnList?.fqdn_admin && (
+            <ExpandoForm
+              ref={formAdminFQDNRef}
+              fileType='text'
+              pageHeader='ADMIN FQDN'
+              isLoading={isLoading}
+              disableSaveButton={true}
+              defaultValues={{ expando: [{ value: `${fqdnList?.fqdn_admin}` }] || [] }}
             />
           )}
 
