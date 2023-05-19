@@ -262,6 +262,7 @@
     "Approved By": "批准者", 
     "Balance": "馀额", 
     "Type(Debit | Credit)": "类型(借方 | 贷方)", 
+    "Type": "类型", 
     "Back": "后退", 
     "Update": "更新", 
     "Important Notes": "重要笔记", 

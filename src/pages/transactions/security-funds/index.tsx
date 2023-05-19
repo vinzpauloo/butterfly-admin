@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import EditDrawer from './EditDrawer'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
@@ -21,12 +21,10 @@ function index() {
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
 
-  // temporary for now, get only donations
-  const { getDonations } = TransactionsService()
+  const { getSecurityFunds } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
     queryKey: ['donations', pageSize, page],
-    queryFn: () =>
-      getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize } }),
+    queryFn: () => getSecurityFunds({ data: { with: 'site,user', page: page, paginate: pageSize } }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -34,79 +32,61 @@ function index() {
       setPage(data.current_page)
     },
     onError: (e: any) => {
-      handleError(e, `getDonations() transactions/commissions/index.tsx`)
+      handleError(e, `getSecurityFunds() transactions/security-funds/index.tsx`)
     }
   })
 
   const columnData: GridColDef[] = [
     {
-      field: 'contentCreator',
-      headerName: TranslateString('Content Creator'),
-      flex: 0.5,
+      field: 'site name',
+      headerName: TranslateString('Site Name'),
+      flex: 0.35,
       minWidth: 170,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.users.username}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.site?.name 
     },
     {
       field: 'amount',
       headerName: TranslateString('Amount'),
       headerAlign: 'center',
       align: 'center',
-      minWidth: 110,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.coin_amount}
-        </Typography>
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.amount 
     },
     {
       field: 'balance',
       headerName: TranslateString('Balance'),
       headerAlign: 'center',
       align: 'center',
-      minWidth: 110,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.money_amount}
-        </Typography>
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.balance 
     },
     {
       field: 'type',
-      headerName: TranslateString('Type (Debit | Credit)'),
+      headerName: TranslateString('Type'),
       headerAlign: 'center',
       align: 'center',
-      minWidth: 170,
-      sortable: false,
-      renderCell: () =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {/* {params.row.users.username} */} Debit
-        </Typography>
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.type 
     },
     {
-      field: 'dateCreate',
+      field: 'created_at',
       headerName: TranslateString('Date Created'),
-      flex: 0.5,
+      flex: 0.35,
       minWidth: 200,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.created_at)}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)  
     },
     {
-      field: 'lastUpdate',
+      field: 'updated_at',
       headerName: TranslateString('Last Update'),
-      flex: 0.5,
+      flex: 0.35,
       minWidth: 200,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) =>
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {formatDate(params.row.updated_at)}
-        </Typography>
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.updated_at)
     },
     {
       field: 'edit',
