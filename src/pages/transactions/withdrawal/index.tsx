@@ -2,157 +2,139 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import { Box, Button } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import ShowWithdrawDrawer from './ShowWithdrawDrawer'
-import Translations from '@/layouts/components/Translations'
-
-const rowData = [
-  {
-    id: 1,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 2,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 3,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 4,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 5,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 6,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 7,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 8,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 9,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 10,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  }
-]
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import { useTranslateString } from '@/utils/TranslateString'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+import TransactionsService from '@/services/api/Transactions'
+import { useQuery } from '@tanstack/react-query'
+import formatDate from '@/utils/formatDate'
 
 function index() {
+  const [data, setData] = useState([])
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [rowCount, setRowCount] = useState(0)
   const [open, setOpen] = useState(false)
+  const TranslateString = useTranslateString()
+  const { handleError } = useErrorHandling()
 
-  const columnData = [
-    { field: 'contentCreator', headerName: <Translations text='Content Creator'/>, width: 169, sortable: false },
-    { field: 'siteName', headerName: <Translations text='Site Name'/>, width: 169, sortable: false },
-    { field: 'amount', headerName: <Translations text='Amount'/>, width: 140, sortable: false },
-    { field: 'paymentMethod', headerName: <Translations text='Payment Method'/>, width: 160, sortable: false },
-    { field: 'requestDate', headerName: <Translations text='Request Date'/>, width: 169, sortable: false },
-    { field: 'lastUpdate', headerName: <Translations text='Last Update'/>, width: 169, sortable: false },
+  // temporary for now, get only donations
+  const { getDonations } = TransactionsService()
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['donations', pageSize, page],
+    queryFn: () =>
+      getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize } }),
+    onSuccess: data => {
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+    },
+    onError: (e: any) => {
+      handleError(e, `getDonations() transactions/commissions/index.tsx`)
+    }
+  })
+
+  const columnData: GridColDef[] = [
+    {
+      field: 'contentCreator',
+      headerName: TranslateString('Content Creator'),
+      flex: 1,
+      minWidth: 170,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.users.username}
+        </Typography>
+    },
+    {
+      field: 'siteName',
+      headerName: TranslateString('Site Name'),
+      minWidth: 150,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.sites.name}
+        </Typography>
+    },
+    {
+      field: 'amount',
+      headerName: TranslateString('Amount'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 110,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.coin_amount}
+        </Typography>
+    },
+    {
+      field: 'paymentMethod',
+      headerName: TranslateString('Payment Method'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 150,
+      sortable: false,
+      renderCell: () =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {/* {params.row.users.username} */} Deposit
+        </Typography>
+    },
+    {
+      field: 'requestDate',
+      headerName: TranslateString('Request Date'),
+      minWidth: 200,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {formatDate(params.row.created_at)}
+        </Typography>
+    },
+    {
+      field: 'lastUpdate',
+      headerName: TranslateString('Last Update'),
+      minWidth: 200,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {formatDate(params.row.updated_at)}
+        </Typography>
+    },
     {
       field: 'status',
-      headerName: <Translations text='Status'/>,
-      width: 169,
+      headerName: TranslateString('Status'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 120,
       sortable: false,
       renderCell: () => (
-        <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-          <Button variant='contained' color='success'>
-            Approved
-          </Button>
-        </Box>
+        <Typography color='green'>
+          {/* {params.row.users.username} */} Approved
+        </Typography>
       )
     },
     {
       field: 'approvedBy',
-      headerName: <Translations text='Approved By'/>,
-      width: 140,
-      sortable: false
+      headerName: TranslateString('Approved By'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 140,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.customers.username}
+        </Typography>
     },
     {
-      field: 'show',
-      headerName: '',
-      width: 65,
+      field: 'view',
+      headerName: 'View',
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 70,
       sortable: false,
       renderCell: () => {
         const handleClick = () => {
@@ -172,7 +154,16 @@ function index() {
 
   return (
     <>
-      <Transaction rowData={rowData} columnData={columnData} />
+      <Transaction
+        isLoading={isLoading}
+        isFetching={isFetching}
+        rowData={data}
+        columnData={columnData}
+        rowCount={rowCount}
+        pageSize={pageSize}
+        setPage={setPage}
+        setPageSize={setPageSize}
+      />
       {open ? <ShowWithdrawDrawer open={open} setOpen={setOpen} /> : null}
     </>
   )

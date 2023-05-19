@@ -2,97 +2,16 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from 'react'
 
-import { Box, Button, OutlinedInput, Typography } from '@mui/material'
-import { GridRenderCellParams } from '@mui/x-data-grid'
+import { Stack, Button, OutlinedInput, Typography } from '@mui/material'
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
 
 import formatDate from '@/utils/formatDate'
 import Transaction from '@/pages/transactions'
 import TransactionsService from '@/services/api/Transactions'
 import { useTranslateString } from '@/utils/TranslateString'
-import Translations from '@/layouts/components/Translations'
 
 import { useErrorHandling } from '@/hooks/useErrorHandling'
-
-const columnData = [
-  {
-    field: 'content_creator',
-    headerName: <Translations text='Content Creator' />,
-    width: 193,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.users.username}
-      </Typography>
-    )
-  },
-  {
-    field: 'customer',
-    headerName: <Translations text='Customer' />,
-    width: 193,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.customers.username}
-      </Typography>
-    )
-  },
-  {
-    field: 'site',
-    headerName: <Translations text='Site Name' />,
-    width: 193,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.sites.name}
-      </Typography>
-    )
-  },
-  {
-    field: 'coin_amount',
-    headerName: <Translations text='Amount (Gold)' />,
-    width: 193,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.coin_amount}
-      </Typography>
-    )
-  },
-  {
-    field: 'money_amount',
-    headerName: <Translations text='Amount (CNY)' />,
-    width: 193,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {params.row.money_amount}
-      </Typography>
-    )
-  },
-  {
-    field: 'created_at',
-    headerName: <Translations text='Date Created' />,
-    width: 193,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {formatDate(params.row.created_at)}
-      </Typography>
-    )
-  },
-  {
-    field: 'updated_at',
-    headerName: <Translations text='Last Update' />,
-    width: 193,
-    sortable: false,
-    renderCell: (params: GridRenderCellParams) => (
-      <Typography variant='body2' sx={{ color: 'text.primary' }}>
-        {formatDate(params.row.updated_at)}
-      </Typography>
-    )
-  }
-]
 
 const useDebounce = (value: any, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -121,6 +40,7 @@ function index() {
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
   const { getDonations } = TransactionsService()
+  const TranslateString = useTranslateString()
 
   const filterParams = () => {
     const userUsername = !!contentCreator && { user_username: contentCreator }
@@ -155,7 +75,90 @@ function index() {
     setSiteName('')
   }
 
-  const TranslateString = useTranslateString()
+  const columnData: GridColDef[] = [
+    {
+      field: 'content_creator',
+      headerName: TranslateString('Content Creator'),
+      flex: 1,
+      minWidth: 170,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.users.username}
+        </Typography>
+      )
+    },
+    {
+      field: 'customer',
+      headerName: TranslateString('Customer'),
+      minWidth: 170,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.customers.username}
+        </Typography>
+      )
+    },
+    {
+      field: 'site',
+      headerName: TranslateString('Site Name'),
+      minWidth: 170,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.sites.name}
+        </Typography>
+      )
+    },
+    {
+      field: 'coin_amount',
+      headerName: TranslateString('Amount (Gold)'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 150,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.coin_amount}
+        </Typography>
+      )
+    },
+    {
+      field: 'money_amount',
+      headerName: TranslateString('Amount (CNY)'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 150,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.money_amount}
+        </Typography>
+      )
+    },
+    {
+      field: 'created_at',
+      headerName: TranslateString('Date Created'),
+      minWidth: 225,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {formatDate(params.row.created_at)}
+        </Typography>
+      )
+    },
+    {
+      field: 'updated_at',
+      headerName: TranslateString('Last Update'),
+      minWidth: 225,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {formatDate(params.row.updated_at)}
+        </Typography>
+      )
+    }
+  ]
 
   return (
     <Transaction
@@ -168,23 +171,20 @@ function index() {
       setPage={setPage}
       setPageSize={setPageSize}
     >
-      <Box>
+      <Stack direction={['column', 'row', 'row']} gap={2.5} alignItems={['flex-start','center']} mb={5}>
         <OutlinedInput
-          style={{ marginBottom: '10px', marginRight: '10px' }}
           placeholder='Content Creator'
           size='small'
           value={contentCreator}
           onChange={e => setContentCreator(e.target.value)}
         />
         <OutlinedInput
-          style={{ marginBottom: '10px', marginRight: '10px' }}
           placeholder='Customer'
           size='small'
           value={customer}
           onChange={e => setCustomer(e.target.value)}
         />
         <OutlinedInput
-          style={{ marginBottom: '10px', marginRight: '10px' }}
           placeholder='Sitename'
           size='small'
           value={sitename}
@@ -193,7 +193,7 @@ function index() {
         <Button variant='contained' color='error' sx={{ width: 100 }} onClick={handleClear}>
           {TranslateString('Clear')}
         </Button>
-      </Box>
+      </Stack>
     </Transaction>
   )
 }
