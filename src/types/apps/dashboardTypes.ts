@@ -29,10 +29,8 @@ export type ChartData = BaseData & {
     yearly?: string
 }
 
-type ExtendedData = DashboardData | ChartData;
-
 export type DataProps<T extends BaseData> = {
     data: T;
 }
 
-export type AllDashboardData = BaseData & ExtendedData;
+export type AllDashboardData = BaseData & ChartData & DashboardData;
