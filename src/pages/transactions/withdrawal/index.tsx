@@ -25,8 +25,7 @@ function index() {
   const { getDonations } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
     queryKey: ['donations', pageSize, page],
-    queryFn: () =>
-      getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize } }),
+    queryFn: () => getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize } }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -70,10 +69,11 @@ function index() {
       align: 'center',
       minWidth: 150,
       sortable: true,
-      renderCell: () =>
+      renderCell: () => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {/* {params.row.users.username} */} Deposit
         </Typography>
+      )
     },
     {
       field: 'request date',
@@ -96,11 +96,7 @@ function index() {
       align: 'center',
       minWidth: 120,
       sortable: true,
-      renderCell: () => (
-        <Typography color='green'>
-          {/* {params.row.users.username} */} Approved
-        </Typography>
-      )
+      renderCell: () => <Typography color='green'>{/* {params.row.users.username} */} Approved</Typography>
     },
     {
       field: 'approved by',

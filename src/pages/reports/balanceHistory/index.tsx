@@ -1,15 +1,15 @@
 import React from 'react'
-import { Stack } from '@mui/material'
-import ReportsTable from '../components/ReportsTable'
-import FilterButtons from '../components/FilterButtons'
+import Container from '@/pages/components/Container'
+import Header from './components/Header'
+import BalanceHistoryTable from './table/BalanceHistoryTable'
 
 const BalanceHistoryReport = () => {
-	return (
-		<Stack gap={6}>
-			<FilterButtons />
-			<ReportsTable />
-		</Stack>
-	)
+  return (
+    <Container>
+      <Header />
+      <BalanceHistoryTable />
+    </Container>
+  )
 }
 
 export default BalanceHistoryReport
