@@ -21,6 +21,7 @@ const FQDN = () => {
   const [photoFQDNS, setPhotoFQDNS] = useState<string[]>([])
   const [streamingFQDNS, setStreamingFQDNS] = useState<string[]>([])
   const [hasGetDone, setHasGetDone] = useState<boolean>(false)
+  const [FQDNAdminLink, setFQDNAdminLink] = useState<string>('')
   const formAPIRef = useRef<any>()
   const formPhotosRef = useRef<any>()
   const formStreamRef = useRef<any>()
@@ -31,14 +32,15 @@ const FQDN = () => {
     queryKey: ['fqdns'],
     queryFn: () =>
       getSuperAgentFQDNList({
-        site: auth?.user?.site
+        site: auth?.user?.site,
       }),
     onSuccess: data => {
       console.log(data?.data)
-      setAPIFQDNS(data?.api)
-      setPhotoFQDNS(data?.photo)
-      setStreamingFQDNS(data?.streaming)
+      setAPIFQDNS(data?.api || data?.Api)
+      setPhotoFQDNS(data?.photo || data?.Photo)
+      setStreamingFQDNS(data?.streaming || data?.Streaming)
       setHasGetDone(true)
+      setFQDNAdminLink(data?.fqdn_admin)
     },
     onError: error => {
       console.log(error)
@@ -66,8 +68,9 @@ const FQDN = () => {
       siteId: auth?.user?.site,
       data: {
         site: auth?.user?.site,
-        fqdns: apiArray.concat(photoArray).concat(streamingArray)
-      }
+        fqdns: apiArray.concat(photoArray).concat(streamingArray),
+        fqdn_admin: FQDNAdminLink
+      },
     })
   }
 
@@ -87,6 +90,7 @@ const FQDN = () => {
             </Stack>
             <Stack gap={20}>
               <ExpandoForm
+                multipleInputs={true}
                 ref={formAPIRef}
                 fileType='text'
                 pageHeader="API's"
@@ -95,6 +99,7 @@ const FQDN = () => {
                 defaultValues={{ expando: APIFQDNS.map((value: string) => ({ value })) }}
               />
               <ExpandoForm
+                multipleInputs={true}
                 ref={formPhotosRef}
                 fileType='text'
                 pageHeader="PHOTOS"
@@ -103,6 +108,7 @@ const FQDN = () => {
                 defaultValues={{ expando: photoFQDNS.map((value: string) => ({ value })) }}
               />
               <ExpandoForm
+                multipleInputs={true}
                 ref={formStreamRef}
                 fileType='text'
                 pageHeader="STREAMING"
