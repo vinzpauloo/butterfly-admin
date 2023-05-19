@@ -1,15 +1,15 @@
 import React from 'react'
-import { Stack } from '@mui/material'
-import ReportsTable from '../components/ReportsTable'
-import FilterButtons from '../components/FilterButtons'
+import Header from './components/Header'
+import Container from '@/pages/components/Container'
+import CommissionsTable from './table/CommissionsTable'
 
 const CommissionsReport = () => {
-	return (
-		<Stack gap={6}>
-			<FilterButtons />
-			<ReportsTable />
-		</Stack>
-	)
+  return (
+    <Container>
+      <Header />
+      <CommissionsTable />
+    </Container>
+  )
 }
 
 export default CommissionsReport

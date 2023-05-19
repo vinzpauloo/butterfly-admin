@@ -70,10 +70,10 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:grid-large',
       path: '/reports',
       children: [
-        {
-          title: 'All',
-          path: '/reports/all'
-        },
+        // {
+        //   title: 'All',
+        //   path: '/reports/all'
+        // },
         {
           title: 'Commissions',
           path: '/reports/commissions'
