@@ -3,121 +3,118 @@ import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
 import NotesDrawer from './NotesDrawer'
-import { Box, Button } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import Icon from '@/@core/components/icon'
-import Translations from '@/layouts/components/Translations'
-
-const rowData = [
-  {
-    id: 1,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 2,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 3,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 4,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 5,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 6,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 7,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 8,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 9,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 10,
-    contentCreator: 'Syaoran Taio',
-    referenceID: '2023-ASFM123',
-    wacthed: '28',
-    amount: '2,543 Golds',
-    dateCreated: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  }
-]
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import { useTranslateString } from '@/utils/TranslateString'
+import { useQuery } from '@tanstack/react-query'
+import TransactionsService from '@/services/api/Transactions'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+import formatDate from '@/utils/formatDate'
 
 function index() {
-  const [open, setOpen] = useState(false)
+  const [data, setData] = useState([])
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [rowCount, setRowCount] = useState(0)
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const TranslateString = useTranslateString()
+  const { handleError } = useErrorHandling()
 
-  const columnData = [
-    { field: 'contentCreator', headerName: <Translations text='Content Creator'/>, width: 193, sortable: false },
-    { field: 'referenceID', headerName: <><Translations text='Reference' />{" ID"}</>, width: 193, sortable: false },
-    { field: 'wacthed', headerName: <Translations text='Watched'/>, width: 193, sortable: false },
-    { field: 'amount', headerName: <Translations text='Amount'/>, width: 193, sortable: false },
-    { field: 'dateCreated', headerName: <Translations text='Date Created'/>, width: 193, sortable: false },
-    { field: 'lastUpdate', headerName: <Translations text='Last Update'/>, width: 193, sortable: false },
+  // temporary for now, get only donations
+  const { getDonations } = TransactionsService()
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['donations', pageSize, page],
+    queryFn: () =>
+      getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize } }),
+    onSuccess: data => {
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+    },
+    onError: (e: any) => {
+      handleError(e, `getDonations() transactions/commissions/index.tsx`)
+    }
+  })
+
+  const columnData: GridColDef[] = [
+    {
+      field: 'contentCreator',
+      headerName: TranslateString('Content Creator'),
+      flex: 1,
+      minWidth: 193,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+        {params.row.users.username}
+        </Typography>
+    },
+    {
+      field: 'referenceID',
+      headerName: TranslateString('Reference') + ' ID',
+      minWidth: 250,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) => 
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.customers._id}
+        </Typography>
+    },
+    {
+      field: 'watched',
+      headerName: TranslateString('Watched'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 110,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.coin_amount.slice(0, -3)}
+        </Typography>
+
+    },
+    {
+      field: 'amount',
+      headerName: TranslateString('Amount'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 110,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {params.row.money_amount.slice(0, -3)}
+        </Typography>
+    },
+    {
+      field: 'dateCreated',
+      headerName: TranslateString('Date Created'),
+      minWidth: 225,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {formatDate(params.row.created_at)}
+        </Typography>
+    },
+    {
+      field: 'lastUpdate',
+      headerName: TranslateString('Last Update'),
+      minWidth: 225,
+      sortable: true,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {formatDate(params.row.updated_at)}
+        </Typography>
+    },
     {
       field: 'notes',
-      headerName: <Translations text='Notes'/>,
-      width: 193,
-      sortable: false,
+      headerName: TranslateString('Notes'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 110,
+      sortable: true,
       renderCell: () => {
         const handleClick = () => {
-          setOpen(true)
+          setOpenDrawer(true)
         }
 
         return (
@@ -133,8 +130,17 @@ function index() {
 
   return (
     <>
-      <Transaction rowData={rowData} columnData={columnData} />
-      {open ? <NotesDrawer open={open} setOpen={setOpen} /> : null}
+      <Transaction
+        isLoading={isLoading}
+        isFetching={isFetching}
+        rowData={data}
+        columnData={columnData}
+        rowCount={rowCount}
+        pageSize={pageSize}
+        setPage={setPage}
+        setPageSize={setPageSize}
+      />
+      {openDrawer ? <NotesDrawer open={openDrawer} setOpen={setOpenDrawer} /> : null}
     </>
   )
 }

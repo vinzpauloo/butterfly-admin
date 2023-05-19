@@ -1,6 +1,22 @@
 import React from 'react'
 
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid'
+
+
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer sx={{marginBottom: 2}}>
+      <GridToolbarExport
+        size='medium'
+        variant='outlined'
+        color='secondary'
+        printOptions={{ disableToolbarButton: true }}
+        excelOptions={{ allColumns: true }}
+        csvOptions={{ allColumns: true }}
+      />
+    </GridToolbarContainer>
+  );
+}
 
 function Table({ isLoading, isFetching, rowData, columnData, rowCount, pageSize, setPage, setPageSize }: any) {
   const handlePageChange = (newPage: number) => {
@@ -28,6 +44,7 @@ function Table({ isLoading, isFetching, rowData, columnData, rowCount, pageSize,
       rowCount={rowCount}
       rows={rowData}
       rowsPerPageOptions={[10, 25, 50]}
+      components={{ Toolbar: CustomToolbar }}
     />
   )
 }

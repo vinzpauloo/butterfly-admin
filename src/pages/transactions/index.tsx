@@ -4,9 +4,12 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import Container from '@/pages/transactions/components/Container'
-import Header from '@/pages/transactions/components/Header'
+
+// import Header from '@/pages/transactions/components/Header'
 import Table from '@/pages/transactions/components/Table'
 import TabLists from '@/pages/transactions/components/TabLists'
+import { Typography } from '@mui/material'
+import { useTranslateString } from '@/utils/TranslateString'
 
 
 
@@ -31,9 +34,12 @@ function index({
     setActiveTab(pathName)
   }, [router.pathname])
 
+  const TranslateString = useTranslateString()
+
   return (
     <Container>
-      <Header />
+      {/* <Header /> */}
+      <Typography variant='h4' component='h4' mb={5}>{TranslateString("Transactions")}</Typography>
       {children}
       <TabLists activeTab={activeTab} setActiveTab={setActiveTab} setOpen={setOpen} />
       <Table
