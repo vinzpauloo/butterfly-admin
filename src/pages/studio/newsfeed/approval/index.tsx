@@ -107,10 +107,10 @@ const NewsFeedApproval = () => {
   const [page, setPage] = React.useState<number>(1)
   const [searchText, setSearchText] = React.useState('')
   const debounceSearchText = useDebounce(searchText, 600)
-  const [sort, setSort] = React.useState<'desc' | 'asc'>('asc')
+  const [sort, setSort] = React.useState<'desc' | 'asc'>('desc')
   const [specificType, setSpecificType] = React.useState<{} | null>(null)
   const [searchBy, setSearchBy] = React.useState<string>('username') //data columns
-  const [sortBy, setSortBy] = React.useState<string>('username') //data columns
+  const [sortBy, setSortBy] = React.useState<string>('updated_at') //data columns
 
   const { handleError } = useErrorHandling()
 

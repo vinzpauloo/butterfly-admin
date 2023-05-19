@@ -63,7 +63,7 @@ type Props = {
 }
 
 // ** Feeds Params
-const defaultParams = { with: 'user', page: 1, approval: 'Approved' }
+const defaultParams = { with: 'user', page: 1, sort: 'desc', sort_by: 'updated_at' }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SelectFeaturedFeeds = (props: Props) => {
