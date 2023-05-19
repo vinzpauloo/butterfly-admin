@@ -161,70 +161,49 @@ const VIPBundleItem = (props: Props) => {
   ]
 
   return (
-    <>
-      <Stack gap={2} width={300} sx={loadingStyle} position='relative'>
+    <React.Fragment>
+      <Stack gap={2} width={350} sx={loadingStyle} position='relative'>
         {isBeingDeletedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
-        <Stack bgcolor='#D9D9D9' borderRadius={0.5} p={2} width={300}>
-          <Stack gap={2}>
-            <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
-              {props.site_id}: {props.siteName}
-            </Typography>
-            <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
+        <Stack bgcolor='#202833' borderRadius={1} p={2} pt={0} width={350} alignItems='center' border={'4px solid #3E404D'} gap={2}>
+          <Typography bgcolor='#454B5E' color='#CAC0AA' px={4} py={2} borderRadius={'0px 0px 8px 8px'} width='max-content' sx={{ wordBreak: 'break-word' }}>
+            {props.bundleName}
+          </Typography>
+          <Typography variant='h4' color='#CAC0AA' textAlign='center' sx={{ wordBreak: 'break-word' }} >
+            {props.bundlePrice}
+          </Typography>
+          <Typography variant='body2' bgcolor='#36384B' color='#CAC0AA' px={4} py={2} borderRadius={3} width='max-content' sx={{ wordBreak: 'break-word' }}>
+            {props.bundleDescription}
+          </Typography>
+          <Typography variant='body1' color='white' sx={{ wordBreak: 'break-word' }}>
+            {props.site_id}: {props.siteName}
+          </Typography>
+          <Stack gap={2} flexDirection='row' alignItems='center' justifyContent='space-between'>
+            <Typography variant='body1' color='white' sx={{ wordBreak: 'break-word' }}>
               Duration:&nbsp;
               {props.bundleDuration === 31 && '1 Month'}
               {props.bundleDuration === 92 && '3 Months'}
               {props.bundleDuration === 182 && '6 Months'}
               {props.bundleDuration === 365 && '1 Year'}
             </Typography>
-            <Stack gap={2} flexDirection='row' justifyContent='space-between'>
-              <Typography
-                variant='h6'
-                bgcolor='white'
-                p={2}
-                borderRadius={0.5}
-                width='max-content'
-                sx={{ wordBreak: 'break-word' }}
-              >
-                {props.bundleName}
-              </Typography>
-              <Switch checked={props.isBundleOn} onClick={SwtichOnAndOffVIPBundle} />
-            </Stack>
-            <Typography
-              variant='body1'
-              bgcolor='white'
-              p={2}
-              borderRadius={0.5}
-              textAlign='center'
-              sx={{ wordBreak: 'break-word' }}
-            >
-              {props.bundlePrice}
-            </Typography>
-            <Typography variant='body2' bgcolor='white' p={2} borderRadius={0.5} sx={{ wordBreak: 'break-word' }}>
-              {props.bundleDescription}
-            </Typography>
+            <Switch color='primary' checked={props.isBundleOn} onClick={SwtichOnAndOffVIPBundle} />
           </Stack>
         </Stack>
         <Stack>
-          <Stack bgcolor='#D9D9D9' borderRadius={0.5} p={2}>
-            <Stack bgcolor='white' borderRadius={0.5} gap={4} p={1}>
-              <Typography variant='body1' borderRadius={0.5} textAlign='center' sx={{ wordBreak: 'break-word' }}>
-                {props.bundleName}
-              </Typography>
-              <Grid container gap={2}>
-                {perksList.map((item, index) => (
-                  <Grid item key={index} {...gridItemProps}>
-                    <img src={item.isIncluded ? item.includedSrc : item.src} alt='' style={{width: 32, height: 32}} />
-                    <Typography {...typographyItemProps}>{item.featureName}</Typography>
-                  </Grid>
-                ))}
-              </Grid>
-            </Stack>
-          </Stack>
+          <Stack bgcolor='#202833' borderRadius={0.5} gap={4} border={'4px solid #3E404D'}>
+            <Grid container gap={4} py={4}>
+              {perksList.map((item, index) => (
+                <Grid item key={index} {...gridItemProps}>
+                  <img src={item.isIncluded ? item.includedSrc : item.src} alt='' style={{width: 32, height: 32}} />
+                  <Typography color='white' {...typographyItemProps}>{item.featureName}</Typography>
+                </Grid>
+              ))}
+            </Grid>
+          </Stack>          
           <Stack flexDirection='row' gap={4} mt={2}>
-            <Button variant='contained' color='warning' fullWidth onClick={() => setOpen(true)}>
+            <Button variant='contained' size='small' sx={{ backgroundColor: '#F09536'}} fullWidth onClick={() => setOpen(true)}>
               {TranslateString('Edit')}
             </Button>
-            <Button variant='contained' color='error' fullWidth onClick={confirmDeleteVIPBundle}>
+            <Button variant='contained' size='small' sx={{ backgroundColor: '#F03663'}} fullWidth onClick={confirmDeleteVIPBundle}>
               {TranslateString('Delete')}
             </Button>
           </Stack>
@@ -252,7 +231,7 @@ const VIPBundleItem = (props: Props) => {
           isOfflineBenefitsIncluded={props.bundlePerks.offline_benefit}
         />
       </Modal>
-    </>
+    </React.Fragment>
   )
 }
 
@@ -265,8 +244,7 @@ const gridItemProps: GridProps = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: 2,
-  width: 64,
-  xs: 3.7
+  xs: 2.5
 }
 
 const typographyItemProps: TypographyProps = {
