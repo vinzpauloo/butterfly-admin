@@ -5,11 +5,9 @@ import React, { useState } from 'react'
 import { Button, CircularProgress, Modal, Stack, Switch } from '@mui/material'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import Grid, { GridProps } from '@mui/material/Grid'
-import { Icon, IconProps } from '@mui/material'
 
 // ** Project/Other Imports
 import VIPBundleModal from './VIPBundleModal'
-import IconList from './IconList'
 
 // ** TanStack Imports
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -42,18 +40,6 @@ type Props = {
     offline_benefit: boolean
   }
 }
-
-const bundleNames = [
-  'Video',
-  'Photos',
-  'Live Stream',
-  'Video Call',
-  'Live Chat',
-  'Forever VIP',
-  'Download',
-  'Watch Ticket',
-  'Offline Benefits'
-]
 
 const VIPBundleItem = (props: Props) => {
   const [open, setOpen] = useState(false)
@@ -123,36 +109,52 @@ const VIPBundleItem = (props: Props) => {
 
   const TranslateString = useTranslateString()
 
-  const featuresList = [
+  const perksList = [
     {
-      featureName: 'Video',
+      includedSrc: '/images/vipBundle/videos.png',
+      src: '/images/vipBundle/videos_white.png',
+      featureName: 'Videos',
       isIncluded: props.bundlePerks.videos
     },
     {
+      includedSrc: '/images/vipBundle/photos.png',
+      src: '/images/vipBundle/photos_white.png',
       featureName: 'Photos',
       isIncluded: props.bundlePerks.photos
     },
     {
-      featureName: 'Live Stream',
+      includedSrc: '/images/vipBundle/live.png',
+      src: '/images/vipBundle/live_white.png',
+      featureName: 'Live',
       isIncluded: props.bundlePerks.live_streaming
     },
     {
+      includedSrc: '/images/vipBundle/videocall.png',
+      src: '/images/vipBundle/videocall_white.png',
       featureName: 'Video Call',
       isIncluded: props.bundlePerks.video_call
     },
     {
+      includedSrc: '/images/vipBundle/liveChat.png',
+      src: '/images/vipBundle/liveChat_white.png',
       featureName: 'Live Chat',
       isIncluded: props.bundlePerks.live_chat
     },
     {
+      includedSrc: '/images/vipBundle/foreverVIP.png',
+      src: '/images/vipBundle/foreverVIP_white.png',
       featureName: 'Forever VIP',
       isIncluded: props.bundlePerks.forever_vip
     },
     {
+      includedSrc: '/images/vipBundle/download.png',
+      src: '/images/vipBundle/download_white.png',
       featureName: 'Download',
       isIncluded: props.bundlePerks.download
     },
     {
+      includedSrc: '/images/vipBundle/watchTicket.png',
+      src: '/images/vipBundle/watchTicket_white.png',
       featureName: 'Watch Ticket',
       isIncluded: props.bundlePerks.watch_ticket
     }
@@ -209,10 +211,10 @@ const VIPBundleItem = (props: Props) => {
                 {props.bundleName}
               </Typography>
               <Grid container gap={2}>
-                {featuresList.map((item, index) => (
+                {perksList.map((item, index) => (
                   <Grid item key={index} {...gridItemProps}>
-                    <Icon component={IconList(index, item.isIncluded)} {...iconItemProps} />
-                    <Typography {...typographyItemProps}>{bundleNames.at(index)}</Typography>
+                    <img src={item.isIncluded ? item.includedSrc : item.src} alt='' style={{width: 32, height: 32}} />
+                    <Typography {...typographyItemProps}>{item.featureName}</Typography>
                   </Grid>
                 ))}
               </Grid>
@@ -262,6 +264,7 @@ const gridItemProps: GridProps = {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  gap: 2,
   width: 64,
   xs: 3.7
 }
@@ -270,15 +273,10 @@ const typographyItemProps: TypographyProps = {
   textAlign: 'center',
   variant: 'subtitle1',
   borderRadius: 0.5,
-  fontSize: 10
+  fontSize: 10,
+  textTransform: 'uppercase'
 }
 
-const iconItemProps: IconProps = {
-  sx: {
-    height: 32,
-    width: 32
-  }
-}
 const loaderStyle = {
   position: 'absolute',
   top: 0,
