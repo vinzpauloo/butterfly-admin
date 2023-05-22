@@ -34,10 +34,10 @@ const StepperCustomDot = (props: StepIconProps) => {
     return (
       <Box
         sx={{
-          borderColor: bgColors.primaryLight.backgroundColor,
+          borderColor: '#FF9C00',
           ...(active && {
             borderWidth: 5,
-            borderColor: 'primary.main',
+            borderColor: '#FF9C00',
             backgroundColor: theme.palette.mode === 'light' ? 'common.white' : 'background.default'
           })
         }}
