@@ -17,19 +17,117 @@ const Navigation = (): VerticalNavItemsType => {
       subject: 'shared-page'
     },
     {
-      title: 'Users',
-      icon: 'mdi:user-circle',
-      path: '/user/list',
+      title: 'Admin',
+      icon: 'mdi:file-document-outline',
       action: 'read',
-      subject: 'shared-page'
+      subject: 'shared-page',
+      children: [
+        {
+          title: 'Users',
+          path: '/user/list',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Roles',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Permission',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Menu',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Activity Log',
+          action: 'read',
+          subject: 'shared-page'
+        }
+      ]
     },
     {
-      title: 'FQDN',
-      icon: 'mdi:web',
-      path: '/fqdn',
+      title: 'Super Agents',
+      icon: 'mdi:file-document-outline',
       action: 'read',
-      subject: 'fqdn-page'
+      subject: 'shared-page',
+      children: [
+        {
+          title: 'Sites',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Agents',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Customers',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'FQDN',
+          path: '/fqdn',
+          action: 'read',
+          subject: 'fqdn-page'
+        },
+        {
+          title: 'Integration Key',
+          action: 'read',
+          subject: 'shared-page'
+        }
+      ]
     },
+    {
+      title: 'Content Creators',
+      icon: 'mdi:file-document-outline',
+      action: 'read',
+      subject: 'shared-page',
+      children: [
+        {
+          title: 'List of Content Creators',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Newsfeed List',
+          path: '/studio/newsfeed',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Video List',
+          path: '/studio/video-list',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Create Content Creator',
+          action: 'read',
+          subject: 'fqdn-page'
+        }
+      ]
+    },
+    // {
+    //   title: 'Users',
+    //   icon: 'mdi:user-circle',
+    //   path: '/user/list',
+    //   action: 'read',
+    //   subject: 'shared-page'
+    // },
+    // {
+    //   title: 'FQDN',
+    //   icon: 'mdi:web',
+    //   path: '/fqdn',
+    //   action: 'read',
+    //   subject: 'fqdn-page'
+    // },
     {
       title: 'Transactions',
       icon: 'mdi:file-document-outline',
@@ -52,7 +150,7 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Withdrawal',
+          title: 'Withdrawals',
           path: '/transactions/withdrawal',
           action: 'read',
           subject: 'shared-page'
@@ -70,10 +168,6 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:grid-large',
       path: '/reports',
       children: [
-        // {
-        //   title: 'All',
-        //   path: '/reports/all'
-        // },
         {
           title: 'Commissions',
           path: '/reports/commissions'
@@ -99,24 +193,14 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'cc-page'
         },
         {
-          title: 'Content Approval',
-          path: '/studio/content'
-        },
-        {
-          title: 'Newsfeed Approval',
-          path: '/studio/newsfeed/approval'
-        },
-        {
           title: 'Newsfeed List',
           path: '/studio/newsfeed',
           action: 'read',
           subject: 'cc-page'
         },
         {
-          title: 'Content Status',
-          path: '/studio/cc/content-status',
-          action: 'read',
-          subject: 'cc-post-status'
+          title: 'Newsfeed Approval',
+          path: '/studio/newsfeed/approval'
         },
         {
           title: 'Newsfeed Status',
@@ -131,42 +215,22 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'cc-page'
         },
         {
+          title: 'Video Approval',
+          path: '/studio/content'
+        },
+        {
+          title: 'Video Status',
+          path: '/studio/cc/content-status',
+          action: 'read',
+          subject: 'cc-post-status'
+        },
+        {
           title: 'Album List',
           path: '/studio/album/album-list'
-        }
-      ]
-    },
-    {
-      title: 'Settings',
-      icon: 'mdi:cogs',
-      children: [
+        },
         {
-          title: 'Works Groupings',
+          title: 'Work Groupings',
           path: '/settings'
-        },
-        {
-          title: 'Featured Feeds',
-          path: '/settings/pages/featuredfeeds'
-        },
-        {
-          title: 'Advertisement',
-          path: '/settings/pages/ads',
-          action: 'read',
-          subject: 'sa-page'
-        },
-        {
-          title: 'Announcement',
-          path: '/settings/pages/announcements',
-          action: 'read',
-          subject: 'sa-page'
-        },
-        {
-          title: 'Privacy Policy',
-          path: '/settings/pages/privacypolicy'
-        },
-        {
-          title: 'Terms of Service',
-          path: '/settings/pages/tos'
         }
       ]
     },
@@ -189,17 +253,60 @@ const Navigation = (): VerticalNavItemsType => {
       ]
     },
     {
-      title: 'Versions',
+      title: 'Mobile App',
       icon: 'mdi:source-branch',
       path: '/versions',
       action: 'read',
       subject: 'sa-page'
     },
     {
-      title: 'Wallet',
-      icon: 'mdi:wallet',
-      path: '/wallet',
-      action: 'read'
+      title: 'Site Settings',
+      icon: 'mdi:cogs',
+      children: [
+        {
+          title: 'Privacy Policy',
+          path: '/settings/pages/privacypolicy'
+        },
+        {
+          title: 'Terms and Services',
+          path: '/settings/pages/tos'
+        },
+        {
+          title: 'Featured Feeds',
+          path: '/settings/pages/featuredfeeds'
+        },
+        {
+          title: 'Advertisements',
+          path: '/settings/pages/ads',
+          action: 'read',
+          subject: 'sa-page'
+        },
+        {
+          title: 'Announcements',
+          path: '/settings/pages/announcements',
+          action: 'read',
+          subject: 'sa-page'
+        }
+      ]
+    },
+    {
+      title: 'Settings',
+      icon: 'mdi:cogs',
+      children: [
+        {
+          title: 'Payment Channel',
+          path: '/wallet',
+          action: 'read'
+        },
+        {
+          title: 'Language',
+          action: 'read'
+        },
+        {
+          title: 'Currency',
+          action: 'read'
+        }
+      ]
     }
   ]
 }
