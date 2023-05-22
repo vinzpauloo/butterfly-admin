@@ -175,7 +175,7 @@ const InformationCard = () => {
     queryKey: [`mostActiveUserCount`],
     queryFn: () => getMostActiveUsers(),
     onSuccess: (data: any) => {
-      setMostActiveUsers(data?.total_active)
+      setMostActiveUsers(data)
     },
     onError: (e: any) => {
       handleError(e, `getMostActiveUsers() operator/InformationCard.tsx`)
