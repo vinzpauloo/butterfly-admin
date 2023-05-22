@@ -501,6 +501,7 @@ const SAStepOne = (
                           } else {
                             field.onChange(null)
                           }
+                          console.log(fileName)
                         }}
                         ref={fileInputRef}
                       />

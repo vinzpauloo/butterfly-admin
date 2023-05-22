@@ -27,7 +27,7 @@ type StepOneProps = {
   responseError: any
   setResponseError: React.Dispatch<any>
   fileName: any
-  setFileName: React.Dispatch<React.SetStateAction<string>>
+  setFileName: React.Dispatch<React.SetStateAction<string | File>>
   setSiteID: React.Dispatch<React.SetStateAction<number | null>>
   handleNext: () => void
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>

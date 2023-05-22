@@ -4,8 +4,9 @@ import React, { useState } from 'react'
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
 import {
-  Drawer,
-  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Typography,
   Step,
@@ -14,31 +15,21 @@ import {
   StepContent,
   LinearProgress
 } from '@mui/material'
-
-// ** Style Imports
 import { styled } from '@mui/material/styles'
 
 // ** Third Party Imports
 import clsx from 'clsx'
-import toast from 'react-hot-toast'
-
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
-// ** Styled Component
-import StepperWrapper from 'src/@core/styles/mui/stepper'
 
 // ** Custom Components Imports
 import StepperCustomDot from '@/layouts/components/shared-components/StepperCustomDot'
 import CreatedSuccessful from '../form/CreatedSuccessful'
+import StepperWrapper from 'src/@core/styles/mui/stepper'
+import Icon from 'src/@core/components/icon'
 
 // ** Steps
-import SAStepOne from './superagent/steps/StepOne'
+import SuperAgentModal from '../modal/SuperAgentModal'
 import SAStepTwo from './superagent/steps/StepTwo'
 import SAStepThree from './superagent/steps/StepThree'
-
-// import superAgentStore
-import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
 
 interface SidebarAddUserType {
   open: boolean
@@ -52,7 +43,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const SADrawer = (props: SidebarAddUserType) => {
@@ -65,7 +56,8 @@ const SADrawer = (props: SidebarAddUserType) => {
   const [activeStep, setActiveStep] = useState<number>(defaultStateValues.step)
   const [siteID, setSiteID] = useState<number | null>(defaultStateValues.siteID)
 
-  const [fileName, setFileName] = useState('')
+  const [fileName, setFileName] = useState<string | File>('')
+
   const [responseError, setResponseError] = useState<any>()
   const [resetKey, setResetKey] = useState(0)
 
@@ -111,7 +103,7 @@ const SADrawer = (props: SidebarAddUserType) => {
       title: 'Account Details',
       subtitle: 'Enter your Account Details',
       component: (
-        <SAStepOne
+        <SuperAgentModal
           ref={stepOneRef}
           toggle={toggle}
           resetKey={resetKey}
@@ -157,21 +149,16 @@ const SADrawer = (props: SidebarAddUserType) => {
   ]
 
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
-        <Typography variant='h6'>Add Super Agent</Typography>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
+          Super Agent
+        </DialogTitle>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
-      <Box sx={{ p: 5 }}>
+      <DialogContent>
         <StepperWrapper>
           <Stepper activeStep={activeStep} orientation='vertical'>
             {steps.map((step, index) => {
@@ -179,6 +166,7 @@ const SADrawer = (props: SidebarAddUserType) => {
                 <Step key={index} className={clsx({ active: activeStep === index })}>
                   <StepLabel StepIconComponent={StepperCustomDot}>
                     <div className='step-label'>
+                      <Typography className='step-number'>{`Step`}</Typography>
                       <Typography className='step-number'>{`0${index + 1}`}</Typography>
                       <div>
                         <Typography className='step-title'>{step.title}</Typography>
@@ -215,98 +203,9 @@ const SADrawer = (props: SidebarAddUserType) => {
           </Stepper>
         </StepperWrapper>
         {activeStep === steps.length && <CreatedSuccessful />}
-      </Box>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   )
-}
-
-const styles = {
-  container: {},
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: '#A459D1',
-    padding: 4
-  },
-  radio: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  white: {
-    color: 'white'
-  },
-  formContent: {
-    marginTop: 5
-  },
-  fullWidth: {
-    width: '100%',
-    mt: 5
-  },
-  textInput: {
-    width: {
-      xs: '100%',
-      sm: '100%',
-      md: '100%',
-      lg: '50%'
-    }
-  },
-  formContainer: {
-    display: 'flex',
-    flexDirection: {
-      xs: 'column',
-      lg: 'row'
-    },
-    gap: {
-      xs: 0,
-      lg: 5
-    }
-  },
-  formButtonContainer: {
-    display: 'flex',
-    flexDirection: {
-      xs: 'column',
-      md: 'column',
-      lg: 'column'
-    },
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    mt: 5,
-    gap: 3
-  },
-  cancelButton: {
-    backgroundColor: '#98A9BC',
-    color: 'white',
-    width: '200px',
-    '&:hover': {
-      backgroundColor: '#7899ac'
-    }
-  },
-  text: {
-    color: 'white',
-    textTransform: 'uppercase',
-    '&:hover': {
-      transform: 'scale(1.1)',
-      transition: 'transform 0.2s ease-in-out'
-    }
-  },
-  continueButton: {
-    backgroundColor: '#9747FF',
-    color: 'white',
-    width: '200px',
-    '&:hover': {
-      backgroundColor: '#9747FF'
-    }
-  },
-
-  // Logo Styling
-  input: {
-    display: 'block'
-  },
-  upload: {
-    backgroundColor: '#979797',
-    padding: '8px 12px 8px 12px',
-    borderRadius: '5px'
-  }
 }
 
 export default SADrawer
