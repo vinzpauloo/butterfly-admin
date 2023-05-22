@@ -423,7 +423,7 @@ const SAStepOne = (
                       fullWidth
                       error={!!errors.currency_id}
                       helperText={errors.currency_id?.message}
-                      value={field.value}
+                      value={field.value || ''}
                       onChange={field.onChange}
                       name='currency_id'
                     >
@@ -449,7 +449,7 @@ const SAStepOne = (
                       fullWidth
                       error={!!errors.language_id}
                       helperText={errors.language_id?.message}
-                      value={field.value}
+                      value={field.value || ''}
                       onChange={field.onChange}
                       name='language_id'
                     >
