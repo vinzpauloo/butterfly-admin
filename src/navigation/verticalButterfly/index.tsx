@@ -34,17 +34,12 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Permission',
+          title: 'Permissions',
           action: 'read',
           subject: 'shared-page'
         },
         {
-          title: 'Menu',
-          action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Activity Log',
+          title: 'Activity Logs',
           action: 'read',
           subject: 'shared-page'
         }
@@ -96,13 +91,13 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Newsfeed List',
+          title: 'Feeds List',
           path: '/studio/newsfeed',
           action: 'read',
           subject: 'shared-page'
         },
         {
-          title: 'Video List',
+          title: 'Works List',
           path: '/studio/video-list',
           action: 'read',
           subject: 'shared-page'
@@ -172,7 +167,7 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Gold Bundles',
+          title: 'Gold Coin Bundles',
           action: 'read',
           subject: 'shared-page'
         }
@@ -200,7 +195,7 @@ const Navigation = (): VerticalNavItemsType => {
           title: 'VIP Bundles'
         },
         {
-          title: 'Gold Bundles'
+          title: 'Gold Coin Bundles'
         },
         {
           title: '(OLD) Security Funds',
@@ -219,40 +214,28 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'cc-page'
         },
         {
-          title: 'Newsfeed List',
-          path: '/studio/newsfeed',
-          action: 'read',
-          subject: 'cc-page'
+          title: 'Albums List',
+          path: '/studio/album/album-list'
         },
         {
-          title: 'Newsfeed Approval',
+          title: 'Feeds Approval',
           path: '/studio/newsfeed/approval'
         },
         {
-          title: 'Newsfeed Status',
+          title: 'Feeds Status',
           path: '/studio/cc/post-status',
           action: 'read',
           subject: 'cc-post-status'
         },
         {
-          title: 'Video List',
-          path: '/studio/video-list',
-          action: 'read',
-          subject: 'cc-page'
-        },
-        {
-          title: 'Video Approval',
+          title: 'Works Approval',
           path: '/studio/content'
         },
         {
-          title: 'Video Status',
+          title: 'Works Status',
           path: '/studio/cc/content-status',
           action: 'read',
           subject: 'cc-post-status'
-        },
-        {
-          title: 'Album List',
-          path: '/studio/album/album-list'
         },
         {
           title: 'Work Groupings',
@@ -265,17 +248,17 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:tag-multiple',
       children: [
         {
-          title: 'VIP Bundle',
+          title: 'VIP Bundles',
           path: '/bundles/pages/VIPBundlesPage'
         },
         {
-          title: 'Gold Coin Bundle',
+          title: 'Gold Coin Bundles',
           path: '/bundles/pages/GoldCoinBundlesPage'
-        },
-        {
-          title: 'Gold Coin Table',
-          path: '/bundles/pages/GoldCoinTablesPage'
         }
+        // {
+        //   title: 'Gold Coin Table',
+        //   path: '/bundles/pages/GoldCoinTablesPage'
+        // }
       ]
     },
     {
@@ -290,18 +273,6 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:cogs',
       children: [
         {
-          title: 'Privacy Policy',
-          path: '/settings/pages/privacypolicy'
-        },
-        {
-          title: 'Terms and Services',
-          path: '/settings/pages/tos'
-        },
-        {
-          title: 'Featured Feeds',
-          path: '/settings/pages/featuredfeeds'
-        },
-        {
           title: 'Advertisements',
           path: '/settings/pages/ads',
           action: 'read',
@@ -312,6 +283,18 @@ const Navigation = (): VerticalNavItemsType => {
           path: '/settings/pages/announcements',
           action: 'read',
           subject: 'sa-page'
+        },
+        {
+          title: 'Featured Feeds',
+          path: '/settings/pages/featuredfeeds'
+        },
+        {
+          title: 'Privacy Policy',
+          path: '/settings/pages/privacypolicy'
+        },
+        {
+          title: 'Terms and Services',
+          path: '/settings/pages/tos'
         }
       ]
     },
@@ -320,17 +303,15 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:cogs',
       children: [
         {
-          title: 'Payment Channel',
+          title: 'Payment Channels',
           path: '/wallet',
           action: 'read'
         },
         {
-          title: 'Language',
-          action: 'read'
+          title: 'Security Funds'
         },
         {
-          title: 'Currency',
-          action: 'read'
+          title: 'Withdrawals'
         }
       ]
     }
