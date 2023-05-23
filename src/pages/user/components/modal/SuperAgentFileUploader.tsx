@@ -13,7 +13,12 @@ interface FileProp {
   size: number
 }
 
-const SuperAgentFileUploader = ({ onFilesChange }: { onFilesChange?: (files: File[]) => void }) => {
+interface SuperAgentFileUploaderProps {
+  onFilesChange?: (files: File[]) => void
+  logo?: string
+}
+
+const SuperAgentFileUploader: React.FC<SuperAgentFileUploaderProps> = ({ onFilesChange, logo }) => {
   // ** State
   const [files, setFiles] = useState<File[]>([])
 
@@ -36,7 +41,7 @@ const SuperAgentFileUploader = ({ onFilesChange }: { onFilesChange?: (files: Fil
       key={file.name}
       alt={file.name}
       className='single-file-image'
-      src={URL.createObjectURL(file as any)}
+      src={URL.createObjectURL(file as any) || URL.createObjectURL(logo as any)}
       style={{ objectFit: 'cover', width: '100%', height: '248px', objectPosition: '100% 20%' }}
     />
   ))
@@ -44,28 +49,46 @@ const SuperAgentFileUploader = ({ onFilesChange }: { onFilesChange?: (files: Fil
   return (
     <>
       <Box sx={{ ...styles.albumWrapper, position: 'relative' }}>
-        {files.length > 0 && (
+        <Box
+          {...getRootProps({ className: 'dropzone' })}
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            cursor: 'pointer',
+            zIndex: 1
+          }}
+        >
+          <input {...getInputProps()} />
+          <Typography sx={{ color: '#fff', fontSize: 14 }}>Click to change image</Typography>
+        </Box>
+        {files.length > 0 ? (
           <Box
-            {...getRootProps({ className: 'dropzone' })}
             sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
+              ...styles.albumWrapper,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              cursor: 'pointer',
-              zIndex: 1
+              width: '100%',
+              height: '100%'
             }}
           >
-            <input {...getInputProps()} />
-            <Typography sx={{ color: '#fff', fontSize: 14 }}>Click to change image</Typography>
+            {img}
           </Box>
-        )}
-        {files.length === 0 ? (
+        ) : logo ? (
+          <img
+            alt='edit-logo'
+            className='single-file-image'
+            src={logo}
+            style={{ objectFit: 'cover', width: '100%', height: '248px', objectPosition: '100% 20%' }}
+          />
+        ) : (
           <Box {...getRootProps({ className: 'dropzone' })} sx={{ ...styles.albumContent }}>
             <input {...getInputProps()} />
 
@@ -87,19 +110,6 @@ const SuperAgentFileUploader = ({ onFilesChange }: { onFilesChange?: (files: Fil
                 <Typography sx={{ fontSize: 14 }}>Drag Files here or click to upload.</Typography>
               </Box>
             </Box>
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              ...styles.albumWrapper,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '100%',
-              height: '100%'
-            }}
-          >
-            {img}
           </Box>
         )}
       </Box>

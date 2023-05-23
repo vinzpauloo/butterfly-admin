@@ -18,14 +18,14 @@ const StepperWrapper = styled(Box)<BoxProps>(({ theme }) => {
     },
     '& .MuiStep-root': {
       '& .step-label': {
-        // display: 'flex',
-        // alignItems: 'center',
-        // justifyContent: 'center'
-
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start'
+        alignItems: 'center',
+        justifyContent: 'center'
+
+        // display: 'flex',
+        // flexDirection: 'column',
+        // justifyContent: 'center',
+        // alignItems: 'flex-start'
       },
       '& .step-number': {
         fontWeight: 'bold',

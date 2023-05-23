@@ -6,54 +6,36 @@ import toast from 'react-hot-toast'
 import { Box, Button, Tab, Typography } from '@mui/material'
 import { TabList, TabPanel, TabContext } from '@mui/lab'
 
-// ** Import component
+// ** Project/Other Imports
 import ExpandoForm from '@/pages/fqdn/views/ExpandoForm'
-import CreatedSuccessful from '../../../form/CreatedSuccessful'
 
-// ** API queries
-import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
+// ** Tanstack Imports
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-// ** Hooks/Services
-import { useErrorHandling } from '@/hooks/useErrorHandling'
+// ** Hooks/Services Imports
 import FQDNService from '@/services/api/FQDNService'
-import { useFQDNdata } from '@/hooks/useFQDNdata'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+import CreatedSuccessful from '../form/CreatedSuccessful'
 
-// ** Zustand Imports
-import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
-
-interface SidebarAddUserType {
-  data: any
-  toggle: () => void
-}
-
-interface FQDNProps {
-  api: []
-  photo: []
-  streaming: []
-  fqdn_admin: string
+// ** types
+type SAStepTwoProps = {
+  siteID: number | null
+  handleNext: () => void
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export type FQDNData = {
-  name: string
-  values: [{ value: string }]
   site: number
   fqdns: { name?: string; type?: 'api' | 'streaming' | 'photo' }[]
   fqdn_admin: { name?: string }[]
 }
 
-const EditStepTwo = (props: SidebarAddUserType) => {
-  // ** Props
-  const { toggle } = props
-
-  // ** Store
-  const { siteData } = editSuperAgentStore()
-
-  // ** States
-  const [value, setValue] = React.useState<string>('api')
-  const [fqdnList, setFqdnList] = React.useState<FQDNProps>()
-  const [submitted, setSubmitted] = React.useState<boolean>()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const SuperAgentModalStepTwo = ({ siteID, handleNext, setIsLoading }: SAStepTwoProps, ref: any) => {
+  // ** State
   const [isLoading] = React.useState<boolean>(false)
-  const [validation, setValidation] = React.useState<string>()
+  const [value, setValue] = React.useState<string>('api')
+  const [submitted, setSubmitted] = React.useState<boolean>()
 
   const [apiFormData, setApiFormData] = React.useState<{ value: string }[]>([])
   const [streamingFormData, setStreamingFormData] = React.useState<{ value: string }[]>([])
@@ -64,9 +46,14 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     setValue(newValue)
   }
 
-  // ** Tanstack and services
-  const { addFQDN, getSuperAgentFQDNList } = FQDNService()
-  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
+  // References
+  const formAPIRef = React.useRef<any>()
+  const formPhotosRef = React.useRef<any>()
+  const formStreamRef = React.useRef<any>()
+  const formAdminFQDNRef = React.useRef<any>()
+
+  // ** Hooks
+  const { addFQDN } = FQDNService()
   const queryClient = useQueryClient()
   const fqdnM = useMutation({
     mutationFn: addFQDN,
@@ -75,40 +62,12 @@ const EditStepTwo = (props: SidebarAddUserType) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries(['fqdns'])
-    },
-    onError: (e: any) => {
-      handleError(e, `addFQDN() EditStepTwo.tsx`)
     }
   })
 
-  useQuery({
-    queryKey: [`editSuperAgentStepTwoFQDN`],
-    queryFn: () =>
-      getSuperAgentFQDNList({
-        site: siteData[0]?.id
-      }),
-    onSuccess: data => {
-      setFqdnList(data)
-    },
-    onError: (e: any) => {
-      handleError(e, `getSuperAgentFQDNList() EditStepTwo.tsx`)
-    }
-  })
-
-  // ** Helper function
-  const { formatFQDNdata } = useFQDNdata()
-
-  // ** Format the returned Object key of the FQDN fetched data
-  let normalizedData
-  if (fqdnList !== undefined) {
-    normalizedData = formatFQDNdata(fqdnList)
-  }
-
-  // References
-  const formAPIRef = React.useRef<any>()
-  const formPhotosRef = React.useRef<any>()
-  const formStreamRef = React.useRef<any>()
-  const formAdminFQDNRef = React.useRef<any>()
+  // ** Error Handling Hooks
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
+  const [validation, setValidation] = React.useState<string>()
 
   const handleFinish = () => {
     // check for empty values handleVALIDATIONS
@@ -178,19 +137,18 @@ const EditStepTwo = (props: SidebarAddUserType) => {
         console.log('allFQDNData', fqdnsObject)
 
         await fqdnM.mutateAsync({
-          siteId: siteData[0]?.id,
+          siteId: siteID as number,
           data: fqdnsObject
         })
-
-        setSubmitted(true)
       }
+      setSubmitted(true)
 
       setTimeout(() => {
         clearErrorResponse()
-        toggle()
+        handleNext()
       }, 1000)
     } catch (e: any) {
-      handleError(e, `createFQDN() EditStepTwo.tsx Super Agent`)
+      handleError(e, `createFQDN() StepTwo.tsx Super Agent`)
     }
   }
 
@@ -239,52 +197,43 @@ const EditStepTwo = (props: SidebarAddUserType) => {
             }}
           >
             <TabPanel value='api'>
-              {normalizedData?.api && (
-                <ExpandoForm
-                  multipleInputs={true}
-                  onUpdate={data => setApiFormData(data)}
-                  ref={formAPIRef}
-                  fileType='text'
-                  isLoading={isLoading}
-                  disableSaveButton={true}
-                  defaultValues={{
-                    expando: !apiFormData || apiFormData.length === 0 ? normalizedData?.api : apiFormData
-                  }}
-                />
-              )}
+              <ExpandoForm
+                multipleInputs={true}
+                onUpdate={data => setApiFormData(data)}
+                ref={formAPIRef}
+                fileType='text'
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{
+                  expando: !apiFormData || apiFormData.length === 0 ? [{ value: '' }] : apiFormData
+                }}
+              />
             </TabPanel>
             <TabPanel value='streaming'>
-              {normalizedData?.streaming && (
-                <ExpandoForm
-                  multipleInputs={true}
-                  onUpdate={data => setStreamingFormData(data)}
-                  ref={formStreamRef}
-                  fileType='text'
-                  isLoading={isLoading}
-                  disableSaveButton={true}
-                  defaultValues={{
-                    expando:
-                      !streamingFormData || streamingFormData.length === 0
-                        ? normalizedData?.streaming
-                        : streamingFormData
-                  }}
-                />
-              )}
+              <ExpandoForm
+                multipleInputs={true}
+                onUpdate={data => setStreamingFormData(data)}
+                ref={formStreamRef}
+                fileType='text'
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{
+                  expando: !streamingFormData || streamingFormData.length === 0 ? [{ value: '' }] : streamingFormData
+                }}
+              />
             </TabPanel>
             <TabPanel value='photos'>
-              {normalizedData?.photo && (
-                <ExpandoForm
-                  multipleInputs={true}
-                  onUpdate={data => setPhotosFormData(data)}
-                  ref={formPhotosRef}
-                  fileType='text'
-                  isLoading={isLoading}
-                  disableSaveButton={true}
-                  defaultValues={{
-                    expando: !photosFormData || photosFormData.length === 0 ? normalizedData?.photo : photosFormData
-                  }}
-                />
-              )}
+              <ExpandoForm
+                multipleInputs={true}
+                onUpdate={data => setPhotosFormData(data)}
+                ref={formPhotosRef}
+                fileType='text'
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{
+                  expando: !photosFormData || photosFormData.length === 0 ? [{ value: '' }] : photosFormData
+                }}
+              />
             </TabPanel>
 
             <TabPanel value='admin-fqdn'>
@@ -294,12 +243,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
                 fileType='text'
                 isLoading={isLoading}
                 disableSaveButton={true}
-                defaultValues={{
-                  expando:
-                    fqdnList?.fqdn_admin !== undefined || null
-                      ? [{ value: `${fqdnList?.fqdn_admin}` }]
-                      : fqdnFormData ?? [{ value: '' }]
-                }}
+                defaultValues={{ expando: fqdnFormData ?? [{ value: '' }] }}
               />
             </TabPanel>
 
@@ -323,7 +267,7 @@ const EditStepTwo = (props: SidebarAddUserType) => {
           </Box>
         </TabContext>
       ) : (
-        <CreatedSuccessful update />
+        <CreatedSuccessful />
       )}
     </>
   )
@@ -331,14 +275,13 @@ const EditStepTwo = (props: SidebarAddUserType) => {
 
 const styles = {
   cancelButton: {
-    backgroundColor: '#FF9C00',
+    backgroundColor: '#98A9BC',
     color: 'white',
     width: '200px',
-    mr: 4,
     '&:hover': {
-      backgroundColor: '#FF7c02'
+      backgroundColor: '#7899ac'
     }
   }
 }
 
-export default EditStepTwo
+export default React.forwardRef(SuperAgentModalStepTwo)

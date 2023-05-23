@@ -28,8 +28,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Steps
 import SuperAgentModal from '../modal/SuperAgentModal'
-import SAStepTwo from './superagent/steps/StepTwo'
-import SAStepThree from './superagent/steps/StepThree'
+import SuperAgentModalStepTwo from '../modal/SuperAgentModalStepTwo'
 
 interface SidebarAddUserType {
   open: boolean
@@ -64,7 +63,8 @@ const SADrawer = (props: SidebarAddUserType) => {
   // ** References to multisteps
   const stepOneRef = React.useRef<any>()
   const stepTwoRef = React.useRef<any>()
-  const stepThreeRef = React.useRef<any>()
+
+  // const stepThreeRef = React.useRef<any>()
 
   // ** Props
   const { open, toggle, languages, currencies } = props
@@ -123,29 +123,32 @@ const SADrawer = (props: SidebarAddUserType) => {
     {
       title: 'FQDNS Info',
       subtitle: 'Setup FQDNS',
-      component: <SAStepTwo setIsLoading={setIsLoading} siteID={siteID} ref={stepTwoRef} handleNext={handleNext} />,
-      hideStepperButton: true
-    },
-    {
-      title: 'Integration',
-      subtitle: 'Input Integration and RSA',
       component: (
-        <SAStepThree
-          siteID={siteID}
-          ref={stepThreeRef}
-          toggle={toggle}
-          resetKey={resetKey}
-          handleClose={handleClose}
-          responseError={responseError}
-          setResponseError={setResponseError}
-          fileName={fileName}
-          setFileName={setFileName}
-          setSiteID={setSiteID}
-          handleNext={handleNext}
-          setIsLoading={setIsLoading}
-        />
-      )
+        <SuperAgentModalStepTwo setIsLoading={setIsLoading} siteID={siteID} ref={stepTwoRef} handleNext={handleNext} />
+      ),
+      hideStepperButton: true
     }
+
+    // {
+    //   title: 'Integration',
+    //   subtitle: 'Input Integration and RSA',
+    //   component: (
+    //     <SAStepThree
+    //       siteID={siteID}
+    //       // ref={stepThreeRef}
+    //       toggle={toggle}
+    //       resetKey={resetKey}
+    //       handleClose={handleClose}
+    //       responseError={responseError}
+    //       setResponseError={setResponseError}
+    //       fileName={fileName}
+    //       setFileName={setFileName}
+    //       setSiteID={setSiteID}
+    //       handleNext={handleNext}
+    //       setIsLoading={setIsLoading}
+    //     />
+    //   )
+    // }
   ]
 
   return (
@@ -166,8 +169,8 @@ const SADrawer = (props: SidebarAddUserType) => {
                 <Step key={index} className={clsx({ active: activeStep === index })}>
                   <StepLabel StepIconComponent={StepperCustomDot}>
                     <div className='step-label'>
-                      <Typography className='step-number'>{`Step`}</Typography>
-                      <Typography className='step-number'>{`0${index + 1}`}</Typography>
+                      <Typography className='step-number'>{`Step 0${index + 1}`}</Typography>
+                      {/* <Typography className='step-number'>{`0${index + 1}`}</Typography> */}
                       <div>
                         <Typography className='step-title'>{step.title}</Typography>
                         <Typography className='step-subtitle'>{step.subtitle}</Typography>

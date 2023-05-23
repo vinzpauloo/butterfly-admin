@@ -26,6 +26,7 @@ interface InputFormProps extends TextFieldVariant {
   imageRef?: React.LegacyRef<HTMLInputElement> | undefined
   imageFileName?: any
   imageOnClick?: React.MouseEventHandler<HTMLDivElement> | undefined
+  isEdit?: boolean
 }
 
 const InputForm: React.FC<InputFormProps> = ({
@@ -48,7 +49,8 @@ const InputForm: React.FC<InputFormProps> = ({
   imageStateVariable,
   imageRef,
   imageFileName,
-  imageOnClick
+  imageOnClick,
+  isEdit
 }) => {
   return (
     <Box width={width} mt={marginTop}>
@@ -125,6 +127,21 @@ const InputForm: React.FC<InputFormProps> = ({
                   </MenuItem>
                 ))}
               </TextField>
+            ) : isEdit ? (
+              <TextField
+                label={label}
+                variant={variant}
+                fullWidth={fullWidth}
+                error={error}
+                helperText={helperText}
+                value={field.value || ''}
+                onChange={field.onChange}
+                name={name}
+                type={type}
+                onKeyPress={onKeyPress}
+                multiline={multiline}
+                rows={rows}
+              />
             ) : (
               <TextField
                 label={label}

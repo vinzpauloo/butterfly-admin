@@ -23,13 +23,14 @@ import Icon from 'src/@core/components/icon'
 import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form'
 
 type ExpandoFormProps = {
-  pageHeader: string
+  pageHeader?: string
   fileType: string
   handleExpandoSubmit?: (data: FormInputs) => void
   isLoading?: boolean
   disableSaveButton?: boolean
   defaultValues?: FormInputs
   multipleInputs?: boolean
+  onUpdate: (data: { value: string }[]) => void
 }
 
 type FormInputs = {
@@ -48,19 +49,11 @@ const ExpandoForm = (
     defaultValues = {
       expando: [{ value: '' }, { value: '' }, { value: '' }]
     },
-    multipleInputs
+    multipleInputs,
+    onUpdate
   }: ExpandoFormProps,
   ref: any
 ) => {
-  // forward to parent the resetForm function by calling reset
-  React.useImperativeHandle(
-    ref,
-    () => {
-      return { getFormData: () => getFormData() }
-    },
-    []
-  )
-
   // ** UseForm
   const {
     getValues,
@@ -91,10 +84,20 @@ const ExpandoForm = (
 
   const getFormData = () => {
     const getFormValueData = getValues('expando')
-    {
-      return getFormValueData ? getFormValueData : {}
-    }
+
+    return getFormValueData ? getFormValueData : []
   }
+
+  React.useImperativeHandle(
+    ref,
+    () => {
+      const formData = getFormData()
+      onUpdate(formData)
+
+      return { getFormData: () => formData }
+    },
+    [getFormData]
+  )
 
   return (
     <>
@@ -110,11 +113,7 @@ const ExpandoForm = (
                   <FormControl fullWidth>
                     <OutlinedInput
                       sx={{
-                        width: {
-                          sm: '300px',
-                          md: '300px',
-                          lg: '300px'
-                        }
+                        width: '100%'
                       }}
                       className='expandoInput'
                       {...register(`expando.${index}.value`, { required: true })}
