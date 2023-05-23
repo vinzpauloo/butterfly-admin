@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
-import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
+import { Button, TextField, IconButton, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material'
 
 // ** Style Imports
 import { styled } from '@mui/material/styles'
@@ -45,7 +45,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const EditSupervisorDrawer = (props: SidebarAddUserType) => {
@@ -126,96 +126,120 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
   }
 
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
-        <Typography variant='h6'>Edit Operator/Supervisor</Typography>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
+          Edit Operator/Supervisor
+        </DialogTitle>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
-      <Box sx={{ p: 5 }}>
+      <DialogContent sx={{ mx: 4 }}>
         {!submitted ? (
           <Box sx={styles.container}>
             <Typography color='black'>{props?.data.role_id === 2 ? 'SUPERVISOR' : 'OPERATOR'} </Typography>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <Box sx={styles.formContent}>
-                <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Username'
-                    variant='outlined'
-                    fullWidth
-                    name='username'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    value={props?.data.username || ' '}
-                    disabled
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Enter New Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                        onChange={field.onChange}
-                        name='password'
-                        type='password'
-                        defaultValue={'********'}
-                        InputLabelProps={{
-                          shrink: true
-                        }}
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password_confirmation'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Re-enter New Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password_confirmation}
-                        helperText={errors.password_confirmation?.message}
-                        onChange={field.onChange}
-                        name='password_confirmation'
-                        type='password'
-                        defaultValue={'********'}
-                        InputLabelProps={{
-                          shrink: true
-                        }}
-                      />
-                    )}
-                  />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: {
+                      xs: 'column',
+                      sm: 'row'
+                    },
+                    gap: {
+                      xs: 2,
+                      sm: 5
+                    }
+                  }}
+                >
+                  <Box sx={styles.fullWidth}>
+                    <TextField
+                      label='Username'
+                      variant='outlined'
+                      fullWidth
+                      name='username'
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      value={props?.data.username || ' '}
+                      disabled
+                    />
+                  </Box>
+
+                  <Box sx={styles.fullWidth}>
+                    <TextField
+                      label='Mobile'
+                      variant='outlined'
+                      fullWidth
+                      name='mobile'
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      disabled
+                      value={props?.data.mobile || ''}
+                    />
+                  </Box>
                 </Box>
 
-                <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Mobile'
-                    variant='outlined'
-                    fullWidth
-                    name='mobile'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    disabled
-                    value={props?.data.mobile || ''}
-                  />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: {
+                      xs: 'column',
+                      sm: 'row'
+                    },
+                    gap: {
+                      xs: 2,
+                      sm: 5
+                    }
+                  }}
+                >
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='password'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label='Enter New Password'
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.password}
+                          helperText={errors.password?.message}
+                          onChange={field.onChange}
+                          name='password'
+                          type='password'
+                          defaultValue={'********'}
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='password_confirmation'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label='Re-enter New Password'
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.password_confirmation}
+                          helperText={errors.password_confirmation?.message}
+                          onChange={field.onChange}
+                          name='password_confirmation'
+                          type='password'
+                          defaultValue={'********'}
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
                 </Box>
 
                 <Box sx={styles.fullWidth}>
@@ -242,7 +266,7 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
                         variant='outlined'
                         fullWidth
                         multiline
-                        rows={4}
+                        rows={8}
                         error={!!errors.user_note}
                         helperText={errors.user_note?.message}
                         onChange={field.onChange}
@@ -278,8 +302,8 @@ const EditSupervisorDrawer = (props: SidebarAddUserType) => {
         ) : (
           <CreatedSuccessful update />
         )}
-      </Box>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -299,7 +323,7 @@ const styles = {
     color: 'white'
   },
   formContent: {
-    marginTop: 5
+    marginTop: 0
   },
   fullWidth: {
     width: '100%',
@@ -353,11 +377,11 @@ const styles = {
     }
   },
   continueButton: {
-    backgroundColor: '#9747FF',
+    backgroundColor: '#FF9C00',
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#9747FF'
+      backgroundColor: '#FF7c02'
     }
   }
 }

@@ -28,6 +28,7 @@ interface InputFormProps extends TextFieldVariant {
   imageOnClick?: React.MouseEventHandler<HTMLDivElement> | undefined
   isEdit?: boolean
   placeholder?: string
+  disabled?: boolean
 }
 
 const InputForm: React.FC<InputFormProps> = ({
@@ -52,7 +53,8 @@ const InputForm: React.FC<InputFormProps> = ({
   imageFileName,
   imageOnClick,
   isEdit,
-  placeholder
+  placeholder,
+  disabled
 }) => {
   return (
     <Box width={width} mt={marginTop}>
@@ -159,6 +161,7 @@ const InputForm: React.FC<InputFormProps> = ({
                 onKeyPress={onKeyPress}
                 multiline={multiline}
                 rows={rows}
+                disabled={disabled}
               />
             )
           }

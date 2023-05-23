@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 // ** MUI Imports
-import { Radio, RadioGroup, Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
+import { Radio, RadioGroup, Button, IconButton, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -17,6 +17,7 @@ import Icon from 'src/@core/components/icon'
 // ** Project/Other Imports
 import CreatedSuccessful from '../form/CreatedSuccessful'
 import { useTranslateString } from '@/utils/TranslateString'
+import InputForm from '../form/InputForm'
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -60,7 +61,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const SupervisorDrawer = (props: SidebarAddUserType) => {
@@ -130,213 +131,198 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
   }
 
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
-        <Typography variant='h6'>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
           {TranslateString('Add')} {TranslateString('Operator')}/{TranslateString('Supervisor')}
-        </Typography>
+        </DialogTitle>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
-      <Box sx={{ p: 5 }}>
+      <DialogContent sx={{ mx: 4 }}>
         {!submitted ? (
-          <Box sx={styles.container}>
-            <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
-              <Box sx={styles.header}>
-                <Controller
-                  name='role_id'
+          <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
+            <Box sx={styles.header}>
+              <Controller
+                name='role_id'
+                control={control}
+                defaultValue=''
+                rules={{ required: 'Please select a role' }}
+                render={({ field }) => (
+                  <RadioGroup
+                    {...field}
+                    onChange={e => {
+                      field.onChange(e)
+                    }}
+                  >
+                    <Box sx={styles.radio}>
+                      <Typography>{TranslateString('Operator')}</Typography>
+                      <Radio name='role_id' value='1' inputProps={{ 'aria-label': 'Operator' }} color='default' />
+                      <Typography>{TranslateString('Supervisor')}</Typography>
+                      <Radio name='role_id' value='2' inputProps={{ 'aria-label': 'Supervisor' }} color='default' />
+                    </Box>
+                  </RadioGroup>
+                )}
+              />
+            </Box>
+            {errors.role_id && (
+              <Typography variant='caption' color='error' sx={{ marginLeft: 4 }}>
+                {errors.role_id.message}
+              </Typography>
+            )}
+            <Box sx={styles.formContent}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row'
+                  },
+                  gap: {
+                    xs: 2,
+                    sm: 5
+                  }
+                }}
+              >
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Username</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='username'
+                    control={control}
+                    placeholder='Entired Desired Username'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.username}
+                    helperText={errors.username?.message}
+                    name='username'
+                  />
+                </Box>
+
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Mobile No.</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='mobile'
+                    control={control}
+                    placeholder='Mobile No.'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.mobile}
+                    helperText={errors.mobile?.message}
+                    name='mobile'
+                    onKeyPress={e => {
+                      // Allow only numbers and the '+' symbol
+                      if (!/[0-9+]/.test(e.key)) {
+                        e.preventDefault()
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row'
+                  },
+                  gap: {
+                    xs: 2,
+                    sm: 5
+                  }
+                }}
+              >
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Password</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='password'
+                    control={control}
+                    placeholder='Enter Password'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                    name='password'
+                    type='password'
+                  />
+                </Box>
+
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Re-enter Password</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='password_confirmation'
+                    control={control}
+                    placeholder='Re-enter Password'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.password_confirmation}
+                    helperText={errors.password_confirmation?.message}
+                    name='password_confirmation'
+                    type='password'
+                  />
+                </Box>
+              </Box>
+
+              <Box>
+                <Typography>Email Address</Typography>
+                <InputForm
+                  width='100%'
+                  controllerName='email'
                   control={control}
-                  defaultValue=''
-                  rules={{ required: 'Please select a role' }}
-                  render={({ field }) => (
-                    <RadioGroup
-                      {...field}
-                      onChange={e => {
-                        field.onChange(e)
-                      }}
-                    >
-                      <Box sx={styles.radio}>
-                        <Typography sx={styles.white}>{TranslateString('Operator')}</Typography>
-                        <Radio
-                          name='role_id'
-                          value='1'
-                          inputProps={{ 'aria-label': 'Operator' }}
-                          sx={styles.white}
-                          color='default'
-                        />
-                        <Typography sx={styles.white}>{TranslateString('Supervisor')}</Typography>
-                        <Radio
-                          name='role_id'
-                          value='2'
-                          inputProps={{ 'aria-label': 'Supervisor' }}
-                          sx={styles.white}
-                          color='default'
-                        />
-                      </Box>
-                    </RadioGroup>
-                  )}
+                  placeholder='Email Address'
+                  variant='outlined'
+                  fullWidth={true}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  name='email'
                 />
               </Box>
-              {errors.role_id && (
-                <Typography variant='caption' color='error' sx={{ marginLeft: 4 }}>
-                  {errors.role_id.message}
-                </Typography>
-              )}
-              <Box sx={styles.formContent}>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='username'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Enter') + ' ' + TranslateString('Username')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.username}
-                        helperText={errors.username?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='username'
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Enter') + ' ' + TranslateString('Password')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='password'
-                        type='password'
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password_confirmation'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Re-enter') + ' ' + TranslateString('Password')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password_confirmation}
-                        helperText={errors.password_confirmation?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='password_confirmation'
-                        type='password'
-                      />
-                    )}
-                  />
+
+              <Box>
+                <Typography>Notes</Typography>
+                <InputForm
+                  width='100%'
+                  controllerName='user_note'
+                  control={control}
+                  placeholder='Notes'
+                  variant='outlined'
+                  fullWidth={true}
+                  multiline={true}
+                  rows={8}
+                  error={!!errors.user_note}
+                  helperText={errors.user_note?.message}
+                  name='user_note'
+                />
+              </Box>
+
+              {/* Error messages from backend */}
+              {getErrorResponse(12)}
+
+              <Box sx={styles.formButtonContainer}>
+                <Box>
+                  <Button sx={styles.cancelButton} onClick={handleClose}>
+                    <Typography sx={styles.text}>{TranslateString('Cancel')}</Typography>
+                  </Button>
                 </Box>
 
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='mobile'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Mobile Number')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.mobile}
-                        helperText={errors.mobile?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        onKeyPress={e => {
-                          // Allow only numbers and the '+' symbol
-                          if (!/[0-9+]/.test(e.key)) {
-                            e.preventDefault()
-                          }
-                        }}
-                        name='mobile'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='email'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Email')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='email'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='user_note'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Notes')}
-                        variant='outlined'
-                        fullWidth
-                        multiline
-                        rows={4}
-                        error={!!errors.user_note}
-                        helperText={errors.user_note?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='user_note'
-                      />
-                    )}
-                  />
-                </Box>
-
-                {/* Error messages from backend */}
-                {getErrorResponse(12)}
-
-                <Box sx={styles.formButtonContainer}>
-                  <Box>
-                    <Button sx={styles.cancelButton} onClick={handleClose}>
-                      <Typography sx={styles.text}>{TranslateString('Cancel')}</Typography>
-                    </Button>
-                  </Box>
-
-                  <Box>
-                    <Button type='submit' sx={styles.continueButton}>
-                      <Typography sx={styles.text}>{TranslateString('Continue')}</Typography>
-                    </Button>
-                  </Box>
+                <Box>
+                  <Button type='submit' sx={styles.continueButton}>
+                    <Typography sx={styles.text}>{TranslateString('Continue')}</Typography>
+                  </Button>
                 </Box>
               </Box>
-            </form>
-          </Box>
+            </Box>
+          </form>
         ) : (
           <CreatedSuccessful />
         )}
-      </Box>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -345,8 +331,9 @@ const styles = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#A459D1',
-    padding: 4
+    padding: 0
+
+    // backgroundColor: '#FF9C00',
   },
   radio: {
     display: 'flex',
@@ -356,7 +343,10 @@ const styles = {
     color: 'white'
   },
   formContent: {
-    marginTop: 5
+    marginTop: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2
   },
   fullWidth: {
     width: '100%',
@@ -410,11 +400,11 @@ const styles = {
     }
   },
   continueButton: {
-    backgroundColor: '#9747FF',
+    backgroundColor: '#FF9C00',
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#9747FF'
+      backgroundColor: '#FF7c02'
     }
   }
 }
