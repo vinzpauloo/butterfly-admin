@@ -62,7 +62,8 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Agents',
           action: 'read',
-          subject: 'sa-page'
+          subject: 'sa-page',
+          path: '/user/list/Agents'
         },
         {
           title: 'Customers',

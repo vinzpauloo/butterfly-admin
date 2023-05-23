@@ -27,6 +27,7 @@ import { CreateAccount } from '@/services/api/CreateAccount'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
+  [key: string]: string | Blob
   role_id: '1' | '2' | ''
   username: string
   password: string
@@ -37,7 +38,7 @@ interface FormValues {
 }
 
 const schema = yup.object().shape({
-  role_id: yup.string().oneOf(['1', '2'], 'Role must be Operator or Supervisor').required('Role is required'),
+  // role_id: yup.string().oneOf(['1', '2'], 'Role must be Operator or Supervisor').required('Role is required'),
   username: yup.string().min(7, 'Username must be at least 7 characters').required('Username is required'),
   password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
   password_confirmation: yup
@@ -102,17 +103,30 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
   const mutation = useMutation(createUser)
 
   const handleFormSubmit = async (data: FormValues) => {
-    const userData = {
-      data: data
+    const formData = new FormData()
+
+    for (const key in data) {
+      formData.append(key, data[key])
+    }
+
+    formData.append(`role_id`, `2`)
+
+    // const userData = {
+    //   data: data
+    // }
+
+    const form: any = {
+      data: formData
     }
 
     try {
-      await mutation.mutateAsync(userData)
+      await mutation.mutateAsync(form)
       setSubmitted(true)
       setTimeout(() => {
         toggle()
         resetForm()
         setSubmitted(false)
+        clearErrorResponse()
 
         // Re-fetches UserTable and CSV exportation
         queryClient.invalidateQueries({ queryKey: ['allUsers'] })
@@ -134,7 +148,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
     <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
         <DialogTitle color='#FFF' textTransform='uppercase'>
-          {TranslateString('Add')} {TranslateString('Operator')}/{TranslateString('Supervisor')}
+          {TranslateString('Add')} {TranslateString('Operator')}
         </DialogTitle>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
@@ -143,7 +157,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
       <DialogContent sx={{ mx: 4 }}>
         {!submitted ? (
           <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
-            <Box sx={styles.header}>
+            {/* <Box sx={styles.header}>
               <Controller
                 name='role_id'
                 control={control}
@@ -165,7 +179,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                   </RadioGroup>
                 )}
               />
-            </Box>
+            </Box> */}
             {errors.role_id && (
               <Typography variant='caption' color='error' sx={{ marginLeft: 4 }}>
                 {errors.role_id.message}
