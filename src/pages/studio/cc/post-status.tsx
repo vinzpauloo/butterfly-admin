@@ -20,11 +20,9 @@ import TableCCFeedStatus from './views/TableCCFeedStatus'
 
 // ** Custom Hooks
 import useDebounce from '@/hooks/useDebounce'
-import { useTranslateString } from '@/utils/TranslateString';
-
+import { useTranslateString } from '@/utils/TranslateString'
 
 const PostStatus = () => {
-
   // ** States
   const [rowData, setRowData] = React.useState<IFeedStory[]>([])
   const [total, setTotal] = React.useState(0)
@@ -84,8 +82,13 @@ const PostStatus = () => {
           {TranslateString('CC Newsfeed List')}
         </Typography>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-          <Box sx={{marginBottom:'2rem'}} display={'flex'} alignItems={'center'} justifyContent={'space-between'} gap={3}>
-
+          <Box
+            sx={{ marginBottom: '2rem' }}
+            display={'flex'}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+            gap={3}
+          >
             <Button size='small' variant='contained' color='warning' onClick={() => setPostStatus('Pending')}>
               {TranslateString('Pending')}
             </Button>
@@ -93,7 +96,6 @@ const PostStatus = () => {
             <Button size='small' variant='contained' color='error' onClick={() => setPostStatus('Declined')}>
               {TranslateString('Declined')}
             </Button>
-
           </Box>
         </Box>
       </Box>
@@ -124,7 +126,7 @@ const PostStatus = () => {
 
 PostStatus.acl = {
   action: 'read',
-  subject: 'cc-post-status'
+  subject: 'cc-only-page'
 }
 
 export default PostStatus

@@ -43,7 +43,7 @@ function index() {
       flex: 0.35,
       minWidth: 170,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.site?.name 
+      valueGetter: (params: GridRenderCellParams) => params.row?.site?.name
     },
     {
       field: 'amount',
@@ -52,7 +52,7 @@ function index() {
       align: 'center',
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.amount 
+      valueGetter: (params: GridRenderCellParams) => params.row?.amount
     },
     {
       field: 'balance',
@@ -61,7 +61,7 @@ function index() {
       align: 'center',
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.balance 
+      valueGetter: (params: GridRenderCellParams) => params.row?.balance
     },
     {
       field: 'type',
@@ -70,7 +70,7 @@ function index() {
       align: 'center',
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.type 
+      valueGetter: (params: GridRenderCellParams) => params.row?.type
     },
     {
       field: 'created_at',
@@ -78,7 +78,7 @@ function index() {
       flex: 0.35,
       minWidth: 200,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)  
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
     },
     {
       field: 'updated_at',
@@ -95,12 +95,13 @@ function index() {
       align: 'center',
       minWidth: 40,
       sortable: false,
-      renderCell: () => 
+      renderCell: () => (
         <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
           <Button onClick={() => setOpen(true)}>
             <Icon fontSize={30} icon='la:pen' color='98A9BC' />
           </Button>
         </Box>
+      )
     }
   ]
 
@@ -124,7 +125,7 @@ function index() {
 
 index.acl = {
   action: 'read',
-  subject: 'shared-page'
+  subject: 'sa-page'
 }
 
 export default index
