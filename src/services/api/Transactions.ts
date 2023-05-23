@@ -12,6 +12,7 @@ interface ITransaction {
     user_username?: string
     customer_username?: string
     site_name?: string
+    select?: string
   }
 }
 
@@ -31,6 +32,19 @@ const TransactionsService = () => {
     })
   }
 
+  const getCommissions = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/transactions',
+      method: 'GET',
+      params: params.data
+    })
+  }
+
   const getSecurityFunds = (params: ITransaction) => {
     return request({
       headers: {
@@ -44,7 +58,7 @@ const TransactionsService = () => {
     })
   }
 
-  return { getDonations, getSecurityFunds }
+  return { getDonations, getCommissions, getSecurityFunds }
 }
 
 export default TransactionsService
