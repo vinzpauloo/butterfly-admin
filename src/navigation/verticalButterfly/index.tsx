@@ -32,12 +32,8 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'sa-page'
         },
         {
-          title: 'Roles',
-          action: 'read',
-          subject: 'sa-page'
-        },
-        {
-          title: 'Permissions',
+          title: 'Roles & Permissions',
+          path: '/admin/roles',
           action: 'read',
           subject: 'sa-page'
         },
