@@ -128,6 +128,7 @@ const Navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'Work Purchases',
+          path: '/transactions/work-purchases',
           action: 'read',
           subject: 'shared-page'
         },
@@ -139,11 +140,13 @@ const Navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'VIP Bundles',
+          path: '/transactions/vip-bundles',
           action: 'read',
           subject: 'shared-page'
         },
         {
           title: 'Gold Coin Bundles',
+          path: '/transactions/gold-coin-bundles',
           action: 'read',
           subject: 'shared-page'
         }
