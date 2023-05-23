@@ -163,12 +163,14 @@ const Navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'VIP Bundles',
+          path: '/reports/vip-bundles',
           action: 'read',
           subject: 'agent-page'
         },
         {
           title: 'Gold Coin Bundles',
           action: 'read',
+          path: '/reports/gold-coin-bundles',
           subject: 'agent-page'
         },
         {

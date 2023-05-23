@@ -6,9 +6,8 @@ import { useQuery } from '@tanstack/react-query'
 import { ReportsService } from '@/services/api/ReportsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 import formatDate from '@/utils/formatDate'
-import { Avatar, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import Container from '@/pages/components/Container'
-import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import CustomToolbar from '../components/CustomToolbar'
 
 function index() {
@@ -20,19 +19,20 @@ function index() {
   const { handleError } = useErrorHandling()
   const [timespan, setTimespan] = React.useState<string | null>('Today');
 
-  const { getReportsDonations } = ReportsService()
+  const { getReportsCustomerTransaction } = ReportsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['reportsDonations', pageSize, page, timespan],
+    queryKey: ['reportsGoldCoinBundle', pageSize, page, timespan],
     queryFn: () =>
-      getReportsDonations({
+      getReportsCustomerTransaction({
         data: {
           report: true,
           today: timespan === 'Today' && true,
           weekly: timespan === 'Weekly' && true,
           monthly: timespan === 'Monthly' && true,
           yearly: timespan === 'Yearly' && true,
-          with: 'users,customers,sites',
-          select: 'id,customer_id,user_id,site_id,coin_amount,created_at',
+          select: 'id,transaction_type,bundle_name,customer_username,agent_username,amount,created_at',
+          search_by: 'transaction_type',
+          search_value: 'coins',
           page: page,
           paginate: pageSize
         }
@@ -45,62 +45,54 @@ function index() {
       setPage(data.current_page)
     },
     onError: (e: any) => {
-      handleError(e, `getReportsDonations() reports/donations/index.tsx`)
+      handleError(e, `getReportsCustomerTransaction() reports/gold-coin-bundles/index.tsx`)
     }
   })
 
   const columnData: GridColDef[] = [
     {
-      field: 'site id',
-      headerName: TranslateString('Site ID'),
-      flex: 0.1,
-      minWidth: 50,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.site_id
-    },
-    {
-      field: 'site name',
-      headerName: TranslateString('Site Name'),
-      flex: 0.15,
-      minWidth: 150,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.sites?.name
-    },
-    {
-      field: 'content creator',
-      headerName: TranslateString('Content Creator'),
-      flex: 0.2,
-      minWidth: 150,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username,
-      renderCell: (params: GridRenderCellParams) =>
-        <Stack direction='row' alignItems='center' gap={2}>
-          <Avatar src={FILE_SERVER_URL + params.row?.users?.photo} />
-          <Typography variant='subtitle2'>{params.row?.users?.username}</Typography>
-        </Stack>
-    },
-    {
-      field: 'donator',
-      headerName: TranslateString('Donator'),
-      flex: 0.15,
-      minWidth: 170,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.customers?.username,
-      renderCell: (params: GridRenderCellParams) =>
-        <Stack direction='row' alignItems='center' gap={2}>
-          <Avatar src={FILE_SERVER_URL + params.row?.customers?.photo} />
-          <Typography variant='subtitle2'>{params.row?.customers?.username}</Typography>
-        </Stack>
-    },
-    {
-      field: 'coin amount',
-      headerName: TranslateString('Coin Amount'),
+      field: 'transaction type',
+      headerName: TranslateString('Transaction Type'),
       headerAlign: 'center',
       align: 'center',
       flex: 0.15,
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount
+      valueGetter: (params: GridRenderCellParams) => params.row?.transaction_type
+    },
+    {
+      field: 'bundle name',
+      headerName: TranslateString('Bundle Name'),
+      flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.bundle_name
+    },
+    {
+      field: 'customer',
+      headerName: TranslateString('Customer'),
+      flex: 0.2,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.customer_username,
+    },
+    {
+      field: 'agent username',
+      headerName: TranslateString('Agent'),
+      flex: 0.15,
+      minWidth: 170,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.agent_username,
+    },
+    {
+      field: 'amount',
+      headerName: TranslateString('Amount'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.amount
     },
     {
       field: 'date created',
@@ -126,8 +118,8 @@ function index() {
 
   return (
     <Container>
-      <Typography variant='h4' component='h4' mb={5}>{TranslateString("Reports - Donations")}</Typography>
-      <ToggleButtonGroup color='primary' value={timespan} exclusive onChange={handleOnChange} size='small' sx={{alignSelf: 'center'}}>
+      <Typography variant='h4' component='h4' mb={5}>{TranslateString("Reports - Gold Coin Bundles")}</Typography>
+      <ToggleButtonGroup color='primary' value={timespan} exclusive onChange={handleOnChange} size='small' sx={{ alignSelf: 'center' }}>
         <ToggleButton value='Today' sx={{ textTransform: 'capitalize' }}>Today</ToggleButton>
         <ToggleButton value='Weekly' sx={{ textTransform: 'capitalize' }}>Weekly</ToggleButton>
         <ToggleButton value='Monthly' sx={{ textTransform: 'capitalize' }}>Monthly</ToggleButton>
@@ -152,9 +144,7 @@ function index() {
         components={{ Toolbar: CustomToolbar }}
       />
     </Container>
-    
   )
-
 }
 
 export default index
