@@ -83,31 +83,7 @@ const Navigation = (): VerticalNavItemsType => {
       title: 'Content Creators',
       icon: 'mdi:file-document-outline',
       action: 'read',
-      subject: 'shared-page',
-      children: [
-        {
-          title: 'List of Content Creators',
-          action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Feeds List',
-          path: '/studio/newsfeed',
-          action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Works List',
-          path: '/studio/video-list',
-          action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Create Content Creator',
-          action: 'read',
-          subject: 'fqdn-page'
-        }
-      ]
+      subject: 'shared-page'
     },
     // {
     //   title: 'Users',
@@ -222,6 +198,12 @@ const Navigation = (): VerticalNavItemsType => {
           path: '/studio/newsfeed/approval'
         },
         {
+          title: 'Feeds List',
+          path: '/studio/newsfeed',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
           title: 'Feeds Status',
           path: '/studio/cc/post-status',
           action: 'read',
@@ -230,6 +212,12 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Works Approval',
           path: '/studio/content'
+        },
+        {
+          title: 'Works List',
+          path: '/studio/video-list',
+          action: 'read',
+          subject: 'shared-page'
         },
         {
           title: 'Works Status',
