@@ -17,11 +17,11 @@ function index() {
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
 
-  const { getTransactionGoldCoinBundle } = TransactionsService()
+  const { getCustomerTransaction } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
     queryKey: ['transactionGoldCoinBundles', pageSize, page],
     queryFn: () =>
-      getTransactionGoldCoinBundle({
+      getCustomerTransaction({
         data: {
           select: 'id,transaction_type,bundle_name,customer_username,agent_username,amount,created_at',
           search_by: 'transaction_type',

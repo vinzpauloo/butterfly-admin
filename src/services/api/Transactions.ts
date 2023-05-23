@@ -60,7 +60,8 @@ const TransactionsService = () => {
     })
   }
 
-  const getTransactionGoldCoinBundle = (params: ITransaction) => {
+  // Transaction -> VIP Bundles and Gold Coin Bundles
+  const getCustomerTransaction = (params: ITransaction) => {
     return request({
       headers: {
         ...getHeaders(),
@@ -73,7 +74,7 @@ const TransactionsService = () => {
     })
   }
 
-  return { getDonations, getCommissions, getSecurityFunds, getTransactionGoldCoinBundle }
+  return { getDonations, getCommissions, getSecurityFunds, getCustomerTransaction }
 }
 
 export default TransactionsService
