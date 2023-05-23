@@ -30,7 +30,7 @@ type ExpandoFormProps = {
   disableSaveButton?: boolean
   defaultValues?: FormInputs
   multipleInputs?: boolean
-  onUpdate: (data: { value: string }[]) => void
+  onUpdate?: (data: { value: string }[]) => void
 }
 
 type FormInputs = {
@@ -92,7 +92,9 @@ const ExpandoForm = (
     ref,
     () => {
       const formData = getFormData()
-      onUpdate(formData)
+      if (onUpdate !== undefined) {
+        onUpdate(formData)
+      }
 
       return { getFormData: () => formData }
     },
