@@ -31,7 +31,7 @@ interface IReportsParams {
   }
 }
 
-const ReportsService = () => {
+export const ReportsService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
 
   const getSecurityFunds = (props: BaseProps<ReportsData,ReportsParams>) => {
@@ -63,5 +63,3 @@ const ReportsService = () => {
 
   return { getSecurityFunds, getReportsDonations }
 }
-
-export default ReportsService

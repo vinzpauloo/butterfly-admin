@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
 import { useQuery } from '@tanstack/react-query'
-import ReportsService from '@/services/api/ReportsService'
+import { ReportsService } from '@/services/api/ReportsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 import formatDate from '@/utils/formatDate'
 import { Avatar, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
@@ -32,7 +32,7 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-  const [timespan, setTimespan] = React.useState<string | null>('today');
+  const [timespan, setTimespan] = React.useState<string | null>('Today');
 
   const { getReportsDonations } = ReportsService()
   const { isLoading, isFetching } = useQuery({
@@ -41,10 +41,10 @@ function index() {
       getReportsDonations({
         data: {
           report: true,
-          today: timespan === 'today' && true,
-          weekly: timespan === 'weekly' && true,
-          monthly: timespan === 'monthly' && true,
-          yearly: timespan === 'yearly' && true,
+          today: timespan === 'Today' && true,
+          weekly: timespan === 'Weekly' && true,
+          monthly: timespan === 'Monthly' && true,
+          yearly: timespan === 'Yearly' && true,
           with: 'users,customers,sites',
           select: 'id,customer_id,user_id,site_id,coin_amount,created_at',
           page: page,
@@ -142,10 +142,10 @@ function index() {
     <Container>
       <Typography variant='h4' component='h4' mb={5}>{TranslateString("Reports - Donations")}</Typography>
       <ToggleButtonGroup color='primary' value={timespan} exclusive onChange={handleOnChange} size='small' sx={{alignSelf: 'center'}}>
-        <ToggleButton value="today" sx={{ textTransform: 'capitalize' }}>Today</ToggleButton>
-        <ToggleButton value="weekly" sx={{ textTransform: 'capitalize' }}>Weekly</ToggleButton>
-        <ToggleButton value="monthly" sx={{ textTransform: 'capitalize' }}>Monthly</ToggleButton>
-        <ToggleButton value="yearly" sx={{ textTransform: 'capitalize' }}>Yearly</ToggleButton>
+        <ToggleButton value='Today' sx={{ textTransform: 'capitalize' }}>Today</ToggleButton>
+        <ToggleButton value='Weekly' sx={{ textTransform: 'capitalize' }}>Weekly</ToggleButton>
+        <ToggleButton value='Monthly' sx={{ textTransform: 'capitalize' }}>Monthly</ToggleButton>
+        <ToggleButton value='Yearly' sx={{ textTransform: 'capitalize' }}>Yearly</ToggleButton>
       </ToggleButtonGroup>
       <DataGrid
         autoHeight
