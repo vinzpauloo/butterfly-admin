@@ -13,6 +13,8 @@ interface ITransaction {
     customer_username?: string
     site_name?: string
     select?: string
+    search_by?: string
+    search_value?: string
   }
 }
 
@@ -58,7 +60,20 @@ const TransactionsService = () => {
     })
   }
 
-  return { getDonations, getCommissions, getSecurityFunds }
+  const getTransactionGoldCoinBundle = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/customer-transactions',
+      method: 'GET',
+      params: params.data
+    })
+  }
+
+  return { getDonations, getCommissions, getSecurityFunds, getTransactionGoldCoinBundle }
 }
 
 export default TransactionsService
