@@ -11,7 +11,7 @@ const EditBtn = ({ roleId, data, handleOpenDrawer }: any) => {
   useEffect(() => {
     switch (true) {
       case roleId === 2:
-        setNewRole('SUPERVISOR')
+        setNewRole('OPERATIONS')
         break
 
       case roleId === 3:

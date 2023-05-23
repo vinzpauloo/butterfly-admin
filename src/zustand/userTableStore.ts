@@ -3,7 +3,7 @@ import {create} from 'zustand';
 
 type SortType = 'asc' | 'desc' | undefined | null;
 
-type DrawerType = 'SUPERVISOR' | 'SA' | 'CC' | null
+type DrawerType = 'OPERATIONS' | 'SA' | 'CC' | null
 
 type UserTableState = {
 
@@ -71,9 +71,9 @@ export const useUserTableStore = create<UserTableState>((set) => ({
     // Define initial state
     page: 1,
     pageSize: 10,
-    role: 'SUPERVISOR',
+    role: 'OPERATIONS',
     roleId: null,
-    columnType: 'SUPERVISOR',
+    columnType: 'OPERATIONS',
     rowCount: null,
     subRole: 'role',
     sort: 'desc',
@@ -125,8 +125,8 @@ export const useUserTableStore = create<UserTableState>((set) => ({
         set({ role: newRole });
 
         switch (newRole) {
-            case 'SUPERVISOR':
-        set({ columnType: 'operators' });
+            case 'OPERATIONS':
+        set({ columnType: 'OPERATIONS' });
             break;
             case 'SA':
         set({ columnType: 'superagent' });
@@ -145,7 +145,7 @@ export const useUserTableStore = create<UserTableState>((set) => ({
         set((state) => {
             set({ page: value + 1 });
 
-            if (state.activeTab === 'SUPERVISOR') {
+            if (state.activeTab === 'OPERATIONS') {
             return { supervisorPage: value + 1 };
             } else if (state.activeTab === 'SA') {
             return { saPage: value + 1 };
@@ -178,8 +178,8 @@ export const useUserTableStore = create<UserTableState>((set) => ({
         let drawerType: DrawerType
 
         switch (role) {
-            case 'SUPERVISOR':
-                drawerType = 'SUPERVISOR'
+            case 'OPERATIONS':
+                drawerType = 'OPERATIONS'
                 break;
             case 'SA':
                 drawerType = 'SA'

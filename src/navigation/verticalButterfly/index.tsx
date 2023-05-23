@@ -48,8 +48,12 @@ const Navigation = (): VerticalNavItemsType => {
       title: 'Super Agents',
       icon: 'mdi:file-document-outline',
       action: 'read',
-      subject: 'sa-page',
       children: [
+        {
+          title: 'Users',
+          path: '/user/list/SuperAgents',
+          action: 'read'
+        },
         {
           title: 'Sites',
           action: 'read',
@@ -81,7 +85,14 @@ const Navigation = (): VerticalNavItemsType => {
     {
       title: 'Content Creators',
       icon: 'mdi:file-document-outline',
-      action: 'read'
+      action: 'read',
+      children: [
+        {
+          title: 'Users',
+          path: '/user/list/Creators',
+          action: 'read'
+        }
+      ]
     },
     {
       title: 'Transactions',
@@ -245,6 +256,7 @@ const Navigation = (): VerticalNavItemsType => {
           title: 'Gold Coin Bundles',
           path: '/bundles/pages/GoldCoinBundlesPage'
         }
+
         // {
         //   title: 'Gold Coin Table',
         //   path: '/bundles/pages/GoldCoinTablesPage'

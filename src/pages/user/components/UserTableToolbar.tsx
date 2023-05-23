@@ -39,7 +39,8 @@ const UserTableToolbar = (props: Props) => {
   return (
     <Box
       sx={{
-        padding: 5
+        pt: 5,
+        pb: 5
       }}
     >
       <Box
@@ -184,9 +185,16 @@ const UserTableToolbar = (props: Props) => {
                 md: 'auto',
                 lg: 150
               },
-              float: 'right'
+              float: 'right',
+              backgroundColor: '#FF9C00',
+              '&:hover': {
+                backgroundColor: '#FF7c02'
+              }
             }}
-            onClick={() => props.toggle(props.role)}
+            onClick={() => {
+              console.log('Button clicked with role: ', props.role)
+              props.toggle(props.role)
+            }}
             variant='contained'
           >
             {TranslateString('Add') + ' ' + TranslateString('User')}
