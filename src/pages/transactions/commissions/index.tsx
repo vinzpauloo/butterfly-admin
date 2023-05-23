@@ -21,12 +21,17 @@ function index() {
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
 
-  // temporary for now, get only donations
-  const { getDonations } = TransactionsService()
+  const { getCommissions } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['donations', pageSize, page],
+    queryKey: ['commissions', pageSize, page],
     queryFn: () =>
-      getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize } }),
+      getCommissions({
+        data: {
+          select: 'id,role,transaction_type,gold_amount,status,created_at',
+          page: page,
+          paginate: pageSize
+        }
+      }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -40,58 +45,58 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'content creator',
-      headerName: TranslateString('Content Creator'),
-      flex: 1,
-      minWidth: 193,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username
-    },
-    {
-      field: 'reference id',
-      headerName: TranslateString('Reference') + ' ID',
-      minWidth: 250,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.customers?._id
-    },
-    {
-      field: 'watched',
-      headerName: TranslateString('Watched'),
-      headerAlign: 'center',
-      align: 'center',
+      field: 'role',
+      headerName: TranslateString('Role'),
+      flex: 0.15,
       minWidth: 110,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount?.slice(0, -3)
+      valueGetter: (params: GridRenderCellParams) => params.row?.role
     },
     {
-      field: 'amount',
-      headerName: TranslateString('Amount'),
+      field: 'transaction type',
+      headerName: TranslateString('Transaction Type'),
       headerAlign: 'center',
       align: 'center',
+      flex: 0.15,
+      minWidth: 170,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.transaction_type
+    },
+    {
+      field: 'gold amount',
+      headerName: TranslateString('Gold Amount'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.gold_amount
+    },
+    {
+      field: 'status',
+      headerName: TranslateString('Status'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.15,
       minWidth: 110,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.money_amount?.slice(0, -3)
+      valueGetter: (params: GridRenderCellParams) => params.row?.status
     },
     {
       field: 'date created',
       headerName: TranslateString('Date Created'),
-      minWidth: 225,
+      flex: 0.25,
+      minWidth: 200,
       sortable: true,
       valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
-    },
-    {
-      field: 'last update',
-      headerName: TranslateString('Last Update'),
-      minWidth: 225,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.updated_at)
     },
     {
       field: 'notes',
       headerName: TranslateString('Notes'),
       headerAlign: 'center',
       align: 'center',
-      minWidth: 110,
+      flex: 0.1,
+      minWidth: 100,
       sortable: false,
       renderCell: () => {
         const handleClick = () => {
