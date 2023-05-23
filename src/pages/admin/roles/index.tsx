@@ -1,14 +1,30 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 // ** MUI Imports
-import { Box, OutlinedInput, Typography, Button } from '@mui/material'
+import {
+  Box,
+  OutlinedInput,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  FormControl,
+  TextField,
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableCell,
+  FormControlLabel,
+  Checkbox,
+  TableBody,
+  DialogActions
+} from '@mui/material'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
 
 import Container from '@/pages/components/Container'
-import WorkgroupService from '@/services/api/Workgroup'
-import VideoService from '@/services/api/VideoService'
-import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Utils import
 import formatDate from '@/utils/formatDate'
@@ -21,7 +37,6 @@ import Icon from 'src/@core/components/icon'
 import { IVideoRow } from '@/context/types'
 import useDebounce from '@/hooks/useDebounce'
 import { useTranslateString } from '@/utils/TranslateString'
-import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** AuthContext
 import { useAuth } from '@/services/useAuth'
@@ -30,9 +45,27 @@ import { useAuth } from '@/services/useAuth'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 import RolesService from '@/services/api/RolesService'
 
-const Header = ({ searchName, setSearchName }: any) => {
+const rolesArr: string[] = [
+  'Dashboard',
+  'Admin Management',
+  'Super Agents Management',
+  'Content Creators Management',
+  'Customers Management',
+  'Transactions',
+  'Reports',
+  'Studio',
+  'Mobile App',
+  'Site Settings',
+  'Settings',
+  'Profile',
+  'Chat'
+]
+
+const Header = ({ searchName, setSearchName, setOpen, setDialogTitle }: any) => {
   // ** Auth Hook
   const auth = useAuth()
+
+  const handleClickOpen = () => setOpen(true)
 
   const handleClear = () => {
     setSearchName('')
@@ -62,12 +95,21 @@ const Header = ({ searchName, setSearchName }: any) => {
             {TranslateString('Clear')}
           </Button>
         </Box>
+        <Button
+          variant='contained'
+          onClick={() => {
+            handleClickOpen()
+            setDialogTitle('Add')
+          }}
+        >
+          Add Role
+        </Button>
       </Box>
     </Box>
   )
 }
 
-const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: any) => {
+const CustomTable = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: any) => {
   // ** States
   const [editVideoOpen, setEditVideoOpen] = React.useState<boolean>(false)
   const [editVideoRow, setEditVideoRow] = React.useState<IVideoRow>()
@@ -146,6 +188,10 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
     setPageSize(pageSize)
   }
 
+  if (!data) {
+    return <>... hehehe</>
+  }
+
   return (
     <>
       <DataGrid
@@ -170,16 +216,146 @@ const Table = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: an
   )
 }
 
+const CustomDialog = ({ open, setOpen, dialogTitle }: any) => {
+  // ** States
+  const [selectedCheckbox, setSelectedCheckbox] = useState<string[]>([])
+  const [isIndeterminateCheckbox, setIsIndeterminateCheckbox] = useState<boolean>(false)
+
+  const handleSubmit = () => {
+    console.log('selectedCheckbox', selectedCheckbox)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    setSelectedCheckbox([])
+    setIsIndeterminateCheckbox(false)
+  }
+
+  const togglePermission = (id: string) => {
+    const arr = selectedCheckbox
+    if (selectedCheckbox.includes(id)) {
+      arr.splice(arr.indexOf(id), 1)
+      setSelectedCheckbox([...arr])
+    } else {
+      arr.push(id)
+      setSelectedCheckbox([...arr])
+    }
+  }
+
+  const handleSelectAllCheckbox = () => {
+    if (isIndeterminateCheckbox) {
+      setSelectedCheckbox([])
+    } else {
+      rolesArr.forEach(row => {
+        const id = row.toLowerCase().split(' ').join('-')
+        // togglePermission(`${id}-read`)
+        // togglePermission(`${id}-write`)
+        // togglePermission(`${id}-create`)
+        togglePermission(`${id}`)
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (selectedCheckbox.length > 0 && selectedCheckbox.length < rolesArr.length * 3) {
+      setIsIndeterminateCheckbox(true)
+    } else {
+      setIsIndeterminateCheckbox(false)
+    }
+  }, [selectedCheckbox])
+
+  return (
+    <Dialog fullWidth maxWidth='sm' scroll='body' onClose={handleClose} open={open}>
+      <DialogTitle sx={{ textAlign: 'center' }}>
+        <Typography variant='h5' component='span'>
+          {`${dialogTitle} Role`}
+        </Typography>
+        <Typography variant='body2'>Set Role Permissions</Typography>
+      </DialogTitle>
+      <DialogContent sx={{ p: { xs: 6, sm: 12 } }}>
+        <Box sx={{ my: 4 }}>
+          <FormControl fullWidth>
+            <TextField label='Role Name' placeholder='Enter Role Name' />
+          </FormControl>
+        </Box>
+        <Typography variant='h6'>Role Permissions</Typography>
+        <TableContainer>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ pl: '0 !important' }}>
+                  <FormControlLabel
+                    label='Select All'
+                    sx={{ '& .MuiTypography-root': { textTransform: 'capitalize' } }}
+                    control={
+                      <Checkbox
+                        size='small'
+                        onChange={handleSelectAllCheckbox}
+                        indeterminate={isIndeterminateCheckbox}
+                        checked={selectedCheckbox.length === rolesArr.length * 3}
+                      />
+                    }
+                  />
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rolesArr.map((i: string, index: number) => {
+                const id = i.toLowerCase().split(' ').join('-')
+
+                return (
+                  <TableRow key={index} sx={{ '& .MuiTableCell-root:first-of-type': { pl: '0 !important' } }}>
+                    <TableCell>
+                      <FormControlLabel
+                        label={i}
+                        sx={{
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                          color: theme => `${theme.palette.text.primary} !important`
+                        }}
+                        control={
+                          <Checkbox
+                            size='small'
+                            id={`${id}`}
+                            onChange={() => togglePermission(`${id}`)}
+                            checked={selectedCheckbox.includes(`${id}`)}
+                          />
+                        }
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DialogContent>
+      <DialogActions sx={{ pt: 0, display: 'flex', justifyContent: 'center' }}>
+        <Box className='demo-space-x'>
+          <Button size='large' type='submit' variant='contained' onClick={handleSubmit}>
+            Submit
+          </Button>
+          <Button size='large' color='secondary' variant='outlined' onClick={handleClose}>
+            Cancel
+          </Button>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 function index() {
-  const { handleError } = useErrorHandling()
-  const { getWorkgroup } = WorkgroupService()
-  const { getAllVideos } = VideoService()
-  const { getAllRoles } = RolesService()
+  // ** States
+  const [open, setOpen] = useState<boolean>(false)
+  const [dialogTitle, setDialogTitle] = useState<'Add' | 'Edit'>('Add')
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
   const [postStatus, setPostStatus] = useState<'Approved' | 'Pending' | 'Declined'>('Approved')
+
+  const { handleError } = useErrorHandling()
+  const { getAllRoles } = RolesService()
 
   const [searchName, setSearchName] = useState('')
   const debouncedName = useDebounce(searchName, 1000)
@@ -213,8 +389,13 @@ function index() {
   return (
     <>
       <Container>
-        <Header searchName={searchName} setSearchName={setSearchName} />
-        <Table
+        <Header
+          searchName={searchName}
+          setSearchName={setSearchName}
+          setOpen={setOpen}
+          setDialogTitle={setDialogTitle}
+        />
+        <CustomTable
           data={data}
           isLoading={isLoading || isRefetching}
           setPage={setPage}
@@ -222,6 +403,7 @@ function index() {
           setPageSize={setPageSize}
           rowCount={rowCount}
         />
+        <CustomDialog open={open} setOpen={setOpen} dialogTitle={dialogTitle} />
       </Container>
     </>
   )
