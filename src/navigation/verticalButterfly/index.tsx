@@ -144,8 +144,8 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Commissions',
-          path: '/transactions/commissions',
+          title: 'Security Funds',
+          path: '/transactions/security-funds',
           action: 'read',
           subject: 'shared-page'
         },
@@ -156,8 +156,23 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Security Funds',
-          path: '/transactions/security-funds',
+          title: 'Work Purchases',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Commissions',
+          path: '/transactions/commissions',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'VIP Bundles',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Gold Bundles',
           action: 'read',
           subject: 'shared-page'
         }
@@ -169,15 +184,26 @@ const Navigation = (): VerticalNavItemsType => {
       path: '/reports',
       children: [
         {
+          title: 'Donations'
+        },
+        {
+          title: 'Withdrawals'
+        },
+        {
+          title: 'Work Purchases'
+        },
+        {
           title: 'Commissions',
           path: '/reports/commissions'
         },
         {
-          title: 'Balance History',
-          path: '/reports/balanceHistory'
+          title: 'VIP Bundles'
         },
         {
-          title: 'Security Funds',
+          title: 'Gold Bundles'
+        },
+        {
+          title: '(OLD) Security Funds',
           path: '/reports/securityFunds'
         }
       ]
