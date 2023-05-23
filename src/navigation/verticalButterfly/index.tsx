@@ -1,10 +1,7 @@
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
-import { useAuth } from '@/services/useAuth'
 
 const Navigation = (): VerticalNavItemsType => {
-  const { user } = useAuth()
-
   return [
     {
       sectionTitle: 'Main'
@@ -17,36 +14,37 @@ const Navigation = (): VerticalNavItemsType => {
       subject: 'shared-page'
     },
     {
+      title: 'Customers',
+      icon: 'mdi:home-outline',
+      action: 'read',
+      subject: 'agent-only-page'
+    },
+    {
       title: 'Admin',
       icon: 'mdi:file-document-outline',
       action: 'read',
-      subject: 'shared-page',
+      subject: 'sa-page',
       children: [
         {
           title: 'Users',
           path: '/user/list',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         },
         {
           title: 'Roles',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         },
         {
-          title: 'Permission',
+          title: 'Permissions',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         },
         {
-          title: 'Menu',
+          title: 'Activity Logs',
           action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Activity Log',
-          action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         }
       ]
     },
@@ -54,88 +52,46 @@ const Navigation = (): VerticalNavItemsType => {
       title: 'Super Agents',
       icon: 'mdi:file-document-outline',
       action: 'read',
-      subject: 'shared-page',
+      subject: 'sa-page',
       children: [
         {
           title: 'Sites',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         },
         {
           title: 'Agents',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         },
         {
           title: 'Customers',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         },
         {
           title: 'FQDN',
           path: '/fqdn',
           action: 'read',
-          subject: 'fqdn-page'
+          subject: 'sa-page'
         },
         {
           title: 'Integration Key',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         }
       ]
     },
     {
       title: 'Content Creators',
       icon: 'mdi:file-document-outline',
-      action: 'read',
-      subject: 'shared-page',
-      children: [
-        {
-          title: 'List of Content Creators',
-          action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Newsfeed List',
-          path: '/studio/newsfeed',
-          action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Video List',
-          path: '/studio/video-list',
-          action: 'read',
-          subject: 'shared-page'
-        },
-        {
-          title: 'Create Content Creator',
-          action: 'read',
-          subject: 'fqdn-page'
-        }
-      ]
+      action: 'read'
     },
-    // {
-    //   title: 'Users',
-    //   icon: 'mdi:user-circle',
-    //   path: '/user/list',
-    //   action: 'read',
-    //   subject: 'shared-page'
-    // },
-    // {
-    //   title: 'FQDN',
-    //   icon: 'mdi:web',
-    //   path: '/fqdn',
-    //   action: 'read',
-    //   subject: 'fqdn-page'
-    // },
     {
       title: 'Transactions',
       icon: 'mdi:file-document-outline',
       action: 'read',
       subject: 'shared-page',
-      path: '/transactions',
-
-      // ONLY SOME DROPDOWNS ARE AVAILABLE TO CERTAIN USERS - WIP
       children: [
         {
           title: 'Donations',
@@ -144,40 +100,83 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Commissions',
-          path: '/transactions/commissions',
+          title: 'Security Funds',
+          path: '/transactions/security-funds',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'sa-page'
         },
         {
           title: 'Withdrawals',
           path: '/transactions/withdrawal',
           action: 'read',
+          subject: 'cc-page'
+        },
+        {
+          title: 'Work Purchases',
+          path: '/transactions/work-purchases',
+          action: 'read',
           subject: 'shared-page'
         },
         {
-          title: 'Security Funds',
-          path: '/transactions/security-funds',
+          title: 'Commissions',
+          path: '/transactions/commissions',
           action: 'read',
-          subject: 'shared-page'
+          subject: 'agent-page'
+        },
+        {
+          title: 'VIP Bundles',
+          path: '/transactions/vip-bundles',
+          action: 'read',
+          subject: 'agent-page'
+        },
+        {
+          title: 'Gold Coin Bundles',
+          path: '/transactions/gold-coin-bundles',
+          action: 'read',
+          subject: 'agent-page'
         }
       ]
     },
     {
       title: 'Reports',
       icon: 'mdi:grid-large',
-      path: '/reports',
+      action: 'read',
+      subject: 'shared-page',
       children: [
         {
+          title: 'Donations',
+          action: 'read',
+          path: '/reports/donations',
+          subject: 'shared-page'
+        },
+        {
+          title: 'Withdrawals',
+          action: 'read',
+          subject: 'cc-page'
+        },
+        {
+          title: 'Work Purchases',
+          action: 'read',
+          subject: 'shared-page'
+        },
+        {
           title: 'Commissions',
-          path: '/reports/commissions'
+          path: '/reports/commissions',
+          action: 'read',
+          subject: 'agent-page'
         },
         {
-          title: 'Balance History',
-          path: '/reports/balanceHistory'
+          title: 'VIP Bundles',
+          action: 'read',
+          subject: 'agent-page'
         },
         {
-          title: 'Security Funds',
+          title: 'Gold Coin Bundles',
+          action: 'read',
+          subject: 'agent-page'
+        },
+        {
+          title: '(OLD) Security Funds',
           path: '/reports/securityFunds'
         }
       ]
@@ -185,6 +184,8 @@ const Navigation = (): VerticalNavItemsType => {
     {
       title: 'Studio',
       icon: 'mdi:building',
+      action: 'read',
+      subject: 'cc-page',
       children: [
         {
           title: 'Upload Content',
@@ -193,40 +194,40 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'cc-page'
         },
         {
-          title: 'Newsfeed List',
+          title: 'Albums List',
+          path: '/studio/album/album-list'
+        },
+        {
+          title: 'Feeds Approval',
+          path: '/studio/newsfeed/approval'
+        },
+        {
+          title: 'Feeds List',
           path: '/studio/newsfeed',
           action: 'read',
           subject: 'cc-page'
         },
         {
-          title: 'Newsfeed Approval',
-          path: '/studio/newsfeed/approval'
-        },
-        {
-          title: 'Newsfeed Status',
+          title: 'Feeds Status',
           path: '/studio/cc/post-status',
           action: 'read',
-          subject: 'cc-post-status'
+          subject: 'cc-only-page'
         },
         {
-          title: 'Video List',
+          title: 'Works Approval',
+          path: '/studio/content'
+        },
+        {
+          title: 'Works List',
           path: '/studio/video-list',
           action: 'read',
           subject: 'cc-page'
         },
         {
-          title: 'Video Approval',
-          path: '/studio/content'
-        },
-        {
-          title: 'Video Status',
+          title: 'Works Status',
           path: '/studio/cc/content-status',
           action: 'read',
-          subject: 'cc-post-status'
-        },
-        {
-          title: 'Album List',
-          path: '/studio/album/album-list'
+          subject: 'cc-only-page'
         },
         {
           title: 'Work Groupings',
@@ -239,17 +240,17 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:tag-multiple',
       children: [
         {
-          title: 'VIP Bundle',
+          title: 'VIP Bundles',
           path: '/bundles/pages/VIPBundlesPage'
         },
         {
-          title: 'Gold Coin Bundle',
+          title: 'Gold Coin Bundles',
           path: '/bundles/pages/GoldCoinBundlesPage'
-        },
-        {
-          title: 'Gold Coin Table',
-          path: '/bundles/pages/GoldCoinTablesPage'
         }
+        // {
+        //   title: 'Gold Coin Table',
+        //   path: '/bundles/pages/GoldCoinTablesPage'
+        // }
       ]
     },
     {
@@ -264,18 +265,6 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:cogs',
       children: [
         {
-          title: 'Privacy Policy',
-          path: '/settings/pages/privacypolicy'
-        },
-        {
-          title: 'Terms and Services',
-          path: '/settings/pages/tos'
-        },
-        {
-          title: 'Featured Feeds',
-          path: '/settings/pages/featuredfeeds'
-        },
-        {
           title: 'Advertisements',
           path: '/settings/pages/ads',
           action: 'read',
@@ -286,6 +275,24 @@ const Navigation = (): VerticalNavItemsType => {
           path: '/settings/pages/announcements',
           action: 'read',
           subject: 'sa-page'
+        },
+        {
+          title: 'Featured Feeds',
+          path: '/settings/pages/featuredfeeds',
+          action: 'read',
+          subject: 'sa-page'
+        },
+        {
+          title: 'Privacy Policy',
+          path: '/settings/pages/privacypolicy',
+          action: 'read',
+          subject: 'sa-page'
+        },
+        {
+          title: 'Terms & Services',
+          path: '/settings/pages/tos',
+          action: 'read',
+          subject: 'sa-page'
         }
       ]
     },
@@ -294,17 +301,14 @@ const Navigation = (): VerticalNavItemsType => {
       icon: 'mdi:cogs',
       children: [
         {
-          title: 'Payment Channel',
-          path: '/wallet',
-          action: 'read'
+          title: 'Payment Channels',
+          path: '/wallet'
         },
         {
-          title: 'Language',
-          action: 'read'
+          title: 'Security Funds'
         },
         {
-          title: 'Currency',
-          action: 'read'
+          title: 'Withdrawals'
         }
       ]
     }

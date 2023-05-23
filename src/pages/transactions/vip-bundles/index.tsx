@@ -2,9 +2,6 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import NotesDrawer from './NotesDrawer'
-import { Box, Button } from '@mui/material'
-import Icon from '@/@core/components/icon'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
 import { useQuery } from '@tanstack/react-query'
@@ -17,17 +14,18 @@ function index() {
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
-  const [openDrawer, setOpenDrawer] = useState(false)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
 
-  const { getCommissions } = TransactionsService()
+  const { getCustomerTransaction } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['commissions', pageSize, page],
+    queryKey: ['transactionVIPBundles', pageSize, page],
     queryFn: () =>
-      getCommissions({
+      getCustomerTransaction({
         data: {
-          select: 'id,role,transaction_type,gold_amount,status,created_at',
+          select: 'id,transaction_type,bundle_name,customer_username,agent_username,amount,created_at',
+          search_by: 'transaction_type',
+          search_value: 'subscription',
           page: page,
           paginate: pageSize
         }
@@ -45,42 +43,52 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'role',
-      headerName: TranslateString('Role'),
+      field: 'transaction type',
+      headerName: TranslateString('Transaction Type'),
       flex: 0.15,
       minWidth: 110,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.role
+      valueGetter: (params: GridRenderCellParams) => params.row?.transaction_type
     },
     {
-      field: 'transaction type',
-      headerName: TranslateString('Transaction Type'),
+      field: 'bundle name',
+      headerName: TranslateString('Bundle Name'),
       headerAlign: 'center',
       align: 'center',
       flex: 0.15,
       minWidth: 170,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.transaction_type
+      valueGetter: (params: GridRenderCellParams) => params.row?.bundle_name
     },
     {
-      field: 'gold amount',
-      headerName: TranslateString('Gold Amount'),
+      field: 'customer username',
+      headerName: TranslateString('Customer Username'),
       headerAlign: 'center',
       align: 'center',
       flex: 0.15,
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.gold_amount
+      valueGetter: (params: GridRenderCellParams) => params.row?.customer_username
     },
     {
-      field: 'status',
-      headerName: TranslateString('Status'),
+      field: 'agent username',
+      headerName: TranslateString('Agent Username'),
       headerAlign: 'center',
       align: 'center',
       flex: 0.15,
       minWidth: 110,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.status
+      valueGetter: (params: GridRenderCellParams) => params.row?.agent_username
+    },
+    {
+      field: 'amount',
+      headerName: TranslateString('Amount'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.1,
+      minWidth: 100,
+      sortable: false,
+      valueGetter: (params: GridRenderCellParams) => params.row?.amount
     },
     {
       field: 'date created',
@@ -90,28 +98,6 @@ function index() {
       sortable: true,
       valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
     },
-    {
-      field: 'notes',
-      headerName: TranslateString('Notes'),
-      headerAlign: 'center',
-      align: 'center',
-      flex: 0.1,
-      minWidth: 100,
-      sortable: false,
-      renderCell: () => {
-        const handleClick = () => {
-          setOpenDrawer(true)
-        }
-
-        return (
-          <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-            <Button onClick={handleClick}>
-              <Icon fontSize={30} icon='game-icons:notebook' color='98A9BC' />
-            </Button>
-          </Box>
-        )
-      }
-    }
   ]
 
   return (
@@ -126,7 +112,6 @@ function index() {
         setPage={setPage}
         setPageSize={setPageSize}
       />
-      {openDrawer ? <NotesDrawer open={openDrawer} setOpen={setOpenDrawer} /> : null}
     </>
   )
 }

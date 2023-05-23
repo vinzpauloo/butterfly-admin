@@ -26,13 +26,13 @@ const FQDN = () => {
   const formPhotosRef = useRef<any>()
   const formStreamRef = useRef<any>()
   const auth = useAuth()
-  
+
   const { getSuperAgentFQDNList, addFQDN } = FQDNService()
   const { isLoading } = useQuery({
     queryKey: ['fqdns'],
     queryFn: () =>
       getSuperAgentFQDNList({
-        site: auth?.user?.site,
+        site: auth?.user?.site
       }),
     onSuccess: data => {
       console.log(data?.data)
@@ -62,7 +62,9 @@ const FQDN = () => {
     setHasGetDone(false)
     const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'api' }))
     const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'photo' }))
-    const streamingArray = formStreamRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'streaming' }))
+    const streamingArray = formStreamRef.current
+      .getFormData()
+      .map((name: any) => ({ name: name.value, type: 'streaming' }))
 
     mutate({
       siteId: auth?.user?.site,
@@ -70,23 +72,25 @@ const FQDN = () => {
         site: auth?.user?.site,
         fqdns: apiArray.concat(photoArray).concat(streamingArray),
         fqdn_admin: FQDNAdminLink
-      },
+      }
     })
   }
 
   return (
     <PerfectScrollbar>
       <Grid maxWidth='sm' container spacing={6}>
-        {isLoading || updateLoading ?
+        {isLoading || updateLoading ? (
           <Grid item xs={12} my={24} display='flex' alignItems='center' justifyContent='center'>
             <CircularProgress />
           </Grid>
-        : null}
-        {hasGetDone &&
+        ) : null}
+        {hasGetDone && (
           <Grid item xs={12}>
             <Stack direction='row' alignItems='center' justifyContent='space-between' py={4}>
               <Typography variant='h5'>FQDN</Typography>
-              <Button variant='outlined' onClick={saveChanges}>Save Changes</Button>
+              <Button variant='outlined' onClick={saveChanges}>
+                Save Changes
+              </Button>
             </Stack>
             <Stack gap={20}>
               <ExpandoForm
@@ -102,7 +106,7 @@ const FQDN = () => {
                 multipleInputs={true}
                 ref={formPhotosRef}
                 fileType='text'
-                pageHeader="PHOTOS"
+                pageHeader='PHOTOS'
                 isLoading={isLoading}
                 disableSaveButton={true}
                 defaultValues={{ expando: photoFQDNS.map((value: string) => ({ value })) }}
@@ -111,14 +115,14 @@ const FQDN = () => {
                 multipleInputs={true}
                 ref={formStreamRef}
                 fileType='text'
-                pageHeader="STREAMING"
+                pageHeader='STREAMING'
                 isLoading={isLoading}
                 disableSaveButton={true}
                 defaultValues={{ expando: streamingFQDNS.map((value: string) => ({ value })) }}
               />
             </Stack>
           </Grid>
-        }
+        )}
       </Grid>
     </PerfectScrollbar>
   )
@@ -126,7 +130,7 @@ const FQDN = () => {
 
 FQDN.acl = {
   action: 'read',
-  subject: 'fqdn-page'
+  subject: 'sa-page'
 }
 
 export default FQDN

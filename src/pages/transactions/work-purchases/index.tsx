@@ -4,12 +4,11 @@ import React, { useState } from 'react'
 import Transaction from '@/pages/transactions'
 import { Box, Button } from '@mui/material'
 import Icon from '@/@core/components/icon'
-import EditDrawer from './EditDrawer'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
-import { useErrorHandling } from '@/hooks/useErrorHandling'
-import TransactionsService from '@/services/api/Transactions'
 import { useQuery } from '@tanstack/react-query'
+import TransactionsService from '@/services/api/Transactions'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 import formatDate from '@/utils/formatDate'
 
 function index() {
@@ -17,14 +16,20 @@ function index() {
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
-  const [open, setOpen] = useState(false)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
 
-  const { getSecurityFunds } = TransactionsService()
+  const { getCommissions } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['donations', pageSize, page],
-    queryFn: () => getSecurityFunds({ data: { with: 'site,user', page: page, paginate: pageSize } }),
+    queryKey: ['commissions', pageSize, page],
+    queryFn: () =>
+      getCommissions({
+        data: {
+          select: 'id,role,transaction_type,gold_amount,status,created_at',
+          page: page,
+          paginate: pageSize
+        }
+      }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -32,76 +37,71 @@ function index() {
       setPage(data.current_page)
     },
     onError: (e: any) => {
-      handleError(e, `getSecurityFunds() transactions/security-funds/index.tsx`)
+      handleError(e, `getDonations() transactions/commissions/index.tsx`)
     }
   })
 
   const columnData: GridColDef[] = [
     {
-      field: 'site name',
-      headerName: TranslateString('Site Name'),
-      flex: 0.35,
+      field: 'role',
+      headerName: TranslateString('Role'),
+      flex: 0.15,
+      minWidth: 110,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.role
+    },
+    {
+      field: 'transaction type',
+      headerName: TranslateString('Transaction Type'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.15,
       minWidth: 170,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.site?.name
+      valueGetter: (params: GridRenderCellParams) => params.row?.transaction_type
     },
     {
-      field: 'amount',
-      headerName: TranslateString('Amount'),
+      field: 'gold amount',
+      headerName: TranslateString('Gold Amount'),
       headerAlign: 'center',
       align: 'center',
+      flex: 0.15,
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.amount
+      valueGetter: (params: GridRenderCellParams) => params.row?.gold_amount
     },
     {
-      field: 'balance',
-      headerName: TranslateString('Balance'),
+      field: 'status',
+      headerName: TranslateString('Status'),
       headerAlign: 'center',
       align: 'center',
-      minWidth: 150,
+      flex: 0.15,
+      minWidth: 110,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.balance
+      valueGetter: (params: GridRenderCellParams) => params.row?.status
     },
     {
-      field: 'type',
-      headerName: TranslateString('Type'),
-      headerAlign: 'center',
-      align: 'center',
-      minWidth: 150,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.type
-    },
-    {
-      field: 'created_at',
+      field: 'date created',
       headerName: TranslateString('Date Created'),
-      flex: 0.35,
+      flex: 0.25,
       minWidth: 200,
       sortable: true,
       valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
     },
     {
-      field: 'updated_at',
-      headerName: TranslateString('Last Update'),
-      flex: 0.35,
-      minWidth: 200,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.updated_at)
-    },
-    {
-      field: 'edit',
-      headerName: TranslateString('Edit'),
+      field: 'notes',
+      headerName: TranslateString('Notes'),
       headerAlign: 'center',
       align: 'center',
-      minWidth: 40,
+      flex: 0.1,
+      minWidth: 100,
       sortable: false,
-      renderCell: () => (
+      renderCell: () => 
         <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-          <Button onClick={() => setOpen(true)}>
-            <Icon fontSize={30} icon='la:pen' color='98A9BC' />
+          <Button>
+            <Icon fontSize={30} icon='game-icons:notebook' color='98A9BC' />
           </Button>
         </Box>
-      )
     }
   ]
 
@@ -116,16 +116,14 @@ function index() {
         pageSize={pageSize}
         setPage={setPage}
         setPageSize={setPageSize}
-        setOpen={setOpen}
       />
-      {open ? <EditDrawer open={open} setOpen={setOpen} /> : null}
     </>
   )
 }
 
 index.acl = {
   action: 'read',
-  subject: 'sa-page'
+  subject: 'shared-page'
 }
 
 export default index
