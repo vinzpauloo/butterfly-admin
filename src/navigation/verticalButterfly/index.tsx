@@ -146,6 +146,7 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Donations',
           action: 'read',
+          path: '/reports/donations',
           subject: 'shared-page'
         },
         {
