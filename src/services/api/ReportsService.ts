@@ -28,6 +28,8 @@ interface IReportsParams {
     select?: string
     page?: number
     paginate?: number
+    search_by?: string
+    search_value?: string
   }
 }
 
@@ -60,6 +62,20 @@ export const ReportsService = () => {
     })
   }
 
+  // Reports -> VIP Bundles and Gold Coin Bundles
+  const getReportsCustomerTransaction = (params: IReportsParams) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/customer-transactions',
+      method: 'GET',
+      params: params.data,
+    })
+  }
 
-  return { getSecurityFunds, getReportsDonations }
+
+  return { getSecurityFunds, getReportsDonations, getReportsCustomerTransaction }
 }
