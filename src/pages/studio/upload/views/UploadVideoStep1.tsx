@@ -308,7 +308,7 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Context ReactHookForm
   const { register, getValues, control, watch, setValue, resetField } = useFormContext()
-  console.log('watchhhh', watch())
+
   // ** react query / api services
   const { getGroupings } = useGroupingService()
   const { updateVideoByWorkId } = VideoService()

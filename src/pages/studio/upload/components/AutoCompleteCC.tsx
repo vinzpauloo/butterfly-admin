@@ -22,7 +22,7 @@ interface ICCOptionData {
 }
 
 const AutoCompleteCC = ({name, value, creatorsData, onChange, onBlur, control} : AutoCompleteCCProps) => {
-    console.log('CONTROL',control)
+
     // ** States
     const [ccValue, setCCValue] = React.useState<ICCOptionData | null>(null)
     if ( creatorsData ) {
