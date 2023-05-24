@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
 import { useQuery } from '@tanstack/react-query'
@@ -9,9 +9,7 @@ import formatDate from '@/utils/formatDate'
 import Container from '@/pages/components/Container'
 import CustomToolbar from '../components/CustomToolbar'
 import ReportsHeader from '../components/ReportsHeader'
-import { useRouter } from 'next/router'
-import ReportsTabLists from '@/data/ReportsTabLists'
-import TabLists from '@/pages/components/tab-list/TabLists'
+import { reportsTimespanStore } from '../../../zustand/reportsTimespanStore'
 
 function index() {
   const [data, setData] = useState([])
@@ -20,15 +18,16 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
+  const [timespan] = reportsTimespanStore((state) => [state.timespan])
 
   const { getReportsCustomerTransaction } = ReportsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['reportsGoldCoinBundle', pageSize, page],
+    queryKey: ['reportsGoldCoinBundle', pageSize, page, timespan],
     queryFn: () =>
       getReportsCustomerTransaction({
         data: {
           report: true,
-          today: true,
+          timespan: timespan,
           select: 'id,transaction_type,bundle_name,customer_username,agent_username,amount,created_at',
           search_by: 'transaction_type',
           search_value: 'coins',
@@ -111,19 +110,9 @@ function index() {
     setPageSize(pageSize)
   }
 
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState<any>('donations')
-
-  useEffect(() => {
-    const path = router.pathname.split('/')
-    const pathName = path[path.length - 1] // get the pathname in end of the array
-    setActiveTab(pathName)
-  }, [router.pathname])
-
   return (
     <Container>
-      <ReportsHeader />
-      <TabLists originRoute='reports' tabData={ReportsTabLists} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <ReportsHeader title='Gold Coin Bundles'/>
       <DataGrid
         autoHeight
         columns={columnData}

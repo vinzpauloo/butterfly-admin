@@ -134,6 +134,7 @@ function index() {
 
   return (
     <Transaction
+      title='Donations'
       isLoading={isLoading}
       isFetching={isFetching}
       rowData={data}

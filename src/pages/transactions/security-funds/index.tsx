@@ -108,6 +108,7 @@ function index() {
   return (
     <>
       <Transaction
+        title='Security Funds'
         isLoading={isLoading}
         isFetching={isFetching}
         rowData={data}

@@ -89,5 +89,22 @@ export const AlbumService = () => {
     })
   }
 
-  return { getAlbums, getSpecificUserAlbum, postAlbum, editAlbum }
+  const getAlbumDataForCSV = (params: AlbumData) => {
+     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/albums?export=true`,
+      method: 'GET',
+      params: params.data
+    },
+      processData
+    )
+  }
+
+  return { getAlbums, getSpecificUserAlbum, postAlbum, editAlbum, getAlbumDataForCSV }
 }
