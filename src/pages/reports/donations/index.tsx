@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
 import { useQuery } from '@tanstack/react-query'
@@ -11,9 +11,7 @@ import Container from '@/pages/components/Container'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import CustomToolbar from '../components/CustomToolbar'
 import ReportsHeader from '../components/ReportsHeader'
-import TabLists from '@/pages/components/tab-list/TabLists'
-import ReportsTabLists from '@/data/ReportsTabLists'
-import { useRouter } from 'next/router'
+import { reportsTimespanStore } from '../../../zustand/reportsTimespanStore'
 
 function index() {
   const [data, setData] = useState([])
@@ -22,15 +20,16 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
+  const [timespan] = reportsTimespanStore((state) => [state.timespan])
 
   const { getReportsDonations } = ReportsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['reportsDonations', pageSize, page],
+    queryKey: ['reportsDonations', pageSize, page, timespan],
     queryFn: () =>
       getReportsDonations({
         data: {
           report: true,
-          today: true,
+          timespan: timespan,
           with: 'users,customers,sites',
           select: 'id,customer_id,user_id,site_id,coin_amount,created_at',
           page: page,
@@ -120,19 +119,9 @@ function index() {
     setPageSize(pageSize)
   }
 
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState<any>('donations')
-
-  useEffect(() => {
-    const path = router.pathname.split('/')
-    const pathName = path[path.length - 1] // get the pathname in end of the array
-    setActiveTab(pathName)
-  }, [router.pathname])
-
   return (
     <Container>
-      <ReportsHeader />
-      <TabLists originRoute='reports' tabData={ReportsTabLists} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <ReportsHeader title='Donations' />
       <DataGrid
         autoHeight
         columns={columnData}

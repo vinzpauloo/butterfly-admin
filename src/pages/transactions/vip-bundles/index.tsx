@@ -103,6 +103,7 @@ function index() {
   return (
     <>
       <Transaction
+        title='VIP Bundles'
         isLoading={isLoading}
         isFetching={isFetching}
         rowData={data}

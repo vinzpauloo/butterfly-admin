@@ -133,6 +133,7 @@ function index() {
   return (
     <>
       <Transaction
+        title='Withdrawals'
         isLoading={isLoading}
         isFetching={isFetching}
         rowData={data}

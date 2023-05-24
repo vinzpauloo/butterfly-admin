@@ -103,6 +103,7 @@ function index() {
   return (
     <>
       <Transaction
+        title='Gold Coin Bundles'
         isLoading={isLoading}
         isFetching={isFetching}
         rowData={data}
