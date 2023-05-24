@@ -4,14 +4,12 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import Container from '@/pages/transactions/components/Container'
+import TransactionTabLists from '@/data/TransactionTabLists'
 
-// import Header from '@/pages/transactions/components/Header'
 import Table from '@/pages/transactions/components/Table'
-import TabLists from '@/pages/transactions/components/TabLists'
+import TabLists from '@/pages/components/tab-list/TabLists'
 import { Typography } from '@mui/material'
 import { useTranslateString } from '@/utils/TranslateString'
-
-
 
 function index({
   isLoading,
@@ -23,7 +21,6 @@ function index({
   setPage,
   setPageSize,
   children = null,
-  setOpen = null
 }: any) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<any>('donations')
@@ -38,10 +35,9 @@ function index({
 
   return (
     <Container>
-      {/* <Header /> */}
       <Typography variant='h4' component='h4' mb={5}>{TranslateString("Transactions")}</Typography>
       {children}
-      <TabLists activeTab={activeTab} setActiveTab={setActiveTab} setOpen={setOpen} />
+      <TabLists originRoute='transactions' tabData={TransactionTabLists} activeTab={activeTab} setActiveTab={setActiveTab} />
       <Table
         isLoading={isLoading}
         isFetching={isFetching}

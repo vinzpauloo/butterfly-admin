@@ -1,14 +1,10 @@
 import React from 'react'
-
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
-import { Box, Button, Tab } from '@mui/material'
+import { Box, Tab } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useRouter } from 'next/router'
-
-import TabListData from '@/data/TabLists'
 import { useTranslateString } from '@/utils/TranslateString';
-import Translations from '@/layouts/components/Translations'
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   '& .MuiTabs-indicator': {
@@ -30,30 +26,23 @@ const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   }
 }))
 
-function TabLists({ activeTab, setActiveTab, setOpen }: any) {
+function TabLists({ originRoute, tabData , activeTab, setActiveTab }: any) {
   const router = useRouter()
   const handleChange = (event: any, value: string) => {
     setActiveTab(value)
   }
 
-  const haveAddMore = activeTab === 'security-funds'
-
   const handleClick = (value: string) => {
-    router.push(`/transactions/${value}`)
+    router.push(`/${originRoute}/${value}`)
   }
 
   const TranslateString = useTranslateString()
 
   return (
-    <Box display={'flex'} alignItems='flex-end' justifyContent={'space-between'}>
+    <Box display='flex' alignItems='flex-end' justifyContent='space-between'>
       <TabContext value={activeTab}>
-        <TabList
-          variant='scrollable'
-          scrollButtons='auto'
-          onChange={handleChange}
-          aria-label='forced scroll tabs example'
-        >
-          {TabListData.map((item, index) => (
+        <TabList variant='scrollable' scrollButtons='auto' onChange={handleChange} >
+          {tabData.map((item : any, index: number) => (
             <Tab
               onClick={() => handleClick(item.value)}
               key={index}
@@ -68,14 +57,6 @@ function TabLists({ activeTab, setActiveTab, setOpen }: any) {
           ))}
         </TabList>
       </TabContext>
-      <Box display={'flex'} flexDirection='column'>
-        {/* <OutlinedInput style={{ marginBottom: '10px' }} placeholder={TranslateString('Search')} size='small' /> */}
-        {haveAddMore ? (
-          <Button style={{ marginBottom: '10px' }} size='small' variant='contained' onClick={() => setOpen(true)}>
-            <Translations text='Add More' />
-          </Button>
-        ) : null}
-      </Box>
     </Box>
   )
 }

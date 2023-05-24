@@ -159,11 +159,13 @@ const Navigation = (): VerticalNavItemsType => {
         },
         {
           title: 'Withdrawals',
+          path: '/reports/withdrawal',
           action: 'read',
           subject: 'cc-page'
         },
         {
           title: 'Work Purchases',
+          path: '/reports/work-purchases',
           action: 'read',
           subject: 'shared-page'
         },

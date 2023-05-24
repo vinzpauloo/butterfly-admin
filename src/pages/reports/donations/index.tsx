@@ -1,15 +1,19 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
 import { useQuery } from '@tanstack/react-query'
 import { ReportsService } from '@/services/api/ReportsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 import formatDate from '@/utils/formatDate'
-import { Avatar, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Avatar, Stack, Typography } from '@mui/material'
 import Container from '@/pages/components/Container'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import CustomToolbar from '../components/CustomToolbar'
+import ReportsHeader from '../components/ReportsHeader'
+import TabLists from '@/pages/components/tab-list/TabLists'
+import ReportsTabLists from '@/data/ReportsTabLists'
+import { useRouter } from 'next/router'
 
 function index() {
   const [data, setData] = useState([])
@@ -18,19 +22,15 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-  const [timespan, setTimespan] = React.useState<string | null>('Today');
 
   const { getReportsDonations } = ReportsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['reportsDonations', pageSize, page, timespan],
+    queryKey: ['reportsDonations', pageSize, page],
     queryFn: () =>
       getReportsDonations({
         data: {
           report: true,
-          today: timespan === 'Today' && true,
-          weekly: timespan === 'Weekly' && true,
-          monthly: timespan === 'Monthly' && true,
-          yearly: timespan === 'Yearly' && true,
+          today: true,
           with: 'users,customers,sites',
           select: 'id,customer_id,user_id,site_id,coin_amount,created_at',
           page: page,
@@ -112,10 +112,6 @@ function index() {
     },
   ]
 
-  const handleOnChange = (event: React.MouseEvent<HTMLElement>, newTimespan: string) => {
-    setTimespan(newTimespan)
-  }
-
   const handlePageChange = (newPage: number) => {
     setPage(newPage + 1)
   }
@@ -124,15 +120,19 @@ function index() {
     setPageSize(pageSize)
   }
 
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<any>('donations')
+
+  useEffect(() => {
+    const path = router.pathname.split('/')
+    const pathName = path[path.length - 1] // get the pathname in end of the array
+    setActiveTab(pathName)
+  }, [router.pathname])
+
   return (
     <Container>
-      <Typography variant='h4' component='h4' mb={5}>{TranslateString("Reports - Donations")}</Typography>
-      <ToggleButtonGroup color='primary' value={timespan} exclusive onChange={handleOnChange} size='small' sx={{alignSelf: 'center'}}>
-        <ToggleButton value='Today' sx={{ textTransform: 'capitalize' }}>Today</ToggleButton>
-        <ToggleButton value='Weekly' sx={{ textTransform: 'capitalize' }}>Weekly</ToggleButton>
-        <ToggleButton value='Monthly' sx={{ textTransform: 'capitalize' }}>Monthly</ToggleButton>
-        <ToggleButton value='Yearly' sx={{ textTransform: 'capitalize' }}>Yearly</ToggleButton>
-      </ToggleButtonGroup>
+      <ReportsHeader />
+      <TabLists originRoute='reports' tabData={ReportsTabLists} activeTab={activeTab} setActiveTab={setActiveTab} />
       <DataGrid
         autoHeight
         columns={columnData}
@@ -152,9 +152,7 @@ function index() {
         components={{ Toolbar: CustomToolbar }}
       />
     </Container>
-    
   )
-
 }
 
 export default index
