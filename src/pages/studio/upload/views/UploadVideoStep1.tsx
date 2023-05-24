@@ -33,6 +33,7 @@ import { useErrorHandling } from '@/hooks/useErrorHandling'
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
+import AutoCompleteCC from '../components/AutoCompleteCC'
 
 // ** Third Party Components
 import toast from 'react-hot-toast'
@@ -68,6 +69,7 @@ import { useTranslation } from 'react-i18next'
 
 // ** Auth
 import { useAuth } from '@/services/useAuth'
+
 
 // Styled components
 const Img = styled('img')(({ theme }) => ({
@@ -306,7 +308,7 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Context ReactHookForm
   const { register, getValues, control, watch, setValue, resetField } = useFormContext()
-
+  console.log('watchhhh', watch())
   // ** react query / api services
   const { getGroupings } = useGroupingService()
   const { updateVideoByWorkId } = VideoService()
@@ -570,32 +572,11 @@ const UploadVideoStep1 = (props: Props) => {
                     name='contentCreator'
                     control={control}
                     rules={{ required: true }}
-                    render={({ field: { value, onChange, onBlur } }) => (
+                    render={({ field: { value, onChange, onBlur, name } }) => (
                       <>
                         {isCCLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
                         {CCData && (
-                          <CustomSelect
-                            displayEmpty
-                            inputProps={{ 'aria-label': 'Without label' }}
-                            label={<Translations text='Select Content Creator' />}
-                            defaultValue=''
-                            id='contentCreator'
-                            labelId='cc-select-label'
-                            value={value || ''}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            error={Boolean(errors.title)}
-                          >
-                            <MenuItem disabled value=''>
-                              {`${t('Select Content Creator')}`}
-                            </MenuItem>
-                            {ccOptions &&
-                              ccOptions.map(cc => (
-                                <MenuItem key={cc.id} value={cc.id}>
-                                  {cc.username}
-                                </MenuItem>
-                              ))}
-                          </CustomSelect>
+                          <AutoCompleteCC name={name} control={control} value={value} creatorsData={CCData} onChange={onChange} onBlur={onBlur} />
                         )}
                       </>
                     )}
@@ -655,7 +636,6 @@ const UploadVideoStep1 = (props: Props) => {
                             name='availableTo'
                             defaultValue='vip'
                             inputProps={{ 'aria-label': 'Without label' }}
-                            label={<Translations text='Vip or Coins' />}
                             id='availableTo'
                             labelId='availableTo'
                             value={value || ''}
