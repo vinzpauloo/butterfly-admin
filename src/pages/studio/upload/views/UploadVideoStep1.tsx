@@ -179,10 +179,13 @@ const defaultValues = {
   description: '',
   contentCreator: '',
   startTime: 0,
-  multiTags: ''
+  multiTags: '',
+  availableTo: 'vip',
+  coinAmount : 0
 }
 
 const UploadVideoStep1 = (props: Props) => {
+
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -203,8 +206,6 @@ const UploadVideoStep1 = (props: Props) => {
   // ** UseEffect
   React.useEffect(() => {
     const eventBatchStart = (batch: any, options: any) => {
-      console.log('step 1 - EVENT BATCH START batch', batch)
-      console.log('step 1 - EVENT BATCH START options', options)
       if (options?.params?.video_type == 'full_video') {
         //TODO
       } // end if full video
@@ -219,7 +220,6 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Batch Progress
   const batch = useBatchProgressListener(batch => {})
-  console.log('THE BATCH', batch)
   if (batch && batch.completed > studioContext!.workProgress && batch.completed < 100) {
     console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
   }
@@ -292,6 +292,8 @@ const UploadVideoStep1 = (props: Props) => {
   >([])
   const [openBD, setOpenBD] = React.useState(false)
 
+  const [ availableTo, setAvailableTo ] = React.useState<'vip' | 'coins'>('vip')
+
   // ** UseForm
   const {
     reset,
@@ -335,7 +337,6 @@ const UploadVideoStep1 = (props: Props) => {
       return getAllDataFromCreator()
     },
     onSuccess: (data: any) => {
-      console.log('data CcOptions', data)
       setCCOptions(data)
     },
     onError: (e: any) => {
@@ -376,7 +377,7 @@ const UploadVideoStep1 = (props: Props) => {
 
 
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.code == 'Enter') {
+    if (e.code == 'Enter' || e.code == 'Space') {
       // handle add to Chip
       let tagWord = (e.target as HTMLInputElement).value as string
       console.log('@@@@@@@', watch('multiTags'))
@@ -418,13 +419,22 @@ const UploadVideoStep1 = (props: Props) => {
     setValue('tags', filteredTags)
     setTags(filteredTags as [])
   }
+  
   const handleGroupingsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGroupings((event.target as HTMLInputElement).value as any)
   }
+
   const handleGroupingsDelete = (group: string) => {
     let filteredGroupings = groupings?.filter(e => e !== group)
     setGroupings(filteredGroupings as [])
   }
+
+  const handleAvailableToOnchange = (e : any) => {
+    // reset Coin Value
+    e.target.value = 0
+    setValue('coinAmount', 0)
+  }
+
   const handleStartUpload = () => {
     
     setContextTags()
@@ -467,6 +477,19 @@ const UploadVideoStep1 = (props: Props) => {
       return
     }
 
+    if( !watch('availableTo') ) {
+      toast.error('Select VIP or Coins', { position: 'top-center' })
+      return
+    }
+    // handle coin amount if coin is selected
+    if ( watch() && watch('availableTo') && watch('availableTo') == 'coins' ) {
+      const currentCoins = watch('coinAmount')
+      if ( currentCoins <= 0) {
+        toast.error(`Invalid coin amount`, { position: 'top-center' })
+        return
+      }
+    }
+
     if( trialUploadSwitch == false ) {
 
        if ( watch('startTime') == '' ) {
@@ -486,9 +509,9 @@ const UploadVideoStep1 = (props: Props) => {
     // pass fields to Studio Context
     studioContext?.setTitle(title)
     studioContext?.setContentCreator(contentCreator)
-    studioContext?.setDescription(description)
+    studioContext?.setDescription(description)  
 
-    // UPLOADY UPLOAD
+    // START UPLOADING THE VIDEO THEN GO TO NEXT PAGE
     handleUploadyUpload()
 
     studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
@@ -554,7 +577,7 @@ const UploadVideoStep1 = (props: Props) => {
                           <CustomSelect
                             displayEmpty
                             inputProps={{ 'aria-label': 'Without label' }}
-                            label={<Translations text='dsdasdas' />}
+                            label={<Translations text='Select Content Creator' />}
                             defaultValue=''
                             id='contentCreator'
                             labelId='cc-select-label'
@@ -597,6 +620,7 @@ const UploadVideoStep1 = (props: Props) => {
                     )}
                   />
                 </Grid>
+
                 <Grid item xs={12}>
                   <Controller
                     name='description'
@@ -617,6 +641,72 @@ const UploadVideoStep1 = (props: Props) => {
                     )}
                   />
                 </Grid>
+                
+                <Grid sx={{ display:'flex', gap : [,,'1rem'] }} item xs={12}>
+
+                  <Controller
+                    name='availableTo'
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange, onBlur } }) => (
+                      <>
+                        <CustomSelect
+                            displayEmpty
+                            name='availableTo'
+                            defaultValue='vip'
+                            inputProps={{ 'aria-label': 'Without label' }}
+                            label={<Translations text='Vip or Coins' />}
+                            id='availableTo'
+                            labelId='availableTo'
+                            value={value || ''}
+                            onBlur={onBlur}
+                            onChange={ (e) => {
+                              onChange(e)
+                              handleAvailableToOnchange(e)
+                            }}
+                            error={Boolean(errors.title)}
+                          >
+                            <MenuItem disabled value=''>
+                              {`${t('VIP or Coins')}`}
+                            </MenuItem>
+                            <MenuItem value='vip'>
+                              VIP
+                            </MenuItem>
+                            <MenuItem value='coins'>
+                              Coins
+                            </MenuItem>
+                        </CustomSelect>
+                      </>
+                      )}
+
+                  />
+                  
+                  {
+                    // show input label if coin is selected
+                    watch() && watch('availableTo') && watch('availableTo') == 'coins' && 
+                    <FormControl>
+                      <Controller
+                        name='coinAmount'
+                        control={control}
+                        render={({ field: { value, onChange, onBlur } }) => (
+                          <CustomTextField
+                            sx={{minWidth : '10rem'}}
+                            fullWidth
+                            type='number'
+                            value={value}
+                            onBlur={onBlur}
+                            onChange={onChange}
+                            placeholder='Amount'
+                            InputProps={{ inputProps: { min: 0, max: Infinity } }}
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  }
+                  
+
+                </Grid>
+
                 <Grid item xs={12}>
                   <Grid container justifyContent='space-between' spacing={4} sx={{ marginBottom: 5 }}>
                     <Grid justifySelf='flex-end' item xs={12} sm={6}>

@@ -103,6 +103,10 @@ export type StudioContextType = {
   setWorkId: React.Dispatch<React.SetStateAction<number | null>>
   uploadURL: string
   setUploadURL: React.Dispatch<React.SetStateAction<string>>
+  availableTo : 'vip' | 'coins' | null
+  setAvailableTo : React.Dispatch<React.SetStateAction<"vip" | "coins" | null>>
+  coinAmount : number | null
+  setCoinAmount : React.Dispatch<React.SetStateAction<number | null>>
 }
 
 //** DATA */
@@ -126,6 +130,8 @@ const UploadContent = () => {
   const [trialProgress, setTrialProgress] = React.useState<number>(0)
   const [workId, setWorkId] = React.useState<number | null>(null)
   const [uploadURL, setUploadURL] = React.useState<string>('')
+  const [ availableTo, setAvailableTo ] = React.useState<'vip' | 'coins' | null>(null)
+  const [coinAmount, setCoinAmount] = React.useState<number | null>(null)
 
   // ** React-Hook-Form hooks
   const methods = useForm()
@@ -178,7 +184,11 @@ const UploadContent = () => {
         workId,
         setWorkId,
         uploadURL,
-        setUploadURL
+        setUploadURL,
+        availableTo,
+        setAvailableTo,
+        coinAmount,
+        setCoinAmount
       }}
     >
       <FormProvider {...methods}>
