@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 // ** MUI Imports
-import { Drawer, Button, TextField, IconButton, Typography, Dialog, DialogTitle } from '@mui/material'
+import { Button, TextField, IconButton, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -16,7 +16,6 @@ import Icon from 'src/@core/components/icon'
 
 // ** Other Imports
 import CreatedSuccessful from '@/pages/user/components/form/CreatedSuccessful'
-import { useTranslateString } from '@/utils/TranslateString'
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -131,7 +130,7 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
-      <Box sx={{ p: 5 }}>
+      <DialogContent>
         {!submitted ? (
           <Box sx={styles.container}>
             <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
@@ -273,7 +272,7 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
         ) : (
           <CreatedSuccessful update />
         )}
-      </Box>
+      </DialogContent>
     </Dialog>
   )
 }
@@ -294,7 +293,7 @@ const styles = {
     color: 'white'
   },
   formContent: {
-    marginTop: 5
+    marginTop: 0
   },
   fullWidth: {
     width: '100%',
