@@ -1,6 +1,6 @@
 import Icon from 'src/@core/components/icon'
 
-const TabListData = [
+const TransactionTabLists = [
   {
     value: 'donations',
     icon: <Icon fontSize={20} icon='mdi:donation-outline' />,
@@ -38,4 +38,4 @@ const TabListData = [
   },
 ]
 
-export default TabListData
+export default TransactionTabLists

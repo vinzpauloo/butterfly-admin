@@ -116,7 +116,6 @@ function index() {
         pageSize={pageSize}
         setPage={setPage}
         setPageSize={setPageSize}
-        setOpen={setOpen}
       />
       {open ? <EditDrawer open={open} setOpen={setOpen} /> : null}
     </>

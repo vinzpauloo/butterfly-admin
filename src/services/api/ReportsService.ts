@@ -76,6 +76,19 @@ export const ReportsService = () => {
     })
   }
 
+  const getReportsCommissions = (params: IReportsParams) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/transactions',
+      method: 'GET',
+      params: params.data,
+    })
+  }
 
-  return { getSecurityFunds, getReportsDonations, getReportsCustomerTransaction }
+
+  return { getSecurityFunds, getReportsDonations, getReportsCustomerTransaction, getReportsCommissions }
 }
