@@ -183,7 +183,7 @@ const defaultValues = {
   startTime: 0,
   multiTags: '',
   availableTo: 'vip',
-  coinAmount : 0
+  coinAmount : ''
 }
 
 const UploadVideoStep1 = (props: Props) => {
@@ -307,7 +307,7 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Context ReactHookForm
   const { register, getValues, control, watch, setValue, resetField } = useFormContext()
-
+  console.log('watch', watch())
   // ** react query / api services
   const { getGroupings } = useGroupingService()
   const { updateVideoByWorkId } = VideoService()
@@ -432,7 +432,7 @@ const UploadVideoStep1 = (props: Props) => {
   const handleAvailableToOnchange = (e : any) => {
     // reset Coin Value
     e.target.value = 0
-    setValue('coinAmount', 0)
+    setValue('coinAmount', '')
   }
 
   const handleStartUpload = () => {
@@ -484,7 +484,7 @@ const UploadVideoStep1 = (props: Props) => {
     // handle coin amount if coin is selected
     if ( watch() && watch('availableTo') && watch('availableTo') == 'coins' ) {
       const currentCoins = watch('coinAmount')
-      if ( currentCoins <= 0) {
+      if ( currentCoins <= 0 || isNaN(currentCoins) ) {
         toast.error(`Invalid coin amount`, { position: 'top-center' })
         return
       }

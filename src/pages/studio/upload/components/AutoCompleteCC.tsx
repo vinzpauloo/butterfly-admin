@@ -9,7 +9,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 // ** Props
 type AutoCompleteCCProps = {
     value : any
-    onChange : ( e : IOnChangeValue) => void
+    onChange : ( e : IOnChangeValue | any) => void
     onBlur : () => void
     creatorsData : any
     control : any
@@ -36,13 +36,20 @@ const AutoCompleteCC = ({name, value, creatorsData, onChange, onBlur, control} :
                     sx={{ width: 250 }}
                     options={creatorsData}
                     onChange={ (e,v) => {
-                        onChange({
-                            target : {
-                                name : v!.username,
-                                value : v?.id
-                            }
-                        })
-                        setCCValue(v)
+                        console.log('ONCHANGE', v)
+                        setCCValue(v) 
+                        v && onChange({
+                                target : {
+                                    name : v!.username,
+                                    value : v?.id
+                                }
+                            })
+
+                        if( v == undefined ) {
+                            onChange(e)
+                        }
+                         
+                        
                     }}
                     id='cc-controlled'
                     getOptionLabel={ option => { 
