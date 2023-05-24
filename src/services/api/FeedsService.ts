@@ -52,6 +52,8 @@ interface FeaturedFeedsParams {
   search?: string
   featured_id?: string
   active?: string
+  sort?: 'asc' | 'desc' | undefined | null;
+  sort_by?: string
 }
 
 interface PostFeaturedFeedsProps {

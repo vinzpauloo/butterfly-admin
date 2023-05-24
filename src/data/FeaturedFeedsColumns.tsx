@@ -38,11 +38,11 @@ export const FeaturedFeedsColumns = () => {
   })
 
   const columns = [
-    { flex: 0.04, minWidth: 220, sortable: false, field: 'title', headerName: `Title` },
+    { flex: 0.04, minWidth: 220, field: 'title', headerName: `Title` },
     {
       flex: 0.02,
       minWidth: 150,
-      sortable: false,
+
       field: 'creator',
       headerName: `Username`,
       renderCell: (params: any) => <div>{params?.row.creator.username}</div>
@@ -50,7 +50,7 @@ export const FeaturedFeedsColumns = () => {
     {
       flex: 0.02,
       minWidth: 160,
-      sortable: false,
+
       field: 'feed_details',
       headerName: `Feed Type`,
       renderCell: (params: any) => <div>{params?.row.feed_details.type} </div>
@@ -58,7 +58,7 @@ export const FeaturedFeedsColumns = () => {
     {
       flex: 0.02,
       minWidth: 200,
-      sortable: false,
+
       field: 'created_at',
       headerName: `Date Created`,
       valueFormatter: (params: any) => {
