@@ -255,17 +255,17 @@ const UserTable = () => {
             sx={{ padding: 0 }}
           />
           {/* CREATE Drawers */}
-          <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
+          {/* <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
           <SADrawer
             open={openDrawer === 'SA'}
             toggle={() => handleDrawerToggle('SA')}
             languages={languages}
             currencies={currencies}
           />
-          <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
+          <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} /> */}
 
           {/* EDIT Drawers */}
-          {drawerRole === 'SUPERVISOR' && (
+          {/* {drawerRole === 'SUPERVISOR' && (
             <EditSupervisorDrawer
               data={drawerData}
               open={drawerRole === 'SUPERVISOR'}
@@ -277,7 +277,7 @@ const UserTable = () => {
           )}
           {drawerRole === 'CC' && (
             <EditCreatorDrawer data={drawerData} open={drawerRole === 'CC'} toggle={() => setDrawerRole(null)} />
-          )}
+          )} */}
         </Card>
       </Grid>
     </Grid>
