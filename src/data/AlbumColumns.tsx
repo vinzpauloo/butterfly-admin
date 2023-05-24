@@ -38,14 +38,14 @@ export const AlbumColumns = () => {
     {
       flex: 0.04,
       minWidth: 220,
-      sortable: false,
+
       field: 'title',
       headerName: TranslateString('Title')
     },
     {
       flex: 0.03,
       minWidth: 200,
-      sortable: false,
+
       field: 'created_at',
       headerName: TranslateString('Date Created'),
       valueFormatter: (params: any) => {
@@ -55,7 +55,7 @@ export const AlbumColumns = () => {
     {
       flex: 0.03,
       minWidth: 200,
-      sortable: false,
+
       field: 'updated_at',
       headerName: TranslateString('Last Update'),
       valueFormatter: (params: any) => {
@@ -65,7 +65,7 @@ export const AlbumColumns = () => {
     {
       flex: 0.03,
       minWidth: 120,
-      sortable: false,
+
       field: 'cover',
       headerName: TranslateString('Cover Photo'),
       renderCell: (params: GridRenderCellParams) => {
@@ -86,7 +86,7 @@ export const AlbumColumns = () => {
     {
       flex: 0.01,
       minWidth: 95,
-      sortable: false,
+
       field: 'album',
       headerName: TranslateString('Gallery'),
       renderCell: (params: GridRenderCellParams) => {
