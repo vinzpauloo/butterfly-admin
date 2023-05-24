@@ -191,7 +191,7 @@ const VideoVisibility = () => {
           video_type: 'full_video',
           video_name: title,
           available_to : availableTo,
-          ...( !isVIP ? {coinAmount : coinAmount} : null )
+          ...( !isVIP ? {coin_amount : coinAmount} : null )
         }
 
         try {
