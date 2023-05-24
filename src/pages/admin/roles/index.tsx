@@ -45,6 +45,11 @@ import { useAuth } from '@/services/useAuth'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 import RolesService from '@/services/api/RolesService'
 
+import { FaSquare, FaCheckSquare, FaMinusSquare } from 'react-icons/fa'
+import { IoMdArrowDropright } from 'react-icons/io'
+import TreeView, { flattenTree } from 'react-accessible-treeview'
+import cx from 'classnames'
+
 const rolesArr: string[] = [
   'Dashboard',
   'Admin Management',
@@ -60,6 +65,109 @@ const rolesArr: string[] = [
   'Profile',
   'Chat'
 ]
+
+const folder = {
+  name: '',
+  children: [
+    {
+      name: 'Fruits',
+      children: [{ name: 'Avocados' }, { name: 'Bananas' }, { name: 'Berries' }, { name: 'Oranges' }, { name: 'Pears' }]
+    },
+    {
+      name: 'Drinks',
+      children: [
+        { name: 'Apple Juice' },
+        { name: 'Chocolate' },
+        { name: 'Coffee' },
+        {
+          name: 'Tea',
+          children: [{ name: 'Black Tea' }, { name: 'Green Tea' }, { name: 'Red Tea' }, { name: 'Matcha' }]
+        }
+      ]
+    },
+    {
+      name: 'Vegetables',
+      children: [{ name: 'Beets' }, { name: 'Carrots' }, { name: 'Celery' }, { name: 'Lettuce' }, { name: 'Onions' }]
+    }
+  ]
+}
+
+const data = flattenTree(folder)
+
+function MultiSelectCheckboxControlled() {
+  const [selectedIds, setSelectedIds] = useState<number[]>([2, 5, 16])
+
+  return (
+    <div className='checkbox'>
+      <TreeView
+        data={data}
+        aria-label='Checkbox tree'
+        multiSelect
+        selectedIds={selectedIds}
+        defaultExpandedIds={[1]}
+        propagateSelect
+        propagateSelectUpwards
+        togglableSelect
+        onSelect={props => console.log('onSelect callback: ', props)}
+        onNodeSelect={props => console.log('onNodeSelect callback: ', props)}
+        nodeRenderer={({
+          element,
+          isBranch,
+          isExpanded,
+          isSelected,
+          isHalfSelected,
+          isDisabled,
+          getNodeProps,
+          level,
+          handleSelect,
+          handleExpand
+        }) => {
+          return (
+            <div
+              {...getNodeProps({ onClick: handleExpand })}
+              style={{
+                marginLeft: 40 * (level - 1),
+                opacity: isDisabled ? 0.5 : 1
+              }}
+            >
+              {isBranch && <ArrowIcon isOpen={isExpanded} />}
+              <CheckBoxIcon
+                className='checkbox-icon'
+                onClick={(e: any) => {
+                  handleSelect(e)
+                  e.stopPropagation()
+                }}
+                variant={isHalfSelected ? 'some' : isSelected ? 'all' : 'none'}
+              />
+              <span className='name'>
+                {element.name}-{element.id}
+              </span>
+            </div>
+          )
+        }}
+      />
+    </div>
+  )
+}
+
+const ArrowIcon = ({ isOpen, className }: any) => {
+  const baseClass = 'arrow'
+  const classes = cx(baseClass, { [`${baseClass}--closed`]: !isOpen }, { [`${baseClass}--open`]: isOpen }, className)
+  return <IoMdArrowDropright className={classes} />
+}
+
+const CheckBoxIcon = ({ variant, ...rest }: any) => {
+  switch (variant) {
+    case 'all':
+      return <FaCheckSquare {...rest} />
+    case 'none':
+      return <FaSquare {...rest} />
+    case 'some':
+      return <FaMinusSquare {...rest} />
+    default:
+      return null
+  }
+}
 
 const Header = ({ searchName, setSearchName, setOpen, setDialogTitle }: any) => {
   // ** Auth Hook
@@ -279,6 +387,9 @@ const CustomDialog = ({ open, setOpen, dialogTitle }: any) => {
           </FormControl>
         </Box>
         <Typography variant='h6'>Role Permissions</Typography>
+        <MultiSelectCheckboxControlled />
+        {/* UI from Materio Template */}
+        {/* 
         <TableContainer>
           <Table size='small'>
             <TableHead>
@@ -329,6 +440,7 @@ const CustomDialog = ({ open, setOpen, dialogTitle }: any) => {
             </TableBody>
           </Table>
         </TableContainer>
+        */}
       </DialogContent>
       <DialogActions sx={{ pt: 0, display: 'flex', justifyContent: 'center' }}>
         <Box className='demo-space-x'>
