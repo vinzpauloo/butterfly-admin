@@ -61,7 +61,23 @@ const FeaturedFeedsToolbar = (props: Props) => {
           {TranslateString('Clear')}
         </Button>
       </Box>
-      <Button variant='contained' color='primary' sx={styles.button} onClick={props.toggleFeedModal}>
+      <Button
+        variant='contained'
+        color='primary'
+        sx={{
+          width: {
+            xs: 'auto',
+            sm: 'auto',
+            md: 'auto',
+            lg: 150
+          },
+          backgroundColor: '#FF9C00',
+          '&:hover': {
+            backgroundColor: '#FF7c02'
+          }
+        }}
+        onClick={props.toggleFeedModal}
+      >
         {TranslateString('Select Feeds')}
       </Button>
     </Box>
