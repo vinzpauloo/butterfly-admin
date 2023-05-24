@@ -39,7 +39,7 @@ const AutoCompleteCC = ({name, value, creatorsData, onChange, onBlur, control} :
                                 value : v?.id
                             }
                         })
-                        
+                        setCCValue(v)
                     }}
                     id='cc-controlled'
                     getOptionLabel={ option => { 
