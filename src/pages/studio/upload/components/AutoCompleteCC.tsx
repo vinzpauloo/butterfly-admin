@@ -9,13 +9,16 @@ import Autocomplete from '@mui/material/Autocomplete'
 // ** Props
 type AutoCompleteCCProps = {
     value : any
-    onChange : (e : any) => void
+    onChange : ( e : IOnChangeValue) => void
     onBlur : () => void
     creatorsData : any
     control : any
     name : string
 }
 
+interface IOnChangeValue {
+    target : { name : string, value : any } 
+}
 interface ICCOptionData {
     id : number
     username : string
@@ -35,7 +38,7 @@ const AutoCompleteCC = ({name, value, creatorsData, onChange, onBlur, control} :
                     onChange={ (e,v) => {
                         onChange({
                             target : {
-                                name : v?.username,
+                                name : v!.username,
                                 value : v?.id
                             }
                         })

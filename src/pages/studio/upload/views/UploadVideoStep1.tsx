@@ -190,7 +190,6 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
-  const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
   const uploadyContext = React.useContext(UploadyContext)
 
   // ** Translations
@@ -324,7 +323,6 @@ const UploadVideoStep1 = (props: Props) => {
       return getGroupings({ data: { all: 'true' } })
     },
     onSuccess: (data: any) => {
-      console.log(data)
       setGroupingsOptions(data)
     },
     onError: (e: any) => {
