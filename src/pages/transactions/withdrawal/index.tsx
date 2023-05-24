@@ -2,9 +2,9 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import Icon from '@/@core/components/icon'
-import ShowWithdrawDrawer from './ShowWithdrawDrawer'
+import WithdrawModal from './WithdrawModal'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
@@ -114,19 +114,12 @@ function index() {
       align: 'center',
       minWidth: 70,
       sortable: false,
-      renderCell: () => {
-        const handleClick = () => {
-          setOpen(true)
-        }
-
-        return (
-          <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-            <Button onClick={handleClick}>
-              <Icon fontSize={30} icon='mdi:eye' color='98A9BC' />
-            </Button>
-          </Box>
-        )
-      }
+      renderCell: () => 
+        <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
+          <Button onClick={() => setOpen(true)}>
+            <Icon fontSize={30} icon='mdi:eye' color='98A9BC' />
+          </Button>
+        </Box>
     }
   ]
 
@@ -142,8 +135,12 @@ function index() {
         pageSize={pageSize}
         setPage={setPage}
         setPageSize={setPageSize}
-      />
-      {open ? <ShowWithdrawDrawer open={open} setOpen={setOpen} /> : null}
+      >
+        <Stack direction='row' justifyContent='flex-end'>
+          <Button variant='outlined' size='small' sx={{width: 'max-content'}} onClick={() => setOpen(true)}>Request Withdraw</Button>
+        </Stack>
+      </Transaction>
+      {open ? <WithdrawModal open={open} setOpen={setOpen} /> : null}
     </>
   )
 }
