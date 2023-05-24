@@ -379,7 +379,7 @@ const UploadVideoStep1 = (props: Props) => {
 
 
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.code == 'Enter' || e.code == 'Space') {
+    if (e.code == 'Enter' || e.code == 'Space' || e.code == 'Tab') {
       // handle add to Chip
       let tagWord = (e.target as HTMLInputElement).value as string
       console.log('@@@@@@@', watch('multiTags'))
