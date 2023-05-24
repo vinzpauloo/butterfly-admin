@@ -108,6 +108,7 @@ function index() {
   return (
     <>
       <Transaction
+        title='Work Purchases'
         isLoading={isLoading}
         isFetching={isFetching}
         rowData={data}

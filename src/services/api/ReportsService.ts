@@ -20,10 +20,7 @@ interface ReportsData {
 interface IReportsParams {
   data?: {
     report?: boolean
-    today?: boolean
-    weekly?: boolean
-    monthly?: boolean
-    yearly?: boolean
+    timespan?: 'today' | 'weekly' | 'monthly' | 'yearly' | string
     with?: string
     select?: string
     page?: number

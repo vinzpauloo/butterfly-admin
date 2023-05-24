@@ -172,11 +172,16 @@ const VideoVisibility = () => {
       console.log('CALL PRESEND', options)
 
       let hasTrialVideo = false
+      let isVIP = false
 
-      const { title, contentCreator } = getValues()
+      const { title, contentCreator, availableTo, coinAmount } = getValues()
 
       console.log('EVENTPRESEND VALUES', getValues())
 
+      // check if selected VIP and not coins
+      isVIP = (availableTo == 'vip' ? true : false )
+
+      // Uploading Full Video
       if (options?.params?.video_type == 'full_video') {
         // use react-hook-form context
         setValue('videoType', 'full_video')
@@ -184,7 +189,9 @@ const VideoVisibility = () => {
         const passFullVideoData = {
           user_id: contentCreator,
           video_type: 'full_video',
-          video_name: title
+          video_name: title,
+          available_to : availableTo,
+          ...( !isVIP ? {coinAmount : coinAmount} : null )
         }
 
         try {

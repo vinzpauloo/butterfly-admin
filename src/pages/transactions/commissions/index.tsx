@@ -117,6 +117,7 @@ function index() {
   return (
     <>
       <Transaction
+        title='Commissions'
         isLoading={isLoading}
         isFetching={isFetching}
         rowData={data}
