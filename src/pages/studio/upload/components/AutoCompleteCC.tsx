@@ -19,6 +19,8 @@ type AutoCompleteCCProps = {
 interface IOnChangeValue {
     target : { name : string, value : any } 
 }
+
+//Content creator schema minimalized
 interface ICCOptionData {
     id : number
     username : string
@@ -36,8 +38,9 @@ const AutoCompleteCC = ({name, value, creatorsData, onChange, onBlur, control} :
                     sx={{ width: 250 }}
                     options={creatorsData}
                     onChange={ (e,v) => {
-                        console.log('ONCHANGE', v)
+
                         setCCValue(v) 
+                        
                         v && onChange({
                                 target : {
                                     name : v!.username,
