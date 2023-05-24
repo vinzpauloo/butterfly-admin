@@ -196,42 +196,58 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                     )}
                   />
                 </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='name'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Site') + ' ' + TranslateString('Name')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.name}
-                        helperText={errors.name?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='name'
-                      />
-                    )}
-                  />
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: {
+                      xs: 'column',
+                      sm: 'row'
+                    },
+                    gap: {
+                      xs: 0,
+                      sm: 5
+                    }
+                  }}
+                >
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='name'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={TranslateString('Site') + ' ' + TranslateString('Name')}
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.name}
+                          helperText={errors.name?.message}
+                          defaultValue={field.value}
+                          onChange={field.onChange}
+                          name='name'
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='version'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={TranslateString('Enter') + ' ' + TranslateString('Version')}
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.version}
+                          helperText={errors.version?.message}
+                          defaultValue={field.value}
+                          onChange={field.onChange}
+                          name='version'
+                        />
+                      )}
+                    />
+                  </Box>
                 </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='version'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Enter') + ' ' + TranslateString('Version')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.version}
-                        helperText={errors.version?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='version'
-                      />
-                    )}
-                  />
-                </Box>
+
                 <Box sx={styles.fullWidth}>
                   <Controller
                     name='patch_note'
@@ -242,7 +258,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                         variant='outlined'
                         fullWidth
                         multiline
-                        rows={20}
+                        rows={8}
                         error={!!errors.patch_note}
                         helperText={errors.patch_note?.message}
                         defaultValue={field.value}
