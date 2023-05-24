@@ -50,14 +50,10 @@ const Navigation = (): VerticalNavItemsType => {
       action: 'read',
       children: [
         {
-          title: 'Users',
-          path: '/user/list/SuperAgents',
-          action: 'read'
-        },
-        {
           title: 'Sites',
           action: 'read',
-          subject: 'sa-page'
+          subject: 'sa-page',
+          path: '/user/list/SuperAgents'
         },
         {
           title: 'Agents',
