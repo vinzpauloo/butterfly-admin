@@ -3,7 +3,7 @@ import React, { ChangeEvent } from 'react'
 
 // ** MUI Imports
 import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
 // ** Project/Other Imports
 import { FeaturedFeedsColumns } from '@/data/FeaturedFeedsColumns'
@@ -28,6 +28,7 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Lib Imports
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
+import { useUserTableStore } from '@/zustand/userTableStore'
 
 const FeaturedFeeds = () => {
   // ** Services
@@ -45,13 +46,17 @@ const FeaturedFeeds = () => {
   // ** Debounce Service
   const debouncedTitle = useDebounce(titleSearchValue, 1000)
 
+  const { setSort, setSortName, sort, sortName } = useUserTableStore()
+
   // ** API Methods
   const { isLoading, isRefetching } = useQuery({
-    queryKey: [`featuredFeeds`, selectedSite, debouncedTitle],
+    queryKey: [`featuredFeeds`, selectedSite, debouncedTitle, sort, sortName],
     queryFn: () =>
       getFeaturedFeeds({
         site_id: selectedSite,
-        search: debouncedTitle
+        search: debouncedTitle,
+        sort_by: sortName,
+        sort: sort
       }),
     onSuccess: data => {
       setRowData(data?.data)
@@ -60,6 +65,16 @@ const FeaturedFeeds = () => {
       handleError(e, `getFeaturedFeeds() settings/pages/featuredfeeds.tsx`)
     }
   })
+
+  const handleSortModel = (newModel: GridSortModel) => {
+    if (newModel.length) {
+      setSort(newModel[0].sort)
+      setSortName(newModel[0].field)
+    } else {
+      setSort('asc')
+      setSortName('username')
+    }
+  }
 
   return (
     <Container>
@@ -74,6 +89,9 @@ const FeaturedFeeds = () => {
         loading={isLoading || isRefetching}
         checkboxSelection={false}
         disableSelectionOnClick
+        paginationMode='server'
+        sortingMode='server'
+        onSortModelChange={handleSortModel}
         autoHeight
         rows={rowData ?? []}
         getRowId={(row: any) => row?.featured_id}
