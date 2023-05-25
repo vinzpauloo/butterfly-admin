@@ -306,7 +306,7 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
         }
       />
       <CardContent>
-        <Bar data={data} height={400} options={options} />
+        <Bar data={data} height={200} options={options} />
       </CardContent>
     </Card>
   )
@@ -320,8 +320,7 @@ const styles = {
       sm: 'row',
       md: 'row',
       lg: 'row'
-    },
-    marginLeft: 10
+    }
   }
 }
 
