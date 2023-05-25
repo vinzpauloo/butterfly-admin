@@ -46,7 +46,7 @@ function index() {
   const { getWithdrawals } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
     queryKey: ['transactionEarnings', pageSize, page],
-    queryFn: () => getWithdrawals({ data: { with: 'user' }}),
+    queryFn: () => getWithdrawals({ data: { with: 'user|reviewer' }}),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -62,8 +62,8 @@ function index() {
     {
       field: 'content creator',
       headerName: TranslateString('Content Creator'),
-      flex: 1,
-      minWidth: 170,
+      flex: 0.12,
+      minWidth: 120,
       sortable: true,
       valueGetter: (params: GridRenderCellParams) => params.row?.user?.username,
       renderCell: (params: GridRenderCellParams) =>
@@ -116,13 +116,19 @@ function index() {
         </Typography>
     },
     {
-      field: 'approved by',
-      headerName: TranslateString('Approved By'),
+      field: 'reviewed by',
+      headerName: TranslateString('Reviewed By'),
       headerAlign: 'center',
       align: 'center',
-      minWidth: 140,
+      flex: 0.12,
+      minWidth: 120,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.customers?.amount
+      valueGetter: (params: GridRenderCellParams) => params.row?.reviewer?.username,
+      renderCell: (params: GridRenderCellParams) =>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <Avatar src={FILE_SERVER_URL + params.row?.reviewer?.photo} />
+          <Typography variant='subtitle2'>{params.row?.reviewer?.username}</Typography>
+        </Stack>
     },
     {
       field: 'view',

@@ -102,13 +102,13 @@ const WithdrawModal = (props: Props) => {
           <CloseIcon/>
         </IconButton>
         {isRequestWithdraw ?
-          <Typography variant='h6'>Request Withdraw</Typography> :
+          <Typography variant='h6'>{TranslateString('Request Withdraw')}</Typography> :
           <>
             <Stack alignItems='center' gap={2}>
               <Avatar sx={{width: 60, height: 60}} src={data.photo}/>
               <Typography>{data.name}</Typography>
             </Stack>
-            <TextField value={data.amount} label='Amount' fullWidth/>        
+            <TextField value={data.amount} label='Amount' fullWidth/>
           </>
         }
         <TextField
