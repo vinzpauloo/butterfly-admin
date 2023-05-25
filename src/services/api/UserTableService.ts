@@ -110,11 +110,27 @@ export const UserTableService = () => {
     })
   }
 
+  const getAllCustomers = (params?: UsersData) => {
+     const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/customers',
+      method: 'GET',
+      params: params?.data
+    })
+  }
+
   return {
     getUsers,
     getAllDataForCSV,
     updateUser,
     getSpecificUser,
-    getAllDataFromCreator
+    getAllDataFromCreator,
+    getAllCustomers
   }
 }

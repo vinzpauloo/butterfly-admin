@@ -40,7 +40,8 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Activity Logs',
           action: 'read',
-          subject: 'sa-page'
+          subject: 'sa-page',
+          path: '/admin/activity'
         }
       ]
     },
@@ -64,7 +65,8 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Customers',
           action: 'read',
-          subject: 'sa-page'
+          subject: 'sa-page',
+          path: '/user/list/Customers'
         },
         {
           title: 'FQDN',
