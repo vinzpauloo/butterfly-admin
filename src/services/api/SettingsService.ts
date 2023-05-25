@@ -2,70 +2,49 @@ import request from "@/lib/request";
 import authConfig from 'src/configs/auth';
 import { getHeaders } from "@/lib/cryptoJs";
 
-interface IWithdrawalMinMax  {
-    site_id : number
-    min_amount : number
-    max_count_per_day : number
-    max_amount_per_day : number
-    max_count_per_month : number
-    max_amount_per_month : number
+interface IGlobalData  {
+    security_fund_threshold : number
+    withdrawal_min_amount : number
+    withdrawal_max_count_per_day : number
+    withdrawal_max_amount_per_day : number
+    withdrawal_max_count_per_month : number
+    withdrawal_max_amount_per_month : number
 }
 
-interface ISecuritySettingsThreshold {
-    site_id : number
-    security_threshold : number
-}
+export const SettingsService = () => {
 
-// ****** Widthdrawals Settings ***********/
-
-export const WithdrawalSettingsService = () => {
-
-    const postWithdrawalMinMax = (params : IWithdrawalMinMax) => {
+    const postGlobalSettings = (params : IGlobalData) => {
         const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-        const DUMMYURLONLY = 'https://webhook.site/4a2bdaa3-8ab2-40a4-aed2-e73c7ff1d131'
+        const endpoint = '/admin/global/settings/1'
 
         return request({
             headers : {
                 ...getHeaders(),
                 Authorization: `Bearer ${accessToken}`
             },
-            url : DUMMYURLONLY,
-            method : 'POST',
+            url : endpoint,
+            method : 'PUT',
             params : params
         })
 
-
     }
 
-    return {
-        postWithdrawalMinMax
-    }
-}
-
-
-
-// ********* Security Funds Settings ****************/
-export const SecuritySettingsService = () => {
-
-    const postSettingsThreshold = (params : ISecuritySettingsThreshold) => {
+    const getGlobalSettings = () => {
         const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-        const DUMMYURLONLY = 'https://webhook.site/4a2bdaa3-8ab2-40a4-aed2-e73c7ff1d131'
+        const endpoint = '/admin/global/settings/1'
 
         return request({
             headers : {
                 ...getHeaders(),
                 Authorization: `Bearer ${accessToken}`
             },
-            url : DUMMYURLONLY,
-            method : 'POST',
-            params : params
+            url : endpoint,
+            method : 'GET',
         })
-
-
     }
 
     return {
-        postSettingsThreshold
+        postGlobalSettings,
+        getGlobalSettings
     }
-
 }
