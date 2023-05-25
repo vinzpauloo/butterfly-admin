@@ -6,6 +6,9 @@ import authConfig from 'src/configs/auth'
 
 interface ITransaction {
   data?: {
+    id?: number
+    withdrawal_account_id?: number
+    note?: string
     with?: string
     page?: number
     paginate?: number
@@ -31,6 +34,57 @@ const TransactionsService = () => {
       url: '/admin/donations',
       method: 'GET',
       params: params.data
+    })
+  }
+
+  const getWithdrawals = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/withdrawals',
+      method: 'GET',
+      params: params.data
+    })
+  }
+
+  const requestWithdrawal = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'Content-Type': 'multipart/form-data', // if POST is form-data
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/withdrawals',
+      method: 'POST',
+      data: params.data, // if body is JSON
+    })
+  }
+
+  const approveWithdrawal = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/withdrawals/${params.data?.id}/approve`,
+      method: 'PUT',
+    })
+  }
+
+  const declineWithdrawal = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: `/admin/withdrawals/${params.data?.id}/decline`,
+      method: 'PUT',
     })
   }
 
@@ -74,7 +128,16 @@ const TransactionsService = () => {
     })
   }
 
-  return { getDonations, getCommissions, getSecurityFunds, getCustomerTransaction }
+  return {
+    getDonations,
+    getWithdrawals,
+    requestWithdrawal,
+    approveWithdrawal,
+    declineWithdrawal,
+    getCommissions,
+    getSecurityFunds,
+    getCustomerTransaction
+  }
 }
 
 export default TransactionsService

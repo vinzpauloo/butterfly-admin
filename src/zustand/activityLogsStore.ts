@@ -1,4 +1,5 @@
 // userTableStore.ts
+import { GridSortModel } from '@mui/x-data-grid';
 import {create} from 'zustand';
 
 type SortType = 'asc' | 'desc' | undefined | null;
@@ -19,7 +20,7 @@ type ActivityTableProps = {
     sortName: string;
     search: string | undefined;
     emailSearchValue: string | undefined;
-    mobileSearchValue: string | undefined;
+    actionSearchValue: string | undefined;
     searchValue: string | undefined;
     initialLoad: boolean;
     activeTab: string | undefined;
@@ -45,7 +46,7 @@ type ActivityTableProps = {
     setSortName: (sortName: string) => void;
     setSearch: (search: string | undefined) => void;
     setEmailSearchValue: (emailSearchValue: string | undefined) => void;
-    setMobileSearchValue: (mobileSearchValue: string | undefined) => void;
+    setActionSearchValue: (actionSearchValue: string | undefined) => void;
     setSearchValue: (searchValue: string | undefined) => void;
     setInitialLoad: (initialLoad: boolean) => void;
     setActiveTab: (activeTab: string | undefined) => void;
@@ -65,6 +66,7 @@ type ActivityTableProps = {
     handleSearch: (value: string, type: string) => void;
     handleDrawerToggle: (role: string | null) => void;
     handleOpenDrawer: (role: DrawerType, data: any) => void;
+    handleSortModel: (newModel: GridSortModel) => void
 };
 
 export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
@@ -80,7 +82,7 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
     sortName: 'created_at',
     search: undefined,
     emailSearchValue: undefined,
-    mobileSearchValue: undefined,
+    actionSearchValue: undefined,
     searchValue: undefined,
     initialLoad: true,
     activeTab: undefined,
@@ -106,7 +108,7 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
     setSortName: (sortName) => set({ sortName }),
     setSearch: (search) => set({ search }),
     setEmailSearchValue: (emailSearchValue) => set({ emailSearchValue }),
-    setMobileSearchValue: (mobileSearchValue) => set({ mobileSearchValue }),
+    setActionSearchValue: (actionSearchValue) => set({ actionSearchValue }),
     setSearchValue: (searchValue) => set({ searchValue }),
     setInitialLoad: (initialLoad) => set({ initialLoad }),
     setActiveTab: (activeTab) => set({ activeTab }),
@@ -140,22 +142,10 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
         }
     },
 
-    // handlePageChange: (value) => set({ page: value + 1 }),
     handlePageChange: (value) => {
-        set((state) => {
-            set({ page: value + 1 });
-
-            if (state.activeTab === 'OPERATIONS') {
-            return { supervisorPage: value + 1 };
-            } else if (state.activeTab === 'SA') {
-            return { saPage: value + 1 };
-            } else if (state.activeTab === 'CC') {
-            return { ccPage: value + 1 };
-            }
-            
-            return {};
-        })       
+        set({ page: value + 1 });
     },
+    
     handleSearch: (value, type) => {
         set({ search: type });
 
@@ -166,8 +156,8 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
             case 'email':
                 set({ emailSearchValue: value });
                 break;
-            case 'mobile':
-                set({ mobileSearchValue: value });
+            case 'action':
+                set({ actionSearchValue: value });
                 break;
             
             default:
@@ -200,5 +190,20 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
     handleOpenDrawer: (role, data) => {
         set({ drawerRole: role });
         set({ drawerData: data })
+    },
+    handleSortModel: (newModel: GridSortModel) => {
+        if (newModel.length) {
+            set({ sort: newModel[0].sort })
+
+            if (newModel[0].field === `user`) {
+                set({sortName: `username`})
+            } else {
+                set({sortName: newModel[0].field})
+            }
+            
+        } else {
+            set({ sort: 'asc' })
+            set({ sortName: 'username' })
+        }
     }
 }));

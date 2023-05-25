@@ -78,6 +78,7 @@ const RechartsAreaChart = ({ direction }: Props) => {
           }
         }),
       onSuccess: (data: any) => {
+        console.log(`chartData`, data)
         setChartData(data)
       },
       onError: (e: any) => {

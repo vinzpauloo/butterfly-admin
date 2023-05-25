@@ -1,20 +1,19 @@
 // ** React Imports
-import React, { useEffect, ChangeEvent } from 'react'
+import React, { ChangeEvent } from 'react'
 
 // ** MUI Imports
-import { DataGrid, GridSortModel } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
 
 // ** Custom Table Components Imports
-import UserTableToolbar from '@/pages/user/components/UserTableToolbar'
+import ActivityLogsToolbar from './Toolbar'
 
 // ** Project/Other Imports
-import CCDrawer from '@/pages/user/components/drawer/CCDrawer'
-import EditCreatorDrawer from '@/pages/user/components/drawer/EditCreatorDrawer'
+import { ActivityLogsColumns } from '@/data/ActivityLogsColumns'
 
 // ** Hooks/Services
-import { UserTableService } from '@/services/api/UserTableService'
-import useDebounce from '@/hooks/useDebounce'
+import { ActivityLogsService } from '@/services/api/ActivityLogsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
+import useDebounce from '@/hooks/useDebounce'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -22,154 +21,83 @@ import { useQuery } from '@tanstack/react-query'
 // ** Zustand State Management
 import { useActivityLogsStore } from '@/zustand/activityLogsStore'
 
-import { CustomerColumns } from '@/data/CustomerColumns'
-
 const ActivityLogsTable = () => {
   const {
+    page,
     setPage,
     pageSize,
     setPageSize,
     role,
-    setRole,
     roleId,
-    setColumnType,
     rowCount,
     setRowCount,
-    subRole,
     sort,
-    setSort,
     sortName,
-    setSortName,
-    search,
     emailSearchValue,
-    mobileSearchValue,
+    actionSearchValue,
     searchValue,
-    initialLoad,
-    setInitialLoad,
-    activeTab,
-    setActiveTab,
     rowData,
     setRowData,
-    handleRoleChange,
-    openDrawer,
-    drawerRole,
-    drawerData,
-    setDrawerRole,
-    supervisorPage,
-    saPage,
-    ccPage,
-    setSupervisorPage,
-    setSaPage,
-    setCcPage,
-    setOpenDrawer
+    search
   } = useActivityLogsStore()
 
-  const { handlePageChange, handleSearch, handleDrawerToggle } = useActivityLogsStore(state => ({
+  const { handlePageChange, handleSearch, handleDrawerToggle, handleSortModel } = useActivityLogsStore(state => ({
     handlePageChange: state.handlePageChange,
     handleSearch: state.handleSearch,
-    handleDrawerToggle: state.handleDrawerToggle
+    handleDrawerToggle: state.handleDrawerToggle,
+    handleSortModel: state.handleSortModel
   }))
 
-  // ** Columns for DataGrid
-  const { columns } = CustomerColumns()
-
-  // ** Service/Hooks
-  const { getAllCustomers } = UserTableService()
-  const { handleError } = useErrorHandling()
   const debouncedUsername = useDebounce(searchValue, 1000)
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
-  const debouncedMobile = useDebounce(mobileSearchValue, 1000)
+  const debouncedAction = useDebounce(actionSearchValue, 1000)
 
-  useEffect(() => {
-    if (initialLoad) {
-      setPage(1)
-      setRole('CC')
-      setColumnType('CC')
-      setActiveTab('CC')
-      setSort('desc')
-      setSortName('created_at')
-      handleRoleChange('CC')
-      setInitialLoad(false)
-    } else {
-      handleRoleChange(activeTab)
-    }
-  }, [initialLoad, activeTab, handleRoleChange])
+  // ** Columns for DataGrid
+  const { columns } = ActivityLogsColumns()
 
-  useEffect(() => {
-    setPage(1)
-    setActiveTab('CC')
-    setSort('desc')
-    setSortName('created_at')
-    handleRoleChange('CC')
-    setOpenDrawer(null)
-    handleDrawerToggle('')
-    setDrawerRole(null)
-    setRole('CC')
-    setColumnType('CC')
-  }, [])
+  // ** Service/Hooks
+  const { getActivityLogs } = ActivityLogsService()
+  const { handleError } = useErrorHandling()
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: [
-      'allUsers',
-      role,
-      roleId,
+      'activityLogs',
       sort,
       sortName,
+      page,
       search,
       search === 'username'
         ? debouncedUsername || undefined
         : search === 'email'
         ? debouncedEmail || undefined
-        : debouncedMobile || undefined,
-      subRole,
-      activeTab === 'SUPERVISOR' ? supervisorPage : activeTab === 'SA' ? saPage : ccPage
+        : debouncedAction || undefined
     ],
     queryFn: () =>
-      getAllCustomers({
-        data: {
+      getActivityLogs({
+        params: {
           sort_by: sortName,
-          sort: sort
+          sort: sort,
+          page: page,
+          search_by: search,
+          search_value:
+            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedAction,
+          with: 'user'
         }
       }),
     onSuccess: response => {
-      console.log(`SUCCESS`, response?.data)
       setRowCount(response?.total)
-      setRowData(
-        response?.data.map((item: any) => {
-          return item
-        })
-      )
+      setRowData(response?.data)
       setPageSize(response?.per_page)
-      if (activeTab === 'SUPERVISOR') {
-        setSupervisorPage(response?.current_page)
-      } else if (activeTab === 'SA') {
-        setSaPage(response?.current_page)
-      } else if (activeTab === 'CC') {
-        setCcPage(response?.current_page)
-      }
+      setPage(response?.current_page)
     },
     onError: (e: any) => {
-      handleError(e, `getUsers() UserTable.tsx`)
-    },
-    enabled: !initialLoad
-  })
-
-  console.log(`ROWDATATABLE`, rowData)
-
-  const handleSortModel = (newModel: GridSortModel) => {
-    if (newModel.length) {
-      setSort(newModel[0].sort)
-      setSortName(newModel[0].field)
-    } else {
-      setSort('asc')
-      setSortName('username')
+      handleError(e, `getActivityLogs() ActivityTable.tsx`)
     }
-  }
+  })
 
   return (
     <>
       <DataGrid
-        page={activeTab === 'SUPERVISOR' ? supervisorPage - 1 : activeTab === 'SA' ? saPage - 1 : ccPage - 1}
         disableColumnMenu
         loading={isLoading || isRefetching}
         checkboxSelection={false}
@@ -186,7 +114,7 @@ const ActivityLogsTable = () => {
         onPageChange={handlePageChange}
         rowCount={rowCount || 10}
         rowsPerPageOptions={[10]}
-        components={{ Toolbar: UserTableToolbar }}
+        components={{ Toolbar: ActivityLogsToolbar }}
         componentsProps={{
           toolbar: {
             toggle: (role: any) => handleDrawerToggle(role),
@@ -194,29 +122,22 @@ const ActivityLogsTable = () => {
             role_id: roleId,
             usernameValue: searchValue,
             emailValue: emailSearchValue,
-            mobileValue: mobileSearchValue,
+            actionValue: actionSearchValue,
             clearUsername: () => handleSearch('', 'username'),
             clearEmail: () => handleSearch('', 'email'),
-            clearMobile: () => handleSearch('', 'mobile'),
+            clearAction: () => handleSearch('', 'action'),
             clearAll: () => {
               handleSearch('', 'username')
               handleSearch('', 'email')
-              handleSearch('', 'mobile')
+              handleSearch('', 'action')
             },
             onUsernameChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'username'),
             onEmailChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'email'),
-            onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
+            onActionChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'action')
           }
         }}
         sx={{ padding: 0 }}
       />
-      {/* CREATE Drawers */}
-      <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
-
-      {/* EDIT Drawers */}
-      {drawerRole === 'CC' && (
-        <EditCreatorDrawer data={drawerData} open={drawerRole === 'CC'} toggle={() => setDrawerRole(null)} />
-      )}
     </>
   )
 }
