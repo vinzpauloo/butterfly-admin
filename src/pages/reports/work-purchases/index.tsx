@@ -11,7 +11,8 @@ import Container from '@/pages/components/Container'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import CustomToolbar from '../components/CustomToolbar'
 import ReportsHeader from '../components/ReportsHeader'
-import { reportsTimespanStore } from '../../../zustand/reportsTimespanStore'
+import { reportsHeaderStore } from '../../../zustand/reportsHeaderStore'
+import format from 'date-fns/format'
 
 function index() {
   const [data, setData] = useState([])
@@ -20,12 +21,12 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-  const [timespan] = reportsTimespanStore((state) => [state.timespan])
+  const [timespan, fromDate, toDate] = reportsHeaderStore((state) => [state.timespan, state.fromDate, state.toDate])
 
   // TEMPORARY FOR NOW
   const { getReportsDonations } = ReportsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['reportsWorkPurchases', pageSize, page, timespan],
+    queryKey: ['reportsWorkPurchases', pageSize, page, timespan, fromDate, toDate],
     queryFn: () =>
       getReportsDonations({
         data: {
@@ -33,6 +34,8 @@ function index() {
           timespan: timespan,
           with: 'users,customers,sites',
           select: 'id,customer_id,user_id,site_id,coin_amount,created_at',
+          from: format(fromDate, 'yyyy-MM-dd'),
+          to: format(toDate, 'yyyy-MM-dd'),
           page: page,
           paginate: pageSize
         }

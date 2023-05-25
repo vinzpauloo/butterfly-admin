@@ -9,6 +9,7 @@ interface IRoleParams {
   sort_by?: string
   page?: number
   paginate?: number
+  with?: string
 }
 
 const RolesService = () => {

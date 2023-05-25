@@ -23,6 +23,8 @@ interface IReportsParams {
     timespan?: 'today' | 'weekly' | 'monthly' | 'yearly' | string
     with?: string
     select?: string
+    from?: string
+    to?: string
     page?: number
     paginate?: number
     search_by?: string

@@ -10,14 +10,16 @@ interface PickerProps {
   label?: string
   readOnly?: boolean
   customwidth?: string
+  customSize?: 'small' | 'medium'
 }
 
 const PickersComponent = forwardRef(({ ...props }: PickerProps, ref) => {
   // ** Props
-  const { label, readOnly, customwidth } = props
+  const { label, readOnly, customwidth, customSize } = props
 
   return (
     <TextField
+      size={customSize}
       inputRef={ref}
       {...props}
       label={label || ''}

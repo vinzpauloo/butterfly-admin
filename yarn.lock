@@ -2376,6 +2376,11 @@ classnames@^2.2.5, classnames@^2.2.6:
   resolved "https://registry.npmjs.org/classnames/-/classnames-2.3.2.tgz"
   integrity sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==
 
+classnames@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.3.2.tgz#351d813bf0137fcc6a76a16b88208d2560a0d924"
+  integrity sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==
+
 cleave.js@1.6.0:
   version "1.6.0"
   resolved "https://registry.npmjs.org/cleave.js/-/cleave.js-1.6.0.tgz"
@@ -4929,6 +4934,11 @@ raf-schd@^4.0.2:
   resolved "https://registry.npmjs.org/raf-schd/-/raf-schd-4.0.3.tgz"
   integrity sha512-tQkJl2GRWh83ui2DiPTJz9wEiMN20syf+5oKfB03yYP7ioZcJwsIK8FjrtLwH1m7C7e+Tt2yYBlrOpdT+dyeIQ==
 
+react-accessible-treeview@^2.5.4:
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/react-accessible-treeview/-/react-accessible-treeview-2.5.4.tgz#9f03f9755872404036387a91b277c36775a7cea8"
+  integrity sha512-f4Oo5uohl7g909Jdhvqzas4lXzmoVJ8EhedbVfctgv31CohKdGntF7iYRpPVMYBI75CsF6UtAFyV8Nxd1jCLnw==
+
 react-apexcharts@1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/react-apexcharts/-/react-apexcharts-1.4.0.tgz"
@@ -5025,6 +5035,11 @@ react-i18next@12.0.0:
   dependencies:
     "@babel/runtime" "^7.14.5"
     html-parse-stringify "^3.0.1"
+
+react-icons@^4.8.0:
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.8.0.tgz#621e900caa23b912f737e41be57f27f6b2bff445"
+  integrity sha512-N6+kOLcihDiAnj5Czu637waJqSnwlMNROzVZMhfX68V/9bu9qHaMIJC4UdozWoOk57gahFCNHwVvWzm0MTzRjg==
 
 react-is@^16.10.2, react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"
