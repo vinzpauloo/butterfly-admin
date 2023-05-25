@@ -1,4 +1,5 @@
 // userTableStore.ts
+import { GridSortModel } from '@mui/x-data-grid';
 import {create} from 'zustand';
 
 type SortType = 'asc' | 'desc' | undefined | null;
@@ -65,6 +66,7 @@ type ActivityTableProps = {
     handleSearch: (value: string, type: string) => void;
     handleDrawerToggle: (role: string | null) => void;
     handleOpenDrawer: (role: DrawerType, data: any) => void;
+    handleSortModel: (newModel: GridSortModel) => void
 };
 
 export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
@@ -140,22 +142,10 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
         }
     },
 
-    // handlePageChange: (value) => set({ page: value + 1 }),
     handlePageChange: (value) => {
-        set((state) => {
-            set({ page: value + 1 });
-
-            if (state.activeTab === 'OPERATIONS') {
-            return { supervisorPage: value + 1 };
-            } else if (state.activeTab === 'SA') {
-            return { saPage: value + 1 };
-            } else if (state.activeTab === 'CC') {
-            return { ccPage: value + 1 };
-            }
-            
-            return {};
-        })       
+        set({ page: value + 1 });
     },
+    
     handleSearch: (value, type) => {
         set({ search: type });
 
@@ -200,5 +190,14 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
     handleOpenDrawer: (role, data) => {
         set({ drawerRole: role });
         set({ drawerData: data })
+    },
+    handleSortModel: (newModel: GridSortModel) => {
+        if (newModel.length) {
+            set({ sort: newModel[0].sort })
+            set({sortName: newModel[0].field})
+        } else {
+            set({ sort: 'asc' })
+            set({ sortName: 'username' })
+        }
     }
 }));
