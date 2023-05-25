@@ -9,7 +9,7 @@ const Navigation = (): VerticalNavItemsType => {
     {
       title: 'Dashboard',
       icon: 'mdi:chart-bar',
-      path: '/dashboard',
+      path: '/dashboard/admin-dashboard',
       action: 'read',
       subject: 'shared-page'
     },
@@ -312,7 +312,7 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Security/Withdrawal',
           path: '/funds-withdrawal'
-        },
+        }
       ]
     }
   ]

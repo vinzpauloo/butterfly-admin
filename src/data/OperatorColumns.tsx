@@ -20,36 +20,58 @@ export const OperatorColumns = () => {
 
   return [
     {
+      flex: 0.02,
+      minWidth: 120,
       field: 'role',
       headerName: 'Role',
-      width: 150,
       valueGetter: (params: any) => {
         return params?.row.role ? params?.row.role.name : ''
       }
     },
-    { field: 'username', headerName: 'User Profile', width: 180 },
-    { field: 'mobile', headerName: 'Mobile Number', width: 150 },
-    { field: 'email', headerName: 'Email', width: 250 },
     {
+      flex: 0.01,
+      minWidth: 120,
+      field: 'username',
+      headerName: 'User Profile'
+    },
+    {
+      flex: 0.02,
+      minWidth: 150,
+      field: 'mobile',
+      headerName: 'Mobile Number'
+    },
+    {
+      flex: 0.03,
+      minWidth: 150,
+      field: 'email',
+      headerName: 'Email'
+    },
+    {
+      flex: 0.03,
+      minWidth: 150,
       field: 'created_at',
       headerName: 'Date Created',
-      width: 250,
+
       valueFormatter: (params: any) => {
         return formatDate(params?.value)
       }
     },
     {
+      flex: 0.03,
+      minWidth: 150,
       field: 'updated_at',
       headerName: 'Last Log In',
-      width: 250,
+
       valueFormatter: (params: any) => {
         return formatDate(params?.value)
       }
     },
     {
+      flex: 0.01,
+      minWidth: 90,
       field: 'status',
       headerName: 'Action',
-      width: 135,
+
       renderCell: (params: any) => {
         return (
           <Box>

@@ -187,7 +187,7 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
           </Box>
         </Box>
         <CardContent>
-          <Bar data={chartData} height={400} options={options} />
+          <Bar data={chartData} height={235} options={options} />
         </CardContent>
       </Card>
     </DatePickerWrapper>
@@ -219,7 +219,7 @@ const styles = {
       xs: 'column',
       sm: 'column',
       md: 'column',
-      lg: 'row'
+      lg: 'column'
     },
     gap: 3
   }

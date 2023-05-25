@@ -15,6 +15,7 @@ import Icon from 'src/@core/components/icon'
 import { useQuery } from '@tanstack/react-query'
 import { DashboardService } from '@/services/api/DashboardService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
+import formatDate from '@/utils/formatDate'
 
 interface Props {
   direction: 'ltr' | 'rtl'
@@ -163,7 +164,11 @@ const RechartsAreaChart = ({ direction }: Props) => {
           <ResponsiveContainer>
             <AreaChart height={300} data={chartData} style={{ direction }} margin={{ left: -20 }}>
               <CartesianGrid />
-              <XAxis dataKey='created_at' reversed={direction === 'rtl'} />
+              <XAxis
+                dataKey='created_at'
+                reversed={direction === 'rtl'}
+                tickFormatter={unixTime => formatDate(unixTime)}
+              />
               <YAxis orientation={direction === 'rtl' ? 'right' : 'left'} />
               <Tooltip content={CustomTooltip} />
               <Area dataKey='total_active' stackId='Active' stroke='0' fill='rgb(115, 103, 240)' />

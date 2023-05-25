@@ -22,6 +22,7 @@ export const ContentCreatorColumns = () => {
     { field: 'username', headerName: 'User Name', width: 200 },
     { field: 'mobile', headerName: 'Mobile Number', width: 200 },
     { field: 'email', headerName: 'Email', width: 255 },
+    { field: 'work_shares', headerName: 'Shares', width: 200 },
     {
       field: 'created_at',
       headerName: 'Date Created',
