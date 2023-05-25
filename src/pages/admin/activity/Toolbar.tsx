@@ -17,14 +17,14 @@ import { useTranslateString } from '@/utils/TranslateString'
 interface Props {
   usernameValue: string
   emailValue: string
-  mobileValue: string
+  actionValue: string
   clearUsername: () => void
   clearEmail: () => void
-  clearMobile: () => void
+  clearAction: () => void
   clearAll: () => void
   onUsernameChange: (e: ChangeEvent) => void
   onEmailChange: (e: ChangeEvent) => void
-  onMobileChange: (e: ChangeEvent) => void
+  onActionChange: (e: ChangeEvent) => void
   role: any
   toggle: (role: string) => void
   role_id: any
@@ -68,6 +68,34 @@ const ActivityLogsToolbar = (props: Props) => {
         >
           <TextField
             size='small'
+            value={props.usernameValue ?? ''}
+            onChange={props.onUsernameChange}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Username') + '...'}
+            InputProps={{
+              startAdornment: (
+                <Box sx={{ mr: 2, display: 'flex' }}>
+                  <Icon icon='mdi:magnify' fontSize={20} />
+                </Box>
+              ),
+              endAdornment: props?.usernameValue ? (
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearUsername}>
+                  <Icon icon='mdi:close' fontSize={20} />
+                </IconButton>
+              ) : (
+                false
+              )
+            }}
+            sx={{
+              width: {
+                xs: 'auto',
+                sm: 'auto',
+                md: 'auto',
+                lg: 250
+              }
+            }}
+          />
+          <TextField
+            size='small'
             value={props.emailValue ?? ''}
             onChange={props.onEmailChange}
             placeholder={TranslateString('Search') + ' ' + TranslateString('Email') + '...'}
@@ -95,20 +123,20 @@ const ActivityLogsToolbar = (props: Props) => {
             }}
           />
 
-          {/* Add TextField for searching mobile number */}
+          {/* Add TextField for searching action */}
           <TextField
             size='small'
-            value={props.mobileValue ?? ''}
-            onChange={props.onMobileChange}
-            placeholder={TranslateString('Search') + ' ' + TranslateString('Mobile Number') + '...'}
+            value={props.actionValue ?? ''}
+            onChange={props.onActionChange}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Action') + '...'}
             InputProps={{
               startAdornment: (
                 <Box sx={{ mr: 2, display: 'flex' }}>
                   <Icon icon='mdi:magnify' fontSize={20} />
                 </Box>
               ),
-              endAdornment: props?.mobileValue ? (
-                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearMobile}>
+              endAdornment: props?.actionValue ? (
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearAction}>
                   <Icon icon='mdi:close' fontSize={20} />
                 </IconButton>
               ) : (
@@ -124,34 +152,7 @@ const ActivityLogsToolbar = (props: Props) => {
               }
             }}
           />
-          <TextField
-            size='small'
-            value={props.usernameValue ?? ''}
-            onChange={props.onUsernameChange}
-            placeholder={TranslateString('Search') + ' ' + TranslateString('Users') + '...'}
-            InputProps={{
-              startAdornment: (
-                <Box sx={{ mr: 2, display: 'flex' }}>
-                  <Icon icon='mdi:magnify' fontSize={20} />
-                </Box>
-              ),
-              endAdornment: props?.usernameValue ? (
-                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearUsername}>
-                  <Icon icon='mdi:close' fontSize={20} />
-                </IconButton>
-              ) : (
-                false
-              )
-            }}
-            sx={{
-              width: {
-                xs: 'auto',
-                sm: 'auto',
-                md: 'auto',
-                lg: 250
-              }
-            }}
-          />
+
           <Button
             variant='contained'
             color='error'

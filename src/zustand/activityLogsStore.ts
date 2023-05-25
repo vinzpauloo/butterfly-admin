@@ -20,7 +20,7 @@ type ActivityTableProps = {
     sortName: string;
     search: string | undefined;
     emailSearchValue: string | undefined;
-    mobileSearchValue: string | undefined;
+    actionSearchValue: string | undefined;
     searchValue: string | undefined;
     initialLoad: boolean;
     activeTab: string | undefined;
@@ -46,7 +46,7 @@ type ActivityTableProps = {
     setSortName: (sortName: string) => void;
     setSearch: (search: string | undefined) => void;
     setEmailSearchValue: (emailSearchValue: string | undefined) => void;
-    setMobileSearchValue: (mobileSearchValue: string | undefined) => void;
+    setActionSearchValue: (actionSearchValue: string | undefined) => void;
     setSearchValue: (searchValue: string | undefined) => void;
     setInitialLoad: (initialLoad: boolean) => void;
     setActiveTab: (activeTab: string | undefined) => void;
@@ -82,7 +82,7 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
     sortName: 'created_at',
     search: undefined,
     emailSearchValue: undefined,
-    mobileSearchValue: undefined,
+    actionSearchValue: undefined,
     searchValue: undefined,
     initialLoad: true,
     activeTab: undefined,
@@ -108,7 +108,7 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
     setSortName: (sortName) => set({ sortName }),
     setSearch: (search) => set({ search }),
     setEmailSearchValue: (emailSearchValue) => set({ emailSearchValue }),
-    setMobileSearchValue: (mobileSearchValue) => set({ mobileSearchValue }),
+    setActionSearchValue: (actionSearchValue) => set({ actionSearchValue }),
     setSearchValue: (searchValue) => set({ searchValue }),
     setInitialLoad: (initialLoad) => set({ initialLoad }),
     setActiveTab: (activeTab) => set({ activeTab }),
@@ -156,8 +156,8 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
             case 'email':
                 set({ emailSearchValue: value });
                 break;
-            case 'mobile':
-                set({ mobileSearchValue: value });
+            case 'action':
+                set({ actionSearchValue: value });
                 break;
             
             default:
@@ -194,7 +194,13 @@ export const useActivityLogsStore = create<ActivityTableProps>((set) => ({
     handleSortModel: (newModel: GridSortModel) => {
         if (newModel.length) {
             set({ sort: newModel[0].sort })
-            set({sortName: newModel[0].field})
+
+            if (newModel[0].field === `user`) {
+                set({sortName: `username`})
+            } else {
+                set({sortName: newModel[0].field})
+            }
+            
         } else {
             set({ sort: 'asc' })
             set({ sortName: 'username' })

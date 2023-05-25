@@ -13,8 +13,7 @@ import { ActivityLogsColumns } from '@/data/ActivityLogsColumns'
 // ** Hooks/Services
 import { ActivityLogsService } from '@/services/api/ActivityLogsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
-
-// import useDebounce from '@/hooks/useDebounce'
+import useDebounce from '@/hooks/useDebounce'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -35,10 +34,11 @@ const ActivityLogsTable = () => {
     sort,
     sortName,
     emailSearchValue,
-    mobileSearchValue,
+    actionSearchValue,
     searchValue,
     rowData,
-    setRowData
+    setRowData,
+    search
   } = useActivityLogsStore()
 
   const { handlePageChange, handleSearch, handleDrawerToggle, handleSortModel } = useActivityLogsStore(state => ({
@@ -48,6 +48,10 @@ const ActivityLogsTable = () => {
     handleSortModel: state.handleSortModel
   }))
 
+  const debouncedUsername = useDebounce(searchValue, 1000)
+  const debouncedEmail = useDebounce(emailSearchValue, 1000)
+  const debouncedAction = useDebounce(actionSearchValue, 1000)
+
   // ** Columns for DataGrid
   const { columns } = ActivityLogsColumns()
 
@@ -56,13 +60,28 @@ const ActivityLogsTable = () => {
   const { handleError } = useErrorHandling()
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['activityLogs', sort, sortName, page],
+    queryKey: [
+      'activityLogs',
+      sort,
+      sortName,
+      page,
+      search,
+      search === 'username'
+        ? debouncedUsername || undefined
+        : search === 'email'
+        ? debouncedEmail || undefined
+        : debouncedAction || undefined
+    ],
     queryFn: () =>
       getActivityLogs({
         params: {
           sort_by: sortName,
           sort: sort,
-          page: page
+          page: page,
+          search_by: search,
+          search_value:
+            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedAction,
+          with: 'user'
         }
       }),
     onSuccess: response => {
@@ -103,18 +122,18 @@ const ActivityLogsTable = () => {
             role_id: roleId,
             usernameValue: searchValue,
             emailValue: emailSearchValue,
-            mobileValue: mobileSearchValue,
+            actionValue: actionSearchValue,
             clearUsername: () => handleSearch('', 'username'),
             clearEmail: () => handleSearch('', 'email'),
-            clearMobile: () => handleSearch('', 'mobile'),
+            clearAction: () => handleSearch('', 'action'),
             clearAll: () => {
               handleSearch('', 'username')
               handleSearch('', 'email')
-              handleSearch('', 'mobile')
+              handleSearch('', 'action')
             },
             onUsernameChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'username'),
             onEmailChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'email'),
-            onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
+            onActionChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'action')
           }
         }}
         sx={{ padding: 0 }}

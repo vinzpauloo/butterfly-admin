@@ -3,19 +3,22 @@ import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
 interface BaseProps<T, U> {
-  data?: T
-  params?: U
+    data?: T
+    params?: U
 }
 
 interface ActivityLogsData {
-  user_id?: number;
+    user_id?: number;
 }
 
 interface ActivityLogsParams {
-  sort?: string | undefined | null
-  sort_by?: string;
+    sort?: string | undefined | null
+    sort_by?: string;
     site_id?: string;
     page?: string | number
+    search_by?: string 
+    search_value?: string
+    with?: string
 }
 
 export const ActivityLogsService = () => {
