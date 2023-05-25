@@ -124,10 +124,10 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Commissions',
+          title: 'Earnings',
           path: '/transactions/commissions',
           action: 'read',
-          subject: 'agent-page'
+          subject: 'shared-page'
         },
         {
           title: 'VIP Bundles',
@@ -168,10 +168,10 @@ const Navigation = (): VerticalNavItemsType => {
           subject: 'shared-page'
         },
         {
-          title: 'Commissions',
+          title: 'Earnings',
           path: '/reports/commissions',
           action: 'read',
-          subject: 'agent-page'
+          subject: 'shared-page'
         },
         {
           title: 'VIP Bundles',
