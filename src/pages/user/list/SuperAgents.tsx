@@ -268,4 +268,9 @@ const SuperAgents = () => {
   )
 }
 
+SuperAgents.acl = {
+  action: 'read',
+  subject: 'sa-page'
+}
+
 export default SuperAgents
