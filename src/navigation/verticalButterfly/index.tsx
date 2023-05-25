@@ -67,18 +67,18 @@ const Navigation = (): VerticalNavItemsType => {
           action: 'read',
           subject: 'sa-page',
           path: '/user/list/Customers'
-        },
-        {
-          title: 'FQDN',
-          path: '/fqdn',
-          action: 'read',
-          subject: 'sa-page'
-        },
-        {
-          title: 'Integration Key',
-          action: 'read',
-          subject: 'sa-page'
         }
+        // {
+        //   title: 'FQDN',
+        //   path: '/fqdn',
+        //   action: 'read',
+        //   subject: 'sa-page'
+        // },
+        // {
+        //   title: 'Integration Key',
+        //   action: 'read',
+        //   subject: 'sa-page'
+        // }
       ]
     },
     {
@@ -312,7 +312,7 @@ const Navigation = (): VerticalNavItemsType => {
         {
           title: 'Security/Withdrawal',
           path: '/funds-withdrawal'
-        },
+        }
       ]
     }
   ]
