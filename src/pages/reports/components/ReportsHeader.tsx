@@ -34,7 +34,6 @@ const ReportsHeader = (props: Props) => {
               onChange={(date: Date) => setFromDate(date)}
               placeholderText='Click to select a date'
               customInput={<CustomInput customwidth={'160px'} customSize='small' />}
-              minDate={new Date()}
             />
           </Box>
           <Box>
@@ -45,7 +44,7 @@ const ReportsHeader = (props: Props) => {
               onChange={(date: Date) => setToDate(date)}
               placeholderText='Click to select a date'
               customInput={<CustomInput customwidth={'160px'} customSize='small' />}
-              minDate={new Date()}
+              maxDate={new Date()}
             />
           </Box>
           <ToggleButtonGroup color='primary' value={timespan} exclusive onChange={handleOnChange} size='small'>
