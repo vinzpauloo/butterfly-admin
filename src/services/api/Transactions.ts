@@ -88,6 +88,19 @@ const TransactionsService = () => {
     })
   }
 
+  const getWorkPurchases = (params: ITransaction) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`
+      },
+      url: '/admin/works/purchases',
+      method: 'GET',
+      params: params.data
+    })
+  }
+
   const getCommissions = (params: ITransaction) => {
     return request({
       headers: {
@@ -134,6 +147,7 @@ const TransactionsService = () => {
     requestWithdrawal,
     approveWithdrawal,
     declineWithdrawal,
+    getWorkPurchases,
     getCommissions,
     getSecurityFunds,
     getCustomerTransaction
