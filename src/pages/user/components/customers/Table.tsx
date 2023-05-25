@@ -35,7 +35,7 @@ const CustomerTable = () => {
     sortName,
     setSortName,
     search,
-    emailSearchValue,
+    agentSearchValue,
     mobileSearchValue,
     searchValue,
     rowData,
@@ -55,7 +55,7 @@ const CustomerTable = () => {
   const { getAllCustomers } = UserTableService()
   const { handleError } = useErrorHandling()
   const debouncedUsername = useDebounce(searchValue, 1000)
-  const debouncedEmail = useDebounce(emailSearchValue, 1000)
+  const debounceAgent = useDebounce(agentSearchValue, 1000)
   const debouncedMobile = useDebounce(mobileSearchValue, 1000)
 
   const { isLoading, isRefetching } = useQuery({
@@ -67,8 +67,8 @@ const CustomerTable = () => {
       search,
       search === 'username'
         ? debouncedUsername || undefined
-        : search === 'email'
-        ? debouncedEmail || undefined
+        : search === 'agent'
+        ? debounceAgent || undefined
         : debouncedMobile || undefined
     ],
     queryFn: () =>
@@ -79,8 +79,7 @@ const CustomerTable = () => {
           sort: sort,
           page: page,
           search_by: search,
-          search_value:
-            search === 'username' ? debouncedUsername : search === 'email' ? debouncedEmail : debouncedMobile
+          search_value: search === 'username' ? debouncedUsername : search === 'agent' ? debounceAgent : debouncedMobile
         }
       }),
     onSuccess: response => {
@@ -135,18 +134,18 @@ const CustomerTable = () => {
             role: role,
             role_id: roleId,
             usernameValue: searchValue,
-            emailValue: emailSearchValue,
+            agentValue: agentSearchValue,
             mobileValue: mobileSearchValue,
             clearUsername: () => handleSearch('', 'username'),
-            clearEmail: () => handleSearch('', 'email'),
+            clearAgent: () => handleSearch('', 'agent'),
             clearMobile: () => handleSearch('', 'mobile'),
             clearAll: () => {
               handleSearch('', 'username')
-              handleSearch('', 'email')
+              handleSearch('', 'agent')
               handleSearch('', 'mobile')
             },
             onUsernameChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'username'),
-            onEmailChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'email'),
+            onAgentChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'agent'),
             onMobileChange: (event: ChangeEvent<HTMLInputElement>) => handleSearch(event.target.value, 'mobile')
           }
         }}

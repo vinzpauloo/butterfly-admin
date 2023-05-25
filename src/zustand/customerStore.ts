@@ -18,7 +18,7 @@ type CustomerTableProps = {
     sort: SortType;
     sortName: string;
     search: string | undefined;
-    emailSearchValue: string | undefined;
+    agentSearchValue: string | undefined;
     mobileSearchValue: string | undefined;
     searchValue: string | undefined;
     initialLoad: boolean;
@@ -44,7 +44,7 @@ type CustomerTableProps = {
     setSort: (sort: SortType) => void;
     setSortName: (sortName: string) => void;
     setSearch: (search: string | undefined) => void;
-    setEmailSearchValue: (emailSearchValue: string | undefined) => void;
+    setAgentSearchValue: (agentSearchValue: string | undefined) => void;
     setMobileSearchValue: (mobileSearchValue: string | undefined) => void;
     setSearchValue: (searchValue: string | undefined) => void;
     setInitialLoad: (initialLoad: boolean) => void;
@@ -79,7 +79,7 @@ export const useCustomerStore = create<CustomerTableProps>((set) => ({
     sort: 'desc',
     sortName: 'created_at',
     search: undefined,
-    emailSearchValue: undefined,
+    agentSearchValue: undefined,
     mobileSearchValue: undefined,
     searchValue: undefined,
     initialLoad: true,
@@ -105,7 +105,7 @@ export const useCustomerStore = create<CustomerTableProps>((set) => ({
     setSort: (sort) => set({ sort }),
     setSortName: (sortName) => set({ sortName }),
     setSearch: (search) => set({ search }),
-    setEmailSearchValue: (emailSearchValue) => set({ emailSearchValue }),
+    setAgentSearchValue: (agentSearchValue) => set({ agentSearchValue }),
     setMobileSearchValue: (mobileSearchValue) => set({ mobileSearchValue }),
     setSearchValue: (searchValue) => set({ searchValue }),
     setInitialLoad: (initialLoad) => set({ initialLoad }),
@@ -149,8 +149,8 @@ export const useCustomerStore = create<CustomerTableProps>((set) => ({
             case 'username':
                 set({ searchValue: value });
                 break;
-            case 'email':
-                set({ emailSearchValue: value });
+            case 'agent':
+                set({ agentSearchValue: value });
                 break;
             case 'mobile':
                 set({ mobileSearchValue: value });

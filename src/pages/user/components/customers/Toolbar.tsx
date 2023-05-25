@@ -16,14 +16,14 @@ import { useTranslateString } from '@/utils/TranslateString'
 
 interface Props {
   usernameValue: string
-  emailValue: string
+  agentValue: string
   mobileValue: string
   clearUsername: () => void
-  clearEmail: () => void
+  clearAgent: () => void
   clearMobile: () => void
   clearAll: () => void
   onUsernameChange: (e: ChangeEvent) => void
-  onEmailChange: (e: ChangeEvent) => void
+  onAgentChange: (e: ChangeEvent) => void
   onMobileChange: (e: ChangeEvent) => void
   role: any
   toggle: (role: string) => void
@@ -96,8 +96,8 @@ const CustomersToolbar = (props: Props) => {
           />
           <TextField
             size='small'
-            value={props.emailValue ?? ''}
-            onChange={props.onEmailChange}
+            value={props.agentValue ?? ''}
+            onChange={props.onAgentChange}
             placeholder={TranslateString('Search') + ' ' + TranslateString('Agent') + '...'}
             InputProps={{
               startAdornment: (
@@ -105,8 +105,8 @@ const CustomersToolbar = (props: Props) => {
                   <Icon icon='mdi:magnify' fontSize={20} />
                 </Box>
               ),
-              endAdornment: props?.emailValue ? (
-                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearEmail}>
+              endAdornment: props?.agentValue ? (
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearAgent}>
                   <Icon icon='mdi:close' fontSize={20} />
                 </IconButton>
               ) : (
