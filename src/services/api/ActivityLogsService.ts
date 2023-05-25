@@ -19,6 +19,15 @@ interface ActivityLogsParams {
     search_by?: string 
     search_value?: string
     with?: string
+    export?: string
+}
+
+const processData = (response: any) => {
+  if (response && response.data) {
+    return response.data
+  }
+
+  return {}
 }
 
 export const ActivityLogsService = () => {
@@ -37,6 +46,18 @@ export const ActivityLogsService = () => {
         })
     }
 
+    const getCSV = async (props: BaseProps<ActivityLogsData,ActivityLogsParams>) => {
+        return request({
+            headers: {
+                ...getHeaders(),
+                'ngrok-skip-browser-warning': '69420', // only for dev
+                Authorization: `Bearer ${accessToken}`
+            },
+            url: '/admin/activity-logs',
+            method: 'GET',
+            params: props.params
+        },processData)
+    }
 
-    return {  getActivityLogs }
+    return {  getActivityLogs, getCSV }
 }

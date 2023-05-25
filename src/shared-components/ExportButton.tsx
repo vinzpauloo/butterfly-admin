@@ -13,26 +13,43 @@ import { useQuery } from '@tanstack/react-query'
 
 // ** Custom Imports
 import { saveAs } from 'file-saver'
+import { useActivityLogsStore } from '@/zustand/activityLogsStore'
 
 interface ExportProps {
   ApiService: (params: any) => Promise<any>
   csvTitle: string
   titleValue: string
+  exportTrue?: string
 }
 
-const ExportButton = ({ ApiService, csvTitle, titleValue }: ExportProps) => {
+const ExportButton = ({ ApiService, csvTitle, titleValue, exportTrue }: ExportProps) => {
   const { handleError } = useErrorHandling()
+  const { search, searchValue, emailSearchValue, actionSearchValue } = useActivityLogsStore()
 
   const [response, setResponse] = useState()
-  const [search] = useState('title')
+  const [defaultSearch] = useState('title')
 
   useQuery({
-    queryKey: ['ExportCSV', titleValue],
+    queryKey: [
+      'ExportCSV',
+      titleValue,
+      search,
+      search === 'username'
+        ? searchValue || undefined
+        : search === 'email'
+        ? emailSearchValue || undefined
+        : actionSearchValue || undefined
+    ],
     queryFn: () =>
       ApiService({
         data: {
-          search_by: search,
+          search_by: defaultSearch,
           search_value: titleValue
+        },
+        params: {
+          export: exportTrue,
+          search_by: search,
+          search_value: search === 'username' ? searchValue : search === 'email' ? emailSearchValue : actionSearchValue
         }
       }),
     onSuccess: (data: any) => {

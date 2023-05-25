@@ -13,7 +13,6 @@ import ExportButton from '@/shared-components/ExportButton'
 
 // ** Utils Imports
 import { useTranslateString } from '@/utils/TranslateString'
-import { ActivityLogsService } from '@/services/api/ActivityLogsService'
 
 interface Props {
   usernameValue: string
@@ -31,10 +30,8 @@ interface Props {
   role_id: any
 }
 
-const ActivityLogsToolbar = (props: Props) => {
+const CustomersToolbar = (props: Props) => {
   const TranslateString = useTranslateString()
-
-  const { getCSV } = ActivityLogsService()
 
   const handleClear = () => {
     props.clearAll()
@@ -188,11 +185,17 @@ const ActivityLogsToolbar = (props: Props) => {
             justifyContent: 'space-between'
           }}
         >
-          <ExportButton ApiService={getCSV} csvTitle={'Activity Logs'} titleValue={''} exportTrue='true' />
+          <ExportButton
+            ApiService={function (): Promise<any> {
+              throw new Error('Throw Error: Export Function not yet implemented.')
+            }}
+            csvTitle={'Activity Logs'}
+            titleValue={''}
+          />
         </Box>
       </Box>
     </Box>
   )
 }
 
-export default ActivityLogsToolbar
+export default CustomersToolbar
