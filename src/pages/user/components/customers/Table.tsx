@@ -61,6 +61,7 @@ const CustomerTable = () => {
   const { isLoading, isRefetching } = useQuery({
     queryKey: [
       'getAllCustomers',
+      page,
       role,
       roleId,
       sort,
@@ -75,6 +76,7 @@ const CustomerTable = () => {
     queryFn: () =>
       getAllCustomers({
         data: {
+          with: 'agents',
           sort_by: sortName,
           sort: sort,
           page: page,
@@ -95,7 +97,7 @@ const CustomerTable = () => {
       setPage(response?.current_page)
     },
     onError: (e: any) => {
-      handleError(e, `getUsers() UserTable.tsx`)
+      handleError(e, `getAllCustomers() CustomerTable.tsx`)
     }
   })
 

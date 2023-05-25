@@ -140,22 +140,8 @@ export const useCustomerStore = create<CustomerTableProps>((set) => ({
         }
     },
 
-    // handlePageChange: (value) => set({ page: value + 1 }),
-    handlePageChange: (value) => {
-        set((state) => {
-            set({ page: value + 1 });
-
-            if (state.activeTab === 'OPERATIONS') {
-            return { supervisorPage: value + 1 };
-            } else if (state.activeTab === 'SA') {
-            return { saPage: value + 1 };
-            } else if (state.activeTab === 'CC') {
-            return { ccPage: value + 1 };
-            }
-            
-            return {};
-        })       
-    },
+    handlePageChange: (value) => set({ page: value + 1 }),
+    
     handleSearch: (value, type) => {
         set({ search: type });
 

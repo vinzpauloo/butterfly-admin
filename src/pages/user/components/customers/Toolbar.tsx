@@ -17,14 +17,14 @@ import { useTranslateString } from '@/utils/TranslateString'
 interface Props {
   usernameValue: string
   emailValue: string
-  actionValue: string
+  mobileValue: string
   clearUsername: () => void
   clearEmail: () => void
-  clearAction: () => void
+  clearMobile: () => void
   clearAll: () => void
   onUsernameChange: (e: ChangeEvent) => void
   onEmailChange: (e: ChangeEvent) => void
-  onActionChange: (e: ChangeEvent) => void
+  onMobileChange: (e: ChangeEvent) => void
   role: any
   toggle: (role: string) => void
   role_id: any
@@ -126,17 +126,17 @@ const CustomersToolbar = (props: Props) => {
           {/* Add TextField for searching action */}
           <TextField
             size='small'
-            value={props.actionValue ?? ''}
-            onChange={props.onActionChange}
-            placeholder={TranslateString('Search') + ' ' + TranslateString('Action') + '...'}
+            value={props.mobileValue ?? ''}
+            onChange={props.onMobileChange}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Mobile') + '...'}
             InputProps={{
               startAdornment: (
                 <Box sx={{ mr: 2, display: 'flex' }}>
                   <Icon icon='mdi:magnify' fontSize={20} />
                 </Box>
               ),
-              endAdornment: props?.actionValue ? (
-                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearAction}>
+              endAdornment: props?.mobileValue ? (
+                <IconButton size='small' title='Clear' aria-label='Clear' onClick={props.clearMobile}>
                   <Icon icon='mdi:close' fontSize={20} />
                 </IconButton>
               ) : (
