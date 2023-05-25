@@ -98,7 +98,7 @@ const CustomersToolbar = (props: Props) => {
             size='small'
             value={props.emailValue ?? ''}
             onChange={props.onEmailChange}
-            placeholder={TranslateString('Search') + ' ' + TranslateString('Email') + '...'}
+            placeholder={TranslateString('Search') + ' ' + TranslateString('Agent') + '...'}
             InputProps={{
               startAdornment: (
                 <Box sx={{ mr: 2, display: 'flex' }}>

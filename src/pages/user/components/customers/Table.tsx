@@ -62,8 +62,6 @@ const CustomerTable = () => {
     queryKey: [
       'getAllCustomers',
       page,
-      role,
-      roleId,
       sort,
       sortName,
       search,

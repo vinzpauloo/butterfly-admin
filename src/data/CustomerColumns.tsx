@@ -68,7 +68,14 @@ export const CustomerColumns = () => {
       flex: 0.02,
       minWidth: 140,
       field: 'mobile',
-      headerName: `Mobile`
+      headerName: `Mobile`,
+      renderCell: (params: any) => {
+        if (params?.row.mobile !== null) {
+          return <Typography color='#FF9C00'>{params?.row.mobile}</Typography>
+        }
+
+        return <Typography color='error'>Not available</Typography>
+      }
     },
     {
       flex: 0.01,
