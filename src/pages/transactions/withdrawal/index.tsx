@@ -11,6 +11,7 @@ import { useErrorHandling } from '@/hooks/useErrorHandling'
 import TransactionsService from '@/services/api/Transactions'
 import { useQuery } from '@tanstack/react-query'
 import formatDate from '@/utils/formatDate'
+import { useAuth } from '@/services/useAuth'
 
 function index() {
   const [data, setData] = useState([])
@@ -20,6 +21,8 @@ function index() {
   const [open, setOpen] = useState(false)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
+  const [isRequestWithdraw, setIsRequestWithdraw] = useState<boolean>(false)
+  const auth = useAuth()
 
   // temporary for now, get only donations
   const { getDonations } = TransactionsService()
@@ -116,7 +119,7 @@ function index() {
       sortable: false,
       renderCell: () => 
         <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-          <Button onClick={() => setOpen(true)}>
+          <Button onClick={() => {setIsRequestWithdraw(false); setOpen(true)}}>
             <Icon fontSize={30} icon='mdi:eye' color='98A9BC' />
           </Button>
         </Box>
@@ -136,11 +139,13 @@ function index() {
         setPage={setPage}
         setPageSize={setPageSize}
       >
-        <Stack direction='row' justifyContent='flex-end'>
-          <Button variant='outlined' size='small' sx={{width: 'max-content'}} onClick={() => setOpen(true)}>Request Withdraw</Button>
-        </Stack>
+        {auth.user?.role === 'CC' &&
+          <Stack direction='row' justifyContent='center'>
+            <Button variant='outlined' sx={{ width: 'max-content' }} onClick={() => {setIsRequestWithdraw(true); setOpen(true)}}>Request Withdraw</Button>
+          </Stack>
+        }
       </Transaction>
-      {open ? <WithdrawModal open={open} setOpen={setOpen} /> : null}
+      {open ? <WithdrawModal isRequestWithdraw={isRequestWithdraw} open={open} setOpen={setOpen} /> : null}
     </>
   )
 }

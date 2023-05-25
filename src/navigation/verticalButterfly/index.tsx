@@ -8,20 +8,20 @@ const Navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Dashboard',
-      icon: 'mdi:home-outline',
+      icon: 'mdi:chart-bar',
       path: '/dashboard',
       action: 'read',
       subject: 'shared-page'
     },
     {
       title: 'Customers',
-      icon: 'mdi:home-outline',
+      icon: 'mdi:account-group-outline',
       action: 'read',
       subject: 'agent-only-page'
     },
     {
       title: 'Admin',
-      icon: 'mdi:file-document-outline',
+      icon: 'mdi:account-tie-outline',
       action: 'read',
       subject: 'sa-page',
       children: [
@@ -47,7 +47,7 @@ const Navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Super Agents',
-      icon: 'mdi:file-document-outline',
+      icon: 'mdi:account-supervisor-outline',
       action: 'read',
       children: [
         {
@@ -83,19 +83,13 @@ const Navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Content Creators',
-      icon: 'mdi:file-document-outline',
+      icon: 'mdi:camera-account',
       action: 'read',
-      children: [
-        {
-          title: 'Users',
-          path: '/user/list/Creators',
-          action: 'read'
-        }
-      ]
+      path: '/user/list/Creators'
     },
     {
       title: 'Transactions',
-      icon: 'mdi:file-document-outline',
+      icon: 'mdi:finance',
       action: 'read',
       subject: 'shared-page',
       children: [
@@ -145,7 +139,7 @@ const Navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Reports',
-      icon: 'mdi:grid-large',
+      icon: 'mdi:file-chart-outline',
       action: 'read',
       subject: 'shared-page',
       children: [
@@ -193,7 +187,7 @@ const Navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Studio',
-      icon: 'mdi:building',
+      icon: 'mdi:video-outline',
       action: 'read',
       subject: 'cc-page',
       children: [
@@ -273,7 +267,7 @@ const Navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Site Settings',
-      icon: 'mdi:cogs',
+      icon: 'mdi:web',
       children: [
         {
           title: 'Advertisements',
@@ -316,11 +310,9 @@ const Navigation = (): VerticalNavItemsType => {
           path: '/wallet'
         },
         {
-          title: 'Security Funds'
+          title: 'Security/Withdrawal',
+          path: '/funds-withdrawal'
         },
-        {
-          title: 'Withdrawals'
-        }
       ]
     }
   ]
