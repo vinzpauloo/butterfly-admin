@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Avatar, Box, Button, Stack, Typography } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import WithdrawModal from './WithdrawModal'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
@@ -12,6 +12,17 @@ import TransactionsService from '@/services/api/Transactions'
 import { useQuery } from '@tanstack/react-query'
 import formatDate from '@/utils/formatDate'
 import { useAuth } from '@/services/useAuth'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
+
+type modalData = {
+  id: number | undefined
+  photo: string
+  name: string
+  amount: string
+  note: string
+  status: string
+}
 
 function index() {
   const [data, setData] = useState([])
@@ -23,12 +34,19 @@ function index() {
   const { handleError } = useErrorHandling()
   const [isRequestWithdraw, setIsRequestWithdraw] = useState<boolean>(false)
   const auth = useAuth()
+  const [modalData, setModalData] = useState<modalData>({
+    id: undefined,
+    photo: '',
+    name: '',
+    amount: '',
+    note: '',
+    status: ''
+  })
 
-  // temporary for now, get only donations
-  const { getDonations } = TransactionsService()
+  const { getWithdrawals } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['donations', pageSize, page],
-    queryFn: () => getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize } }),
+    queryKey: ['transactionEarnings', pageSize, page],
+    queryFn: () => getWithdrawals({ data: { with: 'user' }}),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -36,7 +54,7 @@ function index() {
       setPage(data.current_page)
     },
     onError: (e: any) => {
-      handleError(e, `getDonations() transactions/commissions/index.tsx`)
+      handleError(e, `getWithdrawals() transactions/commissions/index.tsx`)
     }
   })
 
@@ -47,14 +65,12 @@ function index() {
       flex: 1,
       minWidth: 170,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username
-    },
-    {
-      field: 'site name',
-      headerName: TranslateString('Site Name'),
-      minWidth: 150,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.sites?.name
+      valueGetter: (params: GridRenderCellParams) => params.row?.user?.username,
+      renderCell: (params: GridRenderCellParams) =>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <Avatar src={FILE_SERVER_URL + params.row?.user?.photo} />
+          <Typography variant='subtitle2'>{params.row?.user?.username}</Typography>
+        </Stack>
     },
     {
       field: 'amount',
@@ -63,20 +79,14 @@ function index() {
       align: 'center',
       minWidth: 110,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount
+      valueGetter: (params: GridRenderCellParams) => params.row?.amount
     },
     {
-      field: 'payment method',
-      headerName: TranslateString('Payment Method'),
-      headerAlign: 'center',
-      align: 'center',
-      minWidth: 150,
+      field: 'note',
+      headerName: TranslateString('Note'),
+      minWidth: 200,
       sortable: true,
-      renderCell: () => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {/* {params.row.users.username} */} Deposit
-        </Typography>
-      )
+      valueGetter: (params: GridRenderCellParams) => params.row?.note,
     },
     {
       field: 'request date',
@@ -99,7 +109,11 @@ function index() {
       align: 'center',
       minWidth: 120,
       sortable: true,
-      renderCell: () => <Typography color='green'>{/* {params.row.users.username} */} Approved</Typography>
+      valueGetter: (params: GridRenderCellParams) => params.row?.status,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography color={params.row?.status === 'Approved' ? 'green' : params.row?.status === 'Declined' ? 'red' : 'default'}>
+          {params.row?.status}
+        </Typography>
     },
     {
       field: 'approved by',
@@ -108,7 +122,7 @@ function index() {
       align: 'center',
       minWidth: 140,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.customers?.username
+      valueGetter: (params: GridRenderCellParams) => params.row?.customers?.amount
     },
     {
       field: 'view',
@@ -117,9 +131,20 @@ function index() {
       align: 'center',
       minWidth: 70,
       sortable: false,
-      renderCell: () => 
+      renderCell: (params: GridRenderCellParams) => 
         <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-          <Button onClick={() => {setIsRequestWithdraw(false); setOpen(true)}}>
+          <Button onClick={() => {
+            setIsRequestWithdraw(false)
+            setOpen(true)
+            setModalData({
+              id: params.row?.id,
+              photo: FILE_SERVER_URL + params.row?.user?.photo,
+              name: params.row?.user?.username,
+              amount: params.row?.amount,
+              note: params.row?.note,
+              status: params.row?.status
+            })
+          }}>
             <Icon fontSize={30} icon='mdi:eye' color='98A9BC' />
           </Button>
         </Box>
@@ -145,7 +170,7 @@ function index() {
           </Stack>
         }
       </Transaction>
-      {open ? <WithdrawModal isRequestWithdraw={isRequestWithdraw} open={open} setOpen={setOpen} /> : null}
+      {open ? <WithdrawModal data={modalData} isRequestWithdraw={isRequestWithdraw} open={open} setOpen={setOpen} /> : null}
     </>
   )
 }
