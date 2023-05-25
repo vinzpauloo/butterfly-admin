@@ -310,11 +310,9 @@ const Navigation = (): VerticalNavItemsType => {
           path: '/wallet'
         },
         {
-          title: 'Security Funds'
+          title: 'Security/Withdrawal',
+          path: '/funds-withdrawal'
         },
-        {
-          title: 'Withdrawals'
-        }
       ]
     }
   ]

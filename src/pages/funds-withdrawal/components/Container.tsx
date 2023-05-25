@@ -1,8 +1,10 @@
+// ** React Imports
 import React from 'react'
 
-import { Box, Card, Grid, CardContent } from '@mui/material'
+// ** MUI Imports
+import { Box, Card, Grid } from '@mui/material'
 
-function Container({ children }: any) {
+const Container = ({ children }: any) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -18,9 +20,7 @@ function Container({ children }: any) {
               }
             ]}
           >
-            <CardContent>
-              {children}
-            </CardContent>
+            {children}
           </Box>
         </Card>
       </Grid>
