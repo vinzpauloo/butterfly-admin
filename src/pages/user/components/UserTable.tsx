@@ -94,12 +94,13 @@ const UserTable = () => {
   const operatorColumns = OperatorColumns()
   const superAgentColumns = SuperAgentColumns()
   const contentCreatorColumns = ContentCreatorColumns()
-  const columnsMap = new Map([
-    ['operators', operatorColumns],
-    ['superagent', superAgentColumns],
-    ['contentcreators', contentCreatorColumns]
-  ])
-  const filteredColumns: any = columnsMap.get(columnType) ?? []
+
+  // const columnsMap = new Map([
+  //   ['operators', operatorColumns],
+  //   ['superagent', superAgentColumns],
+  //   ['contentcreators', contentCreatorColumns]
+  // ])
+  // const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   // ** Service/Hooks
   const { getUsers } = UserTableService()
@@ -212,7 +213,7 @@ const UserTable = () => {
       <Grid item xs={12}>
         <Card>
           <UserTabs />
-          <DataGrid
+          {/* <DataGrid
             page={activeTab === 'SUPERVISOR' ? supervisorPage - 1 : activeTab === 'SA' ? saPage - 1 : ccPage - 1}
             disableColumnMenu
             loading={isLoading || isRefetching}
@@ -253,7 +254,7 @@ const UserTable = () => {
               }
             }}
             sx={{ padding: 0 }}
-          />
+          /> */}
           {/* CREATE Drawers */}
           {/* <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
           <SADrawer

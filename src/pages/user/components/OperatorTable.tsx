@@ -12,8 +12,9 @@ import UserTableToolbar from './UserTableToolbar'
 import SupervisorDrawer from './drawer/SupervisorDrawer'
 import EditSupervisorDrawer from './drawer/EditSupervisorDrawer'
 import { OperatorColumns } from '@/data/OperatorColumns'
-import { SuperAgentColumns } from '@/data/SuperAgentColumns'
-import { ContentCreatorColumns } from '@/data/ContentCreatorColumns'
+
+// import { SuperAgentColumns } from '@/data/SuperAgentColumns'
+// import { ContentCreatorColumns } from '@/data/ContentCreatorColumns'
 
 // ** Hooks/Services
 import { UserTableService } from '../../../services/api/UserTableService'
@@ -35,7 +36,8 @@ const OperatorTable = () => {
     role,
     setRole,
     roleId,
-    columnType,
+
+    // columnType,
     setColumnType,
     rowCount,
     setRowCount,
@@ -76,14 +78,15 @@ const OperatorTable = () => {
 
   // ** Columns for DataGrid
   const operatorColumns = OperatorColumns()
-  const superAgentColumns = SuperAgentColumns()
-  const contentCreatorColumns = ContentCreatorColumns()
-  const columnsMap = new Map([
-    ['OPERATIONS', operatorColumns],
-    ['superagent', superAgentColumns],
-    ['contentcreators', contentCreatorColumns]
-  ])
-  const filteredColumns: any = columnsMap.get(columnType) ?? []
+
+  // const superAgentColumns = SuperAgentColumns()
+  // const contentCreatorColumns = ContentCreatorColumns()
+  // const columnsMap = new Map([
+  //   ['OPERATIONS', operatorColumns],
+  //   ['superagent', superAgentColumns],
+  //   ['contentcreators', contentCreatorColumns]
+  // ])
+  // const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   // ** Service/Hooks
   const { getUsers } = UserTableService()
@@ -165,8 +168,7 @@ const OperatorTable = () => {
     },
     onError: (e: any) => {
       handleError(e, `getUsers() UserTable.tsx`)
-    },
-    enabled: !initialLoad
+    }
   })
 
   const handleSortModel = (newModel: GridSortModel) => {
@@ -197,7 +199,7 @@ const OperatorTable = () => {
         onSortModelChange={handleSortModel}
         autoHeight
         rows={rowData ?? []}
-        columns={filteredColumns}
+        columns={operatorColumns}
         pageSize={pageSize || 10}
         pagination
         onPageChange={handlePageChange}

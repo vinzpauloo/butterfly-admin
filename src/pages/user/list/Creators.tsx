@@ -11,8 +11,9 @@ import UserTableToolbar from '../components/UserTableToolbar'
 // ** Project/Other Imports
 import CCDrawer from '../components/drawer/CCDrawer'
 import EditCreatorDrawer from '../components/drawer/EditCreatorDrawer'
-import { OperatorColumns } from '@/data/OperatorColumns'
-import { SuperAgentColumns } from '@/data/SuperAgentColumns'
+
+// import { OperatorColumns } from '@/data/OperatorColumns'
+// import { SuperAgentColumns } from '@/data/SuperAgentColumns'
 import { ContentCreatorColumns } from '@/data/ContentCreatorColumns'
 
 // ** Hooks/Services
@@ -35,7 +36,8 @@ const Creators = () => {
     role,
     setRole,
     roleId,
-    columnType,
+
+    // columnType,
     setColumnType,
     rowCount,
     setRowCount,
@@ -75,15 +77,7 @@ const Creators = () => {
   }))
 
   // ** Columns for DataGrid
-  const operatorColumns = OperatorColumns()
-  const superAgentColumns = SuperAgentColumns()
   const contentCreatorColumns = ContentCreatorColumns()
-  const columnsMap = new Map([
-    ['operators', operatorColumns],
-    ['superagent', superAgentColumns],
-    ['contentcreators', contentCreatorColumns]
-  ])
-  const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   // ** Service/Hooks
   const { getUsers } = UserTableService()
@@ -164,8 +158,7 @@ const Creators = () => {
     },
     onError: (e: any) => {
       handleError(e, `getUsers() UserTable.tsx`)
-    },
-    enabled: !initialLoad
+    }
   })
 
   const handleSortModel = (newModel: GridSortModel) => {
@@ -194,7 +187,7 @@ const Creators = () => {
         onSortModelChange={handleSortModel}
         autoHeight
         rows={rowData ?? []}
-        columns={filteredColumns}
+        columns={contentCreatorColumns}
         pageSize={pageSize || 10}
         pagination
         onPageChange={handlePageChange}
