@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import { Box, Button } from '@mui/material'
+import { Avatar, Box, Button, Stack, Typography } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query'
 import TransactionsService from '@/services/api/Transactions'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 import formatDate from '@/utils/formatDate'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 function index() {
   const [data, setData] = useState([])
@@ -19,13 +20,12 @@ function index() {
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
 
-  const { getCommissions } = TransactionsService()
+  const { getWorkPurchases } = TransactionsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['commissions', pageSize, page],
+    queryKey: ['workPurchases', pageSize, page],
     queryFn: () =>
-      getCommissions({
+      getWorkPurchases({
         data: {
-          select: 'id,role,transaction_type,gold_amount,status,created_at',
           page: page,
           paginate: pageSize
         }
@@ -43,48 +43,66 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'role',
-      headerName: TranslateString('Role'),
-      flex: 0.15,
-      minWidth: 110,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.role
-    },
-    {
-      field: 'transaction type',
-      headerName: TranslateString('Transaction Type'),
-      headerAlign: 'center',
-      align: 'center',
-      flex: 0.15,
-      minWidth: 170,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.transaction_type
-    },
-    {
-      field: 'gold amount',
-      headerName: TranslateString('Gold Amount'),
-      headerAlign: 'center',
-      align: 'center',
+      field: 'creator',
+      headerName: TranslateString('Creator'),
       flex: 0.15,
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.gold_amount
+      valueGetter: (params: GridRenderCellParams) => params.row?.creator,
+      renderCell: (params: GridRenderCellParams) =>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <Avatar src={FILE_SERVER_URL + params.row?.creator_photo} />
+          <Typography variant='subtitle2'>{params.row?.creator}</Typography>
+        </Stack>
     },
     {
-      field: 'status',
-      headerName: TranslateString('Status'),
+      field: 'customer',
+      headerName: TranslateString('Customer'),
+      flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.customer?.username,
+      renderCell: (params: GridRenderCellParams) =>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <Avatar src={FILE_SERVER_URL + params.row?.customer?.photo} />
+          <Typography variant='subtitle2'>{params.row?.customer?.username}</Typography>
+        </Stack>
+    },
+    {
+      field: 'coin amount',
+      headerName: TranslateString('Coin Amount'),
       headerAlign: 'center',
       align: 'center',
-      flex: 0.15,
-      minWidth: 110,
+      flex: 0.1,
+      minWidth: 100,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.status
+      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount
+    },
+    {
+      field: 'coin balance',
+      headerName: TranslateString('Coin Balance'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.1,
+      minWidth: 100,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.coin_balance
+    },
+    {
+      field: 'coin_partner_share',
+      headerName: TranslateString('Coin Partner Share'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.12,
+      minWidth: 120,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.coin_partner_share + '%'
     },
     {
       field: 'date created',
       headerName: TranslateString('Date Created'),
-      flex: 0.25,
-      minWidth: 200,
+      flex: 0.17,
+      minWidth: 170,
       sortable: true,
       valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
     },
