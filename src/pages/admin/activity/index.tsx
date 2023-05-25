@@ -12,4 +12,9 @@ const ActivityLogs = () => {
   )
 }
 
+ActivityLogs.acl = {
+  action: 'read',
+  subject: 'sa-page'
+}
+
 export default ActivityLogs

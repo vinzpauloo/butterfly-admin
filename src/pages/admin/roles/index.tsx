@@ -19,10 +19,11 @@ import {
   FormControlLabel,
   Checkbox,
   TableBody,
-  DialogActions
+  DialogActions,
+  CircularProgress
 } from '@mui/material'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import Container from '@/pages/components/Container'
 
@@ -46,70 +47,33 @@ import { useErrorHandling } from '@/hooks/useErrorHandling'
 import RolesService from '@/services/api/RolesService'
 
 import { FaSquare, FaCheckSquare, FaMinusSquare } from 'react-icons/fa'
-import { IoMdArrowDropright } from 'react-icons/io'
+import { IoMdArrowDropright, IoMdMore } from 'react-icons/io'
 import TreeView, { flattenTree } from 'react-accessible-treeview'
 import cx from 'classnames'
 
-const rolesArr: string[] = [
-  'Dashboard',
-  'Admin Management',
-  'Super Agents Management',
-  'Content Creators Management',
-  'Customers Management',
-  'Transactions',
-  'Reports',
-  'Studio',
-  'Mobile App',
-  'Site Settings',
-  'Settings',
-  'Profile',
-  'Chat'
-]
-
-const folder = {
-  name: '',
-  children: [
-    {
-      name: 'Fruits',
-      children: [{ name: 'Avocados' }, { name: 'Bananas' }, { name: 'Berries' }, { name: 'Oranges' }, { name: 'Pears' }]
-    },
-    {
-      name: 'Drinks',
-      children: [
-        { name: 'Apple Juice' },
-        { name: 'Chocolate' },
-        { name: 'Coffee' },
-        {
-          name: 'Tea',
-          children: [{ name: 'Black Tea' }, { name: 'Green Tea' }, { name: 'Red Tea' }, { name: 'Matcha' }]
-        }
-      ]
-    },
-    {
-      name: 'Vegetables',
-      children: [{ name: 'Beets' }, { name: 'Carrots' }, { name: 'Celery' }, { name: 'Lettuce' }, { name: 'Onions' }]
-    }
-  ]
-}
-
-const data = flattenTree(folder)
-
-function MultiSelectCheckboxControlled() {
-  const [selectedIds, setSelectedIds] = useState<number[]>([2, 5, 16])
+const MultiSelectCheckboxControlled = ({ dataAbilities, selectedIds, setSelectedIds, initialSelectedIds }: any) => {
+  const tempAbilityTree = {
+    name: '',
+    children: dataAbilities
+  }
+  const abilityTree = flattenTree(tempAbilityTree)
 
   return (
     <div className='checkbox'>
       <TreeView
-        data={data}
+        data={abilityTree}
         aria-label='Checkbox tree'
         multiSelect
-        selectedIds={selectedIds}
+        selectedIds={initialSelectedIds}
         defaultExpandedIds={[1]}
         propagateSelect
         propagateSelectUpwards
         togglableSelect
-        onSelect={props => console.log('onSelect callback: ', props)}
-        onNodeSelect={props => console.log('onNodeSelect callback: ', props)}
+        onSelect={props => {
+          const selected = Array.from(props.treeState.selectedIds)
+          setSelectedIds(selected)
+        }}
+        // onNodeSelect={props => console.log('onNodeSelect callback: ', props)}
         nodeRenderer={({
           element,
           isBranch,
@@ -130,7 +94,7 @@ function MultiSelectCheckboxControlled() {
                 opacity: isDisabled ? 0.5 : 1
               }}
             >
-              {isBranch && <ArrowIcon isOpen={isExpanded} />}
+              {isBranch ? <ArrowIcon isOpen={isExpanded} /> : <IoMdMore className={'arrow'} />}
               <CheckBoxIcon
                 className='checkbox-icon'
                 onClick={(e: any) => {
@@ -139,9 +103,7 @@ function MultiSelectCheckboxControlled() {
                 }}
                 variant={isHalfSelected ? 'some' : isSelected ? 'all' : 'none'}
               />
-              <span className='name'>
-                {element.name}-{element.id}
-              </span>
+              <span className='name'>{element.name}</span>
             </div>
           )
         }}
@@ -169,7 +131,7 @@ const CheckBoxIcon = ({ variant, ...rest }: any) => {
   }
 }
 
-const Header = ({ searchName, setSearchName, setOpen, setDialogTitle }: any) => {
+const Header = ({ searchName, setSearchName, setOpen, setDialogTitle, setIsEditing }: any) => {
   // ** Auth Hook
   const auth = useAuth()
 
@@ -208,6 +170,7 @@ const Header = ({ searchName, setSearchName, setOpen, setDialogTitle }: any) => 
           onClick={() => {
             handleClickOpen()
             setDialogTitle('Add')
+            setIsEditing(false)
           }}
         >
           Add Role
@@ -217,12 +180,19 @@ const Header = ({ searchName, setSearchName, setOpen, setDialogTitle }: any) => 
   )
 }
 
-const CustomTable = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount }: any) => {
-  // ** States
-  const [editVideoOpen, setEditVideoOpen] = React.useState<boolean>(false)
-  const [editVideoRow, setEditVideoRow] = React.useState<IVideoRow>()
-  const toggleEditVideoDrawer = () => setEditVideoOpen(!editVideoOpen)
-
+const CustomTable = ({
+  data,
+  isLoading,
+  setPage,
+  pageSize,
+  setPageSize,
+  rowCount,
+  setOpen,
+  setDialogTitle,
+  setActiveRoleId,
+  setIsEditing
+}: any) => {
+  // ** Hooks
   const TranslateString = useTranslateString()
 
   const columnData = [
@@ -274,17 +244,21 @@ const CustomTable = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount
       field: 'action',
       headerName: TranslateString('Action'),
       sortable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <Icon
-          onClick={() => {
-            setEditVideoRow({ ...params.row }) // pass the row value to state
-            toggleEditVideoDrawer()
-          }}
-          icon='mdi:edit-outline'
-          fontSize={20}
-          cursor='pointer'
-        />
-      )
+      renderCell: (params: GridRenderCellParams) => {
+        return params.row.id > 5 ? (
+          <Icon
+            onClick={() => {
+              setOpen(true)
+              setDialogTitle('Edit')
+              setActiveRoleId(params.row.id)
+              setIsEditing(true)
+            }}
+            icon='mdi:edit-outline'
+            fontSize={20}
+            cursor='pointer'
+          />
+        ) : null
+      }
     }
   ]
 
@@ -324,134 +298,188 @@ const CustomTable = ({ data, isLoading, setPage, pageSize, setPageSize, rowCount
   )
 }
 
-const CustomDialog = ({ open, setOpen, dialogTitle }: any) => {
+const CustomDialog = ({
+  open,
+  setOpen,
+  dialogTitle,
+  dataAbilities,
+  page,
+  pageSize,
+  debouncedName,
+  activeRoleId,
+  setActiveRoleId,
+  isEditing
+}: any) => {
   // ** States
-  const [selectedCheckbox, setSelectedCheckbox] = useState<string[]>([])
-  const [isIndeterminateCheckbox, setIsIndeterminateCheckbox] = useState<boolean>(false)
+  const [initialSelectedIds, setInitialSelectedIds] = useState<number[]>([])
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [roleName, setRoleName] = useState<string>('')
+  const [roleNameError, setRoleNameError] = useState<boolean>(false)
+  const [selectedIdsError, setSelectedIdsError] = useState<boolean>(false)
+
+  // ** Hooks
+  const auth = useAuth()
+  const queryClient = useQueryClient()
+  const { handleError } = useErrorHandling()
+
+  // ** Services
+  const { getSingleRole, postRole, putRole } = RolesService()
+
+  // ** API
+  // Fetching of single role by role id
+  const { isLoading: isLoadingSingleRole, isRefetching: isRefetchingSingleRole } = useQuery({
+    queryKey: ['singleRole', activeRoleId],
+    queryFn: () => getSingleRole(activeRoleId),
+    onSuccess: data => {
+      console.log('success getSingleRole', data)
+      // setActiveRoleId(0)
+
+      // Prepare initial selected menu IDs
+      const mappedAbilities = data.abilities.map((ability: any) => {
+        return ability.id
+      })
+
+      // Set initial values
+      setRoleName(data.name)
+      setSelectedIds(mappedAbilities)
+      setInitialSelectedIds(mappedAbilities)
+    },
+    onError: (e: any) => {
+      handleError(e, `getSingleRole() admin/roles/index.tsx`)
+    },
+    enabled: !!activeRoleId
+  })
+
+  const { mutate: mutateAddRole, isLoading: isLoadingMutateAddRole } = useMutation(postRole, {
+    onSuccess: data => {
+      console.log('mutateAddRole success', data)
+      queryClient.invalidateQueries({
+        queryKey: ['roles', page, pageSize, debouncedName]
+      })
+
+      // Close modal
+      setOpen(false)
+    },
+    onError: error => {
+      console.log('mutateAddRole error', error)
+    }
+  })
+
+  const { mutate: mutateUpdateRole, isLoading: isLoadingMutateUpdateRole } = useMutation(putRole, {
+    onSuccess: data => {
+      console.log('mutateUpdateRole success', data)
+      queryClient.invalidateQueries({
+        queryKey: ['roles', page, pageSize, debouncedName]
+      })
+
+      // Close modal
+      setOpen(false)
+    },
+    onError: error => {
+      console.log('mutateUpdateRole error', error)
+    }
+  })
+
+  // ** Events
+  const validateInput = () => {
+    if (roleName === '') {
+      setRoleNameError(true)
+      return false
+    }
+
+    if (selectedIds.length == 0) {
+      setSelectedIdsError(true)
+      return false
+    }
+
+    return true
+  }
 
   const handleSubmit = () => {
-    console.log('selectedCheckbox', selectedCheckbox)
+    if (validateInput()) {
+      const newRoleData = {
+        name: roleName,
+        abilities: selectedIds,
+        ...(auth.user && auth.user.partner_id && { partner_id: auth.user.partner_id })
+      }
+
+      console.log('newRoleData', newRoleData)
+      console.log('isEditing', isEditing)
+
+      // Condition whether add new role or update a role
+      isEditing ? mutateUpdateRole({ body: newRoleData, id: activeRoleId }) : mutateAddRole(newRoleData)
+    }
   }
 
   const handleClose = () => {
     setOpen(false)
-    setSelectedCheckbox([])
-    setIsIndeterminateCheckbox(false)
+    setSelectedIds([])
   }
 
-  const togglePermission = (id: string) => {
-    const arr = selectedCheckbox
-    if (selectedCheckbox.includes(id)) {
-      arr.splice(arr.indexOf(id), 1)
-      setSelectedCheckbox([...arr])
-    } else {
-      arr.push(id)
-      setSelectedCheckbox([...arr])
-    }
-  }
-
-  const handleSelectAllCheckbox = () => {
-    if (isIndeterminateCheckbox) {
-      setSelectedCheckbox([])
-    } else {
-      rolesArr.forEach(row => {
-        const id = row.toLowerCase().split(' ').join('-')
-        // togglePermission(`${id}-read`)
-        // togglePermission(`${id}-write`)
-        // togglePermission(`${id}-create`)
-        togglePermission(`${id}`)
-      })
-    }
-  }
+  const isAddingOrUpdating = (activeRoleId && isLoadingSingleRole) || isRefetchingSingleRole || isLoadingMutateAddRole
 
   useEffect(() => {
-    if (selectedCheckbox.length > 0 && selectedCheckbox.length < rolesArr.length * 3) {
-      setIsIndeterminateCheckbox(true)
-    } else {
-      setIsIndeterminateCheckbox(false)
+    if (!open) {
+      // Reset fields
+      setRoleName('')
+      setInitialSelectedIds([])
+      setSelectedIds([])
+      setRoleNameError(false)
+      setSelectedIdsError(false)
+      setActiveRoleId(0)
     }
-  }, [selectedCheckbox])
+  }, [open])
 
   return (
     <Dialog fullWidth maxWidth='sm' scroll='body' onClose={handleClose} open={open}>
-      <DialogTitle sx={{ textAlign: 'center' }}>
-        <Typography variant='h5' component='span'>
-          {`${dialogTitle} Role`}
-        </Typography>
-        <Typography variant='body2'>Set Role Permissions</Typography>
-      </DialogTitle>
-      <DialogContent sx={{ p: { xs: 6, sm: 12 } }}>
-        <Box sx={{ my: 4 }}>
-          <FormControl fullWidth>
-            <TextField label='Role Name' placeholder='Enter Role Name' />
-          </FormControl>
-        </Box>
-        <Typography variant='h6'>Role Permissions</Typography>
-        <MultiSelectCheckboxControlled />
-        {/* UI from Materio Template */}
-        {/* 
-        <TableContainer>
-          <Table size='small'>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ pl: '0 !important' }}>
-                  <FormControlLabel
-                    label='Select All'
-                    sx={{ '& .MuiTypography-root': { textTransform: 'capitalize' } }}
-                    control={
-                      <Checkbox
-                        size='small'
-                        onChange={handleSelectAllCheckbox}
-                        indeterminate={isIndeterminateCheckbox}
-                        checked={selectedCheckbox.length === rolesArr.length * 3}
-                      />
-                    }
-                  />
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rolesArr.map((i: string, index: number) => {
-                const id = i.toLowerCase().split(' ').join('-')
+      {isAddingOrUpdating && <CircularProgress sx={styles.loaderStyle} color='primary' size={64} />}
 
-                return (
-                  <TableRow key={index} sx={{ '& .MuiTableCell-root:first-of-type': { pl: '0 !important' } }}>
-                    <TableCell>
-                      <FormControlLabel
-                        label={i}
-                        sx={{
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                          color: theme => `${theme.palette.text.primary} !important`
-                        }}
-                        control={
-                          <Checkbox
-                            size='small'
-                            id={`${id}`}
-                            onChange={() => togglePermission(`${id}`)}
-                            checked={selectedCheckbox.includes(`${id}`)}
-                          />
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        */}
-      </DialogContent>
-      <DialogActions sx={{ pt: 0, display: 'flex', justifyContent: 'center' }}>
-        <Box className='demo-space-x'>
-          <Button size='large' type='submit' variant='contained' onClick={handleSubmit}>
-            Submit
-          </Button>
-          <Button size='large' color='secondary' variant='outlined' onClick={handleClose}>
-            Cancel
-          </Button>
-        </Box>
-      </DialogActions>
+      <Box style={isAddingOrUpdating ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}>
+        <DialogTitle sx={{ textAlign: 'center' }}>
+          <Typography variant='h5' component='span'>
+            {`${dialogTitle} Role`}
+          </Typography>
+          <Typography variant='body2'>Set Role Permissions</Typography>
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 6, sm: 12 } }}>
+          <Box sx={{ my: 4 }}>
+            <FormControl fullWidth>
+              <TextField
+                label='Role Name'
+                placeholder='Enter Role Name'
+                value={roleName}
+                onChange={e => {
+                  setRoleName(e.target.value)
+                  setRoleNameError(false)
+                }}
+                error={roleNameError}
+              />
+            </FormControl>
+          </Box>
+          <Typography variant='h6'>Role Permissions</Typography>
+          <MultiSelectCheckboxControlled
+            dataAbilities={dataAbilities}
+            selectedIds={selectedIds}
+            setSelectedIds={setSelectedIds}
+            initialSelectedIds={initialSelectedIds}
+          />
+          {selectedIdsError && (
+            <Typography variant='body2' color='error' mt={5}>
+              Please select at least 1 role permission.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ pt: 0, display: 'flex', justifyContent: 'center' }}>
+          <Box className='demo-space-x'>
+            <Button size='large' type='submit' variant='contained' onClick={handleSubmit}>
+              Submit
+            </Button>
+            <Button size='large' color='secondary' variant='outlined' onClick={handleClose}>
+              Cancel
+            </Button>
+          </Box>
+        </DialogActions>
+      </Box>
     </Dialog>
   )
 }
@@ -464,10 +492,11 @@ function index() {
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
-  const [postStatus, setPostStatus] = useState<'Approved' | 'Pending' | 'Declined'>('Approved')
+  const [activeRoleId, setActiveRoleId] = useState(0)
+  const [isEditing, setIsEditing] = useState<boolean>(false)
 
   const { handleError } = useErrorHandling()
-  const { getAllRoles } = RolesService()
+  const { getAllRoles, getAbilities } = RolesService()
 
   const [searchName, setSearchName] = useState('')
   const debouncedName = useDebounce(searchName, 1000)
@@ -479,7 +508,7 @@ function index() {
   }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['videosList', page, pageSize, debouncedName, postStatus],
+    queryKey: ['roles', page, pageSize, debouncedName],
     queryFn: () =>
       getAllRoles({
         page,
@@ -491,10 +520,21 @@ function index() {
       setRowCount(data.total)
       setPageSize(data.per_page)
       setPage(data.current_page)
-      console.log('@@@', data)
+      console.log('success getAllRoles', data)
     },
     onError: (e: any) => {
-      handleError(e, `getAllVideos() video-list/table/TableVideos.tsx`)
+      handleError(e, `getAllRoles() admin/roles/index.tsx`)
+    }
+  })
+
+  const { data: dataAbilities } = useQuery({
+    queryKey: ['abilities'],
+    queryFn: () => getAbilities(),
+    onSuccess: data => {
+      console.log('success getAbilities', data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getAbilities() admin/roles/index.tsx`)
     }
   })
 
@@ -506,6 +546,7 @@ function index() {
           setSearchName={setSearchName}
           setOpen={setOpen}
           setDialogTitle={setDialogTitle}
+          setIsEditing={setIsEditing}
         />
         <CustomTable
           data={data}
@@ -514,8 +555,23 @@ function index() {
           pageSize={pageSize}
           setPageSize={setPageSize}
           rowCount={rowCount}
+          setOpen={setOpen}
+          setDialogTitle={setDialogTitle}
+          setActiveRoleId={setActiveRoleId}
+          setIsEditing={setIsEditing}
         />
-        <CustomDialog open={open} setOpen={setOpen} dialogTitle={dialogTitle} />
+        <CustomDialog
+          open={open}
+          setOpen={setOpen}
+          dialogTitle={dialogTitle}
+          dataAbilities={dataAbilities}
+          page={page}
+          pageSize={pageSize}
+          debouncedName={debouncedName}
+          activeRoleId={activeRoleId}
+          setActiveRoleId={setActiveRoleId}
+          isEditing={isEditing}
+        />
       </Container>
     </>
   )
@@ -527,3 +583,15 @@ index.acl = {
 }
 
 export default index
+
+const styles = {
+  loaderStyle: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    margin: 'auto',
+    zIndex: 1
+  }
+}
