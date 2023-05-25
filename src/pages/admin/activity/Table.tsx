@@ -2,7 +2,6 @@
 import React, { useEffect, ChangeEvent } from 'react'
 
 // ** MUI Imports
-import { Typography } from '@mui/material'
 import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
 // ** Custom Table Components Imports
@@ -11,9 +10,6 @@ import UserTableToolbar from '@/pages/user/components/UserTableToolbar'
 // ** Project/Other Imports
 import CCDrawer from '@/pages/user/components/drawer/CCDrawer'
 import EditCreatorDrawer from '@/pages/user/components/drawer/EditCreatorDrawer'
-import { OperatorColumns } from '@/data/OperatorColumns'
-import { SuperAgentColumns } from '@/data/SuperAgentColumns'
-import { ContentCreatorColumns } from '@/data/ContentCreatorColumns'
 
 // ** Hooks/Services
 import { UserTableService } from '@/services/api/UserTableService'
@@ -24,7 +20,7 @@ import { useErrorHandling } from '@/hooks/useErrorHandling'
 import { useQuery } from '@tanstack/react-query'
 
 // ** Zustand State Management
-import { useUserTableStore } from '@/zustand/userTableStore'
+import { useActivityLogsStore } from '@/zustand/activityLogsStore'
 
 import { CustomerColumns } from '@/data/CustomerColumns'
 
@@ -36,7 +32,6 @@ const ActivityLogsTable = () => {
     role,
     setRole,
     roleId,
-    columnType,
     setColumnType,
     rowCount,
     setRowCount,
@@ -67,29 +62,19 @@ const ActivityLogsTable = () => {
     setSaPage,
     setCcPage,
     setOpenDrawer
-  } = useUserTableStore()
+  } = useActivityLogsStore()
 
-  const { handlePageChange, handleSearch, handleDrawerToggle } = useUserTableStore(state => ({
+  const { handlePageChange, handleSearch, handleDrawerToggle } = useActivityLogsStore(state => ({
     handlePageChange: state.handlePageChange,
     handleSearch: state.handleSearch,
     handleDrawerToggle: state.handleDrawerToggle
   }))
 
+  // ** Columns for DataGrid
   const { columns } = CustomerColumns()
 
-  // ** Columns for DataGrid
-  const operatorColumns = OperatorColumns()
-  const superAgentColumns = SuperAgentColumns()
-  const contentCreatorColumns = ContentCreatorColumns()
-  const columnsMap = new Map([
-    ['operators', operatorColumns],
-    ['superagent', superAgentColumns],
-    ['contentcreators', contentCreatorColumns]
-  ])
-  const filteredColumns: any = columnsMap.get(columnType) ?? []
-
   // ** Service/Hooks
-  const { getUsers, getAllCustomers } = UserTableService()
+  const { getAllCustomers } = UserTableService()
   const { handleError } = useErrorHandling()
   const debouncedUsername = useDebounce(searchValue, 1000)
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
@@ -194,7 +179,7 @@ const ActivityLogsTable = () => {
         onSortModelChange={handleSortModel}
         autoHeight
         rows={rowData ?? []}
-        getRowId={(row: any) => row?._id}
+        getRowId={(row: any) => row?._id || row?.id}
         columns={columns}
         pageSize={pageSize || 10}
         pagination

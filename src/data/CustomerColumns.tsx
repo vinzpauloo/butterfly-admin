@@ -52,7 +52,6 @@ export const CustomerColumns = () => {
 
       field: 'gender',
       headerName: `Gender`
-      //   renderCell: (params: any) => <div>{params?.row.feed_details.type} </div>
     },
     {
       flex: 0.02,
