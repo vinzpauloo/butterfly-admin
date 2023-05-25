@@ -9,7 +9,8 @@ import formatDate from '@/utils/formatDate'
 import Container from '@/pages/components/Container'
 import CustomToolbar from '../components/CustomToolbar'
 import ReportsHeader from '../components/ReportsHeader'
-import { reportsTimespanStore } from '../../../zustand/reportsTimespanStore'
+import { reportsHeaderStore } from '../../../zustand/reportsHeaderStore'
+import format from 'date-fns/format'
 
 function index() {
   const [data, setData] = useState([])
@@ -18,17 +19,19 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-  const [timespan] = reportsTimespanStore((state) => [state.timespan])
+  const [timespan, fromDate, toDate] = reportsHeaderStore((state) => [state.timespan, state.fromDate, state.toDate])
 
   const { getReportsCommissions } = ReportsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['reportsCommissions', pageSize, page, timespan],
+    queryKey: ['reportsCommissions', pageSize, page, timespan, fromDate, toDate],
     queryFn: () =>
       getReportsCommissions({
         data: {
           report: true,
           timespan: timespan,
           select: 'id,transaction_type,status,gold_amount,role,new_gold_balance,created_at',
+          from: format(fromDate, 'yyyy-MM-dd'),
+          to: format(toDate, 'yyyy-MM-dd'),
           page: page,
           paginate: pageSize
         }

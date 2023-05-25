@@ -9,7 +9,8 @@ import formatDate from '@/utils/formatDate'
 import Container from '@/pages/components/Container'
 import CustomToolbar from '../components/CustomToolbar'
 import ReportsHeader from '../components/ReportsHeader'
-import { reportsTimespanStore } from '../../../zustand/reportsTimespanStore'
+import { reportsHeaderStore } from '../../../zustand/reportsHeaderStore'
+import format from 'date-fns/format'
 
 function index() {
   const [data, setData] = useState([])
@@ -18,17 +19,19 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-  const [timespan] = reportsTimespanStore((state) => [state.timespan])
+  const [timespan, fromDate, toDate] = reportsHeaderStore((state) => [state.timespan, state.fromDate, state.toDate])
 
   const { getReportsCustomerTransaction } = ReportsService()
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['reportsGoldCoinBundle', pageSize, page, timespan],
+    queryKey: ['reportsGoldCoinBundle', pageSize, page, timespan, fromDate, toDate],
     queryFn: () =>
       getReportsCustomerTransaction({
         data: {
           report: true,
           timespan: timespan,
           select: 'id,transaction_type,bundle_name,customer_username,agent_username,amount,created_at',
+          from: format(fromDate, 'yyyy-MM-dd'),
+          to: format(toDate, 'yyyy-MM-dd'),
           search_by: 'transaction_type',
           search_value: 'coins',
           page: page,
