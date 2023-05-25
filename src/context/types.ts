@@ -22,6 +22,7 @@ export type UserDataType = {
   avatar?: string | null
   photo?: string
   site?: number
+  partner_id?: number
 }
 
 export type AuthValuesType = {
@@ -77,7 +78,7 @@ export interface IFeedStory {
   videos: {
     url: string
   }
-  type? : string
+  type?: string
 }
 
 export interface IImages {
@@ -115,9 +116,9 @@ export interface IVideoRow {
   description: string
   endTimeSeconds: number
   filename: string
-  has_own_trial : boolean
+  has_own_trial: boolean
   full: {}
-  full_video_hls : string
+  full_video_hls: string
   full_upload_url: string
   full_video_uid: string
   tags: string[]
