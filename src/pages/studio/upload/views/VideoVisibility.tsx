@@ -95,6 +95,7 @@ const VideoVisibility = () => {
   const [workVideo, setWorkVideo] = React.useState<string | null>(null)
   const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
   const [videoTypeUploaded, setVideoTypeUploaded] = React.useState<'full_video' | 'trial_video'>('full_video')
+  const [batchFinalized, setBatchFinalized] = React.useState<boolean>(false)
 
   // ** SERVICES CALLS
   const { uploadVideoURL } = VideoService()
@@ -262,9 +263,14 @@ const VideoVisibility = () => {
       }
     }
 
+    const eventBatchFinalized = (batch : any, options : any) => {
+      setBatchFinalized(true)
+    }
+
     uploadyContext.on(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
     uploadyContext.on(UPLOADER_EVENTS.REQUEST_PRE_SEND, eventPreSend)
     uploadyContext.on(UPLOADER_EVENTS.BATCH_START, eventBatchStart)
+    uploadyContext.on(UPLOADER_EVENTS.BATCH_FINALIZE, eventBatchFinalized)
 
     return () => {
       uploadyContext.off(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
@@ -587,6 +593,7 @@ const VideoVisibility = () => {
 
                     <Box>
                       <Button
+                        disabled={ !batchFinalized ? true : false }
                         onClick={() => {
                           dummyNavigate()
                         }}
