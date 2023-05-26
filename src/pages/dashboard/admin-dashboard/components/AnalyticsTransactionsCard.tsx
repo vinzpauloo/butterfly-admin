@@ -31,7 +31,7 @@ interface ResponseProps {
 
 const Data = () => {
   const router = useRouter()
-  const { getTopDonation, getTotalSecurityFunds } = NewDashboardService()
+  const { getTopDonation, getTotalSecurityFunds, getTotalWorkPurchases } = NewDashboardService()
 
   const [topDonation, setTopDonation] = useState<ResponseProps[]>([])
   const [totalSecurityFunds, setTotalSecurityFunds] = useState<any>()
@@ -62,6 +62,16 @@ const Data = () => {
     }
   })
 
+  const { data, isLoading } = useQuery({
+    queryKey: [`getTotalWorkPurchases`],
+    queryFn: () =>
+      getTotalWorkPurchases({
+        params: {
+          sum: `coin_amount`
+        }
+      })
+  })
+
   const salesData: DataType[] = [
     {
       stats: topDonation[0]?.money_amount === undefined ? `Loading...` : `¥` + topDonation[0]?.money_amount,
@@ -79,13 +89,17 @@ const Data = () => {
       icon: <Icon icon='mdi:account-outline' onClick={() => router.push(`/transactions/security-funds`)} />
     },
     {
-      stats: '1.54k',
+      stats:
+        data === undefined || isLoading ? `Loading...` : `¥` + new Intl.NumberFormat('en-US').format(data.slice(0, 10)),
       color: 'warning',
       title: 'Withdrawals',
-      icon: <Icon icon='mdi:cellphone-link' onClick={() => router.push(`/transactions/withdrawals`)} />
+      icon: <Icon icon='mdi:cellphone-link' onClick={() => router.push(`/transactions/withdrawal`)} />
     },
     {
-      stats: '$88k',
+      stats:
+        totalSecurityFunds === undefined
+          ? `Loading...`
+          : `¥` + new Intl.NumberFormat('en-US').format(totalSecurityFunds.slice(0, 10)),
       color: 'info',
       title: 'Work Purchases',
       icon: <Icon icon='mdi:currency-usd' onClick={() => router.push(`/transactions/work-purchases`)} />
@@ -105,7 +119,7 @@ const renderStats = () => {
           variant='rounded'
           color={item.color}
           sx={{
-            mr: 3,
+            mr: 2,
             boxShadow: 3,
             width: 44,
             height: 44,

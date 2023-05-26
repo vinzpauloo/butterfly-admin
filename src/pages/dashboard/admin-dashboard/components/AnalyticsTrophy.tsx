@@ -21,10 +21,10 @@ import { FILE_SERVER_URL } from '@/lib/baseUrls'
 // ** Styles Components
 const TrophyImg = styled('img')({
   width: '100%',
-  height: '620px',
+  height: '100%',
   position: 'absolute',
   objectFit: 'cover',
-  objectPosition: 'center',
+  objectPosition: 'right',
   zIndex: 1,
   top: 0
 })

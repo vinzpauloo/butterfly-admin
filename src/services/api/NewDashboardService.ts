@@ -19,6 +19,13 @@ interface DashboardParams {
   site_id?: string
   max?: string
   sum?: string
+  paginate?: string
+  with?: string
+  purchases?: string
+  daily?: string
+  select?: string
+  from?: string
+  to?: string
 }
 
 export const NewDashboardService = () => {
@@ -48,5 +55,25 @@ export const NewDashboardService = () => {
   const getTotalSecurityFunds = (props: BaseProps<DashboardData, DashboardParams>) =>
     apiRequest(`admin/security/funds`, `GET`, props.params)
 
-  return { getTopCreatorWorkShare, getTopDonation, getTotalSecurityFunds }
+  const getSecurityFundsRanking = (props: BaseProps<DashboardData, DashboardParams>) =>
+    apiRequest(`admin/sites`, `GET`, props.params)
+
+  const getTopDonators = (props: BaseProps<DashboardData, DashboardParams>) =>
+    apiRequest(`admin/customers`, `GET`, props.params)
+
+  const getTotalWorkPurchases = (props: BaseProps<DashboardData, DashboardParams>) =>
+    apiRequest(`admin/works/purchases`, `GET`, props.params)
+
+  const getNewUsers = (props: BaseProps<DashboardData, DashboardParams>) =>
+    apiRequest(`admin/customers`, `GET`, props.params)
+
+  return {
+    getTopCreatorWorkShare,
+    getTopDonation,
+    getTotalSecurityFunds,
+    getSecurityFundsRanking,
+    getTopDonators,
+    getTotalWorkPurchases,
+    getNewUsers
+  }
 }
