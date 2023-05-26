@@ -25,7 +25,7 @@ const statusObj: StatusObj = {
 export const ActivityLogsColumns = () => {
   const columns = [
     {
-      flex: 0.02,
+      flex: 0.0,
       minWidth: 150,
       field: 'user',
       headerName: 'Username',
@@ -34,7 +34,7 @@ export const ActivityLogsColumns = () => {
       }
     },
     {
-      flex: 0.02,
+      flex: 0.01,
       minWidth: 150,
       field: 'mobile',
       headerName: 'Mobile Number',
@@ -44,7 +44,7 @@ export const ActivityLogsColumns = () => {
     },
     {
       flex: 0.02,
-      minWidth: 150,
+      minWidth: 200,
       field: 'email',
       headerName: 'Email Address',
       valueGetter: (params: any) => {
@@ -52,14 +52,14 @@ export const ActivityLogsColumns = () => {
       }
     },
     {
-      flex: 0.02,
-      minWidth: 150,
+      flex: 0.03,
+      minWidth: 250,
       field: 'description',
       headerName: `Description`
     },
     {
-      flex: 0.03,
-      minWidth: 200,
+      flex: 0.02,
+      minWidth: 150,
       field: 'created_at',
       headerName: `Date Created`,
       valueFormatter: (params: any) => {
@@ -67,8 +67,8 @@ export const ActivityLogsColumns = () => {
       }
     },
     {
-      flex: 0.03,
-      minWidth: 200,
+      flex: 0.02,
+      minWidth: 150,
       field: 'updated_at',
       headerName: `Last Updated`,
       valueFormatter: (params: any) => {
