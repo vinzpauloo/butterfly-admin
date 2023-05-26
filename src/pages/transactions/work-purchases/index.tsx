@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import { Avatar, Box, Button, Stack, Typography } from '@mui/material'
+import { Autocomplete, Avatar, Box, Button, Stack, TextField, Typography } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useTranslateString } from '@/utils/TranslateString'
@@ -13,6 +13,9 @@ import formatDate from '@/utils/formatDate'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 function index() {
+  const [contentCreator, setContentCreator] = useState<string | null>('')
+  const [customer, setCustomer] = useState<string | null>('')
+  const [sitename, setSiteName] = useState<string | null>('')
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
@@ -41,10 +44,16 @@ function index() {
     }
   })
 
+  const handleClear = () => {
+    setContentCreator('')
+    setCustomer('')
+    setSiteName('')
+  }
+
   const columnData: GridColDef[] = [
     {
-      field: 'creator',
-      headerName: TranslateString('Creator'),
+      field: 'content creator',
+      headerName: TranslateString('Content Creator'),
       flex: 0.15,
       minWidth: 150,
       sortable: true,
@@ -123,20 +132,58 @@ function index() {
     }
   ]
 
+  const fakeCCList = ['KimiNoLiyan', 'MamaKatsu', 'AriyanaNoJowa', 'JokkakeUdon']
+  const fakeCustomerList = ['miguel26', 'MamaKatsu', 'AriyanaNoJowa', 'JokkakeUdon']
+  const fakeSiteList = ['Butterfly-Vlog', 'Cornhub-Vlog', 'Phil Corn', '69420-Vlog']
+
   return (
-    <>
-      <Transaction
-        title='Work Purchases'
-        isLoading={isLoading}
-        isFetching={isFetching}
-        rowData={data}
-        columnData={columnData}
-        rowCount={rowCount}
-        pageSize={pageSize}
-        setPage={setPage}
-        setPageSize={setPageSize}
-      />
-    </>
+    <Transaction
+      title='Work Purchases'
+      isLoading={isLoading}
+      isFetching={isFetching}
+      rowData={data}
+      columnData={columnData}
+      rowCount={rowCount}
+      pageSize={pageSize}
+      setPage={setPage}
+      setPageSize={setPageSize}
+    >
+      <Stack direction={['column', 'column', 'row']} gap={2.5} mb={5}>
+        <Autocomplete
+          sx={{ width: 200 }}
+          disablePortal
+          clearOnBlur={false}
+          options={fakeCCList}
+          value={contentCreator}
+          onChange={(event, value) => setContentCreator(value)}
+          onInputChange={(event, value) => setContentCreator(value)}
+          renderInput={(params) => <TextField {...params} label='Content Creator' size='small'/>}
+        />
+        <Autocomplete
+          sx={{ width: 200 }}
+          disablePortal
+          clearOnBlur={false}
+          options={fakeCustomerList}
+          value={customer}
+          onChange={(event, value) => setCustomer(value)}
+          onInputChange={(event, value) => setCustomer(value)}
+          renderInput={(params) => <TextField {...params} label='Customer' size='small'/>}
+        />
+        <Autocomplete
+          sx={{ width: 200 }}
+          disablePortal
+          clearOnBlur={false}
+          options={fakeSiteList}
+          value={sitename}
+          onChange={(event, value) => setSiteName(value)}
+          onInputChange={(event, value) => setSiteName(value)}
+          renderInput={(params) => <TextField {...params} label='Site Name' size='small'/>}
+        />
+        <Button variant='contained' color='error' onClick={handleClear}>
+          {TranslateString('Clear')}
+        </Button>
+      </Stack>
+    </Transaction>
   )
 }
 

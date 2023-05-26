@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from 'react'
 
-import { Stack, Button, OutlinedInput, Typography } from '@mui/material'
+import { Stack, Button, OutlinedInput, Typography, Autocomplete, TextField } from '@mui/material'
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { useQuery } from '@tanstack/react-query'
 
@@ -32,9 +32,9 @@ const useDebounce = (value: any, delay: number) => {
 function index() {
   const { handleError } = useErrorHandling()
 
-  const [contentCreator, setContentCreator] = useState('')
-  const [customer, setCustomer] = useState('')
-  const [sitename, setSiteName] = useState('')
+  const [contentCreator, setContentCreator] = useState<string | null>('')
+  const [customer, setCustomer] = useState<string | null>('')
+  const [sitename, setSiteName] = useState<string | null>('')
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
@@ -132,6 +132,8 @@ function index() {
     }
   ]
 
+  const fakeList = ['fakelist1', 'fakelist2', 'fakelist3', 'fakelist4']
+
   return (
     <Transaction
       title='Donations'
@@ -144,24 +146,36 @@ function index() {
       setPage={setPage}
       setPageSize={setPageSize}
     >
-      <Stack direction={['column', 'row', 'row']} gap={2.5} alignItems={['flex-start','center']} mb={5}>
-        <OutlinedInput
-          placeholder='Content Creator'
-          size='small'
+      <Stack direction={['column', 'row', 'row']} gap={2.5} alignItems={['flex-start', 'center']} mb={5}>
+        <Autocomplete
+          sx={{ width: 200 }}
+          disablePortal
+          clearOnBlur={false}
+          options={fakeList}
           value={contentCreator}
-          onChange={e => setContentCreator(e.target.value)}
+          onChange={(event, value) => setContentCreator(value)}
+          onInputChange={(event, value) => setContentCreator(value)}
+          renderInput={(params) => <TextField {...params} label='Content Creator' size='small' />}
         />
-        <OutlinedInput
-          placeholder='Customer'
-          size='small'
+        <Autocomplete
+          sx={{ width: 200 }}
+          disablePortal
+          clearOnBlur={false}
+          options={fakeList}
           value={customer}
-          onChange={e => setCustomer(e.target.value)}
+          onChange={(event, value) => setCustomer(value)}
+          onInputChange={(event, value) => setCustomer(value)}
+          renderInput={(params) => <TextField {...params} label='Customer' size='small' />}
         />
-        <OutlinedInput
-          placeholder='Sitename'
-          size='small'
+        <Autocomplete
+          sx={{ width: 200 }}
+          disablePortal
+          clearOnBlur={false}
+          options={fakeList}
           value={sitename}
-          onChange={e => setSiteName(e.target.value)}
+          onChange={(event, value) => setSiteName(value)}
+          onInputChange={(event, value) => setSiteName(value)}
+          renderInput={(params) => <TextField {...params} label='Site Name' size='small' />}
         />
         <Button variant='contained' color='error' sx={{ width: 100 }} onClick={handleClear}>
           {TranslateString('Clear')}
