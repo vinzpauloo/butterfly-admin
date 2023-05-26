@@ -305,7 +305,7 @@ const CustomDialog = ({
   dataAbilities,
   page,
   pageSize,
-  debouncedName,
+  debouncedSearchName,
   activeRoleId,
   setActiveRoleId,
   isEditing
@@ -354,7 +354,7 @@ const CustomDialog = ({
     onSuccess: data => {
       console.log('mutateAddRole success', data)
       queryClient.invalidateQueries({
-        queryKey: ['roles', page, pageSize, debouncedName]
+        queryKey: ['roles', page, pageSize, debouncedSearchName]
       })
 
       // Close modal
@@ -369,7 +369,7 @@ const CustomDialog = ({
     onSuccess: data => {
       console.log('mutateUpdateRole success', data)
       queryClient.invalidateQueries({
-        queryKey: ['roles', page, pageSize, debouncedName]
+        queryKey: ['roles', page, pageSize, debouncedSearchName]
       })
 
       // Close modal
@@ -499,20 +499,21 @@ function index() {
   const { getAllRoles, getAbilities } = RolesService()
 
   const [searchName, setSearchName] = useState('')
-  const debouncedName = useDebounce(searchName, 1000)
+  const debouncedSearchName = useDebounce(searchName, 1000)
 
   const filterParams = () => {
-    const name = !!searchName && { name: searchName }
+    const name = !!searchName && { search_by: 'name', search_value: searchName }
 
     return { ...name }
   }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['roles', page, pageSize, debouncedName],
+    queryKey: ['roles', page, pageSize, debouncedSearchName],
     queryFn: () =>
       getAllRoles({
         page,
         paginate: pageSize,
+        with: 'abilities',
         ...filterParams()
       }),
     onSuccess: data => {
@@ -567,7 +568,7 @@ function index() {
           dataAbilities={dataAbilities}
           page={page}
           pageSize={pageSize}
-          debouncedName={debouncedName}
+          debouncedSearchName={debouncedSearchName}
           activeRoleId={activeRoleId}
           setActiveRoleId={setActiveRoleId}
           isEditing={isEditing}
