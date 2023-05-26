@@ -53,14 +53,6 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'site id',
-      headerName: TranslateString('Site ID'),
-      flex: 0.1,
-      minWidth: 50,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.site_id
-    },
-    {
       field: 'site name',
       headerName: TranslateString('Site Name'),
       flex: 0.15,

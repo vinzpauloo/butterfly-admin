@@ -7,6 +7,7 @@ interface UsersData {
     role?: string
     role_id?: any
     page?: number
+    paginate?: number
     sort?: any
     sort_by?: string
     search_by?: string
