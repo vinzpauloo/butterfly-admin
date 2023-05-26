@@ -31,7 +31,7 @@ interface ResponseProps {
 
 const Data = () => {
   const router = useRouter()
-  const { getTopDonation, getTotalSecurityFunds, getTotalWorkPurchases } = NewDashboardService()
+  const { getDashboardDonations, getDashboardSecurityFunds, getDashboardWorkPurchases } = NewDashboardService()
 
   const [topDonation, setTopDonation] = useState<ResponseProps[]>([])
   const [totalSecurityFunds, setTotalSecurityFunds] = useState<any>()
@@ -40,7 +40,7 @@ const Data = () => {
   useQuery({
     queryKey: [`getTopDonation`],
     queryFn: () =>
-      getTopDonation({
+      getDashboardDonations({
         params: {
           max: `coin_amount`
         }
@@ -53,7 +53,7 @@ const Data = () => {
   useQuery({
     queryKey: [`getTotalSecurityFunds`],
     queryFn: () =>
-      getTotalSecurityFunds({
+      getDashboardSecurityFunds({
         params: {
           sum: `balance`
         }
@@ -66,7 +66,7 @@ const Data = () => {
   useQuery({
     queryKey: [`getTotalWorkPurchases`],
     queryFn: () =>
-      getTotalWorkPurchases({
+      getDashboardWorkPurchases({
         params: {
           sum: `coin_amount`
         }

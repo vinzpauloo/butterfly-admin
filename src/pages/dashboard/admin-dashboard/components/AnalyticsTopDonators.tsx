@@ -120,15 +120,15 @@ const Divider = styled(MuiDivider)<DividerProps>(({ theme }) => ({
 }))
 
 const AnalyticsTopDonators = () => {
-  const { getTopDonators } = NewDashboardService()
+  const { getDashboardCustomers } = NewDashboardService()
   const router = useRouter()
 
-  const [response, setReponse] = useState<[]>([])
+  const [response, setResponse] = useState<[]>([])
 
   useQuery({
     queryKey: [`getTopDonators`],
     queryFn: () =>
-      getTopDonators({
+      getDashboardCustomers({
         params: {
           sort: `desc`,
           sort_by: `coins`,
@@ -136,7 +136,7 @@ const AnalyticsTopDonators = () => {
         }
       }),
     onSuccess: (data: any) => {
-      setReponse(data?.data)
+      setResponse(data?.data)
     }
   })
 

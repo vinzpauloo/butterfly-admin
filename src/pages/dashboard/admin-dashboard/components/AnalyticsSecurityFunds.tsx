@@ -17,13 +17,13 @@ import { FILE_SERVER_URL } from '@/lib/baseUrls'
 const AnalyticsSecurityFunds = () => {
   const router = useRouter()
 
-  const { getSecurityFundsRanking } = NewDashboardService()
+  const { getDashboardSites } = NewDashboardService()
   const [response, setResponse] = useState<[]>([])
 
   useQuery({
     queryKey: [`getSecurityFundsRanking`],
     queryFn: () =>
-      getSecurityFundsRanking({
+      getDashboardSites({
         params: {
           sort: 'desc',
           sort_by: 'security_funds_balance'
@@ -104,7 +104,9 @@ const AnalyticsSecurityFunds = () => {
                         color: item?.security_funds_balance <= 0 ? `error.main` : `success.main`
                       }}
                     >
-                      {`¥` + new Intl.NumberFormat('en-US').format(item.security_funds_balance.slice(0, 10))}
+                      {item?.security_funds_balance
+                        ? `¥` + new Intl.NumberFormat('en-US').format(item.security_funds_balance.slice(0, 10))
+                        : `¥ 0`}
                     </Typography>
                   </Box>
                 </Box>

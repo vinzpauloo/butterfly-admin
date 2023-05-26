@@ -24,14 +24,14 @@ const AnalyticsNewUsers = () => {
   // ** Hook
   const theme = useTheme()
 
-  const { getNewUsers } = NewDashboardService()
+  const { getDashboardCustomers } = NewDashboardService()
 
   const [response, setResponse] = useState<ResponseProps[]>([])
 
   useQuery({
     queryKey: [`getNewUsers`],
     queryFn: () =>
-      getNewUsers({
+      getDashboardCustomers({
         params: {
           daily: `true`,
           select: `total_active,total_new_vip,total_new_guest,created_at`,
@@ -44,11 +44,16 @@ const AnalyticsNewUsers = () => {
     }
   })
 
-  const vipUsers = response.map(item => Number(item?.total_new_vip))
-  const guestUsers = response.map(
-    item => Number(item?.total_new_guest) / 2
-  ) /* Temporarily divides the data by 2 in order to produce the graph design */
-  const CreatedAt = response.map(item => formatDate(item?.created_at).slice(0, 10))
+  const vipUsers = response.length > 0 ? response?.map(item => Number(item?.total_new_vip)) : []
+  const guestUsers =
+    response.length > 0
+      ? response?.map(item => Number(item?.total_new_guest) / 2)
+      : [] /* Temporarily divides the data by 2 in order to produce the graph design */
+  const CreatedAt = response.length > 0 ? response?.map(item => formatDate(item?.created_at).slice(0, 10)) : []
+
+  // console.log(`vipUsers`, vipUsers)
+  // console.log(`GuestUsers`, guestUsers)
+  // console.log(`created at`, CreatedAt)
 
   const series = [
     {

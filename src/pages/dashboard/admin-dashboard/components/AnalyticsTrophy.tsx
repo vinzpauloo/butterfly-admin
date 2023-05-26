@@ -46,7 +46,7 @@ interface ResponseProps {
 }
 
 const AnalyticsTrophy = () => {
-  const { getTopCreatorWorkShare } = NewDashboardService()
+  const { getDashboardUsers } = NewDashboardService()
   const router = useRouter()
   const { handleError } = useErrorHandling()
 
@@ -55,7 +55,7 @@ const AnalyticsTrophy = () => {
   useQuery({
     queryKey: [`TopCreatorWorkShare`],
     queryFn: () =>
-      getTopCreatorWorkShare({
+      getDashboardUsers({
         params: {
           role: `CC`,
           sort: `desc`,
