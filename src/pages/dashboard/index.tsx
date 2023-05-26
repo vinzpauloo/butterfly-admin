@@ -2,10 +2,10 @@
 import { useAuth } from '@/services/useAuth'
 
 // ** Project/Other Imports
-import OperatorDashboard from './components/operator/Operator'
 import DashboardAgent from './agentDashboard'
 import DashboardSuperAgent from './superAgentDashboard'
 import CreatorDashboard from './components/creator/Creator'
+import AdminDashboard from './admin-dashboard'
 
 const Dashboard = () => {
   const auth = useAuth()
@@ -13,7 +13,7 @@ const Dashboard = () => {
   if (auth?.user?.role === 'AGENT') return <DashboardAgent />
   else if (auth?.user?.role === 'SA') return <DashboardSuperAgent />
   else if (auth?.user?.role === 'CC') return <CreatorDashboard />
-  else return <OperatorDashboard />
+  else return <AdminDashboard />
 }
 
 Dashboard.acl = {

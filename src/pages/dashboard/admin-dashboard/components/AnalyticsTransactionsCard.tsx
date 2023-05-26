@@ -35,6 +35,7 @@ const Data = () => {
 
   const [topDonation, setTopDonation] = useState<ResponseProps[]>([])
   const [totalSecurityFunds, setTotalSecurityFunds] = useState<any>()
+  const [totalWorkPurchases, setTotalWorkPurchases] = useState<any>()
 
   useQuery({
     queryKey: [`getTopDonation`],
@@ -62,14 +63,17 @@ const Data = () => {
     }
   })
 
-  const { data, isLoading } = useQuery({
+  useQuery({
     queryKey: [`getTotalWorkPurchases`],
     queryFn: () =>
       getTotalWorkPurchases({
         params: {
           sum: `coin_amount`
         }
-      })
+      }),
+    onSuccess: (data: any) => {
+      setTotalWorkPurchases(data)
+    }
   })
 
   const salesData: DataType[] = [
@@ -90,7 +94,9 @@ const Data = () => {
     },
     {
       stats:
-        data === undefined || isLoading ? `Loading...` : `¥` + new Intl.NumberFormat('en-US').format(data.slice(0, 10)),
+        totalWorkPurchases === undefined
+          ? `Loading...`
+          : `¥` + new Intl.NumberFormat('en-US').format(totalWorkPurchases.slice(0, 10)),
       color: 'warning',
       title: 'Withdrawals',
       icon: <Icon icon='mdi:cellphone-link' onClick={() => router.push(`/transactions/withdrawal`)} />
