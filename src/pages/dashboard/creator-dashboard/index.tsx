@@ -32,7 +32,7 @@ const NewCreatorDashboard = () => {
           <CardStatsCharacter />
         </Grid>
         <Grid item xs={12} sm={6} md={3} sx={{ pt: theme => `${theme.spacing(12.25)} !important` }}>
-          {/* <CardStatisticsCharacter data={data[1]} /> */}
+          <CardStatsCharacter />
         </Grid>
         <Grid item xs={12} md={6}>
           <CrmTransactions />
