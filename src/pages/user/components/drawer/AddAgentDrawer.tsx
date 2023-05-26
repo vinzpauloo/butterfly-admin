@@ -199,7 +199,7 @@ const AddAgentDrawer = (props: SidebarAddUserType) => {
                     width='100%'
                     controllerName='username'
                     control={control}
-                    placeholder='Entired Desired Username'
+                    placeholder='Enter Desired Username'
                     variant='outlined'
                     fullWidth={true}
                     error={!!errors.username}
