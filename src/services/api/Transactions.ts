@@ -12,9 +12,9 @@ interface ITransaction {
     with?: string
     page?: number
     paginate?: number
-    user_username?: string
-    customer_username?: string
-    site_name?: string
+    user_username?: string | null
+    customer_username?: string | null
+    site_name?: string | null
     select?: string
     search_by?: string
     search_value?: string

@@ -2,14 +2,14 @@
 import React, { useState } from 'react'
 
 // ** MUI Imports
-import { Box, Typography, Button, Stack, IconButton } from '@mui/material'
+import { Box, Typography, Button, Stack, IconButton, MenuItem, Select, SelectChangeEvent, InputLabel } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
 // ** Project/Other Imports
 import AnnouncementModal from '../components/modal/AnnouncementModal'
-import Translations from '../../../layouts/components/Translations'
+import { useTranslateString } from '@/utils/TranslateString'
 import Container from '@/pages/components/Container'
 import ToggleButton from '@/pages/user/components/button/ToggleButton'
 
@@ -26,8 +26,9 @@ const Announcements = () => {
   // const [rowCount, setRowCount] = useState<number>(0)
   // const [page, setPage] = useState<number>(1)
 
+  const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en')
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [data, setData] = useState([])
@@ -140,17 +141,17 @@ const Announcements = () => {
 
   const columns: GridColDef[] = [
     { field: 'site_id', headerName: 'Site ID', minWidth: 100, flex: 0.03, sortable: false },
-    { field: 'title', renderHeader: () => <Translations text='Title' />, minWidth: 150, flex: 0.08, sortable: false },
+    { field: 'title', headerName: TranslateString('Title'), minWidth: 150, flex: 0.08, sortable: false },
     {
       field: 'description',
-      renderHeader: () => <Translations text='Description' />,
+      headerName: TranslateString('Description'),
       minWidth: 200,
       flex: 0.15,
       sortable: false
     },
     {
       field: 'start_date',
-      renderHeader: () => <Translations text='Start Date' />,
+      headerName: TranslateString('Start Date'),
       minWidth: 120,
       flex: 0.03,
       sortable: false,
@@ -158,7 +159,7 @@ const Announcements = () => {
     },
     {
       field: 'end_date',
-      renderHeader: () => <Translations text='End Date' />,
+      headerName: TranslateString('End Date'),
       minWidth: 120,
       flex: 0.03,
       sortable: false,
@@ -167,7 +168,7 @@ const Announcements = () => {
     },
     {
       field: 'active',
-      renderHeader: () => <Translations text='Active' />,
+      headerName: TranslateString('Active'),
       minWidth: 85,
       flex: 0.02,
       sortable: false,
@@ -180,7 +181,7 @@ const Announcements = () => {
     },
     {
       field: 'action',
-      renderHeader: () => <Translations text='Action' />,
+      headerName: TranslateString('Action'),
       minWidth: 90,
       flex: 0.025,
       sortable: false,
@@ -211,29 +212,23 @@ const Announcements = () => {
 
   return (
     <Container>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: {
-            xs: '',
-            sm: 'center'
-          },
-          justifyContent: 'space-between',
-          mb: 5,
-          flexDirection: {
-            xs: 'column',
-            sm: 'row'
-          }
-        }}
-      >
-        <Typography variant='h4' component='h4'>
-          Announcements
-        </Typography>
-
+      <Stack direction={['column', 'row']} mb={5} alignItems={['flex-start','flex-end']} gap={4} justifyContent='space-between'>
+        <Typography variant='h4' component='h4'>Announcements</Typography>
+        <Box sx={{ width: 200 }}>
+          <InputLabel>Language</InputLabel>
+          <Select
+            size='small'
+            fullWidth value={selectedLanguage}
+            onChange={(event: SelectChangeEvent) => setSelectedLanguage(event.target.value)}
+          >
+            <MenuItem value='en'>English</MenuItem>
+            <MenuItem value='zh_cn'>中国語</MenuItem>
+          </Select>
+        </Box>
         <Button variant='contained' onClick={handleOpen}>
-          + <Translations text='Add New Announcements' />
+          + {TranslateString('Add New Announcements')}
         </Button>
-      </Box>
+      </Stack>
 
       <DataGrid
         disableColumnMenu
