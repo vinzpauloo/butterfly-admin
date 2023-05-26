@@ -10,6 +10,7 @@ interface IUserParams {
     _method?: 'put'
     select?: 'username,photo'
     with?: string
+    role?: string
 
     //updating user
     username?: string
@@ -24,6 +25,20 @@ interface IUserParams {
 
 const UserService = () => {
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+
+  const getUsersList = (params: IUserParams) => {
+    return request({
+      headers: {
+        ...getHeaders(),
+        'ngrok-skip-browser-warning': '69420', // only for dev
+        Authorization: `Bearer ${accessToken}`,
+        "Accept": "application/json",
+      },
+      url: "/users",
+      method: "GET",
+      params: params.data
+    });
+  }; 
 
   const getUser = (params: IUserParams) => {
     return request({
@@ -84,7 +99,7 @@ const UserService = () => {
     });
   };
 
-  return { getUser, updateUser, getUserFollowers, getUserDonators }
+  return { getUsersList, getUser, updateUser, getUserFollowers, getUserDonators }
 }
 
 export default UserService
