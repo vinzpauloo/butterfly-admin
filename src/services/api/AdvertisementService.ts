@@ -14,7 +14,8 @@ interface IAdvertisementParams {
 		end_date?: string | null
 		active?: number
 		_method?: string
-		language?: string,
+		language?: string
+		locale?: string
 	},
 	token?: string
 }
