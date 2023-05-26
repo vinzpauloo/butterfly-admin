@@ -52,7 +52,6 @@ const Advertisements = () => {
           {TranslateString('Advertisement')}
         </Typography>
         <Box sx={{ width: 200 }}>
-          {/* <Typography>Language</Typography> */}
           <Select
             size='small'
             fullWidth value={selectedLanguage}
