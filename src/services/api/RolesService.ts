@@ -10,6 +10,8 @@ interface IRoleParams {
   page?: number
   paginate?: number
   with?: string
+  search_by?: string
+  search_value?: string
 }
 
 interface INewRoleData {

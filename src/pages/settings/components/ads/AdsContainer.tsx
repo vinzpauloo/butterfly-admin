@@ -2,7 +2,7 @@ import React from 'react'
 import { ImageList, Button, Stack } from '@mui/material'
 import AdsItem from './AdsItem'
 import { adsGlobalStore } from '../../../../zustand/adsGlobalStore'
-import Translations from '@/layouts/components/Translations'
+import { useTranslateString } from '@/utils/TranslateString'
 
 type Props = {
   containerID: string
@@ -12,6 +12,7 @@ type Props = {
 }
 
 const AdsContainer = (props: Props) => {
+  const TranslateString = useTranslateString()
 
   // subscribe to ads global store
   const [
@@ -67,7 +68,9 @@ const AdsContainer = (props: Props) => {
           />
         )}
       </ImageList>
-      <Button sx={{ mt: 4, textTransform: "uppercase", width: customWidht }} variant="contained" onClick={openModalCreatingNewAds}><Translations text="Add More" /></Button>
+      <Button sx={{ mt: 4, textTransform: "uppercase", width: customWidht }} variant="contained" onClick={openModalCreatingNewAds}>
+        {TranslateString('Add More')}
+      </Button>
     </Stack>
   )
 }

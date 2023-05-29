@@ -40,9 +40,9 @@ function index() {
   const [customerList, setCustomerList] = useState<string []>([])
   const [siteList, setSiteList] = useState<string []>([])
   
-  const [contentCreator, setContentCreator] = useState<string | null>('')
-  const [customer, setCustomer] = useState<string | null>('')
-  const [sitename, setSiteName] = useState<string | null>('')
+  const [contentCreator, setContentCreator] = useState<string | null>(null)
+  const [customer, setCustomer] = useState<string | null>(null)
+  const [sitename, setSiteName] = useState<string | null>(null)
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
@@ -53,22 +53,31 @@ function index() {
   const { getAllCustomers } = UserTableService()
   const TranslateString = useTranslateString()
 
-  const filterParams = () => {
-    const userUsername = !!contentCreator && { user_username: contentCreator }
-    const customerUsername = !!customer && { customer_username: customer }
-    const siteName = !!sitename && { site_name: sitename }
+  // const filterParams = () => {
+  //   const userUsername = !!contentCreator && { user_username: contentCreator }
+  //   const customerUsername = !!customer && { customer_username: customer }
+  //   const siteName = !!sitename && { site_name: sitename }
 
-    return { ...userUsername, ...customerUsername, ...siteName }
-  }
+  //   return { ...userUsername, ...customerUsername, ...siteName }
+  // }
 
-  const debouncedContentCreator = useDebounce(contentCreator, 1000)
-  const debouncedCustomer = useDebounce(customer, 1000)
-  const debouncedSitename = useDebounce(sitename, 1000)
+  // const debouncedContentCreator = useDebounce(contentCreator, 1000)
+  // const debouncedCustomer = useDebounce(customer, 1000)
+  // const debouncedSitename = useDebounce(sitename, 1000)
 
   const { isLoading, isFetching } = useQuery({
-    queryKey: ['donations', debouncedContentCreator, debouncedCustomer, debouncedSitename, pageSize, page],
+    queryKey: ['donations', contentCreator, customer, sitename, pageSize, page],
     queryFn: () =>
-      getDonations({ data: { with: 'users,customers,sites', page: page, paginate: pageSize, ...filterParams() } }),
+      getDonations({
+        data: {
+          user_username: contentCreator,
+          customer_username: customer,
+          site_name: sitename,
+          with: 'users,customers,sites',
+          page: page,
+          paginate: pageSize,
+        }
+      }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)
@@ -214,7 +223,8 @@ function index() {
           options={CCList}
           value={contentCreator}
           onChange={(event, value) => setContentCreator(value)}
-          onInputChange={(event, value) => setContentCreator(value)}
+          
+          // onInputChange={(event, value) => setContentCreator(value)}
           renderInput={(params) => <TextField {...params} label='Content Creator' size='small' />}
         />
         <Autocomplete
@@ -224,7 +234,8 @@ function index() {
           options={customerList}
           value={customer}
           onChange={(event, value) => setCustomer(value)}
-          onInputChange={(event, value) => setCustomer(value)}
+
+          // onInputChange={(event, value) => setCustomer(value)}
           renderInput={(params) => <TextField {...params} label='Customer' size='small' />}
         />
         <Autocomplete
@@ -234,7 +245,8 @@ function index() {
           options={siteList}
           value={sitename}
           onChange={(event, value) => setSiteName(value)}
-          onInputChange={(event, value) => setSiteName(value)}
+
+          // onInputChange={(event, value) => setSiteName(value)}
           renderInput={(params) => <TextField {...params} label='Site Name' size='small' />}
         />
         <Button variant='contained' color='error' sx={{ width: 100 }} onClick={handleClear}>

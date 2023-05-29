@@ -1,5 +1,5 @@
-import React from 'react'
-import { Box, Typography, Button, CircularProgress } from '@mui/material'
+import React, { useState } from 'react'
+import { Box, Typography, Button, CircularProgress, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import { convertToRaw } from 'draft-js'
 import { EditorProps } from 'react-draft-wysiwyg'
 import draftToHtml from 'draftjs-to-html'
@@ -21,7 +21,7 @@ type Props = {
 
 const EditorContainer = (props: Props) => {
   const { title, editorState, setEditorState, isLoading } = props
-
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en')
   const { handleError, getErrorResponse } = useErrorHandling()
 
   // Get QueryClient from the context
@@ -102,6 +102,17 @@ const EditorContainer = (props: Props) => {
       {isBeingLoadedOrUpdated ? <CircularProgress sx={styles.loaderStyle} /> : undefined}
       <Box>
         <Typography sx={styles.title}>{title}</Typography>
+        <Box sx={{ width: 200 }}>
+          <InputLabel>Language</InputLabel>
+          <Select
+            size='small'
+            fullWidth value={selectedLanguage}
+            onChange={(event: SelectChangeEvent) => setSelectedLanguage(event.target.value)}
+          >
+            <MenuItem value='en'>English</MenuItem>
+            <MenuItem value='zh_cn'>中国語</MenuItem>
+          </Select>
+        </Box>
       </Box>
       <Box>
         <Editor

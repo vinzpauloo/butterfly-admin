@@ -26,7 +26,7 @@ import format from 'date-fns/format'
 
 // ** Project/Other Imports
 import CustomInput from '@/layouts/components/shared-components/Picker/CustomPickerInput'
-import Translations from '@/layouts/components/Translations'
+import { useTranslateString } from '@/utils/TranslateString'
 import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
@@ -46,6 +46,8 @@ interface ModalProps {
 }
 
 const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
+  const TranslateString = useTranslateString()
+
   // subscribe to ads global store
   const [
     adsCategory,
@@ -221,7 +223,6 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
         data: {
           photo: selectedFile,
           url: newURLLink,
-
           start_date: format(newAdsStartDate, 'yyyy-MM-dd'),
           end_date: isDurationForever ? '' : format(newAdsEndDate, 'yyyy-MM-dd'),
           active: 1
@@ -264,13 +265,13 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
   })
 
   const isBeingAddedUpdatedDelete = addedLoading || updateLoading || deleteLoading
-
+ 
   return (
     <DatePickerWrapper>
       <Dialog open={props.isOpen} onClose={props.onClose}>
         <DialogContent sx={styles.dialogContent}>
           <DialogTitle sx={styles.title}>
-            <Translations text={adsCategory} /> <Translations text='Advertisement' />
+            {TranslateString(adsCategory)} {TranslateString('Advertisement')}
           </DialogTitle>
           {isBeingAddedUpdatedDelete ? <CircularProgress sx={styles.loaderStyle} color='primary' size={64} /> : null}
           <Box
@@ -278,7 +279,6 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
             style={isBeingAddedUpdatedDelete ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
           >
             <Box sx={styles.left}>
-              {/* {adsCategory === "Carousel" || adsCategory === "Video-Grid" ? <Switch disabled={isBeingAddedUpdatedDelete} /> : null} */}
               <Box
                 sx={styles.uploadContainer}
                 width={{ sm: '100%', md: adsWidth }}
@@ -302,7 +302,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
               <Stack>
                 <Typography textAlign='center'>
                   {' '}
-                  <Translations text='Recommended Size' />: {adsWidth * 1.25}x{adsHeight * 1.25}
+                  {TranslateString('Recommended Size')}: {adsWidth * 1.25}x{adsHeight * 1.25}
                 </Typography>
                 <Stack flexDirection='row' justifyContent='center' gap={{ xs: 4, md: 12 }} mt={4}>
                   {!isCreatingNewAds ? (
@@ -313,7 +313,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                       sx={{ width: 150, textTransform: 'uppercase' }}
                       onClick={deleteAdvertisement}
                     >
-                      <Translations text='Delete' />
+                      {TranslateString('Delete')}
                     </Button>
                   ) : null}
                   <Button
@@ -322,7 +322,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                     component='label'
                     sx={styles.uploadBtn}
                   >
-                    <Translations text={preview || adsPhotoURL ? 'Change' : 'Select'} /> <Translations text='Image' />
+                    {TranslateString(preview || adsPhotoURL ? 'Change' : 'Select')} {TranslateString('Image')}
                     <input onChange={handleFileInputChange} type='file' hidden />
                   </Button>
                 </Stack>
@@ -331,7 +331,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
             <Box sx={styles.right}>
               <Box>
                 <Typography>
-                  <Translations text='Start Date' />
+                  {TranslateString('Start Date')}
                 </Typography>
                 <DatePicker
                   dateFormat='dd/MM/yyyy'
@@ -346,7 +346,7 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
               <Box>
                 <Typography sx={isDurationForever ? { color: '#999' } : null}>
                   {' '}
-                  <Translations text='End Date' />
+                  {TranslateString('End Date')}
                 </Typography>
                 <DatePicker
                   dateFormat='dd/MM/yyyy'
@@ -365,13 +365,13 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
                         onChange={event => setIsDurationForever(event.target.checked)}
                       />
                     }
-                    label={<Translations text='Duration: Forever' />}
+                    label={TranslateString('Duration: Forever')}
                   />
                 </Stack>
               </Box>
               <Box>
                 <Typography>
-                  <Translations text='URL Link' />
+                  {TranslateString('URL Link')}
                 </Typography>
                 <TextField
                   fullWidth
@@ -387,14 +387,14 @@ const AdvertisementModal: React.FC<ModalProps> = (props: ModalProps) => {
               {getErrorResponse(12)}
               <Box sx={styles.bottomBtnWrapper}>
                 <Button sx={styles.bottomBtns} disabled={isBeingAddedUpdatedDelete} onClick={props.onClose}>
-                  <Translations text='Cancel' />
+                  {TranslateString('Cancel')}
                 </Button>
                 <Button
                   sx={styles.bottomBtns}
                   disabled={isBeingAddedUpdatedDelete}
                   onClick={isCreatingNewAds ? publishAdvertisement : editAdvertisement}
                 >
-                  <Translations text='Publish' />
+                  {TranslateString('Publish')}
                 </Button>
               </Box>
             </Box>

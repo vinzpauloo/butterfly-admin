@@ -31,15 +31,16 @@ interface ResponseProps {
 
 const Data = () => {
   const router = useRouter()
-  const { getTopDonation, getTotalSecurityFunds } = NewDashboardService()
+  const { getDashboardDonations, getDashboardSecurityFunds, getDashboardWorkPurchases } = NewDashboardService()
 
   const [topDonation, setTopDonation] = useState<ResponseProps[]>([])
   const [totalSecurityFunds, setTotalSecurityFunds] = useState<any>()
+  const [totalWorkPurchases, setTotalWorkPurchases] = useState<any>()
 
   useQuery({
     queryKey: [`getTopDonation`],
     queryFn: () =>
-      getTopDonation({
+      getDashboardDonations({
         params: {
           max: `coin_amount`
         }
@@ -52,13 +53,26 @@ const Data = () => {
   useQuery({
     queryKey: [`getTotalSecurityFunds`],
     queryFn: () =>
-      getTotalSecurityFunds({
+      getDashboardSecurityFunds({
         params: {
           sum: `balance`
         }
       }),
     onSuccess: (data: any) => {
       setTotalSecurityFunds(data)
+    }
+  })
+
+  useQuery({
+    queryKey: [`getTotalWorkPurchases`],
+    queryFn: () =>
+      getDashboardWorkPurchases({
+        params: {
+          sum: `coin_amount`
+        }
+      }),
+    onSuccess: (data: any) => {
+      setTotalWorkPurchases(data)
     }
   })
 
@@ -79,13 +93,19 @@ const Data = () => {
       icon: <Icon icon='mdi:account-outline' onClick={() => router.push(`/transactions/security-funds`)} />
     },
     {
-      stats: '1.54k',
+      stats:
+        totalWorkPurchases === undefined
+          ? `Loading...`
+          : `¥` + new Intl.NumberFormat('en-US').format(totalWorkPurchases.slice(0, 10)),
       color: 'warning',
       title: 'Withdrawals',
-      icon: <Icon icon='mdi:cellphone-link' onClick={() => router.push(`/transactions/withdrawals`)} />
+      icon: <Icon icon='mdi:cellphone-link' onClick={() => router.push(`/transactions/withdrawal`)} />
     },
     {
-      stats: '$88k',
+      stats:
+        totalSecurityFunds === undefined
+          ? `Loading...`
+          : `¥` + new Intl.NumberFormat('en-US').format(totalSecurityFunds.slice(0, 10)),
       color: 'info',
       title: 'Work Purchases',
       icon: <Icon icon='mdi:currency-usd' onClick={() => router.push(`/transactions/work-purchases`)} />
@@ -105,7 +125,7 @@ const renderStats = () => {
           variant='rounded'
           color={item.color}
           sx={{
-            mr: 3,
+            mr: 2,
             boxShadow: 3,
             width: 44,
             height: 44,

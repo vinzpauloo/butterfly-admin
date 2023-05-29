@@ -6,11 +6,6 @@ import { useTheme } from '@mui/material/styles'
 import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 
 // ** Demo Components Imports
-import AnalyticsTable from 'src/views/dashboards/analytics/AnalyticsTable'
-import AnalyticsPerformance from 'src/views/dashboards/analytics/AnalyticsPerformance'
-import AnalyticsTotalEarning from 'src/views/dashboards/analytics/AnalyticsTotalEarning'
-import AnalyticsDepositWithdraw from 'src/views/dashboards/analytics/AnalyticsDepositWithdraw'
-import AnalyticsSalesByCountries from 'src/views/dashboards/analytics/AnalyticsSalesByCountries'
 
 import AnalyticsTrophy from './components/AnalyticsTrophy'
 import AnalyticsTransactionsCard from './components/AnalyticsTransactionsCard'
@@ -18,6 +13,9 @@ import VideoContentsBarChart from '../components/operator/VideoContentsBarChart'
 import VipAndGuestsData from '../components/operator/VipAndGuestsData'
 
 import 'chart.js/auto'
+import AnalyticsSecurityFunds from './components/AnalyticsSecurityFunds'
+import AnalyticsTopDonators from './components/AnalyticsTopDonators'
+import AnalyticsNewUsers from './components/AnalyticsNewUsers'
 
 const AdminDashboard = () => {
   const theme = useTheme()
@@ -38,7 +36,6 @@ const AdminDashboard = () => {
           <AnalyticsTransactionsCard />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
-          {/* <AnalyticsWeeklyOverview /> */}
           <VideoContentsBarChart
             labelColor={labelColor}
             info={horizontalBarInfo}
@@ -48,7 +45,7 @@ const AdminDashboard = () => {
           />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
-          <AnalyticsTotalEarning />
+          <AnalyticsSecurityFunds />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
           <VipAndGuestsData
@@ -60,20 +57,19 @@ const AdminDashboard = () => {
           />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
-          <AnalyticsPerformance />
+          <AnalyticsNewUsers />
         </Grid>
         <Grid item xs={12} md={8}>
-          <AnalyticsDepositWithdraw />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <AnalyticsSalesByCountries />
-        </Grid>
-        <Grid item xs={12} md={12} lg={8}>
-          <AnalyticsTable />
+          <AnalyticsTopDonators />
         </Grid>
       </Grid>
     </ApexChartWrapper>
   )
+}
+
+AdminDashboard.acl = {
+  action: `read`,
+  subject: `shared-page`
 }
 
 export default AdminDashboard

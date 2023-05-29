@@ -11,18 +11,10 @@ import {
   DialogContent,
   FormControl,
   TextField,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableCell,
-  FormControlLabel,
-  Checkbox,
-  TableBody,
   DialogActions,
   CircularProgress
 } from '@mui/material'
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
+import { DataGrid, GridRenderCellParams, GridSortModel } from '@mui/x-data-grid'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import Container from '@/pages/components/Container'
@@ -35,7 +27,6 @@ import formatDate from '@/utils/formatDate'
 import Icon from 'src/@core/components/icon'
 
 // ** Interfaces
-import { IVideoRow } from '@/context/types'
 import useDebounce from '@/hooks/useDebounce'
 import { useTranslateString } from '@/utils/TranslateString'
 
@@ -190,7 +181,9 @@ const CustomTable = ({
   setOpen,
   setDialogTitle,
   setActiveRoleId,
-  setIsEditing
+  setIsEditing,
+  setSort,
+  setSortBy
 }: any) => {
   // ** Hooks
   const TranslateString = useTranslateString()
@@ -270,8 +263,15 @@ const CustomTable = ({
     setPageSize(pageSize)
   }
 
+  const handleSortModel = (newModel: GridSortModel) => {
+    if (newModel.length && newModel[0].sort) {
+      setSort(newModel[0].sort)
+      setSortBy(newModel[0].field)
+    }
+  }
+
   if (!data) {
-    return <>... hehehe</>
+    return <>No data</>
   }
 
   return (
@@ -292,6 +292,8 @@ const CustomTable = ({
         pagination
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
+        sortingMode='server'
+        onSortModelChange={handleSortModel}
       />
       {/* {editVideoRow && <EditVideoDrawer open={editVideoOpen} toggle={toggleEditVideoDrawer} row={editVideoRow} />} */}
     </>
@@ -305,7 +307,7 @@ const CustomDialog = ({
   dataAbilities,
   page,
   pageSize,
-  debouncedName,
+  debouncedSearchName,
   activeRoleId,
   setActiveRoleId,
   isEditing
@@ -354,7 +356,7 @@ const CustomDialog = ({
     onSuccess: data => {
       console.log('mutateAddRole success', data)
       queryClient.invalidateQueries({
-        queryKey: ['roles', page, pageSize, debouncedName]
+        queryKey: ['roles', page, pageSize, debouncedSearchName]
       })
 
       // Close modal
@@ -369,7 +371,7 @@ const CustomDialog = ({
     onSuccess: data => {
       console.log('mutateUpdateRole success', data)
       queryClient.invalidateQueries({
-        queryKey: ['roles', page, pageSize, debouncedName]
+        queryKey: ['roles', page, pageSize, debouncedSearchName]
       })
 
       // Close modal
@@ -494,26 +496,29 @@ function index() {
   const [rowCount, setRowCount] = useState(0)
   const [activeRoleId, setActiveRoleId] = useState(0)
   const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [sort, setSort] = useState<'desc' | 'asc'>('desc')
+  const [sortBy, setSortBy] = useState<string>('')
 
   const { handleError } = useErrorHandling()
   const { getAllRoles, getAbilities } = RolesService()
 
   const [searchName, setSearchName] = useState('')
-  const debouncedName = useDebounce(searchName, 1000)
+  const debouncedSearchName = useDebounce(searchName, 1000)
 
-  const filterParams = () => {
-    const name = !!searchName && { name: searchName }
-
-    return { ...name }
+  const addExtraFilters = () => {
+    const nameFilter = !!searchName && { search_by: 'name', search_value: searchName }
+    const sortFilter = !!sortBy && { sort, sort_by: sortBy }
+    return { ...nameFilter, ...sortFilter }
   }
 
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['roles', page, pageSize, debouncedName],
+    queryKey: ['roles', page, pageSize, debouncedSearchName, sort, sortBy],
     queryFn: () =>
       getAllRoles({
         page,
         paginate: pageSize,
-        ...filterParams()
+        with: 'abilitiesParents',
+        ...addExtraFilters()
       }),
     onSuccess: data => {
       setData(data.data)
@@ -559,6 +564,8 @@ function index() {
           setDialogTitle={setDialogTitle}
           setActiveRoleId={setActiveRoleId}
           setIsEditing={setIsEditing}
+          setSort={setSort}
+          setSortBy={setSortBy}
         />
         <CustomDialog
           open={open}
@@ -567,7 +574,7 @@ function index() {
           dataAbilities={dataAbilities}
           page={page}
           pageSize={pageSize}
-          debouncedName={debouncedName}
+          debouncedSearchName={debouncedSearchName}
           activeRoleId={activeRoleId}
           setActiveRoleId={setActiveRoleId}
           isEditing={isEditing}
