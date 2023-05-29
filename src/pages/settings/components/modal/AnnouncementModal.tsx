@@ -49,9 +49,10 @@ interface ModalProps {
     end_date: any
     active: boolean
   }
+  locale: string
 }
 
-const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, modalInfo }) => {
+const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, modalInfo, locale }) => {
   const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   const [title, setTitle] = useState<string>('')
@@ -94,8 +95,9 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
         setIsDurationForever(false)
         setEndDate(convertStringDateToDateObject(modalInfo.end_date))
       }
-    } else {
-      //if we are adding new announcement instead of editing
+    }
+    
+    return () => {
       setTitle('')
       setDescription('')
       setStartDate(new Date())
@@ -173,6 +175,7 @@ const AnnouncementModal: React.FC<ModalProps> = ({ isOpen, onClose, isEditing, m
           type: 'introduction',
           style: 'text',
           title: title,
+          locale: locale,
           description: description,
           start_date: format(startDate, 'yyyy-MM-dd'),
           end_date: isDurationForever ? '' : format(endDate, 'yyyy-MM-dd')

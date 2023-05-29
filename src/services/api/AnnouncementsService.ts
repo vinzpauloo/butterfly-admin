@@ -18,6 +18,9 @@ interface IAnnouncementParams {
     exclude?: number
     sort?: string
     sort_by?: string
+    search_by?: string
+    search_value?: string
+    locale?: string
   }
   token?: string
 }

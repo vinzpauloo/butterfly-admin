@@ -45,12 +45,14 @@ const Announcements = () => {
   // FETCH ALL ADMIN ANNOUNCEMENT FROM ALL SITES
   const { getAllAnnouncement, updateAnnouncement, deleteAnnouncement } = AnnouncementsService()
   const { isLoading, isRefetching } = useQuery({
-    queryKey: ['allAnnouncement'],
+    queryKey: ['allAnnouncement', selectedLanguage],
     queryFn: () =>
       getAllAnnouncement({
         data: {
           sort: 'desc',
-          sort_by: 'created_at'
+          sort_by: 'created_at',
+          search_by: 'locale',
+          search_value: selectedLanguage,
         }
       }),
     onSuccess: data => {
@@ -104,7 +106,7 @@ const Announcements = () => {
       description: description,
       start_date: start_date,
       end_date: end_date,
-      active: active
+      active: active,
     })
   }
 
@@ -249,7 +251,7 @@ const Announcements = () => {
         // rowCount={rowCount} //total of data
         // paginationMode='server'
       />
-      <AnnouncementModal modalInfo={modalInfo} isEditing={isEditing} isOpen={openModal} onClose={handleClose} />
+      <AnnouncementModal modalInfo={modalInfo} isEditing={isEditing} isOpen={openModal} onClose={handleClose} locale={selectedLanguage} />
     </Container>
   )
 }
