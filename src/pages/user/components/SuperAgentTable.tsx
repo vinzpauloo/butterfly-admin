@@ -39,7 +39,13 @@ const useDebounce = (value: any, delay: number) => {
 type SortType = 'asc' | 'desc' | undefined | null
 
 // ** Types
-import { RoleEnum } from './types/roles'
+enum RoleEnum  {
+  GOD = 1,
+  OPERATIONS = 2,
+  CC = 3,
+  SA = 4,
+  AGENT = 5
+}
 
 const SuperAgentTable = () => {
 
