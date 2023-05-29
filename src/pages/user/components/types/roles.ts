@@ -1,11 +1,3 @@
-export enum RoleEnum  {
-    GOD = 1,
-    OPERATIONS = 2,
-    CC = 3,
-    SA = 4,
-    AGENT = 5
-}
-
 export interface IRoles {
     created_at? : string
     deleted_at? : any
