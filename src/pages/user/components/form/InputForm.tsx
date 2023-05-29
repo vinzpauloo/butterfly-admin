@@ -20,7 +20,7 @@ interface InputFormProps extends TextFieldVariant {
   onKeyPress?: KeyboardEventHandler<HTMLDivElement> | undefined
   multiline?: boolean
   rows?: number
-  isDropdown?: string[]
+  isDropdown?: string[] | {}[]
   isImage?: boolean
   imageStateVariable?: React.Dispatch<React.SetStateAction<string>>
   imageRef?: React.LegacyRef<HTMLInputElement> | undefined

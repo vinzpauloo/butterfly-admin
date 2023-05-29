@@ -180,7 +180,7 @@ const CreateForm = () => {
               <Box sx={styles.fullWidth}>
                 <Typography>Username</Typography>
                 <TextField
-                  label='Entire Desired Username'
+                  label='Enter Desired Username'
                   variant='outlined'
                   fullWidth
                   {...register('username')}

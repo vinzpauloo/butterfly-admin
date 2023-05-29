@@ -272,7 +272,7 @@ const SAStepOne = (
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Entire Desired Username'
+                      label='Enter Desired Username'
                       variant='outlined'
                       fullWidth
                       error={!!errors.username}

@@ -12,7 +12,9 @@ import SuperAgentToolbar from './SuperAgentToolbar'
 import AddAgentDrawer from './drawer/AddAgentDrawer'
 
 // ** Hooks
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 import { UserTableService } from '@/services/api/UserTableService'
+import RolesService from '@/services/api/RolesService'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -36,8 +38,21 @@ const useDebounce = (value: any, delay: number) => {
 
 type SortType = 'asc' | 'desc' | undefined | null
 
+// ** Types
+enum RoleEnum  {
+  GOD = 1,
+  OPERATIONS = 2,
+  CC = 3,
+  SA = 4,
+  AGENT = 5
+}
+
 const SuperAgentTable = () => {
+
+  const { getAllRoles } = RolesService()
   const { getUsers } = UserTableService()
+  const { handleError } = useErrorHandling()
+
   const [page, setPage] = useState<number>()
   const [pageSize, setPageSize] = useState<number>()
   const [role, setRole] = useState('AGENT')
@@ -54,6 +69,8 @@ const SuperAgentTable = () => {
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined)
 
   const debouncedUsername = useDebounce(searchValue, 1000)
+
+  const [ dropdownRoles, setDropdownRoles ] = React.useState< [] | null >(null)
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: [
@@ -85,6 +102,18 @@ const SuperAgentTable = () => {
       setRowData(data?.data)
       setPageSize(data?.per_page)
       setPage(data?.current_page)
+    }
+  })
+
+  //get All Roles
+  const { data : dataRoles } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => getAllRoles({}),
+    onSuccess: data => {
+      setDropdownRoles(data.data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getAllRoles() user/components/SuperAgentTable.tsx`)
     }
   })
 
@@ -128,6 +157,19 @@ const SuperAgentTable = () => {
     setOpenDrawer(isDrawerOpen => !isDrawerOpen)
   }
 
+  const filterDropdownRoles = (roles : any[]) => { 
+    // Filter by roles inside this array
+    const filterByIds = [
+      RoleEnum.GOD,
+      RoleEnum.OPERATIONS,
+      RoleEnum.CC, 
+      RoleEnum.SA, 
+      RoleEnum.AGENT
+    ]
+    const filteredRoles = roles.filter( role => !filterByIds.includes(role.id) )
+    return filteredRoles
+  }
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -164,7 +206,15 @@ const SuperAgentTable = () => {
             }}
             sx={{ padding: 0 }}
           />
-          <AddAgentDrawer open={openDrawer} toggle={handleDrawerToggle} />
+          {/* CREATE Agent Drawer */}
+          {
+            dropdownRoles && 
+            <AddAgentDrawer
+              dataRoles={ filterDropdownRoles(dropdownRoles) }
+              open={openDrawer} 
+              toggle={handleDrawerToggle} />
+          }
+          
         </Card>
       </Grid>
     </Grid>

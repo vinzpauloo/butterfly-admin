@@ -27,6 +27,8 @@ import { useAuth } from '@/services/useAuth'
 import InputForm from '../form/InputForm'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 
+// ** Types
+import { IRoles } from '../types/roles'
 interface FormValues {
   [key: string]: any
   role_id: '3' | ''
@@ -54,6 +56,7 @@ const schema = yup.object().shape({
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
+  dataRoles : IRoles[]
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -199,7 +202,7 @@ const AddAgentDrawer = (props: SidebarAddUserType) => {
                     width='100%'
                     controllerName='username'
                     control={control}
-                    placeholder='Entired Desired Username'
+                    placeholder='Enter Desired Username'
                     variant='outlined'
                     fullWidth={true}
                     error={!!errors.username}
@@ -272,6 +275,25 @@ const AddAgentDrawer = (props: SidebarAddUserType) => {
                     helperText={errors.password_confirmation?.message}
                     name='password_confirmation'
                     type='password'
+                  />
+                </Box>
+              </Box>
+
+              <Box>
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Roles</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='role_id'
+                    control={control}
+                    placeholder='Enter Role'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.role_id}
+                    helperText={errors.role_id?.message}
+                    name='role_id'
+                    type='role_id'
+                    isDropdown={props.dataRoles}
                   />
                 </Box>
               </Box>

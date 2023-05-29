@@ -26,9 +26,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreateAccount } from '@/services/api/CreateAccount'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 
+// ** Types
+import { IRoles } from '../types/roles'
 interface FormValues {
   [key: string]: string | Blob
-  role_id: '1' | '2' | ''
+  role_id: string
   username: string
   password: string
   password_confirmation: string
@@ -37,8 +39,9 @@ interface FormValues {
   user_note: string
 }
 
+
 const schema = yup.object().shape({
-  // role_id: yup.string().oneOf(['1', '2'], 'Role must be Operator or Supervisor').required('Role is required'),
+  role_id: yup.string().required('Role is required'),
   username: yup.string().min(7, 'Username must be at least 7 characters').required('Username is required'),
   password: yup.string().min(7, 'Password must be at least 7 characters').required('Password is required'),
   password_confirmation: yup
@@ -55,6 +58,7 @@ const schema = yup.object().shape({
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
+  dataRoles : IRoles[]
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -109,7 +113,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
       formData.append(key, data[key])
     }
 
-    formData.append(`role_id`, `2`)
+    //formData.append(`role_id`, `2`) commented out
 
     // const userData = {
     //   data: data
@@ -205,7 +209,7 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                     width='100%'
                     controllerName='username'
                     control={control}
-                    placeholder='Entired Desired Username'
+                    placeholder='Enter Desired Username'
                     variant='outlined'
                     fullWidth={true}
                     error={!!errors.username}
@@ -294,6 +298,21 @@ const SupervisorDrawer = (props: SidebarAddUserType) => {
                   error={!!errors.email}
                   helperText={errors.email?.message}
                   name='email'
+                />
+              </Box>
+
+              <Box>
+                <Typography>Role</Typography>
+                <InputForm
+                  width='100%'
+                  controllerName='role_id'
+                  control={control}
+                  variant='outlined'
+                  fullWidth={true}
+                  error={!!errors.role_id}
+                  helperText={errors.role_id?.message}
+                  name='role_id'
+                  isDropdown={props.dataRoles}
                 />
               </Box>
 
