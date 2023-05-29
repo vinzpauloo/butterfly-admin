@@ -20,6 +20,7 @@ import { OperatorColumns } from '@/data/OperatorColumns'
 import { UserTableService } from '../../../services/api/UserTableService'
 import useDebounce from '@/hooks/useDebounce'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
+import RolesService from '@/services/api/RolesService'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
@@ -27,6 +28,15 @@ import { useQuery } from '@tanstack/react-query'
 // ** Zustand State Management
 import { useUserTableStore } from '@/zustand/userTableStore'
 import Container from '@/pages/components/Container'
+
+// ** Types
+enum RoleEnum  {
+  GOD = 1,
+  OPERATIONS = 2,
+  CC = 3,
+  SA = 4,
+  AGENT = 5
+}
 
 const OperatorTable = () => {
   const {
@@ -89,11 +99,16 @@ const OperatorTable = () => {
   // const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   // ** Service/Hooks
+  const { getAllRoles, getAbilities } = RolesService()
   const { getUsers } = UserTableService()
   const { handleError } = useErrorHandling()
   const debouncedUsername = useDebounce(searchValue, 1000)
   const debouncedEmail = useDebounce(emailSearchValue, 1000)
   const debouncedMobile = useDebounce(mobileSearchValue, 1000)
+
+  
+  // ** States
+  const [ dropdownRoles, setDropdownRoles ] = React.useState< [] | null >(null)
 
   useEffect(() => {
     if (initialLoad) {
@@ -171,6 +186,19 @@ const OperatorTable = () => {
     }
   })
 
+  //get All Roles
+  const { data : dataRoles } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => getAllRoles({}),
+    onSuccess: data => {
+      console.log('success getAllRoles', data)
+      setDropdownRoles(data.data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getAllRoles() user/components/OperatorTable.tsx`)
+    }
+  })
+
   const handleSortModel = (newModel: GridSortModel) => {
     if (newModel.length) {
       setSort(newModel[0].sort)
@@ -181,7 +209,16 @@ const OperatorTable = () => {
     }
   }
 
-  console.log(`drawerRole`, drawerRole)
+  const filterDropdownRoles = (roles : any[]) => { 
+    // Filter by roles inside this array
+    const filterByIds = [
+      RoleEnum.CC, 
+      RoleEnum.SA, 
+      RoleEnum.AGENT
+    ]
+    const filteredRoles = roles.filter( role => !filterByIds.includes(role.id) )
+    return filteredRoles
+  }
 
   return (
     <Container>
@@ -230,7 +267,14 @@ const OperatorTable = () => {
         sx={{ padding: 0 }}
       />
       {/* CREATE Drawers */}
-      <SupervisorDrawer open={openDrawer === 'OPERATIONS'} toggle={() => handleDrawerToggle('OPERATIONS')} />
+      {
+        dropdownRoles && 
+        <SupervisorDrawer 
+          dataRoles={ filterDropdownRoles(dropdownRoles) }
+          open={openDrawer === 'OPERATIONS'} 
+          toggle={() => handleDrawerToggle('OPERATIONS')} />
+      }
+      
 
       {/* EDIT Drawers */}
       {drawerRole === 'OPERATIONS' && (
