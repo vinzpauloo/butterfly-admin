@@ -4,8 +4,6 @@ import Grid from '@mui/material/Grid'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** Type Import
-
 // ** Custom Components Imports
 import CardStatisticsVerticalComponent from 'src/@core/components/card-statistics/card-stats-vertical'
 import CardStatsCharacter from './components/CardStatsCharacter'
@@ -23,6 +21,7 @@ import CrmSalesOverview from 'src/views/dashboards/crm/CrmSalesOverview'
 import CrmActivityTimeline from 'src/views/dashboards/crm/CrmActivityTimeline'
 
 import 'chart.js/auto'
+import CardStatsTopDonators from './components/CardStatsTopDonators'
 
 const NewCreatorDashboard = () => {
   return (
@@ -32,7 +31,7 @@ const NewCreatorDashboard = () => {
           <CardStatsCharacter />
         </Grid>
         <Grid item xs={12} sm={6} md={3} sx={{ pt: theme => `${theme.spacing(12.25)} !important` }}>
-          <CardStatsCharacter />
+          <CardStatsTopDonators />
         </Grid>
         <Grid item xs={12} md={6}>
           <CrmTransactions />
