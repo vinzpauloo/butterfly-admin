@@ -30,13 +30,7 @@ import { useUserTableStore } from '@/zustand/userTableStore'
 import Container from '@/pages/components/Container'
 
 // ** Types
-enum RoleEnum  {
-  GOD = 1,
-  OPERATIONS = 2,
-  CC = 3,
-  SA = 4,
-  AGENT = 5
-}
+import { RoleEnum } from './types/roles'
 
 const OperatorTable = () => {
   const {
@@ -99,7 +93,7 @@ const OperatorTable = () => {
   // const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   // ** Service/Hooks
-  const { getAllRoles, getAbilities } = RolesService()
+  const { getAllRoles } = RolesService()
   const { getUsers } = UserTableService()
   const { handleError } = useErrorHandling()
   const debouncedUsername = useDebounce(searchValue, 1000)
@@ -191,7 +185,6 @@ const OperatorTable = () => {
     queryKey: ['roles'],
     queryFn: () => getAllRoles({}),
     onSuccess: data => {
-      console.log('success getAllRoles', data)
       setDropdownRoles(data.data)
     },
     onError: (e: any) => {

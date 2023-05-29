@@ -26,6 +26,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreateAccount } from '@/services/api/CreateAccount'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
 
+// ** Types
+import { IRoles } from '../types/roles'
 interface FormValues {
   [key: string]: string | Blob
   role_id: string
@@ -37,15 +39,6 @@ interface FormValues {
   user_note: string
 }
 
-interface IRoles {
-  created_at? : string
-  deleted_at? : any
-  description? : string
-  id : number
-  name : string
-  partner_id? : number | null
-  updated_at : string
-}
 
 const schema = yup.object().shape({
   role_id: yup.string().required('Role is required'),
