@@ -56,7 +56,7 @@ const schema = yup.object().shape({
 interface SidebarAddUserType {
   open: boolean
   toggle: () => void
-  dataRoles : IRoles[]
+  dataRoles?: IRoles[]
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
