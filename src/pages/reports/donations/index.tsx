@@ -9,7 +9,7 @@ import formatDate from '@/utils/formatDate'
 import { Avatar, Stack, Typography } from '@mui/material'
 import Container from '@/pages/components/Container'
 import { FILE_SERVER_URL } from '@/lib/baseUrls'
-import CustomToolbar from '../components/CustomToolbar'
+import DonationsTableToolbar from '../components/DonationsTableToolbar'
 import ReportsHeader from '../components/ReportsHeader'
 import { reportsHeaderStore } from '../../../zustand/reportsHeaderStore'
 import format from 'date-fns/format'
@@ -133,7 +133,7 @@ function index() {
         rowCount={rowCount}
         rows={data}
         rowsPerPageOptions={[10, 25, 50]}
-        components={{ Toolbar: CustomToolbar }}
+        components={{ Toolbar: DonationsTableToolbar }}
       />
     </Container>
   )
