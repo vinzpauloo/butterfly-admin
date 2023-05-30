@@ -1,25 +1,26 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
-import { useTranslateString } from '@/utils/TranslateString'
+
+// import { useTranslateString } from '@/utils/TranslateString'
 import { useQuery } from '@tanstack/react-query'
 import { ReportsService } from '@/services/api/ReportsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
-import formatDate from '@/utils/formatDate'
 import Container from '@/pages/components/Container'
 import CustomToolbar from '../components/CustomToolbar'
 import ReportsHeader from '../components/ReportsHeader'
 import { reportsHeaderStore } from '../../../zustand/reportsHeaderStore'
-import format from 'date-fns/format'
+import moment from 'moment'
 
 function index() {
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
-  const TranslateString = useTranslateString()
+
+  // const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-  const [timespan, fromDate, toDate] = reportsHeaderStore((state) => [state.timespan, state.fromDate, state.toDate])
+  const [timespan, fromDate, toDate] = reportsHeaderStore(state => [state.timespan, state.fromDate, state.toDate])
 
   const { getReportsCustomerTransaction } = ReportsService()
   const { isLoading, isFetching } = useQuery({
@@ -29,9 +30,9 @@ function index() {
         data: {
           report: true,
           timespan: timespan,
-          select: 'id,transaction_type,bundle_name,customer_username,agent_username,amount,created_at',
-          from: format(fromDate, 'yyyy-MM-dd'),
-          to: format(toDate, 'yyyy-MM-dd'),
+          with: 'sites',
+          from: moment(fromDate).format('YYYY-MM-D'),
+          to: moment(toDate).format('YYYY-MM-D'),
           search_by: 'transaction_type',
           search_value: 'coins',
           page: page,
@@ -52,57 +53,65 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'transaction type',
-      headerName: TranslateString('Transaction Type'),
+      field: 'date',
+      headerName: 'Date',
+      flex: 0.07,
+      minWidth: 70,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => {
+        if (timespan === 'daily') {
+          return moment(params.row?.created_at).format('MMM D, YYYY')
+        } else if (timespan === 'monthly') {
+          return `${moment(params?.row?.month).format('MMMM')} ${params?.row?.year}`
+        } else {
+          return params.row?.year
+        }
+      }
+    },
+    {
+      field: 'customer',
+      headerName: 'Customer',
       headerAlign: 'center',
       align: 'center',
       flex: 0.15,
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.transaction_type
+      valueGetter: (params: GridRenderCellParams) => params.row?.customer_username
     },
     {
-      field: 'bundle name',
-      headerName: TranslateString('Bundle Name'),
+      field: 'site name',
+      headerName: 'Site Name',
       flex: 0.15,
       minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.sites?.name
+    },
+    {
+      field: 'name of agent',
+      headerName: 'Name of Agent',
+      flex: 0.1,
+      minWidth: 100,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.agent_username
+    },
+    {
+      field: 'bundle title',
+      headerName: 'Bundle Title',
+      flex: 0.1,
+      minWidth: 100,
       sortable: true,
       valueGetter: (params: GridRenderCellParams) => params.row?.bundle_name
     },
     {
-      field: 'customer',
-      headerName: TranslateString('Customer'),
-      flex: 0.2,
-      minWidth: 150,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.customer_username,
-    },
-    {
-      field: 'agent username',
-      headerName: TranslateString('Agent'),
-      flex: 0.15,
-      minWidth: 170,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.agent_username,
-    },
-    {
-      field: 'amount',
-      headerName: TranslateString('Amount'),
+      field: 'total amount',
+      headerName: 'Total Amount',
       headerAlign: 'center',
       align: 'center',
-      flex: 0.15,
-      minWidth: 150,
+      flex: 0.1,
+      minWidth: 100,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.amount
-    },
-    {
-      field: 'date created',
-      headerName: TranslateString('Date Created'),
-      flex: 0.25,
-      minWidth: 200,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
-    },
+      valueGetter: (params: GridRenderCellParams) => params.row?.total_amount
+    }
   ]
 
   const handlePageChange = (newPage: number) => {
@@ -115,7 +124,7 @@ function index() {
 
   return (
     <Container>
-      <ReportsHeader title='Gold Coin Bundles'/>
+      <ReportsHeader title='Gold Coin Bundles' />
       <DataGrid
         autoHeight
         columns={columnData}

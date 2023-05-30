@@ -53,7 +53,7 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'data',
+      field: 'date',
       headerName: 'Date',
       flex: 0.07,
       minWidth: 70,
