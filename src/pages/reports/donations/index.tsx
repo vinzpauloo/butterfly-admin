@@ -1,27 +1,28 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState } from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
-import { useTranslateString } from '@/utils/TranslateString'
+
+// import { useTranslateString } from '@/utils/TranslateString'
 import { useQuery } from '@tanstack/react-query'
 import { ReportsService } from '@/services/api/ReportsService'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
-import formatDate from '@/utils/formatDate'
-import { Avatar, Stack, Typography } from '@mui/material'
 import Container from '@/pages/components/Container'
-import { FILE_SERVER_URL } from '@/lib/baseUrls'
+
+// import { FILE_SERVER_URL } from '@/lib/baseUrls'
 import DonationsTableToolbar from '../components/DonationsTableToolbar'
 import ReportsHeader from '../components/ReportsHeader'
 import { reportsHeaderStore } from '../../../zustand/reportsHeaderStore'
-import format from 'date-fns/format'
+import moment from 'moment'
 
 function index() {
   const [data, setData] = useState([])
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState(10)
   const [rowCount, setRowCount] = useState(0)
-  const TranslateString = useTranslateString()
+
+  // const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-  const [timespan, fromDate, toDate] = reportsHeaderStore((state) => [state.timespan, state.fromDate, state.toDate])
+  const [timespan, fromDate, toDate] = reportsHeaderStore(state => [state.timespan, state.fromDate, state.toDate])
 
   const { getReportsDonations } = ReportsService()
   const { isLoading, isFetching } = useQuery({
@@ -31,10 +32,9 @@ function index() {
         data: {
           report: true,
           timespan: timespan,
-          with: 'users,customers,sites',
-          select: 'id,customer_id,user_id,site_id,coin_amount,created_at',
-          from: format(fromDate, 'yyyy-MM-dd'),
-          to: format(toDate, 'yyyy-MM-dd'),
+          with: 'users,sites',
+          from: moment(fromDate).format('YYYY-MM-D'),
+          to: moment(toDate).format('YYYY-MM-D'),
           page: page,
           paginate: pageSize
         }
@@ -53,57 +53,87 @@ function index() {
 
   const columnData: GridColDef[] = [
     {
-      field: 'site name',
-      headerName: TranslateString('Site Name'),
+      field: 'date',
+      headerName: 'Date',
       flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => {
+        if (timespan === 'daily') {
+          return moment(params.row?.created_at).format('MMM D, YYYY')
+        } else if (timespan === 'monthly') {
+          return `${moment(params?.row?.month).format('MMMM')} ${params?.row?.year}`
+        } else {
+          return params.row?.year
+        }
+      }
+    },
+    {
+      field: 'site name',
+      headerName: 'Site Name',
+      flex: 0.2,
       minWidth: 150,
       sortable: true,
       valueGetter: (params: GridRenderCellParams) => params.row?.sites?.name
     },
     {
       field: 'content creator',
-      headerName: TranslateString('Content Creator'),
-      flex: 0.2,
-      minWidth: 150,
-      sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username,
-      renderCell: (params: GridRenderCellParams) =>
-        <Stack direction='row' alignItems='center' gap={2}>
-          <Avatar src={FILE_SERVER_URL + params.row?.users?.photo} />
-          <Typography variant='subtitle2'>{params.row?.users?.username}</Typography>
-        </Stack>
-    },
-    {
-      field: 'donator',
-      headerName: TranslateString('Donator'),
+      headerName: 'Content Creator',
       flex: 0.15,
       minWidth: 170,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.customers?.username,
-      renderCell: (params: GridRenderCellParams) =>
-        <Stack direction='row' alignItems='center' gap={2}>
-          <Avatar src={FILE_SERVER_URL + params.row?.customers?.photo} />
-          <Typography variant='subtitle2'>{params.row?.customers?.username}</Typography>
-        </Stack>
+      valueGetter: (params: GridRenderCellParams) => params.row?.users?.username
     },
     {
-      field: 'coin amount',
-      headerName: TranslateString('Coin Amount'),
+      field: 'account id',
+      headerName: 'Account ID',
       headerAlign: 'center',
       align: 'center',
       flex: 0.15,
       minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => params.row?.coin_amount
+      valueGetter: (params: GridRenderCellParams) => params.row?.user_id
     },
     {
-      field: 'date created',
-      headerName: TranslateString('Date Created'),
-      flex: 0.25,
-      minWidth: 200,
+      field: 'total coin',
+      headerName: 'Total Coin',
+      flex: 0.15,
+      minWidth: 150,
       sortable: true,
-      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
+      valueGetter: (params: GridRenderCellParams) => params.row?.total_coin_amount
     },
+    {
+      field: 'coin transactions',
+      headerName: 'Coin Transactions',
+      flex: 0.15,
+      minWidth: 170,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.total_coin_transactions_count
+    },
+    {
+      field: 'site coin share',
+      headerName: 'Site Coin Share',
+      flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.total_coin_partner_share
+    },
+    {
+      field: 'coin average',
+      headerName: 'Site Coin Share',
+      flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.total_coin_avg
+    },
+    {
+      field: 'avg site share',
+      headerName: 'Avg Site Share',
+      flex: 0.15,
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.total_coin_partner_share_avg
+    }
   ]
 
   const handlePageChange = (newPage: number) => {

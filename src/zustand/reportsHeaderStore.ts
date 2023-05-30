@@ -10,12 +10,12 @@ interface reportsHeader {
   setToDate: (newToDate: Date) => void
 }
 
-export const reportsHeaderStore = create<reportsHeader>((set) => ({
-  timespan: 'today',
+export const reportsHeaderStore = create<reportsHeader>(set => ({
+  timespan: 'daily',
   fromDate: new Date('2020-01-01'),
   toDate: new Date(),
 
-  setTimespan: (newTimespan) => set(() => ({ timespan: newTimespan })),
-  setFromDate: (newFromDate) => set(() => ({ fromDate: newFromDate })),
-  setToDate: (newToDate) => set(() => ({ toDate: newToDate })),
+  setTimespan: newTimespan => set(() => ({ timespan: newTimespan })),
+  setFromDate: newFromDate => set(() => ({ fromDate: newFromDate })),
+  setToDate: newToDate => set(() => ({ toDate: newToDate }))
 }))
