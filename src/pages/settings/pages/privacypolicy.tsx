@@ -67,4 +67,9 @@ const PrivacyPolicy = () => {
   )
 }
 
+PrivacyPolicy.acl = {
+  action: 'read',
+  subject: 'sa-page'
+}
+
 export default PrivacyPolicy

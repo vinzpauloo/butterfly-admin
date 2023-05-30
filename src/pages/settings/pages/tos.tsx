@@ -24,13 +24,14 @@ const TermsOfService = () => {
   const { getSitesList, getSiteOtherDetails } = SitesService()
   const { isLoading, isFetching } = useQuery({
     queryKey: ['termsOfService', selectedSite, selectedLanguage],
-    queryFn: () => getSiteOtherDetails({
-      data: {
-        detail: 'provisions',
-        site_id: selectedSite,
-        locale: selectedLanguage,
-      }
-    }),
+    queryFn: () =>
+      getSiteOtherDetails({
+        data: {
+          detail: 'provisions',
+          site_id: selectedSite,
+          locale: selectedLanguage
+        }
+      }),
     onSuccess: data => {
       setEditorState(
         EditorState.createWithContent(ContentState.createFromBlockArray(convertFromHTML(data).contentBlocks))
@@ -41,7 +42,7 @@ const TermsOfService = () => {
     }
   })
 
-  const { } = useQuery({
+  const {} = useQuery({
     queryKey: ['allSitesList'],
     queryFn: () => getSitesList({}),
     onSuccess: data => {
@@ -65,6 +66,11 @@ const TermsOfService = () => {
       sitesList={sitesList}
     />
   )
+}
+
+TermsOfService.acl = {
+  action: 'read',
+  subject: 'sa-page'
 }
 
 export default TermsOfService
