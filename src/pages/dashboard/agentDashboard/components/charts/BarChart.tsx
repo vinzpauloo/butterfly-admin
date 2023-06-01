@@ -298,7 +298,7 @@ const BarChart = (props: VerticalBarProps) => {
           </ToggleButtonGroup>
         }
       />
-      <CardContent>
+      <CardContent sx={{ minHeight: 480 }}>
         <Bar data={data} height={200} options={options} />
       </CardContent>
     </Card>

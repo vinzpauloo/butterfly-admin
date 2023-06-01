@@ -16,13 +16,22 @@ import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 const TermsOfService = () => {
   const { handleError } = useErrorHandling()
-
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty())
+  const [selectedSite, setSelectedSite] = useState<number>(0)
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en')
+  const [sitesList, setSitesList] = useState<any>([])
 
-  const { getSiteOtherDetails } = SitesService()
-  const { isLoading } = useQuery({
-    queryKey: ['termsOfService'],
-    queryFn: () => getSiteOtherDetails({ data: { detail: 'provisions' } }),
+  const { getSitesList, getSiteOtherDetails } = SitesService()
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['termsOfService', selectedSite, selectedLanguage],
+    queryFn: () =>
+      getSiteOtherDetails({
+        data: {
+          detail: 'provisions',
+          site_id: selectedSite,
+          locale: selectedLanguage
+        }
+      }),
     onSuccess: data => {
       setEditorState(
         EditorState.createWithContent(ContentState.createFromBlockArray(convertFromHTML(data).contentBlocks))
@@ -33,14 +42,35 @@ const TermsOfService = () => {
     }
   })
 
+  const {} = useQuery({
+    queryKey: ['allSitesList'],
+    queryFn: () => getSitesList({}),
+    onSuccess: data => {
+      setSitesList(data?.data)
+    },
+    onError: (e: any) => {
+      handleError(e, `getSitesList() privacypolicy`)
+    }
+  })
+
   return (
     <EditorContainer
       title='Terms of Service'
       editorState={editorState}
       setEditorState={setEditorState}
-      isLoading={isLoading}
+      isLoading={isLoading || isFetching}
+      selectedSite={selectedSite}
+      setSelectedSite={setSelectedSite}
+      selectedLanguage={selectedLanguage}
+      setSelectedLanguage={setSelectedLanguage}
+      sitesList={sitesList}
     />
   )
+}
+
+TermsOfService.acl = {
+  action: 'read',
+  subject: 'sa-page'
 }
 
 export default TermsOfService

@@ -33,6 +33,7 @@ import { useErrorHandling } from '@/hooks/useErrorHandling'
 // ** Layout Imports
 import BasicCard from '@/layouts/components/shared-components/Card/BasicCard'
 import CustomButton from '@/layouts/components/shared-components/CustomButton/CustomButton'
+import AutoCompleteCC from '../components/AutoCompleteCC'
 
 // ** Third Party Components
 import toast from 'react-hot-toast'
@@ -68,6 +69,7 @@ import { useTranslation } from 'react-i18next'
 
 // ** Auth
 import { useAuth } from '@/services/useAuth'
+
 
 // Styled components
 const Img = styled('img')(({ theme }) => ({
@@ -179,13 +181,15 @@ const defaultValues = {
   description: '',
   contentCreator: '',
   startTime: 0,
-  multiTags: ''
+  multiTags: '',
+  availableTo: 'vip',
+  coinAmount : ''
 }
 
 const UploadVideoStep1 = (props: Props) => {
+
   // ** Contexts
   const studioContext = React.useContext(StudioContext)
-  const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
   const uploadyContext = React.useContext(UploadyContext)
 
   // ** Translations
@@ -203,8 +207,6 @@ const UploadVideoStep1 = (props: Props) => {
   // ** UseEffect
   React.useEffect(() => {
     const eventBatchStart = (batch: any, options: any) => {
-      console.log('step 1 - EVENT BATCH START batch', batch)
-      console.log('step 1 - EVENT BATCH START options', options)
       if (options?.params?.video_type == 'full_video') {
         //TODO
       } // end if full video
@@ -219,7 +221,6 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Batch Progress
   const batch = useBatchProgressListener(batch => {})
-  console.log('THE BATCH', batch)
   if (batch && batch.completed > studioContext!.workProgress && batch.completed < 100) {
     console.log(`batch ${batch.id} is ${batch.completed}% done and ${batch.loaded} bytes uploaded`)
   }
@@ -292,6 +293,8 @@ const UploadVideoStep1 = (props: Props) => {
   >([])
   const [openBD, setOpenBD] = React.useState(false)
 
+  const [ availableTo, setAvailableTo ] = React.useState<'vip' | 'coins'>('vip')
+
   // ** UseForm
   const {
     reset,
@@ -304,7 +307,7 @@ const UploadVideoStep1 = (props: Props) => {
 
   // ** Context ReactHookForm
   const { register, getValues, control, watch, setValue, resetField } = useFormContext()
-
+  console.log('watch', watch())
   // ** react query / api services
   const { getGroupings } = useGroupingService()
   const { updateVideoByWorkId } = VideoService()
@@ -320,7 +323,6 @@ const UploadVideoStep1 = (props: Props) => {
       return getGroupings({ data: { all: 'true' } })
     },
     onSuccess: (data: any) => {
-      console.log(data)
       setGroupingsOptions(data)
     },
     onError: (e: any) => {
@@ -335,7 +337,6 @@ const UploadVideoStep1 = (props: Props) => {
       return getAllDataFromCreator()
     },
     onSuccess: (data: any) => {
-      console.log('data CcOptions', data)
       setCCOptions(data)
     },
     onError: (e: any) => {
@@ -376,7 +377,7 @@ const UploadVideoStep1 = (props: Props) => {
 
 
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.code == 'Enter') {
+    if (e.code == 'Enter' || e.code == 'Space' || e.code == 'Tab') {
       // handle add to Chip
       let tagWord = (e.target as HTMLInputElement).value as string
       console.log('@@@@@@@', watch('multiTags'))
@@ -418,13 +419,22 @@ const UploadVideoStep1 = (props: Props) => {
     setValue('tags', filteredTags)
     setTags(filteredTags as [])
   }
+  
   const handleGroupingsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setGroupings((event.target as HTMLInputElement).value as any)
   }
+
   const handleGroupingsDelete = (group: string) => {
     let filteredGroupings = groupings?.filter(e => e !== group)
     setGroupings(filteredGroupings as [])
   }
+
+  const handleAvailableToOnchange = (e : any) => {
+    // reset Coin Value
+    e.target.value = 0
+    setValue('coinAmount', '')
+  }
+
   const handleStartUpload = () => {
     
     setContextTags()
@@ -467,6 +477,19 @@ const UploadVideoStep1 = (props: Props) => {
       return
     }
 
+    if( !watch('availableTo') ) {
+      toast.error('Select VIP or Coins', { position: 'top-center' })
+      return
+    }
+    // handle coin amount if coin is selected
+    if ( watch() && watch('availableTo') && watch('availableTo') == 'coins' ) {
+      const currentCoins = watch('coinAmount')
+      if ( currentCoins <= 0 || isNaN(currentCoins) ) {
+        toast.error(`Invalid coin amount`, { position: 'top-center' })
+        return
+      }
+    }
+
     if( trialUploadSwitch == false ) {
 
        if ( watch('startTime') == '' ) {
@@ -486,9 +509,9 @@ const UploadVideoStep1 = (props: Props) => {
     // pass fields to Studio Context
     studioContext?.setTitle(title)
     studioContext?.setContentCreator(contentCreator)
-    studioContext?.setDescription(description)
+    studioContext?.setDescription(description)  
 
-    // UPLOADY UPLOAD
+    // START UPLOADING THE VIDEO THEN GO TO NEXT PAGE
     handleUploadyUpload()
 
     studioContext?.setDisplayPage(DisplayPage.VideoVisibility)
@@ -547,32 +570,11 @@ const UploadVideoStep1 = (props: Props) => {
                     name='contentCreator'
                     control={control}
                     rules={{ required: true }}
-                    render={({ field: { value, onChange, onBlur } }) => (
+                    render={({ field: { value, onChange, onBlur, name } }) => (
                       <>
                         {isCCLoading && <LinearProgress sx={{ maxWidth: '100px' }} color='success' />}
                         {CCData && (
-                          <CustomSelect
-                            displayEmpty
-                            inputProps={{ 'aria-label': 'Without label' }}
-                            label={<Translations text='dsdasdas' />}
-                            defaultValue=''
-                            id='contentCreator'
-                            labelId='cc-select-label'
-                            value={value || ''}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            error={Boolean(errors.title)}
-                          >
-                            <MenuItem disabled value=''>
-                              {`${t('Select Content Creator')}`}
-                            </MenuItem>
-                            {ccOptions &&
-                              ccOptions.map(cc => (
-                                <MenuItem key={cc.id} value={cc.id}>
-                                  {cc.username}
-                                </MenuItem>
-                              ))}
-                          </CustomSelect>
+                          <AutoCompleteCC name={name} control={control} value={value} creatorsData={CCData} onChange={onChange} onBlur={onBlur} />
                         )}
                       </>
                     )}
@@ -597,6 +599,7 @@ const UploadVideoStep1 = (props: Props) => {
                     )}
                   />
                 </Grid>
+
                 <Grid item xs={12}>
                   <Controller
                     name='description'
@@ -617,6 +620,71 @@ const UploadVideoStep1 = (props: Props) => {
                     )}
                   />
                 </Grid>
+                
+                <Grid sx={{ display:'flex', gap : [,,'1rem'] }} item xs={12}>
+
+                  <Controller
+                    name='availableTo'
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange, onBlur } }) => (
+                      <>
+                        <CustomSelect
+                            displayEmpty
+                            name='availableTo'
+                            defaultValue='vip'
+                            inputProps={{ 'aria-label': 'Without label' }}
+                            id='availableTo'
+                            labelId='availableTo'
+                            value={value || ''}
+                            onBlur={onBlur}
+                            onChange={ (e) => {
+                              onChange(e)
+                              handleAvailableToOnchange(e)
+                            }}
+                            error={Boolean(errors.title)}
+                          >
+                            <MenuItem disabled value=''>
+                              {`${t('VIP or Coins')}`}
+                            </MenuItem>
+                            <MenuItem value='vip'>
+                              VIP
+                            </MenuItem>
+                            <MenuItem value='coins'>
+                              Coins
+                            </MenuItem>
+                        </CustomSelect>
+                      </>
+                      )}
+
+                  />
+                  
+                  {
+                    // show input label if coin is selected
+                    watch() && watch('availableTo') && watch('availableTo') == 'coins' && 
+                    <FormControl>
+                      <Controller
+                        name='coinAmount'
+                        control={control}
+                        render={({ field: { value, onChange, onBlur } }) => (
+                          <CustomTextField
+                            sx={{minWidth : '10rem'}}
+                            fullWidth
+                            type='number'
+                            value={value}
+                            onBlur={onBlur}
+                            onChange={onChange}
+                            placeholder='Amount'
+                            InputProps={{ inputProps: { min: 0, max: Infinity } }}
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  }
+                  
+
+                </Grid>
+
                 <Grid item xs={12}>
                   <Grid container justifyContent='space-between' spacing={4} sx={{ marginBottom: 5 }}>
                     <Grid justifySelf='flex-end' item xs={12} sm={6}>

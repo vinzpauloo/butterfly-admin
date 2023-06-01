@@ -95,6 +95,7 @@ const VideoVisibility = () => {
   const [workVideo, setWorkVideo] = React.useState<string | null>(null)
   const [trailerFile, setTrailerFile] = React.useState<File[] | null>([])
   const [videoTypeUploaded, setVideoTypeUploaded] = React.useState<'full_video' | 'trial_video'>('full_video')
+  const [batchFinalized, setBatchFinalized] = React.useState<boolean>(false)
 
   // ** SERVICES CALLS
   const { uploadVideoURL } = VideoService()
@@ -172,11 +173,16 @@ const VideoVisibility = () => {
       console.log('CALL PRESEND', options)
 
       let hasTrialVideo = false
+      let isVIP = false
 
-      const { title, contentCreator } = getValues()
+      const { title, contentCreator, availableTo, coinAmount } = getValues()
 
       console.log('EVENTPRESEND VALUES', getValues())
 
+      // check if selected VIP and not coins
+      isVIP = (availableTo == 'vip' ? true : false )
+
+      // Uploading Full Video
       if (options?.params?.video_type == 'full_video') {
         // use react-hook-form context
         setValue('videoType', 'full_video')
@@ -184,7 +190,9 @@ const VideoVisibility = () => {
         const passFullVideoData = {
           user_id: contentCreator,
           video_type: 'full_video',
-          video_name: title
+          video_name: title,
+          available_to : availableTo,
+          ...( !isVIP ? {coin_amount : coinAmount} : null )
         }
 
         try {
@@ -255,9 +263,14 @@ const VideoVisibility = () => {
       }
     }
 
+    const eventBatchFinalized = (batch : any, options : any) => {
+      setBatchFinalized(true)
+    }
+
     uploadyContext.on(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
     uploadyContext.on(UPLOADER_EVENTS.REQUEST_PRE_SEND, eventPreSend)
     uploadyContext.on(UPLOADER_EVENTS.BATCH_START, eventBatchStart)
+    uploadyContext.on(UPLOADER_EVENTS.BATCH_FINALIZE, eventBatchFinalized)
 
     return () => {
       uploadyContext.off(UPLOADER_EVENTS.BATCH_PROGRESS, eventProgress)
@@ -580,6 +593,7 @@ const VideoVisibility = () => {
 
                     <Box>
                       <Button
+                        disabled={ !batchFinalized ? true : false }
                         onClick={() => {
                           dummyNavigate()
                         }}

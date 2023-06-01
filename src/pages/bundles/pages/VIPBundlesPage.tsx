@@ -69,11 +69,7 @@ const VIPBundlesPage = () => {
 
   return (
     <>
-      <Stack
-        sx={{ padding: { xs: 4, sm: 8 } }}
-        bgcolor={theme => theme.customBflyColors.alwaysPrimary}
-        borderRadius={1}
-      >
+      <Stack>
         <Stack
           justifyContent={{ xs: 'center', sm: 'space-between' }}
           alignItems='center'
@@ -81,11 +77,11 @@ const VIPBundlesPage = () => {
           gap={2}
           mb={4}
         >
-          <Box display='flex' gap={10} alignItems='center'>
-            <Typography variant='h5' component='div' color='white'>
+          <Box display='flex' flexDirection={['column', 'row']} gap={4} alignItems='center'>
+            <Typography variant='h5' component='div' color='black'>
               {TranslateString('VIP Bundle')} - {TranslateString('Membership')}
             </Typography>
-            <Button variant='contained' onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>
+            <Button variant='outlined' size='small' onClick={openMenu} endIcon={<KeyboardArrowDownIcon />}>
               {selectedSiteID === 0 ? 'Default' : null}
               {selectedSiteID === undefined ? 'All Sites' : null}
               {uniqueSites.find((item: any) => item.id === selectedSiteID)?.name}
@@ -131,8 +127,8 @@ const VIPBundlesPage = () => {
         ) : (
           <Grid
             container
-            gap={10.5}
-            justifyContent={{ xs: 'center', sm: data?.data?.length % 4 === 0 ? 'space-between' : 'flex-start' }}
+            gap={4}
+            justifyContent={{ xs: 'center', sm: 'flex-start' }}
           >
             {data?.data?.map((item: any) => (
               <VIPBundleItem

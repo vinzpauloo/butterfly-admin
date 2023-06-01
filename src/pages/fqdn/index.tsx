@@ -1,14 +1,13 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import PageHeader from 'src/@core/components/page-header'
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import FQDNService from '@/services/api/FQDNService'
 import { useAuth } from '@/services/useAuth'
-import { Stack } from '@mui/material'
-import LinksContainer from './components/LinksContainer'
+import { Button, CircularProgress, Stack } from '@mui/material'
+import ExpandoForm from './views/ExpandoForm'
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   height: '80vh',
@@ -17,46 +16,113 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)({
   display: 'flex'
 })
 
-type response = {
-  id: number
-  site_id: number
-  name: string
-  type: 'Api' | 'Streaming' | 'Photo'  
-}
-
 const FQDN = () => {
-  const [APIFQDNS, setAPIFQDNS] = useState<response[]>([])
-  const [streamingFQDNS, setStreamingFQDNS] = useState<response[]>([])
-  const [photosFQDNS, setPhotosFQDNS] = useState<response[]>([])
+  const [APIFQDNS, setAPIFQDNS] = useState<string[]>([])
+  const [photoFQDNS, setPhotoFQDNS] = useState<string[]>([])
+  const [streamingFQDNS, setStreamingFQDNS] = useState<string[]>([])
+  const [hasGetDone, setHasGetDone] = useState<boolean>(false)
+  const [FQDNAdminLink, setFQDNAdminLink] = useState<string>('')
+  const formAPIRef = useRef<any>()
+  const formPhotosRef = useRef<any>()
+  const formStreamRef = useRef<any>()
   const auth = useAuth()
 
-  const { getFQDNList } = FQDNService()
+  const { getSuperAgentFQDNList, addFQDN } = FQDNService()
   const { isLoading } = useQuery({
-    queryKey : ['fqdns'],
-    queryFn: () => getFQDNList({
-      site: auth?.user?.site,
-      paginate : 1000
-     }),
+    queryKey: ['fqdns'],
+    queryFn: () =>
+      getSuperAgentFQDNList({
+        site: auth?.user?.site
+      }),
     onSuccess: data => {
       console.log(data?.data)
-      setAPIFQDNS(data?.data?.filter((item: response) => item?.type === 'Api'))
-      setStreamingFQDNS(data?.data?.filter((item: response) => item?.type === 'Streaming'))
-      setPhotosFQDNS(data?.data?.filter((item: response) => item?.type === 'Photo'))
+      setAPIFQDNS(data?.api || data?.Api)
+      setPhotoFQDNS(data?.photo || data?.Photo)
+      setStreamingFQDNS(data?.streaming || data?.Streaming)
+      setHasGetDone(true)
+      setFQDNAdminLink(data?.fqdn_admin)
     },
-    onError: error => { console.log(error) }
+    onError: error => {
+      console.log(error)
+    }
   })
-  
+
+  const queryClient = useQueryClient()
+  const { mutate, isLoading: updateLoading } = useMutation(addFQDN, {
+    onSuccess: data => {
+      console.log(data)
+      queryClient.invalidateQueries({ queryKey: ['fqdns'] })
+    },
+    onError: error => {
+      console.log(error)
+    }
+  })
+
+  const saveChanges = () => {
+    setHasGetDone(false)
+    const apiArray = formAPIRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'api' }))
+    const photoArray = formPhotosRef.current.getFormData().map((name: any) => ({ name: name.value, type: 'photo' }))
+    const streamingArray = formStreamRef.current
+      .getFormData()
+      .map((name: any) => ({ name: name.value, type: 'streaming' }))
+
+    mutate({
+      siteId: auth?.user?.site,
+      data: {
+        site: auth?.user?.site,
+        fqdns: apiArray.concat(photoArray).concat(streamingArray),
+        fqdn_admin: FQDNAdminLink
+      }
+    })
+  }
+
   return (
     <PerfectScrollbar>
       <Grid maxWidth='sm' container spacing={6}>
-        <PageHeader title={<Typography variant='h5'>FQDN</Typography>} />
-        <Grid item xs={12}>
-          <Stack gap={20}>
-            <LinksContainer data={APIFQDNS} type='Api' isLoading={isLoading} />
-            <LinksContainer data={streamingFQDNS} type='Streaming' isLoading={isLoading} />
-            <LinksContainer data={photosFQDNS} type='Photo' isLoading={isLoading} />
-          </Stack>
-        </Grid>
+        {isLoading || updateLoading ? (
+          <Grid item xs={12} my={24} display='flex' alignItems='center' justifyContent='center'>
+            <CircularProgress />
+          </Grid>
+        ) : null}
+        {hasGetDone && (
+          <Grid item xs={12}>
+            <Stack direction='row' alignItems='center' justifyContent='space-between' py={4}>
+              <Typography variant='h5'>FQDN</Typography>
+              <Button variant='outlined' onClick={saveChanges}>
+                Save Changes
+              </Button>
+            </Stack>
+            <Stack gap={20}>
+              <ExpandoForm
+                multipleInputs={true}
+                ref={formAPIRef}
+                fileType='text'
+                pageHeader="API's"
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{ expando: APIFQDNS.map((value: string) => ({ value })) }}
+              />
+              <ExpandoForm
+                multipleInputs={true}
+                ref={formPhotosRef}
+                fileType='text'
+                pageHeader='PHOTOS'
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{ expando: photoFQDNS.map((value: string) => ({ value })) }}
+              />
+              <ExpandoForm
+                multipleInputs={true}
+                ref={formStreamRef}
+                fileType='text'
+                pageHeader='STREAMING'
+                isLoading={isLoading}
+                disableSaveButton={true}
+                defaultValues={{ expando: streamingFQDNS.map((value: string) => ({ value })) }}
+              />
+            </Stack>
+          </Grid>
+        )}
       </Grid>
     </PerfectScrollbar>
   )
@@ -64,7 +130,7 @@ const FQDN = () => {
 
 FQDN.acl = {
   action: 'read',
-  subject: 'fqdn-page'
+  subject: 'sa-page'
 }
 
 export default FQDN

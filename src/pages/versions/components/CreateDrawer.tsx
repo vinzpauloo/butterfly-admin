@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 
 // ** MUI Imports
-import { Drawer, Button, TextField, IconButton, Typography, MenuItem } from '@mui/material'
+import { Drawer, Button, TextField, IconButton, Typography, MenuItem, Dialog, DialogTitle } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -56,7 +56,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const VersionsDrawer = (props: SidebarAddUserType) => {
@@ -138,19 +138,12 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
   const TranslateString = useTranslateString()
 
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
-        <Typography variant='h6'>
-          {TranslateString('Upload')} {TranslateString('Patch')}
-        </Typography>
-        <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
+          Upload Patch
+        </DialogTitle>
+        <IconButton size='small' onClick={handleClose} sx={{ color: '#FFF' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
@@ -203,42 +196,58 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                     )}
                   />
                 </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='name'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Site') + ' ' + TranslateString('Name')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.name}
-                        helperText={errors.name?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='name'
-                      />
-                    )}
-                  />
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: {
+                      xs: 'column',
+                      sm: 'row'
+                    },
+                    gap: {
+                      xs: 0,
+                      sm: 5
+                    }
+                  }}
+                >
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='name'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={TranslateString('Site') + ' ' + TranslateString('Name')}
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.name}
+                          helperText={errors.name?.message}
+                          defaultValue={field.value}
+                          onChange={field.onChange}
+                          name='name'
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='version'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label={TranslateString('Enter') + ' ' + TranslateString('Version')}
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.version}
+                          helperText={errors.version?.message}
+                          defaultValue={field.value}
+                          onChange={field.onChange}
+                          name='version'
+                        />
+                      )}
+                    />
+                  </Box>
                 </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='version'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label={TranslateString('Enter') + ' ' + TranslateString('Version')}
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.version}
-                        helperText={errors.version?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='version'
-                      />
-                    )}
-                  />
-                </Box>
+
                 <Box sx={styles.fullWidth}>
                   <Controller
                     name='patch_note'
@@ -249,7 +258,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
                         variant='outlined'
                         fullWidth
                         multiline
-                        rows={20}
+                        rows={8}
                         error={!!errors.patch_note}
                         helperText={errors.patch_note?.message}
                         defaultValue={field.value}
@@ -283,7 +292,7 @@ const VersionsDrawer = (props: SidebarAddUserType) => {
           <CreatedSuccessful />
         )}
       </Box>
-    </Drawer>
+    </Dialog>
   )
 }
 
@@ -357,11 +366,11 @@ const styles = {
     }
   },
   continueButton: {
-    backgroundColor: '#9747FF',
+    backgroundColor: '#FF9C00',
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#9747FF'
+      backgroundColor: '#FF7c02'
     }
   }
 }

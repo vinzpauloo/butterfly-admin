@@ -1,19 +1,14 @@
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import Avatar from '@mui/material/Avatar'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import IconButton from '@mui/material/IconButton'
+import { Avatar, Box, Card, CardContent, IconButton, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/system'
-import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
-// ** Import Custom Components
+// ** Project/Other Imports
 import FeedAttachments from './FeedAttachments'
-
-// ** Custom Layout Style Components
 import Icon from 'src/@core/components/icon'
+
+// ** Lib Imports
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 // ** Styled Components
 const FeedTextContent = styled(Typography)(({ theme }) => ({
@@ -27,23 +22,37 @@ type User = {
   username: string
 }
 interface FeedCardProps {
-  _id? : string
+  _id?: string
   user?: User
-  editable? : boolean
+  editable?: boolean
   string_story?: string
   datePublished?: string
   children?:
     | (React.ReactNode & React.ReactElement<typeof FeedAttachments>)
     | (React.ReactNode & React.ReactElement<typeof FeedAttachments>[])
-  handleEditButtonClick? : () => void
+  handleEditButtonClick?: () => void
+  selected?: boolean
 }
 
-const FeedCard = ({ string_story, user, children, datePublished, editable, handleEditButtonClick }: FeedCardProps) => {
+const FeedCard = ({
+  string_story,
+  user,
+  children,
+  datePublished,
+  editable,
+  handleEditButtonClick,
+  selected
+}: FeedCardProps) => {
   // ** Hook
   const theme = useTheme()
 
   return (
-    <Box>
+    <Box
+      sx={{
+        border: selected ? `7px solid #56ca00` : ``,
+        borderRadius: selected ? `14px` : ``
+      }}
+    >
       <Card
         variant='elevation'
         sx={{
@@ -73,16 +82,15 @@ const FeedCard = ({ string_story, user, children, datePublished, editable, handl
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 3.5, '& svg': { mr: 1.25 } }}>
-              <img src='/images/icons/chat.png' />
+              <img src='/images/icons/chat.png' alt='chat icon' />
             </Box>
-            {
-              editable && handleEditButtonClick && 
+            {editable && handleEditButtonClick && (
               <Box>
-                <IconButton onClick={ handleEditButtonClick }>
-                  <Icon icon='mdi:pencil' fontSize={20} color={ theme.palette.common.white } />
+                <IconButton onClick={handleEditButtonClick}>
+                  <Icon icon='mdi:pencil' fontSize={20} color={theme.palette.common.white} />
                 </IconButton>
               </Box>
-            }
+            )}
           </Box>
         </Box>
 

@@ -310,7 +310,17 @@ function TableVideos() {
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['videosList', page, pageSize, debouncedCreator, debouncedTitle, debouncedTag, postStatus],
     queryFn: () =>
-      getAllVideos({ data: { with: 'user', page, approval: postStatus, paginate: pageSize, ...filterParams() } }),
+      getAllVideos({
+        data: {
+          with: 'user',
+          page,
+          approval: postStatus,
+          paginate: pageSize,
+          sort: 'desc',
+          sort_by: 'created_at',
+          ...filterParams()
+        }
+      }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)

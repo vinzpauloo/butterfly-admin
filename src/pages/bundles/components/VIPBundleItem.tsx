@@ -5,11 +5,9 @@ import React, { useState } from 'react'
 import { Button, CircularProgress, Modal, Stack, Switch } from '@mui/material'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import Grid, { GridProps } from '@mui/material/Grid'
-import { Icon, IconProps } from '@mui/material'
 
 // ** Project/Other Imports
 import VIPBundleModal from './VIPBundleModal'
-import IconList from './IconList'
 
 // ** TanStack Imports
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -42,18 +40,6 @@ type Props = {
     offline_benefit: boolean
   }
 }
-
-const bundleNames = [
-  'Video',
-  'Photos',
-  'Live Stream',
-  'Video Call',
-  'Live Chat',
-  'Forever VIP',
-  'Download',
-  'Watch Ticket',
-  'Offline Benefits'
-]
 
 const VIPBundleItem = (props: Props) => {
   const [open, setOpen] = useState(false)
@@ -123,106 +109,101 @@ const VIPBundleItem = (props: Props) => {
 
   const TranslateString = useTranslateString()
 
-  const featuresList = [
+  const perksList = [
     {
-      featureName: 'Video',
+      includedSrc: '/images/vipBundle/videos.png',
+      src: '/images/vipBundle/videos_white.png',
+      featureName: 'Videos',
       isIncluded: props.bundlePerks.videos
     },
     {
+      includedSrc: '/images/vipBundle/photos.png',
+      src: '/images/vipBundle/photos_white.png',
       featureName: 'Photos',
       isIncluded: props.bundlePerks.photos
     },
     {
-      featureName: 'Live Stream',
+      includedSrc: '/images/vipBundle/live.png',
+      src: '/images/vipBundle/live_white.png',
+      featureName: 'Live',
       isIncluded: props.bundlePerks.live_streaming
     },
     {
+      includedSrc: '/images/vipBundle/videocall.png',
+      src: '/images/vipBundle/videocall_white.png',
       featureName: 'Video Call',
       isIncluded: props.bundlePerks.video_call
     },
     {
+      includedSrc: '/images/vipBundle/liveChat.png',
+      src: '/images/vipBundle/liveChat_white.png',
       featureName: 'Live Chat',
       isIncluded: props.bundlePerks.live_chat
     },
     {
+      includedSrc: '/images/vipBundle/foreverVIP.png',
+      src: '/images/vipBundle/foreverVIP_white.png',
       featureName: 'Forever VIP',
       isIncluded: props.bundlePerks.forever_vip
     },
     {
+      includedSrc: '/images/vipBundle/download.png',
+      src: '/images/vipBundle/download_white.png',
       featureName: 'Download',
       isIncluded: props.bundlePerks.download
     },
     {
+      includedSrc: '/images/vipBundle/watchTicket.png',
+      src: '/images/vipBundle/watchTicket_white.png',
       featureName: 'Watch Ticket',
       isIncluded: props.bundlePerks.watch_ticket
     }
   ]
 
   return (
-    <>
-      <Stack gap={2} width={300} sx={loadingStyle} position='relative'>
+    <React.Fragment>
+      <Stack gap={2} width={350} sx={loadingStyle} position='relative'>
         {isBeingDeletedOrEdited ? <CircularProgress sx={loaderStyle} /> : null}
-        <Stack bgcolor='#D9D9D9' borderRadius={0.5} p={2} width={300}>
-          <Stack gap={2}>
-            <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
-              {props.site_id}: {props.siteName}
-            </Typography>
-            <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
+        <Stack bgcolor='#202833' borderRadius={1} p={2} pt={0} width={350} alignItems='center' border={'4px solid #3E404D'} gap={2}>
+          <Typography bgcolor='#454B5E' color='#CAC0AA' px={4} py={2} borderRadius={'0px 0px 8px 8px'} width='max-content' sx={{ wordBreak: 'break-word' }}>
+            {props.bundleName}
+          </Typography>
+          <Typography variant='h4' color='#CAC0AA' textAlign='center' sx={{ wordBreak: 'break-word' }} >
+            {props.bundlePrice}
+          </Typography>
+          <Typography variant='body2' bgcolor='#36384B' color='#CAC0AA' px={4} py={2} borderRadius={3} width='max-content' sx={{ wordBreak: 'break-word' }}>
+            {props.bundleDescription}
+          </Typography>
+          <Typography variant='body1' color='white' sx={{ wordBreak: 'break-word' }}>
+            {props.site_id}: {props.siteName}
+          </Typography>
+          <Stack gap={2} flexDirection='row' alignItems='center' justifyContent='space-between'>
+            <Typography variant='body1' color='white' sx={{ wordBreak: 'break-word' }}>
               Duration:&nbsp;
               {props.bundleDuration === 31 && '1 Month'}
               {props.bundleDuration === 92 && '3 Months'}
               {props.bundleDuration === 182 && '6 Months'}
               {props.bundleDuration === 365 && '1 Year'}
             </Typography>
-            <Stack gap={2} flexDirection='row' justifyContent='space-between'>
-              <Typography
-                variant='h6'
-                bgcolor='white'
-                p={2}
-                borderRadius={0.5}
-                width='max-content'
-                sx={{ wordBreak: 'break-word' }}
-              >
-                {props.bundleName}
-              </Typography>
-              <Switch checked={props.isBundleOn} onClick={SwtichOnAndOffVIPBundle} />
-            </Stack>
-            <Typography
-              variant='body1'
-              bgcolor='white'
-              p={2}
-              borderRadius={0.5}
-              textAlign='center'
-              sx={{ wordBreak: 'break-word' }}
-            >
-              {props.bundlePrice}
-            </Typography>
-            <Typography variant='body2' bgcolor='white' p={2} borderRadius={0.5} sx={{ wordBreak: 'break-word' }}>
-              {props.bundleDescription}
-            </Typography>
+            <Switch color='primary' checked={props.isBundleOn} onClick={SwtichOnAndOffVIPBundle} />
           </Stack>
         </Stack>
         <Stack>
-          <Stack bgcolor='#D9D9D9' borderRadius={0.5} p={2}>
-            <Stack bgcolor='white' borderRadius={0.5} gap={4} p={1}>
-              <Typography variant='body1' borderRadius={0.5} textAlign='center' sx={{ wordBreak: 'break-word' }}>
-                {props.bundleName}
-              </Typography>
-              <Grid container gap={2}>
-                {featuresList.map((item, index) => (
-                  <Grid item key={index} {...gridItemProps}>
-                    <Icon component={IconList(index, item.isIncluded)} {...iconItemProps} />
-                    <Typography {...typographyItemProps}>{bundleNames.at(index)}</Typography>
-                  </Grid>
-                ))}
-              </Grid>
-            </Stack>
-          </Stack>
+          <Stack bgcolor='#202833' borderRadius={0.5} gap={4} border={'4px solid #3E404D'}>
+            <Grid container gap={4} py={4}>
+              {perksList.map((item, index) => (
+                <Grid item key={index} {...gridItemProps}>
+                  <img src={item.isIncluded ? item.includedSrc : item.src} alt='' style={{width: 32, height: 32}} />
+                  <Typography color='white' {...typographyItemProps}>{item.featureName}</Typography>
+                </Grid>
+              ))}
+            </Grid>
+          </Stack>          
           <Stack flexDirection='row' gap={4} mt={2}>
-            <Button variant='contained' color='warning' fullWidth onClick={() => setOpen(true)}>
+            <Button variant='contained' size='small' sx={{ backgroundColor: '#F09536'}} fullWidth onClick={() => setOpen(true)}>
               {TranslateString('Edit')}
             </Button>
-            <Button variant='contained' color='error' fullWidth onClick={confirmDeleteVIPBundle}>
+            <Button variant='contained' size='small' sx={{ backgroundColor: '#F03663'}} fullWidth onClick={confirmDeleteVIPBundle}>
               {TranslateString('Delete')}
             </Button>
           </Stack>
@@ -250,7 +231,7 @@ const VIPBundleItem = (props: Props) => {
           isOfflineBenefitsIncluded={props.bundlePerks.offline_benefit}
         />
       </Modal>
-    </>
+    </React.Fragment>
   )
 }
 
@@ -262,23 +243,18 @@ const gridItemProps: GridProps = {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  width: 64,
-  xs: 3.7
+  gap: 2,
+  xs: 2.5
 }
 
 const typographyItemProps: TypographyProps = {
   textAlign: 'center',
   variant: 'subtitle1',
   borderRadius: 0.5,
-  fontSize: 10
+  fontSize: 10,
+  textTransform: 'uppercase'
 }
 
-const iconItemProps: IconProps = {
-  sx: {
-    height: 32,
-    width: 32
-  }
-}
 const loaderStyle = {
   position: 'absolute',
   top: 0,

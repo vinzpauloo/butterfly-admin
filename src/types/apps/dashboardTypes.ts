@@ -1,4 +1,4 @@
-export type BaseData =  {
+interface BaseData {
     from?: string
     to?: string
     select?: string
@@ -13,6 +13,8 @@ export type DashboardData = BaseData & {
     most_followed?: string
     most_liked?: string
     most_download?: string
+    most_favorite?: string
+    most_viewed?: string
     limit?: string
     paginate?: string
     top_donators?: string
@@ -27,15 +29,8 @@ export type ChartData = BaseData & {
     yearly?: string
 }
 
-export type DashboardProps = {
-    data: DashboardData
-}
-
-export type ChartProps = {
-    data: ChartData
+export type DataProps<T extends BaseData> = {
+    data: T;
 }
 
 export type AllDashboardData = BaseData & ChartData & DashboardData;
-export type AllDashboardDataProps = {
-    data: AllDashboardData
-}

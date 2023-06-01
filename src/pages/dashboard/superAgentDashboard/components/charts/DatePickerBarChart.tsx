@@ -87,7 +87,9 @@ const DatePickerBarChart = (props: VerticalBarProps) => {
           from: fromDate,
           to: toDate,
           sort: sort,
-          sort_by: sortName
+          sort_by: sortName,
+          select: 'total_new_vip,total_new_guest,created_at',
+          daily: 'true'
         }
       }),
     onSuccess: (data: any) => {
@@ -177,7 +179,7 @@ const DatePickerBarChart = (props: VerticalBarProps) => {
             </Box>
           </Box>
         </Box>
-        <CardContent>
+        <CardContent sx={{ height: 510 }}>
           <Bar data={chartData} height={248} options={options} />
         </CardContent>
       </Card>

@@ -3,7 +3,17 @@ import React from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
-import { Drawer, IconButton, Step, Stepper, StepLabel, StepContent, Typography } from '@mui/material'
+import {
+  IconButton,
+  Step,
+  Stepper,
+  StepLabel,
+  StepContent,
+  Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle
+} from '@mui/material'
 
 // ** Style Imports
 import { styled } from '@mui/material/styles'
@@ -14,7 +24,6 @@ import Icon from 'src/@core/components/icon'
 // ** Project/Other Imports
 import EditStepOne from './components/EditStepOne'
 import EditStepTwo from './components/EditStepTwo'
-import EditStepThree from './components/EditStepThree'
 import StepperWrapper from '@/@core/styles/mui/stepper'
 import StepperCustomDot from '@/layouts/components/shared-components/StepperCustomDot'
 import { editSuperAgentStore } from '@/zustand/editSuperAgentStore'
@@ -35,7 +44,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const Steps = () => {
@@ -59,13 +68,14 @@ const Steps = () => {
     {
       title: 'Configure FQDN Info',
       subtitle: 'Modify Setup',
-      component: <EditStepTwo data={drawerData} />
-    },
-    {
-      title: 'Modify Integration',
-      subtitle: 'Edit Integration and RSA Details',
-      component: <EditStepThree toggle={() => setDrawerRole(null)} />
+      component: <EditStepTwo data={drawerData} toggle={() => setDrawerRole(null)} />
     }
+
+    // {
+    //   title: 'Modify Integration',
+    //   subtitle: 'Edit Integration and RSA Details',
+    //   component: <EditStepThree toggle={() => setDrawerRole(null)} />
+    // }
   ]
 }
 
@@ -93,16 +103,16 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
   }
 
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
-      <HeaderWrapper handleClose={handleClose} />
-      <Box sx={{ p: 5 }}>
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
+      <Header>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
+          Edit Super Agent
+        </DialogTitle>
+        <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
+          <Icon icon='mdi:close' fontSize={20} />
+        </IconButton>
+      </Header>
+      <DialogContent>
         <StepperWrapper>
           <Stepper activeStep={activeStep} orientation='vertical'>
             {steps.map((step, index) => {
@@ -110,7 +120,7 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
                 <Step key={index} className={clsx({ active: activeStep === index })}>
                   <StepLabel StepIconComponent={StepperCustomDot} onClick={() => handleStepToggle(index)}>
                     <div className='step-label'>
-                      <Typography className='step-number'>{`0${index + 1}`}</Typography>
+                      <Typography className='step-number'>{`Step 0${index + 1}`}</Typography>
                       <div>
                         <Typography className='step-title'>{step.title}</Typography>
                         <Typography className='step-subtitle'>{step.subtitle}</Typography>
@@ -123,21 +133,8 @@ const EditSuperAgentDrawer = (props: SidebarAddUserType) => {
             })}
           </Stepper>
         </StepperWrapper>
-      </Box>
-    </Drawer>
-  )
-}
-
-function HeaderWrapper({ handleClose }: any) {
-  return (
-    <>
-      <Header>
-        <Typography variant='h6'>Edit Super Agent</Typography>
-        <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
-          <Icon icon='mdi:close' fontSize={20} />
-        </IconButton>
-      </Header>
-    </>
+      </DialogContent>
+    </Dialog>
   )
 }
 

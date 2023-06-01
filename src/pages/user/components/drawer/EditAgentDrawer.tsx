@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 // ** MUI Imports
-import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
+import { Button, TextField, IconButton, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
@@ -16,13 +16,13 @@ import Icon from 'src/@core/components/icon'
 
 // ** Other Imports
 import CreatedSuccessful from '@/pages/user/components/form/CreatedSuccessful'
-import { useTranslateString } from '@/utils/TranslateString'
 
 // ** TanStack Query
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ** Hooks
 import { UserTableService } from '@/services/api/UserTableService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
 
 interface FormValues {
   password: string
@@ -49,16 +49,15 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const EditAgentDrawer = (props: SidebarAddUserType) => {
   const queryClient = useQueryClient()
+  const { handleError, getErrorResponse, clearErrorResponse } = useErrorHandling()
 
   // ** Props
   const { open, toggle, rowData } = props
-
-  console.log(rowData)
 
   // ** State
   const [submitted, setSubmitted] = useState<boolean>()
@@ -87,13 +86,6 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
     }
   })
 
-  interface ResponseErrorProps {
-    password?: string
-    user_note?: string
-  }
-
-  const [responseError, setResponseError] = useState<ResponseErrorProps>()
-
   const handleFormSubmit = async (data: FormValues) => {
     const { password, password_confirmation } = data
 
@@ -109,16 +101,13 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
           toggle()
           setSubmitted(false)
           resetForm()
-          setResponseError({ password: '' })
+          clearErrorResponse()
 
           // Re-fetches UserTable and CSV exportation
           queryClient.invalidateQueries({ queryKey: ['allUsers'] })
         }, 1500)
       } catch (e: any) {
-        const {
-          data: { error }
-        } = e
-        setResponseError(error)
+        handleError(e, `updateUser() EditAgentDrawer.tsx`)
       }
     }
   }
@@ -131,89 +120,120 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
     toggle()
   }
 
-  const TranslateString = useTranslateString()
-
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
-        <Typography variant='h6'>
-          {TranslateString('Edit')} {TranslateString('Agent')} {TranslateString('Account')}
-        </Typography>
-        <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
+          Edit Agent
+        </DialogTitle>
+        <IconButton size='small' onClick={handleClose} sx={{ color: '#FFF' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
-      <Box sx={{ p: 5 }}>
+      <DialogContent>
         {!submitted ? (
           <Box sx={styles.container}>
             <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
-              <TextField
-                label='Username'
-                variant='outlined'
-                fullWidth
-                name='username'
-                InputLabelProps={{
-                  shrink: true
-                }}
-                value={rowData?.username || ''}
-                disabled
-              />
               <Box sx={styles.formContent}>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Enter New Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                        onChange={field.onChange}
-                        name='password'
-                        type='password'
-                      />
-                    )}
-                  />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: {
+                      xs: 'column',
+                      sm: 'row'
+                    },
+                    gap: {
+                      xs: 2,
+                      sm: 5
+                    }
+                  }}
+                >
+                  <Box sx={styles.fullWidth}>
+                    <TextField
+                      label='Username'
+                      variant='outlined'
+                      fullWidth
+                      name='username'
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      value={rowData?.username || ' '}
+                      disabled
+                    />
+                  </Box>
+
+                  <Box sx={styles.fullWidth}>
+                    <TextField
+                      label='Mobile'
+                      variant='outlined'
+                      fullWidth
+                      name='mobile'
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      disabled
+                      value={rowData?.mobile || ''}
+                    />
+                  </Box>
                 </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password_confirmation'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Re-enter New Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password_confirmation}
-                        helperText={errors.password_confirmation?.message}
-                        onChange={field.onChange}
-                        name='password_confirmation'
-                        type='password'
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Mobile'
-                    variant='outlined'
-                    fullWidth
-                    name='mobile'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    disabled
-                    value={rowData?.mobile || ''}
-                  />
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: {
+                      xs: 'column',
+                      sm: 'row'
+                    },
+                    gap: {
+                      xs: 2,
+                      sm: 5
+                    }
+                  }}
+                >
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='password'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label='Enter New Password'
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.password}
+                          helperText={errors.password?.message}
+                          onChange={field.onChange}
+                          name='password'
+                          type='password'
+                          defaultValue={'********'}
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box sx={styles.fullWidth}>
+                    <Controller
+                      name='password_confirmation'
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          label='Re-enter New Password'
+                          variant='outlined'
+                          fullWidth
+                          error={!!errors.password_confirmation}
+                          helperText={errors.password_confirmation?.message}
+                          onChange={field.onChange}
+                          name='password_confirmation'
+                          type='password'
+                          defaultValue={'********'}
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
                 </Box>
 
                 <Box sx={styles.fullWidth}>
@@ -230,18 +250,19 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
                   />
                 </Box>
 
-                {responseError && <Typography color='red'>{responseError.password}</Typography>}
+                {/* Error messages from backend */}
+                {getErrorResponse(12)}
 
                 <Box sx={styles.formButtonContainer}>
                   <Box>
                     <Button sx={styles.cancelButton} onClick={handleClose}>
-                      <Typography sx={styles.text}>{TranslateString('Cancel')}</Typography>
+                      <Typography sx={styles.text}>Cancel</Typography>
                     </Button>
                   </Box>
 
                   <Box>
                     <Button type='submit' sx={styles.continueButton}>
-                      <Typography sx={styles.text}>{TranslateString('Continue')}</Typography>
+                      <Typography sx={styles.text}>Continue</Typography>
                     </Button>
                   </Box>
                 </Box>
@@ -249,10 +270,10 @@ const EditAgentDrawer = (props: SidebarAddUserType) => {
             </form>
           </Box>
         ) : (
-          <CreatedSuccessful />
+          <CreatedSuccessful update />
         )}
-      </Box>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -272,7 +293,7 @@ const styles = {
     color: 'white'
   },
   formContent: {
-    marginTop: 5
+    marginTop: 0
   },
   fullWidth: {
     width: '100%',
@@ -326,11 +347,11 @@ const styles = {
     }
   },
   continueButton: {
-    backgroundColor: '#9747FF',
+    backgroundColor: '#FF9C00',
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#9747FF'
+      backgroundColor: '#FF7c02'
     }
   }
 }

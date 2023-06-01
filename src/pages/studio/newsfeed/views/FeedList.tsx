@@ -1,10 +1,11 @@
 // ** React imports
 import React from 'react'
 
+// ** Next Imports
+import { useRouter } from 'next/router'
+
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
+import { Box, Grid, Typography } from '@mui/material'
 
 // ** Custom Components
 import FeedCard from '../../shared-component/feed/FeedCard'
@@ -23,15 +24,21 @@ import NoPostsFound from './NoPostsFound'
 
 // ** Base Links
 import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+import { useFeaturedFeedStore } from '@/zustand/featuredFeedGlobalStore'
 
 type StoryProps = {
   data?: any
   handleFeedItemClick?: (story: IFeedStory) => void
-  editable? : boolean
-  handleCardClick? : (story: IFeedStory) => void
+  editable?: boolean
+  handleCardClick?: (story: IFeedStory) => void
 }
 
-const FeedList = ({ data, handleFeedItemClick, editable=false, handleCardClick }: StoryProps) => {
+const FeedList = ({ data, editable = false, handleFeedItemClick }: StoryProps) => {
+  const { selectedFeed } = useFeaturedFeedStore()
+  const handleSelectSpecificFeed = useFeaturedFeedStore(state => state.handleSelectSpecificFeed)
+  const router = useRouter()
+  const currentLocation = router.asPath
+
   if (data?.length == 0) {
     return <NoPostsFound />
   }
@@ -44,14 +51,22 @@ const FeedList = ({ data, handleFeedItemClick, editable=false, handleCardClick }
         <Grid container spacing={10}>
           {stories &&
             stories?.map((story: IFeedStory) => (
-              <Grid key={story._id} item sm={6} onClick={ handleCardClick ? () => handleCardClick(story) : ()=>{} }>
+              <Grid key={story._id} item sm={6} onClick={() => handleSelectSpecificFeed(story._id, story.string_story)}>
                 <FeedCard
                   _id={story._id}
                   datePublished={formatDate(story.created_at)}
                   string_story={story.string_story}
                   {...(story.user && { user: story.user })}
                   editable={editable}
-                  handleEditButtonClick={ handleFeedItemClick ? () => handleFeedItemClick(story) : () => {} }
+                  selected={
+                    currentLocation === '/settings/pages/featuredfeeds/' && selectedFeed === story._id ? true : false
+                  }
+                  handleEditButtonClick={
+                    currentLocation === '/studio/newsfeed/' && handleFeedItemClick
+                      ? () => handleFeedItemClick(story)
+                      : // eslint-disable-next-line @typescript-eslint/no-empty-function
+                        () => {}
+                  }
                 >
                   {story && story?.tags && (
                     <FeedAttachments>
@@ -70,7 +85,7 @@ const FeedList = ({ data, handleFeedItemClick, editable=false, handleCardClick }
                       <FeedVideoCard source={STREAMING_SERVER_URL + story.videos.url} />
                     </FeedAttachments>
                   )}
-                  
+
                   <FeedAttachments>
                     {story.images && (
                       <PhotoGridCard cols={story!.images!.length > 3 ? 3 : story?.images?.length}>
@@ -82,7 +97,6 @@ const FeedList = ({ data, handleFeedItemClick, editable=false, handleCardClick }
                       </PhotoGridCard>
                     )}
                   </FeedAttachments>
-
                 </FeedCard>
               </Grid>
             ))}

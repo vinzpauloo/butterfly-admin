@@ -91,10 +91,10 @@ const DatePickerBarChart = (props: VerticalBarProps) => {
         }
       }),
     onSuccess: (data: any) => {
-      const date = data?.map((item: any) => item?.created_at)
-      const guest = data?.map((item: any) => item?.total_new_guest)
-      const vip = data?.map((item: any) => item?.total_new_vip)
-      setChartData(generateChartData(startDate, endDate, warning, info, date, guest, vip))
+      // const date = data?.map((item: any) => item?.created_at)
+      // const guest = data?.map((item: any) => item?.total_new_guest)
+      // const vip = data?.map((item: any) => item?.total_new_vip)
+      // setChartData(generateChartData(startDate, endDate, warning, info, date, guest, vip))
     }
   })
 

@@ -21,12 +21,18 @@ const StepperWrapper = styled(Box)<BoxProps>(({ theme }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
+
+        // display: 'flex',
+        // flexDirection: 'column',
+        // justifyContent: 'center',
+        // alignItems: 'flex-start'
       },
       '& .step-number': {
         fontWeight: 'bold',
         fontSize: '2.125rem',
         marginRight: theme.spacing(2.5),
-        color: theme.palette.text.primary
+        color: '#FF9C00'
+        // color: theme.palette.text.primary
       },
       '& .step-title': {
         fontWeight: 600,
@@ -44,27 +50,28 @@ const StepperWrapper = styled(Box)<BoxProps>(({ theme }) => {
       },
       '& .Mui-error': {
         '& .MuiStepLabel-labelContainer, & .step-number, & .step-title, & .step-subtitle': {
-          color: theme.palette.error.main
+          color: theme.palette.error.main,
         }
       }
     },
     '& .MuiStepConnector-root': {
       '& .MuiStepConnector-line': {
         borderWidth: 3,
-        borderRadius: 3
+        borderRadius: 3,
       },
       '&.Mui-active, &.Mui-completed': {
         '& .MuiStepConnector-line': {
-          borderColor: theme.palette.primary.main
+          // borderColor: theme.palette.primary.main,
+          borderColor: '#FF9C00'
         }
       },
       '&.Mui-disabled .MuiStepConnector-line': {
-        borderColor: bgColors.primaryLight.backgroundColor
+        borderColor: bgColors.primaryLight.backgroundColor,
       }
     },
     '& .MuiStepper-alternativeLabel': {
       '& .MuiStepConnector-root': {
-        top: 10
+        top: 10,
       },
       '& .MuiStepLabel-labelContainer': {
         display: 'flex',
@@ -78,24 +85,33 @@ const StepperWrapper = styled(Box)<BoxProps>(({ theme }) => {
     '& .MuiStepper-vertical': {
       '& .MuiStep-root': {
         '& .step-label': {
-          justifyContent: 'flex-start'
+          justifyContent: 'flex-start',
         },
         '& .MuiStepContent-root': {
           borderWidth: 3,
-          marginLeft: theme.spacing(2.25),
-          borderColor: theme.palette.primary.main
+          marginLeft: {
+            xs: theme.spacing(2.25),
+            sm: 50
+          },
+          // borderColor: theme.palette.primary.main,
+          borderColor: '#FF9C00'
         },
         '& .button-wrapper': {
           marginTop: theme.spacing(4)
         },
         '&.active + .MuiStepConnector-root .MuiStepConnector-line': {
-          borderColor: theme.palette.primary.main
+          // borderColor: theme.palette.primary.main,
+          borderColor: '#FF9C00'
         }
       },
       '& .MuiStepConnector-root': {
-        marginLeft: theme.spacing(2.25),
+        marginLeft: {
+          xs: theme.spacing(2.25),
+          sm: 50
+        },
+        
         '& .MuiStepConnector-line': {
-          borderRadius: 0
+          borderRadius: 0,
         }
       }
     }

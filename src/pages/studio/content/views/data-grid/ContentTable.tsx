@@ -80,7 +80,17 @@ const ContentTable = (props: IContentTable) => {
   //Queries
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['contents', page, pageSize],
-    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize, approval } }),
+    queryFn: () =>
+      getContents({
+        data: {
+          with: 'user',
+          page: page,
+          paginate: pageSize,
+          sort: 'desc',
+          sort_by: 'created_at',
+          approval
+        }
+      }),
     onSuccess: data => {
       setData(data.data)
       setRowCount(data.total)

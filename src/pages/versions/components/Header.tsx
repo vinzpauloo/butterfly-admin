@@ -140,7 +140,11 @@ const styles = {
       md: 'auto',
       lg: 150
     },
-    float: 'right'
+    float: 'right',
+    backgroundColor: '#FF9C00',
+    '&:hover': {
+      backgroundColor: '#FF7c02'
+    }
   },
   menuSelect: {
     '& .MuiSelect-select': {

@@ -39,7 +39,7 @@ const ChatService = () => {
   const getSingleChat = (data: ISingleChatParams) => {
     return request({
       headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}`, ...getHeaders() },
-      url: `/web/chats/${data.chatId}`,
+      url: `/web/chats/user/${data.chatId}`,
       method: 'GET',
       params: data.params
     })

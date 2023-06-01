@@ -91,7 +91,9 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
           from: fromDate,
           to: toDate,
           sort: sort,
-          sort_by: sortName
+          sort_by: sortName,
+          select: 'total_new_vip,total_new_guest,created_at',
+          daily: 'true'
         }
       }),
     onSuccess: (data: any) => {
@@ -185,7 +187,7 @@ const VipAndGuestsData = (props: VerticalBarProps) => {
           </Box>
         </Box>
         <CardContent>
-          <Bar data={chartData} height={400} options={options} />
+          <Bar data={chartData} height={235} options={options} />
         </CardContent>
       </Card>
     </DatePickerWrapper>
@@ -217,7 +219,7 @@ const styles = {
       xs: 'column',
       sm: 'column',
       md: 'column',
-      lg: 'row'
+      lg: 'column'
     },
     gap: 3
   }

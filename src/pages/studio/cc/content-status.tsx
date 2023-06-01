@@ -20,17 +20,16 @@ import TableCCContentStatus from './views/TableCCContentStatus'
 
 // ** Custom Hooks
 import useDebounce from '@/hooks/useDebounce'
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** Types
-type StatusTypes = 'Approved' | 'Pending' | 'Declined' 
+type StatusTypes = 'Approved' | 'Pending' | 'Declined'
 
 interface SnackState extends SnackbarOrigin {
-    open: boolean
+  open: boolean
 }
 
 const ContentStatus = () => {
-
   // ** States
   const [data, setData] = React.useState([])
   const [rowCount, setRowCount] = React.useState(0)
@@ -56,12 +55,12 @@ const ContentStatus = () => {
   const getContentQuery = useQuery({
     keepPreviousData: false,
     queryKey: ['contents', page, pageSize, postStatus],
-    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize, approval : postStatus  } }),
+    queryFn: () => getContents({ data: { with: 'user', page: page, paginate: pageSize, approval: postStatus } }),
     onSuccess: data => {
-        setData(data.data)
-        setRowCount(data.total)
-        setPage(data.current_page)
-        setTotal(data.total)
+      setData(data.data)
+      setRowCount(data.total)
+      setPage(data.current_page)
+      setTotal(data.total)
     }
   })
 
@@ -86,8 +85,13 @@ const ContentStatus = () => {
           {TranslateString('CC Content List')}
         </Typography>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-          <Box sx={{marginBottom:'2rem'}} display={'flex'} alignItems={'center'} justifyContent={'space-between'} gap={3}>
-
+          <Box
+            sx={{ marginBottom: '2rem' }}
+            display={'flex'}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+            gap={3}
+          >
             <Button size='small' variant='contained' color='warning' onClick={() => setPostStatus('Pending')}>
               {TranslateString('Pending')}
             </Button>
@@ -95,7 +99,6 @@ const ContentStatus = () => {
             <Button size='small' variant='contained' color='error' onClick={() => setPostStatus('Declined')}>
               {TranslateString('Declined')}
             </Button>
-
           </Box>
         </Box>
       </Box>
@@ -124,7 +127,7 @@ const ContentStatus = () => {
 
 ContentStatus.acl = {
   action: 'read',
-  subject: 'cc-post-status'
+  subject: 'cc-only-page'
 }
 
 export default ContentStatus

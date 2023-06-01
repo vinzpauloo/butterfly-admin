@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
-import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
+import { Button, TextField, IconButton, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material'
 
 // ** Style Imports
 import { styled } from '@mui/material/styles'
@@ -45,7 +45,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const EditCreatorDrawer = (props: SidebarAddUserType) => {
@@ -124,25 +124,32 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
   }
 
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
-        <Typography variant='h6'>Edit Creator</Typography>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
+          Edit Creator
+        </DialogTitle>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
-      <Box sx={{ p: 5 }}>
+      <DialogContent sx={{ mx: 4 }}>
         {!submitted ? (
-          <Box sx={styles.container}>
-            <form onSubmit={handleSubmit(handleFormSubmit)}>
-              <Box sx={styles.formContent}>
+          <form onSubmit={handleSubmit(handleFormSubmit)}>
+            <Box sx={styles.formContent}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row'
+                  },
+                  gap: {
+                    xs: 2,
+                    sm: 5
+                  }
+                }}
+              >
                 <Box sx={styles.fullWidth}>
                   <TextField
                     label='Username'
@@ -152,10 +159,39 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                     InputLabelProps={{
                       shrink: true
                     }}
-                    value={props?.data.username || ''}
+                    value={props?.data.username || ' '}
                     disabled
                   />
                 </Box>
+
+                <Box sx={styles.fullWidth}>
+                  <TextField
+                    label='Mobile'
+                    variant='outlined'
+                    fullWidth
+                    name='mobile'
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    disabled
+                    value={props?.data.mobile || ''}
+                  />
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row'
+                  },
+                  gap: {
+                    xs: 2,
+                    sm: 5
+                  }
+                }}
+              >
                 <Box sx={styles.fullWidth}>
                   <Controller
                     name='password'
@@ -200,83 +236,69 @@ const EditCreatorDrawer = (props: SidebarAddUserType) => {
                     )}
                   />
                 </Box>
+              </Box>
 
-                <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Mobile'
-                    variant='outlined'
-                    fullWidth
-                    name='mobile'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    disabled
-                    value={props?.data.mobile || ''}
-                  />
+              <Box sx={styles.fullWidth}>
+                <TextField
+                  label='Email'
+                  variant='outlined'
+                  fullWidth
+                  name='email'
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  disabled
+                  value={props?.data.email || ''}
+                />
+              </Box>
+
+              <Box sx={styles.fullWidth}>
+                <Controller
+                  name='user_note'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Notes'
+                      variant='outlined'
+                      fullWidth
+                      multiline
+                      rows={8}
+                      error={!!errors.user_note}
+                      helperText={errors.user_note?.message}
+                      onChange={field.onChange}
+                      name='user_note'
+                      defaultValue={field.value}
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                    />
+                  )}
+                />
+              </Box>
+
+              {/* Error messages from backend */}
+              {getErrorResponse(12)}
+
+              <Box sx={styles.formButtonContainer}>
+                <Box>
+                  <Button sx={styles.cancelButton} onClick={handleClose}>
+                    <Typography sx={styles.text}>Cancel</Typography>
+                  </Button>
                 </Box>
 
-                <Box sx={styles.fullWidth}>
-                  <TextField
-                    label='Email'
-                    variant='outlined'
-                    fullWidth
-                    name='email'
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    disabled
-                    value={props?.data.email || ''}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='user_note'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Notes'
-                        variant='outlined'
-                        fullWidth
-                        multiline
-                        rows={4}
-                        error={!!errors.user_note}
-                        helperText={errors.user_note?.message}
-                        onChange={field.onChange}
-                        name='user_note'
-                        defaultValue={field.value}
-                        InputLabelProps={{
-                          shrink: true
-                        }}
-                      />
-                    )}
-                  />
-                </Box>
-
-                {/* Error messages from backend */}
-                {getErrorResponse(12)}
-
-                <Box sx={styles.formButtonContainer}>
-                  <Box>
-                    <Button sx={styles.cancelButton} onClick={handleClose}>
-                      <Typography sx={styles.text}>Cancel</Typography>
-                    </Button>
-                  </Box>
-
-                  <Box>
-                    <Button type='submit' sx={styles.continueButton}>
-                      <Typography sx={styles.text}>Continue</Typography>
-                    </Button>
-                  </Box>
+                <Box>
+                  <Button type='submit' sx={styles.continueButton}>
+                    <Typography sx={styles.text}>Continue</Typography>
+                  </Button>
                 </Box>
               </Box>
-            </form>
-          </Box>
+            </Box>
+          </form>
         ) : (
           <CreatedSuccessful update />
         )}
-      </Box>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -296,7 +318,7 @@ const styles = {
     color: 'white'
   },
   formContent: {
-    marginTop: 5
+    marginTop: 0
   },
   fullWidth: {
     width: '100%',
@@ -350,11 +372,11 @@ const styles = {
     }
   },
   continueButton: {
-    backgroundColor: '#9747FF',
+    backgroundColor: '#FF9C00',
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#9747FF'
+      backgroundColor: '#FF7c02'
     }
   }
 }

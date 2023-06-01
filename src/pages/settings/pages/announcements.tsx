@@ -2,14 +2,16 @@
 import React, { useState } from 'react'
 
 // ** MUI Imports
-import { Box, Card, Grid, Divider, Typography, Button, Switch, Stack, IconButton } from '@mui/material'
+import { Box, Typography, Button, Stack, IconButton, MenuItem, Select, SelectChangeEvent, InputLabel } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
 // ** Project/Other Imports
 import AnnouncementModal from '../components/modal/AnnouncementModal'
-import Translations from '../../../layouts/components/Translations'
+import { useTranslateString } from '@/utils/TranslateString'
+import Container from '@/pages/components/Container'
+import ToggleButton from '@/pages/user/components/button/ToggleButton'
 
 // ** TanStack Imports
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -24,8 +26,9 @@ const Announcements = () => {
   // const [rowCount, setRowCount] = useState<number>(0)
   // const [page, setPage] = useState<number>(1)
 
+  const TranslateString = useTranslateString()
   const { handleError } = useErrorHandling()
-
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en')
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [data, setData] = useState([])
@@ -41,9 +44,17 @@ const Announcements = () => {
 
   // FETCH ALL ADMIN ANNOUNCEMENT FROM ALL SITES
   const { getAllAnnouncement, updateAnnouncement, deleteAnnouncement } = AnnouncementsService()
-  const { isLoading } = useQuery({
-    queryKey: ['allAnnouncement'],
-    queryFn: () => getAllAnnouncement({ data: {} }),
+  const { isLoading, isRefetching } = useQuery({
+    queryKey: ['allAnnouncement', selectedLanguage],
+    queryFn: () =>
+      getAllAnnouncement({
+        data: {
+          sort: 'desc',
+          sort_by: 'created_at',
+          search_by: 'locale',
+          search_value: selectedLanguage,
+        }
+      }),
     onSuccess: data => {
       setData(data?.data)
     },
@@ -95,7 +106,7 @@ const Announcements = () => {
       description: description,
       start_date: start_date,
       end_date: end_date,
-      active: active
+      active: active,
     })
   }
 
@@ -131,40 +142,51 @@ const Announcements = () => {
   }
 
   const columns: GridColDef[] = [
-    { field: 'site_id', headerName: 'Site ID', minWidth: 100, flex: 0.03 },
-    { field: 'title', renderHeader: () => <Translations text='Title' />, minWidth: 150, flex: 0.08 },
-    { field: 'description', renderHeader: () => <Translations text='Description' />, minWidth: 200, flex: 0.15 },
+    { field: 'site_id', headerName: 'Site ID', minWidth: 100, flex: 0.03, sortable: false },
+    { field: 'title', headerName: TranslateString('Title'), minWidth: 150, flex: 0.08, sortable: false },
+    {
+      field: 'description',
+      headerName: TranslateString('Description'),
+      minWidth: 200,
+      flex: 0.15,
+      sortable: false
+    },
     {
       field: 'start_date',
-      renderHeader: () => <Translations text='Start Date' />,
+      headerName: TranslateString('Start Date'),
       minWidth: 120,
       flex: 0.03,
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => params.row.start_date?.split('T')[0]
     },
     {
       field: 'end_date',
-      renderHeader: () => <Translations text='End Date' />,
+      headerName: TranslateString('End Date'),
       minWidth: 120,
       flex: 0.03,
+      sortable: false,
       renderCell: (params: GridRenderCellParams) =>
         params.row.end_date === null ? 'None' : params.row.end_date?.split('T')[0]
     },
     {
       field: 'active',
-      renderHeader: () => <Translations text='Active' />,
+      headerName: TranslateString('Active'),
       minWidth: 85,
       flex: 0.02,
-      disableColumnMenu: true,
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <Switch checked={params.value} onClick={() => activateDeactivateAnnouncement(params.row._id, !params.value)} />
+        <ToggleButton
+          checked={params.value}
+          onToggle={() => activateDeactivateAnnouncement(params.row._id, !params.value)}
+        />
       )
     },
     {
       field: 'action',
-      renderHeader: () => <Translations text='Action' />,
+      headerName: TranslateString('Action'),
       minWidth: 90,
       flex: 0.025,
-      disableColumnMenu: true,
+      sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Stack direction='row'>
           <IconButton
@@ -191,112 +213,47 @@ const Announcements = () => {
   ]
 
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <Box sx={styles.header}>
-            <Box sx={styles.announcements}>
-              <Typography sx={styles.announceText}>
-                <Translations text={'Announcement'} />
-              </Typography>
-            </Box>
-            <Button variant='contained' onClick={handleOpen}>
-              + <Translations text='Add New Announcements' />
-            </Button>
-          </Box>
-          <Divider />
-          <DataGrid
-            autoHeight
-            rows={data}
-            columns={columns}
-            disableSelectionOnClick
-            checkboxSelection={false}
-            sx={styles.dataGrid}
-            loading={isLoading || updateLoading || deleteLoading}
-            getRowId={row => row._id}
-            rowsPerPageOptions={[5, 10, 15]}
+    <Container>
+      <Stack direction={['column', 'row']} mb={5} alignItems={['flex-start','flex-end']} gap={4} justifyContent='space-between'>
+        <Typography variant='h4' component='h4'>Announcements</Typography>
+        <Box sx={{ width: 200 }}>
+          <InputLabel>Language</InputLabel>
+          <Select
+            size='small'
+            fullWidth value={selectedLanguage}
+            onChange={(event: SelectChangeEvent) => setSelectedLanguage(event.target.value)}
+          >
+            <MenuItem value='en'>English</MenuItem>
+            <MenuItem value='zh_cn'>中国語</MenuItem>
+          </Select>
+        </Box>
+        <Button variant='contained' onClick={handleOpen}>
+          + {TranslateString('Add New Announcements')}
+        </Button>
+      </Stack>
 
-            // in case pagination is added on backend
-            // pagination
-            // pageSize={pageSize}
-            // onPageChange={newPage => setPage(newPage + 1)}
-            // onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-            // rowCount={rowCount} //total of data
-            // paginationMode='server'
-          />
-        </Card>
-      </Grid>
-      <AnnouncementModal modalInfo={modalInfo} isEditing={isEditing} isOpen={openModal} onClose={handleClose} />
-    </Grid>
+      <DataGrid
+        disableColumnMenu
+        autoHeight
+        rows={data}
+        columns={columns}
+        disableSelectionOnClick
+        checkboxSelection={false}
+        loading={isLoading || isRefetching || updateLoading || deleteLoading}
+        getRowId={row => row._id}
+        rowsPerPageOptions={[5, 10, 15]}
+
+        // in case pagination is added on backend
+        // pagination
+        // pageSize={pageSize}
+        // onPageChange={newPage => setPage(newPage + 1)}
+        // onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+        // rowCount={rowCount} //total of data
+        // paginationMode='server'
+      />
+      <AnnouncementModal modalInfo={modalInfo} isEditing={isEditing} isOpen={openModal} onClose={handleClose} locale={selectedLanguage} />
+    </Container>
   )
-}
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: 'auto',
-    overflow: 'hidden'
-  },
-  header: {
-    display: 'flex',
-    flexDirection: {
-      xs: 'column',
-      sm: 'row',
-      md: 'row',
-      lg: 'row'
-    },
-    justifyContent: {
-      xs: 'flex-start',
-      sm: 'space-between',
-      md: 'space-between',
-      lg: 'space-between'
-    },
-    alignItems: 'center',
-    padding: 10,
-    gap: [5, 5, 0]
-  },
-  announcements: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  announceText: {
-    fontSize: 20,
-    textTransform: 'uppercase',
-    fontWeight: 500
-  },
-  linkButton: {
-    textDecoration: 'none'
-  },
-  createAccount: {
-    border: 1,
-    height: '56px',
-    minWidth: '224px',
-    width: {
-      xs: '100%',
-      md: '100%',
-      lg: '324px'
-    },
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderColor: 'black',
-    textTransform: 'uppercase',
-    color: 'black',
-    backgroundColor: '#FFF',
-    '&:hover': {
-      backgroundColor: `#9747FF`,
-      color: 'white'
-    }
-  },
-  dataGrid: {
-    padding: 5
-  },
-  icon: {
-    color: '#98A9BC',
-    fontSize: 30
-  }
 }
 
 Announcements.acl = {

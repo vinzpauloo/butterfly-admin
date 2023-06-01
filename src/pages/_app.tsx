@@ -63,6 +63,7 @@ import 'src/iconify-bundle/icons-bundle-react'
 
 // ** Global css styles
 import '../../styles/globals.css'
+import '../../styles/treeview.css'
 
 // ** Uploady
 import ChunkedUploady from '@rpldy/chunked-uploady'

@@ -19,11 +19,11 @@ export const ContentCreatorColumns = () => {
   }))
 
   return [
-    { sortable: false, field: 'username', headerName: 'User Name', width: 200 },
-    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 200 },
-    { sortable: false, field: 'email', headerName: 'Email', width: 255 },
+    { field: 'username', headerName: 'User Name', width: 200 },
+    { field: 'mobile', headerName: 'Mobile Number', width: 200 },
+    { field: 'email', headerName: 'Email', width: 255 },
+    { field: 'work_shares', headerName: 'Shares', width: 200 },
     {
-      sortable: false,
       field: 'created_at',
       headerName: 'Date Created',
       width: 285,
@@ -32,7 +32,6 @@ export const ContentCreatorColumns = () => {
       }
     },
     {
-      sortable: false,
       field: 'updated_at',
       headerName: 'Last Log In',
       width: 285,
@@ -41,7 +40,6 @@ export const ContentCreatorColumns = () => {
       }
     },
     {
-      sortable: false,
       field: 'status',
       headerName: 'Action',
       width: 135,

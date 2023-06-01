@@ -2,185 +2,188 @@
 import React, { useState } from 'react'
 
 import Transaction from '@/pages/transactions'
-import { Box, Button } from '@mui/material'
+import { Avatar, Box, Button, Stack, Typography } from '@mui/material'
 import Icon from '@/@core/components/icon'
-import ShowWithdrawDrawer from './ShowWithdrawDrawer'
-import Translations from '@/layouts/components/Translations'
+import WithdrawModal from './WithdrawModal'
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import { useTranslateString } from '@/utils/TranslateString'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+import TransactionsService from '@/services/api/Transactions'
+import { useQuery } from '@tanstack/react-query'
+import formatDate from '@/utils/formatDate'
+import { useAuth } from '@/services/useAuth'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
-const rowData = [
-  {
-    id: 1,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 2,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 3,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 4,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 5,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 6,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 7,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 8,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 9,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  },
-  {
-    id: 10,
-    contentCreator: 'Syaoran Taio',
-    siteName: 'Sugar Honey Pop',
-    amount: '2,543 Golds',
-    paymentMethod: 'Deposit',
-    requestDate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06',
-    status: 'Approved',
-    approvedBy: 'Operator 1'
-  }
-]
+
+type modalData = {
+  id: number | undefined
+  photo: string
+  name: string
+  amount: string
+  note: string
+  status: string
+}
 
 function index() {
+  const [data, setData] = useState([])
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [rowCount, setRowCount] = useState(0)
   const [open, setOpen] = useState(false)
+  const TranslateString = useTranslateString()
+  const { handleError } = useErrorHandling()
+  const [isRequestWithdraw, setIsRequestWithdraw] = useState<boolean>(false)
+  const auth = useAuth()
+  const [modalData, setModalData] = useState<modalData>({
+    id: undefined,
+    photo: '',
+    name: '',
+    amount: '',
+    note: '',
+    status: ''
+  })
 
-  const columnData = [
-    { field: 'contentCreator', headerName: <Translations text='Content Creator'/>, width: 169, sortable: false },
-    { field: 'siteName', headerName: <Translations text='Site Name'/>, width: 169, sortable: false },
-    { field: 'amount', headerName: <Translations text='Amount'/>, width: 140, sortable: false },
-    { field: 'paymentMethod', headerName: <Translations text='Payment Method'/>, width: 160, sortable: false },
-    { field: 'requestDate', headerName: <Translations text='Request Date'/>, width: 169, sortable: false },
-    { field: 'lastUpdate', headerName: <Translations text='Last Update'/>, width: 169, sortable: false },
+  const { getWithdrawals } = TransactionsService()
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['transactionEarnings', pageSize, page],
+    queryFn: () => getWithdrawals({ data: { with: 'user|reviewer' }}),
+    onSuccess: data => {
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+    },
+    onError: (e: any) => {
+      handleError(e, `getWithdrawals() transactions/commissions/index.tsx`)
+    }
+  })
+
+  const columnData: GridColDef[] = [
+    {
+      field: 'content creator',
+      headerName: TranslateString('Content Creator'),
+      flex: 0.12,
+      minWidth: 120,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.user?.username,
+      renderCell: (params: GridRenderCellParams) =>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <Avatar src={FILE_SERVER_URL + params.row?.user?.photo} />
+          <Typography variant='subtitle2'>{params.row?.user?.username}</Typography>
+        </Stack>
+    },
+    {
+      field: 'amount',
+      headerName: TranslateString('Amount'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 110,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.amount
+    },
+    {
+      field: 'note',
+      headerName: TranslateString('Note'),
+      minWidth: 200,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.note,
+    },
+    {
+      field: 'request date',
+      headerName: TranslateString('Request Date'),
+      minWidth: 200,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
+    },
+    {
+      field: 'last update',
+      headerName: TranslateString('Last Update'),
+      minWidth: 200,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.updated_at)
+    },
     {
       field: 'status',
-      headerName: <Translations text='Status'/>,
-      width: 169,
+      headerName: TranslateString('Status'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 120,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.status,
+      renderCell: (params: GridRenderCellParams) =>
+        <Typography color={params.row?.status === 'Approved' ? 'green' : params.row?.status === 'Declined' ? 'red' : 'default'}>
+          {params.row?.status}
+        </Typography>
+    },
+    {
+      field: 'reviewed by',
+      headerName: TranslateString('Reviewed By'),
+      headerAlign: 'center',
+      align: 'center',
+      flex: 0.12,
+      minWidth: 120,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.reviewer?.username,
+      renderCell: (params: GridRenderCellParams) =>
+        <Stack direction='row' alignItems='center' gap={2}>
+          <Avatar src={FILE_SERVER_URL + params.row?.reviewer?.photo} />
+          <Typography variant='subtitle2'>{params.row?.reviewer?.username}</Typography>
+        </Stack>
+    },
+    {
+      field: 'view',
+      headerName: 'View',
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 70,
       sortable: false,
-      renderCell: () => (
+      renderCell: (params: GridRenderCellParams) => 
         <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-          <Button variant='contained' color='success'>
-            Approved
+          <Button onClick={() => {
+            setIsRequestWithdraw(false)
+            setOpen(true)
+            setModalData({
+              id: params.row?.id,
+              photo: FILE_SERVER_URL + params.row?.user?.photo,
+              name: params.row?.user?.username,
+              amount: params.row?.amount,
+              note: params.row?.note,
+              status: params.row?.status
+            })
+          }}>
+            <Icon fontSize={30} icon='mdi:eye' color='98A9BC' />
           </Button>
         </Box>
-      )
-    },
-    {
-      field: 'approvedBy',
-      headerName: <Translations text='Approved By'/>,
-      width: 140,
-      sortable: false
-    },
-    {
-      field: 'show',
-      headerName: '',
-      width: 65,
-      sortable: false,
-      renderCell: () => {
-        const handleClick = () => {
-          setOpen(true)
-        }
-
-        return (
-          <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-            <Button onClick={handleClick}>
-              <Icon fontSize={30} icon='mdi:eye' color='98A9BC' />
-            </Button>
-          </Box>
-        )
-      }
     }
   ]
 
   return (
     <>
-      <Transaction rowData={rowData} columnData={columnData} />
-      {open ? <ShowWithdrawDrawer open={open} setOpen={setOpen} /> : null}
+      <Transaction
+        title='Withdrawals'
+        isLoading={isLoading}
+        isFetching={isFetching}
+        rowData={data}
+        columnData={columnData}
+        rowCount={rowCount}
+        pageSize={pageSize}
+        setPage={setPage}
+        setPageSize={setPageSize}
+      >
+        {auth.user?.role === 'CC' &&
+          <Stack direction='row' justifyContent='center'>
+            <Button variant='outlined' sx={{ width: 'max-content' }} onClick={() => {setIsRequestWithdraw(true); setOpen(true)}}>Request Withdraw</Button>
+          </Stack>
+        }
+      </Transaction>
+      {open ? <WithdrawModal data={modalData} isRequestWithdraw={isRequestWithdraw} open={open} setOpen={setOpen} /> : null}
     </>
   )
 }
 
 index.acl = {
   action: 'read',
-  subject: 'shared-page'
+  subject: 'cc-page'
 }
 
 export default index

@@ -2,14 +2,14 @@
 import { useState } from 'react'
 
 // ** MUI Imports
-import { Drawer, Button, TextField, IconButton, Typography } from '@mui/material'
+import { Button, IconButton, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Box, { BoxProps } from '@mui/material/Box'
 
 // ** Third Party Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -23,6 +23,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 // ** Hooks/Services Imports
 import { CreateAccount } from '@/services/api/CreateAccount'
 import { useErrorHandling } from '@/hooks/useErrorHandling'
+import InputForm from '../form/InputForm'
 
 interface FormValues {
   role_id: '3' | ''
@@ -57,7 +58,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
+  backgroundColor: '#FF9C00'
 }))
 
 const CCDrawer = (props: SidebarAddUserType) => {
@@ -130,171 +131,170 @@ const CCDrawer = (props: SidebarAddUserType) => {
   }
 
   return (
-    <Drawer
-      open={open}
-      anchor='right'
-      variant='temporary'
-      onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth>
       <Header>
-        <Typography variant='h6'>Add Content Creator</Typography>
+        <DialogTitle color='#FFF' textTransform='uppercase'>
+          Add Content Creator
+        </DialogTitle>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
       </Header>
-      <Box sx={{ p: 5 }}>
+      <DialogContent sx={{ mx: 4 }}>
         {!submitted ? (
-          <Box sx={styles.container}>
-            <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
-              <Box sx={styles.formContent}>
-                <Box sx={styles.fullWidth}>
-                  <Controller
+          <form key={resetKey} onSubmit={handleSubmit(handleFormSubmit)}>
+            <Box sx={styles.formContent}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row'
+                  },
+                  gap: {
+                    xs: 2,
+                    sm: 5
+                  }
+                }}
+              >
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Username</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='username'
+                    control={control}
+                    placeholder='Enter Desired Username'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.username}
+                    helperText={errors.username?.message}
                     name='username'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Entire Desired Username'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.username}
-                        helperText={errors.username?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='username'
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Entire Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='password'
-                        type='password'
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='password_confirmation'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Re-enter Password'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.password_confirmation}
-                        helperText={errors.password_confirmation?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='password_confirmation'
-                        type='password'
-                      />
-                    )}
                   />
                 </Box>
 
-                <Box sx={styles.fullWidth}>
-                  <Controller
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Mobile No.</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='mobile'
+                    control={control}
+                    placeholder='Mobile No.'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.mobile}
+                    helperText={errors.mobile?.message}
                     name='mobile'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Mobile No.'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.mobile}
-                        helperText={errors.mobile?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        onKeyPress={e => {
-                          // Allow only numbers and the '+' symbol
-                          if (!/[0-9+]/.test(e.key)) {
-                            e.preventDefault()
-                          }
-                        }}
-                        name='mobile'
-                      />
-                    )}
+                    onKeyPress={e => {
+                      // Allow only numbers and the '+' symbol
+                      if (!/[0-9+]/.test(e.key)) {
+                        e.preventDefault()
+                      }
+                    }}
                   />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='email'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Email Address'
-                        variant='outlined'
-                        fullWidth
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='email'
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={styles.fullWidth}>
-                  <Controller
-                    name='user_note'
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        label='Notes'
-                        variant='outlined'
-                        fullWidth
-                        multiline
-                        rows={4}
-                        error={!!errors.user_note}
-                        helperText={errors.user_note?.message}
-                        defaultValue={field.value}
-                        onChange={field.onChange}
-                        name='user_note'
-                      />
-                    )}
-                  />
-                </Box>
-
-                {/* Error messages from backend */}
-                {getErrorResponse(12)}
-
-                <Box sx={styles.formButtonContainer}>
-                  <Box>
-                    <Button sx={styles.cancelButton} onClick={handleClose}>
-                      <Typography sx={styles.text}>Cancel</Typography>
-                    </Button>
-                  </Box>
-
-                  <Box>
-                    <Button type='submit' sx={styles.continueButton}>
-                      <Typography sx={styles.text}>Continue</Typography>
-                    </Button>
-                  </Box>
                 </Box>
               </Box>
-            </form>
-          </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    sm: 'row'
+                  },
+                  gap: {
+                    xs: 2,
+                    sm: 5
+                  }
+                }}
+              >
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Password</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='password'
+                    control={control}
+                    placeholder='Enter Password'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                    name='password'
+                    type='password'
+                  />
+                </Box>
+
+                <Box sx={{ flex: '1 0 40%' }}>
+                  <Typography>Re-enter Password</Typography>
+                  <InputForm
+                    width='100%'
+                    controllerName='password_confirmation'
+                    control={control}
+                    placeholder='Re-enter Password'
+                    variant='outlined'
+                    fullWidth={true}
+                    error={!!errors.password_confirmation}
+                    helperText={errors.password_confirmation?.message}
+                    name='password_confirmation'
+                    type='password'
+                  />
+                </Box>
+              </Box>
+
+              <Box>
+                <Typography>Email Address</Typography>
+                <InputForm
+                  width='100%'
+                  controllerName='email'
+                  control={control}
+                  placeholder='Email Address'
+                  variant='outlined'
+                  fullWidth={true}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  name='email'
+                />
+              </Box>
+
+              <Box>
+                <Typography>Notes</Typography>
+                <InputForm
+                  width='100%'
+                  controllerName='user_note'
+                  control={control}
+                  placeholder='Notes'
+                  variant='outlined'
+                  fullWidth={true}
+                  multiline={true}
+                  rows={8}
+                  error={!!errors.user_note}
+                  helperText={errors.user_note?.message}
+                  name='user_note'
+                />
+              </Box>
+
+              {/* Error messages from backend */}
+              {getErrorResponse(12)}
+
+              <Box sx={styles.formButtonContainer}>
+                <Box>
+                  <Button sx={styles.cancelButton} onClick={handleClose}>
+                    <Typography sx={styles.text}>Cancel</Typography>
+                  </Button>
+                </Box>
+
+                <Box>
+                  <Button type='submit' sx={styles.continueButton}>
+                    <Typography sx={styles.text}>Continue</Typography>
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+          </form>
         ) : (
           <CreatedSuccessful />
         )}
-      </Box>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -314,7 +314,10 @@ const styles = {
     color: 'white'
   },
   formContent: {
-    marginTop: 5
+    marginTop: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2
   },
   fullWidth: {
     width: '100%',
@@ -368,11 +371,11 @@ const styles = {
     }
   },
   continueButton: {
-    backgroundColor: '#9747FF',
+    backgroundColor: '#FF9C00',
     color: 'white',
     width: '200px',
     '&:hover': {
-      backgroundColor: '#9747FF'
+      backgroundColor: '#FF7c02'
     }
   }
 }

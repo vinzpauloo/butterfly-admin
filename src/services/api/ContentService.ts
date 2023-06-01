@@ -4,6 +4,8 @@ import { getHeaders } from '@/lib/cryptoJs'
 
 export interface IGetContentsParams {
   data: {
+     sort?: 'desc' | 'asc'
+    sort_by?: string
     search_by?: string
     search_value?: string
     order_by?: string

@@ -3,8 +3,21 @@ import React from 'react'
 
 // ** MUI Imports
 import { Stack, Typography, Box } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { DashboardService } from '@/services/api/DashboardService'
 
 const SalesAndAddedUsers = () => {
+  const { getMostActiveUsers } = DashboardService()
+  const [users, setUsers] = React.useState()
+
+  useQuery({
+    queryKey: [`agentUsers`],
+    queryFn: () => getMostActiveUsers(),
+    onSuccess: (data: any) => {
+      setUsers(data)
+    }
+  })
+
   return (
     <Stack sx={styles.wrapper}>
       <Box sx={styles.containers}>
@@ -14,18 +27,18 @@ const SalesAndAddedUsers = () => {
         </Stack>
         <Stack sx={styles.textWrapper}>
           <Typography fontWeight={500} variant='h6'>
-            ¥50,000
+            ¥0
           </Typography>
           <Typography fontWeight={500} variant='h6'>
-            ¥2,500
+            ¥0
           </Typography>
         </Stack>
         <Typography variant='subtitle2'>Refresh every 1st of the month</Typography>
       </Box>
       <Box sx={styles.containers}>
         <Typography variant='subtitle2'>Live update of the Added Users</Typography>
-        <Typography variant='h6'>New Users: 500</Typography>
-        <Typography fontWeight={500}>Total Users: 2500</Typography>
+        <Typography variant='h6'>New Users: {users}</Typography>
+        <Typography fontWeight={500}>Total Users: {users} </Typography>
       </Box>
     </Stack>
   )

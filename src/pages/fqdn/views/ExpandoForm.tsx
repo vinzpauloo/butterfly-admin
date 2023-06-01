@@ -1,6 +1,7 @@
+// ** React Imports
 import React from 'react'
 
-// ** MUI
+// ** MUI Imports
 import {
   Box,
   Button,
@@ -22,12 +23,14 @@ import Icon from 'src/@core/components/icon'
 import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form'
 
 type ExpandoFormProps = {
-  pageHeader: string
+  pageHeader?: string
   fileType: string
   handleExpandoSubmit?: (data: FormInputs) => void
   isLoading?: boolean
-  disableSaveButton? : boolean
-  getData? : () => any
+  disableSaveButton?: boolean
+  defaultValues?: FormInputs
+  multipleInputs?: boolean
+  onUpdate?: (data: { value: string }[]) => void
 }
 
 type FormInputs = {
@@ -36,13 +39,21 @@ type FormInputs = {
   }[]
 }
 
-const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = false, disableSaveButton = false, getData }: ExpandoFormProps, ref : any) => {
-
-  // forward to parent the resetForm function by calling reset
-  React.useImperativeHandle(ref, () => {
-    return { getFormData : () => getFormData() }
-  }, [])
-
+const ExpandoForm = (
+  {
+    pageHeader,
+    fileType,
+    handleExpandoSubmit,
+    isLoading = false,
+    disableSaveButton = false,
+    defaultValues = {
+      expando: [{ value: '' }, { value: '' }, { value: '' }]
+    },
+    multipleInputs,
+    onUpdate
+  }: ExpandoFormProps,
+  ref: any
+) => {
   // ** UseForm
   const {
     getValues,
@@ -51,9 +62,7 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
     handleSubmit,
     formState: { errors }
   } = useForm<FormInputs>({
-    defaultValues: {
-      expando: [{ value: '' }, { value: '' }, { value: '' }]
-    }
+    defaultValues
   })
   const { fields, append, remove } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
@@ -75,10 +84,22 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
 
   const getFormData = () => {
     const getFormValueData = getValues('expando')
-    {
-      return getFormValueData ? getFormValueData : {}
-    }
+
+    return getFormValueData ? getFormValueData : []
   }
+
+  React.useImperativeHandle(
+    ref,
+    () => {
+      const formData = getFormData()
+      if (onUpdate !== undefined) {
+        onUpdate(formData)
+      }
+
+      return { getFormData: () => formData }
+    },
+    [getFormData]
+  )
 
   return (
     <>
@@ -91,24 +112,34 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
             <Grid className='expandoGrid' container spacing={5}>
               {fields.map((field, index) => (
                 <Grid key={field.id} item xs={12}>
-                  <FormControl 
-                    
-                    fullWidth
-                  >
+                  <FormControl fullWidth>
                     <OutlinedInput
+                      sx={{
+                        width: '100%'
+                      }}
                       className='expandoInput'
-                      {...register(`expando.${index}.value`, {required : true})} 
+                      {...register(`expando.${index}.value`, { required: true })}
                       error={Boolean(errors.expando)}
                       placeholder={`Option ${index + 1}`}
                       type={fileType}
                       endAdornment={
                         index >= 3 ? (
                           <InputAdornment position='end'>
-                            <IconButton edge='end' onClick={() => { remove(index) }} onMouseDown={() => { remove(index) }}>
+                            <IconButton
+                              edge='end'
+                              onClick={() => {
+                                remove(index)
+                              }}
+                              onMouseDown={() => {
+                                remove(index)
+                              }}
+                            >
                               <Icon color='red' icon='mdi:close' />
                             </IconButton>
                           </InputAdornment>
-                        ) : <></>
+                        ) : (
+                          <></>
+                        )
                       }
                     />
                   </FormControl>
@@ -116,23 +147,23 @@ const ExpandoForm = ({ pageHeader, fileType, handleExpandoSubmit, isLoading = fa
               ))}
               <Grid item xs={12}>
                 <Box display='flex' justifyContent='space-evenly'>
-                  <Button
-                    disabled={isLoading ? true : false}
-                    variant='contained'
-                    color='info'
-                    onClick={() => {
-                      handleAddMore()
-                    }}
-                  >
-                    Add More
-                  </Button>
-                  {
-                    !disableSaveButton && 
+                  {multipleInputs && (
+                    <Button
+                      disabled={isLoading ? true : false}
+                      variant='contained'
+                      color='info'
+                      onClick={() => {
+                        handleAddMore()
+                      }}
+                    >
+                      Add More
+                    </Button>
+                  )}
+                  {!disableSaveButton && (
                     <Button disabled={isLoading ? true : false} type='submit' variant='contained' color='primary'>
-                    {isLoading ? <CircularProgress size={12} sx={{ mr: 2 }} /> : null} Save
-                  </Button>
-                  }
-                  
+                      {isLoading ? <CircularProgress size={12} sx={{ mr: 2 }} /> : null} Save
+                    </Button>
+                  )}
                 </Box>
               </Grid>
             </Grid>

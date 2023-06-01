@@ -6,16 +6,21 @@ interface IAnnouncementParams {
   announcementID?: string
   data?: {
     site_id?: number
-    with?: "introductions"
-    style?: "text" | "image"
-    type?: "introduction"
+    with?: 'introductions'
+    style?: 'text' | 'image'
+    type?: 'introduction'
     title?: string
     description?: string
     start_date?: string
     end_date?: string
-    _method?: "put"
+    _method?: 'put'
     active?: 0 | 1
     exclude?: number
+    sort?: string
+    sort_by?: string
+    search_by?: string
+    search_value?: string
+    locale?: string
   }
   token?: string
 }
@@ -27,12 +32,11 @@ const AnnouncementsService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
       url: '/admin/announcements',
       method: 'GET',
-      params: params.data,
+      params: params.data
     })
   }
 
@@ -40,13 +44,12 @@ const AnnouncementsService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`
       },
       url: '/admin/announcements',
       method: 'POST',
-      params: params.data,
+      params: params.data
     })
   }
 
@@ -54,13 +57,12 @@ const AnnouncementsService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${accessToken}`
       },
       url: `/admin/announcements/${params.announcementID}`,
       method: 'POST',
-      data: params.data, // if body is JSON
+      data: params.data // if body is JSON
     })
   }
 
@@ -68,11 +70,10 @@ const AnnouncementsService = () => {
     return request({
       headers: {
         ...getHeaders(),
-        'ngrok-skip-browser-warning': '69420', // only for dev
         Authorization: `Bearer ${accessToken}`
       },
       url: `/admin/announcements/${params.announcementID}`,
-      method: 'DELETE',
+      method: 'DELETE'
     })
   }
 

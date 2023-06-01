@@ -22,13 +22,13 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
   // ** Vars
   const { layout } = settings
 
-  const handleLangItemClick = (lang: 'en' | 'fr' | 'ar' | 'zh_CN') => {
+  const handleLangItemClick = (lang: 'en' | 'fr' | 'ar' | 'zh_cn') => {
     i18n.changeLanguage(lang)
   }
 
   return (
     <OptionsMenu
-      icon={<Icon icon='mdi:flag-outline' />}
+      icon={<Icon icon='mdi:web' />}
       menuProps={{ sx: { '& .MuiMenu-paper': { mt: 4, minWidth: 130 } } }}
       iconButtonProps={{ color: 'inherit', sx: { ...(layout === 'vertical' ? { mr: 0.75 } : { mx: 0.75 }) } }}
       options={[
@@ -36,9 +36,9 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
           text: 'Chinese',
           menuItemProps: {
             sx: { py: 2 },
-            selected: i18n.language === 'zh_CN',
+            selected: i18n.language === 'zh_cn',
             onClick: () => {
-              handleLangItemClick('zh_CN')
+              handleLangItemClick('zh_cn')
               saveSettings({ ...settings, direction: 'ltr' })
             }
           }
@@ -53,29 +53,29 @@ const LanguageDropdown = ({ settings, saveSettings }: Props) => {
               saveSettings({ ...settings, direction: 'ltr' })
             }
           }
-        },
-        {
-          text: 'French',
-          menuItemProps: {
-            sx: { py: 2 },
-            selected: i18n.language === 'fr',
-            onClick: () => {
-              handleLangItemClick('fr')
-              saveSettings({ ...settings, direction: 'ltr' })
-            }
-          }
-        },
-        {
-          text: 'Arabic',
-          menuItemProps: {
-            sx: { py: 2 },
-            selected: i18n.language === 'ar',
-            onClick: () => {
-              handleLangItemClick('ar')
-              saveSettings({ ...settings, direction: 'rtl' })
-            }
-          }
         }
+        // {
+        //   text: 'French',
+        //   menuItemProps: {
+        //     sx: { py: 2 },
+        //     selected: i18n.language === 'fr',
+        //     onClick: () => {
+        //       handleLangItemClick('fr')
+        //       saveSettings({ ...settings, direction: 'ltr' })
+        //     }
+        //   }
+        // },
+        // {
+        //   text: 'Arabic',
+        //   menuItemProps: {
+        //     sx: { py: 2 },
+        //     selected: i18n.language === 'ar',
+        //     onClick: () => {
+        //       handleLangItemClick('ar')
+        //       saveSettings({ ...settings, direction: 'rtl' })
+        //     }
+        //   }
+        // }
       ]}
     />
   )

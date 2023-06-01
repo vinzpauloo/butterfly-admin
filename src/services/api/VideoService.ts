@@ -7,7 +7,7 @@ import authConfig from 'src/configs/auth'
 interface IVideoParams {
   data: {
     sort?: 'desc' | 'asc'
-    sort_by?: 'title' // sorted by table column name
+    sort_by?: string // sorted by table column name
     with?: 'user'
     page?: number
     paginate?: number

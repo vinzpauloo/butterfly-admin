@@ -10,6 +10,8 @@ interface ISitesParams {
 		_method?: "put"
 		detail?: "provisions" | "policy" | "about"
 		paginate?: number
+		site_id?: number
+		locale?: string
 	}
 }
 

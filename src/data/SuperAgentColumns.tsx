@@ -12,6 +12,7 @@ import { useUserTableStore } from '@/zustand/userTableStore'
 
 // ** Utils Imports
 import formatDate from '@/utils/formatDate'
+import { FILE_SERVER_URL } from '@/lib/baseUrls'
 
 export const SuperAgentColumns = () => {
   const { handleOpenDrawer } = useUserTableStore(state => ({
@@ -19,25 +20,42 @@ export const SuperAgentColumns = () => {
   }))
 
   return [
-    { sortable: false, field: 'username', headerName: 'Super Agent', width: 200 },
-
-    // { field: 'SiteName', headerName: 'Site Name', width: 250 },
-    { sortable: false, field: 'mobile', headerName: 'Mobile Number', width: 210 },
-    { sortable: false, field: 'email', headerName: 'Email', width: 250 },
     {
-      sortable: false,
+      flex: 0.01,
+      minWidth: 80,
+      field: 'photo',
+      headerName: `Photo`,
+      renderCell: (params: any) => {
+        return (
+          <img
+            src={FILE_SERVER_URL + params?.value}
+            alt='photo'
+            width={50}
+            height={50}
+            style={{ borderRadius: '12px' }}
+          />
+        )
+      }
+    },
+    { flex: 0.02, minWidth: 120, field: 'username', headerName: 'Username' },
+    { flex: 0.02, minWidth: 120, field: 'mobile', headerName: 'Mobile Number' },
+    { flex: 0.02, minWidth: 120, field: 'email', headerName: 'Email' },
+    {
+      flex: 0.02,
+      minWidth: 120,
       field: 'created_at',
       headerName: 'Date Created',
-      width: 285,
+
       valueFormatter: (params: any) => {
         return formatDate(params?.value)
       }
     },
     {
-      sortable: false,
+      flex: 0.02,
+      minWidth: 120,
       field: 'updated_at',
-      headerName: 'Last Log In',
-      width: 285,
+      headerName: 'Last Updated',
+
       valueFormatter: (params: any) => {
         return formatDate(params?.value)
       }
@@ -45,10 +63,11 @@ export const SuperAgentColumns = () => {
 
     // { field: 'SecurityFunds', headerName: 'Security Funds', width: 250 },
     {
-      sortable: false,
+      flex: 0.02,
+      minWidth: 120,
       field: 'status',
       headerName: 'Action',
-      width: 135,
+
       renderCell: (params: any) => {
         return (
           <Box>

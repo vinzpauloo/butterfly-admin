@@ -29,15 +29,23 @@ import VideoService from '@/services/api/VideoService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircularProgress } from '@mui/material'
 
-import { useTranslateString } from '@/utils/TranslateString';
+import { useTranslateString } from '@/utils/TranslateString'
 
 // ** BASE APIS Import
-import { STREAMING_SERVER_URL, FILE_SERVER_URL } from '@/lib/baseUrls'
+import { STREAMING_SERVER_URL } from '@/lib/baseUrls'
+
+interface StreamType {
+  ready_to_stream?: boolean
+}
+
+interface RowType {
+  trial?: StreamType
+}
 
 interface SidebarEditVideoType {
   open: boolean
   toggle: () => void
-  row: IVideoRow
+  row: IVideoRow & RowType
 }
 
 interface UserData {
@@ -50,7 +58,7 @@ interface UserData {
   groups?: string[]
 }
 
-const VideoBox = styled(Box)(({ theme }) => ({
+const VideoBox = styled(Box)(({}) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
   gap: '.5rem',
@@ -100,10 +108,8 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
   // ** React Hook Form
   const {
     getValues,
-    reset,
     resetField,
     register,
-    control,
     setValue,
     handleSubmit,
     watch,
@@ -137,8 +143,8 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
   const handleTagPressEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.code == 'Enter') {
       // handle add to Chip
-      let tagWord = (e.target as HTMLInputElement).value as string
-      let hasDuplicate = watch('tags')?.includes(tagWord)
+      const tagWord = (e.target as HTMLInputElement).value as string
+      const hasDuplicate = watch('tags')?.includes(tagWord)
 
       if (hasDuplicate || tagWord == '') {
         //handle Errors
@@ -146,10 +152,13 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
         setError('tags', { type: 'custom', message: 'Tag cannot empty or duplicate' })
         e.preventDefault()
       } else {
-        let insertTagArray = [tagWord]
-        let newTagsArray = ( getValues('tags') == undefined )  ? [ ...insertTagArray ] :  [...getValues('tags'), ...insertTagArray]
+        const insertTagArray = [tagWord]
+        const newTagsArray =
+          getValues('tags') == undefined ? [...insertTagArray] : [...getValues('tags'), ...insertTagArray]
+
         //setTags(newTagsArray as [])
         setValue('tags', newTagsArray)
+
         //reset multiTags
         resetField('tagTextField')
         e.preventDefault()
@@ -159,8 +168,10 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
 
   const TranslateString = useTranslateString()
 
+  console.log(`TRIAL READY TO STREAM`, row?.trial)
+
   const handleTagDelete = (tag: string) => {
-    let filteredTags = getValues('tags')?.filter(e => e !== tag)
+    const filteredTags = getValues('tags')?.filter(e => e !== tag)
     setValue('tags', filteredTags as [])
   }
 
@@ -175,8 +186,6 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
   }, [row])
 
   if (row == undefined) return <></>
-
-  
 
   if (row) {
     return (
@@ -195,14 +204,37 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
           </IconButton>
         </Header>
         <Box>
-          <VideoBox>
-            <ReactPlayer 
-              className='reactPlayer' 
-              width='100%' 
-              height='100%' 
-              controls={true} 
-              url={ STREAMING_SERVER_URL + row.trial_video_hls } />
-          </VideoBox>
+          {row && row?.trial.ready_to_stream === true ? (
+            <VideoBox>
+              <ReactPlayer
+                className='reactPlayer'
+                width='100%'
+                height='100%'
+                controls={true}
+                url={STREAMING_SERVER_URL + row.trial_video_hls}
+              />
+            </VideoBox>
+          ) : (
+            <Box
+              sx={{
+                backgroundColor: '#000',
+                height: '225px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5
+              }}
+            >
+              <Typography variant='h6' color='error'>
+                Video is still processing...
+              </Typography>
+              <CircularProgress />
+              <Typography variant='h6' color='error'>
+                Please wait.
+              </Typography>
+            </Box>
+          )}
         </Box>
         <Box sx={{ p: 5 }}>
           <form onSubmit={event => event.preventDefault()}>
@@ -237,9 +269,15 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 }}
               />
 
-              <Stack sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding:'.5rem' }} flexWrap='wrap' direction='row' spacing={1} rowGap={2}>
+              <Stack
+                sx={{ border: '1px solid rgba(58, 53, 65, 0.22)', padding: '.5rem' }}
+                flexWrap='wrap'
+                direction='row'
+                spacing={1}
+                rowGap={2}
+              >
                 {watch('tags') &&
-                  getValues('tags').map(tag => <Chip key={tag} label={tag} onDelete={e => handleTagDelete(tag)} />)}
+                  getValues('tags').map(tag => <Chip key={tag} label={tag} onDelete={() => handleTagDelete(tag)} />)}
               </Stack>
             </FormControl>
 
@@ -254,7 +292,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 sx={{ mr: 3 }}
                 disabled={isEditLoading ? true : false}
               >
-                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString("Submit")}
+                {isEditLoading ? <CircularProgress size={12} sx={{ mr: 5 }} /> : null} {TranslateString('Submit')}
               </Button>
               <Button
                 disabled={isEditLoading ? true : false}
@@ -263,7 +301,7 @@ const EditVideoDrawer = (props: SidebarEditVideoType) => {
                 color='secondary'
                 onClick={handleClose}
               >
-                {TranslateString("Cancel")}
+                {TranslateString('Cancel')}
               </Button>
             </Box>
           </form>

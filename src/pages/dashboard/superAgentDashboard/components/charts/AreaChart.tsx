@@ -2,14 +2,7 @@
 import { forwardRef, useState } from 'react'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import Divider from '@mui/material/Divider'
-import TextField from '@mui/material/TextField'
-import CardHeader from '@mui/material/CardHeader'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import InputAdornment from '@mui/material/InputAdornment'
+import { Box, Card, CardHeader, CardContent, Divider, InputAdornment, TextField, Typography } from '@mui/material'
 
 // ** Third Party Imports
 import format from 'date-fns/format'
@@ -19,8 +12,10 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** Types
-import { DateType } from 'src/types/forms/reactDatepickerTypes'
+import { useQuery } from '@tanstack/react-query'
+import { DashboardService } from '@/services/api/DashboardService'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+import formatDate from '@/utils/formatDate'
 
 interface Props {
   direction: 'ltr' | 'rtl'
@@ -30,87 +25,6 @@ interface PickerProps {
   start: Date | number
   end: Date | number
 }
-
-const data = [
-  {
-    name: '7/12',
-    Sales: 20,
-    Clicks: 60,
-    Visits: 100
-  },
-  {
-    name: '8/12',
-    Sales: 40,
-    Clicks: 80,
-    Visits: 120
-  },
-  {
-    name: '9/12',
-    Sales: 30,
-    Clicks: 70,
-    Visits: 90
-  },
-  {
-    name: '10/12',
-    Sales: 70,
-    Clicks: 110,
-    Visits: 170
-  },
-  {
-    name: '11/12',
-    Sales: 40,
-    Clicks: 80,
-    Visits: 130
-  },
-  {
-    name: '12/12',
-    Sales: 60,
-    Clicks: 80,
-    Visits: 160
-  },
-  {
-    name: '13/12',
-    Sales: 50,
-    Clicks: 100,
-    Visits: 140
-  },
-  {
-    name: '14/12',
-    Sales: 140,
-    Clicks: 90,
-    Visits: 240
-  },
-  {
-    name: '15/12',
-    Sales: 120,
-    Clicks: 180,
-    Visits: 220
-  },
-  {
-    name: '16/12',
-    Sales: 100,
-    Clicks: 160,
-    Visits: 180
-  },
-  {
-    name: '17/12',
-    Sales: 140,
-    Clicks: 140,
-    Visits: 270
-  },
-  {
-    name: '18/12',
-    Sales: 180,
-    Clicks: 200,
-    Visits: 280
-  },
-  {
-    name: '19/12',
-    Sales: 220,
-    Clicks: 220,
-    Visits: 375
-  }
-]
 
 const CustomTooltip = (data: TooltipProps<any, any>) => {
   const { active, payload } = data
@@ -138,15 +52,40 @@ const CustomTooltip = (data: TooltipProps<any, any>) => {
 }
 
 const RechartsAreaChart = ({ direction }: Props) => {
+  const { getVIPandGuestChart } = DashboardService()
+  const { handleError } = useErrorHandling()
+
   // ** States
-  const [endDate, setEndDate] = useState<DateType>(null)
-  const [startDate, setStartDate] = useState<DateType>(null)
+  const [endDate, setEndDate] = useState(new Date())
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+
+  const [chartData, setChartData] = useState()
 
   const CustomInput = forwardRef((props: PickerProps, ref) => {
-    const startDate = props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
-    const endDate = props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
+    const startDate = props.start !== null ? format(props.start, 'yyyy-MM-dd') : ''
+    const endDate = props.end !== null ? format(props.end, 'yyyy-MM-dd') : ''
 
-    const value = `${startDate}${endDate !== null ? endDate : ''}`
+    const value = startDate && endDate ? `${startDate} - ${endDate}` : `${startDate}${endDate}`
+
+    useQuery({
+      queryKey: [`UsersMonitoring`],
+      queryFn: () =>
+        getVIPandGuestChart({
+          data: {
+            daily: 'true',
+            from: startDate,
+            to: endDate,
+            select: 'total_active,total_new_vip,total_new_guest,created_at'
+          }
+        }),
+      onSuccess: (data: any) => {
+        console.log(`chartData`, data)
+        setChartData(data)
+      },
+      onError: (e: any) => {
+        handleError(e, `getVIPandGuestChart() AreaChart.tsx superAgentDashboard`)
+      }
+    })
 
     return (
       <TextField
@@ -203,7 +142,7 @@ const RechartsAreaChart = ({ direction }: Props) => {
         <Box sx={{ display: 'flex', mb: 4 }}>
           <Box sx={{ mr: 6, display: 'flex', alignItems: 'center', '& svg': { mr: 1.5, color: 'rgb(115, 103, 240)' } }}>
             <Icon icon='mdi:circle' fontSize='0.75rem' />
-            <Typography variant='body2'>Click</Typography>
+            <Typography variant='body2'>Active</Typography>
           </Box>
           <Box
             sx={{
@@ -214,23 +153,27 @@ const RechartsAreaChart = ({ direction }: Props) => {
             }}
           >
             <Icon icon='mdi:circle' fontSize='0.75rem' />
-            <Typography variant='body2'>Sales</Typography>
+            <Typography variant='body2'>New VIPs</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 1.5, color: 'rgba(115, 103, 240, .2)' } }}>
             <Icon icon='mdi:circle' fontSize='0.75rem' />
-            <Typography variant='body2'>Visits</Typography>
+            <Typography variant='body2'>New Guests</Typography>
           </Box>
         </Box>
-        <Box sx={{ height: 300 }}>
+        <Box sx={{ height: 420 }}>
           <ResponsiveContainer>
-            <AreaChart height={300} data={data} style={{ direction }} margin={{ left: -20 }}>
+            <AreaChart height={300} data={chartData} style={{ direction }} margin={{ left: -20 }}>
               <CartesianGrid />
-              <XAxis dataKey='name' reversed={direction === 'rtl'} />
+              <XAxis
+                dataKey='created_at'
+                reversed={direction === 'rtl'}
+                tickFormatter={unixTime => formatDate(unixTime)}
+              />
               <YAxis orientation={direction === 'rtl' ? 'right' : 'left'} />
               <Tooltip content={CustomTooltip} />
-              <Area dataKey='Clicks' stackId='Clicks' stroke='0' fill='rgb(115, 103, 240)' />
-              <Area dataKey='Sales' stackId='Sales' stroke='0' fill='rgba(115, 103, 240, .5)' />
-              <Area dataKey='Visits' stackId='Visits' stroke='0' fill='rgba(115, 103, 240, .2)' />
+              <Area dataKey='total_active' stackId='Active' stroke='0' fill='rgb(115, 103, 240)' />
+              <Area dataKey='total_new_vip' stackId='New VIPs' stroke='0' fill='rgba(115, 103, 240, .5)' />
+              <Area dataKey='total_new_guest' stackId='New Guests' stroke='0' fill='rgba(115, 103, 240, .2)' />
             </AreaChart>
           </ResponsiveContainer>
         </Box>

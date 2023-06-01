@@ -15,7 +15,7 @@ const CreatedSuccessful = ({ update }: any) => {
         backgroundColor: '#FFF'
       }}
     >
-      <Box sx={{ display: 'flex', backgroundColor: '#A459D1', height: 50 }} />
+      <Box sx={{ display: 'flex', backgroundColor: '#FF9C00', height: 50 }} />
 
       <Box sx={{ padding: 4, backgroundColor: '#FFF' }}>
         <Box
@@ -37,14 +37,17 @@ const CreatedSuccessful = ({ update }: any) => {
             <Typography sx={{ fontWeight: '600', fontSize: ['10px', '20px'] }}>CREATED SUCCESSFULLY!</Typography>
           )}
           <Box sx={{ display: 'flex', gap: 10, mt: 5 }}>
-            <Box sx={{ backgroundColor: '#60FF00', height: ['8px', '15px'], width: ['20px', '50px'] }} />
+            {/* <Box sx={{ backgroundColor: '#60FF00', height: ['8px', '15px'], width: ['20px', '50px'] }} />
             <Box sx={{ backgroundColor: '#6DD230', height: ['8px', '15px'], width: ['20px', '50px'] }} />
-            <Box sx={{ backgroundColor: '#41A207', height: ['8px', '15px'], width: ['20px', '50px'] }} />
+            <Box sx={{ backgroundColor: '#41A207', height: ['8px', '15px'], width: ['20px', '50px'] }} /> */}
+            <Box sx={{ backgroundColor: '#FF9C00', height: ['8px', '15px'], width: ['20px', '50px'] }} />
+            <Box sx={{ backgroundColor: '#FF8c02', height: ['8px', '15px'], width: ['20px', '50px'] }} />
+            <Box sx={{ backgroundColor: '#FF7c02', height: ['8px', '15px'], width: ['20px', '50px'] }} />
           </Box>
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', backgroundColor: '#A459D1', height: 50 }} />
+      <Box sx={{ display: 'flex', backgroundColor: '#FF9C00', height: 50 }} />
     </Box>
   )
 }

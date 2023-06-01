@@ -200,9 +200,10 @@ const EditStepThree = (props: ToggleProps) => {
                       fullWidth
                       error={!!errors.merchant_id}
                       helperText={errors.merchant_id?.message}
-                      value={field.value || siteData[0]?.yuanhua_member_id}
+                      value={field.value || siteData[0]?.yuanhua_member_id || ''}
                       onChange={field.onChange}
                       name='merchant_id'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />
@@ -218,9 +219,10 @@ const EditStepThree = (props: ToggleProps) => {
                       fullWidth
                       error={!!errors.key}
                       helperText={errors.key?.message}
-                      value={field.value || rsaData?.yuanhua_md5_key}
+                      value={field.value || rsaData?.yuanhua_md5_key || ''}
                       onChange={field.onChange}
                       name='key'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />
@@ -238,9 +240,10 @@ const EditStepThree = (props: ToggleProps) => {
                       rows={8}
                       error={!!errors.rsa_private}
                       helperText={errors.rsa_private?.message}
-                      value={field.value || rsaData?.yuanhua_rsa_private}
+                      value={field.value || rsaData?.yuanhua_rsa_private || ''}
                       onChange={field.onChange}
                       name='rsa_private'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />
@@ -258,9 +261,10 @@ const EditStepThree = (props: ToggleProps) => {
                       rows={8}
                       error={!!errors.rsa_public}
                       helperText={errors.rsa_public?.message}
-                      value={field.value || rsaData?.yuanhua_rsa_public}
+                      value={field.value || rsaData?.yuanhua_rsa_public || ''}
                       onChange={field.onChange}
                       name='rsa_public'
+                      InputLabelProps={{ shrink: true }}
                     />
                   )}
                 />

@@ -1,5 +1,5 @@
-import React from 'react'
-import { Box, Typography, Button, CircularProgress } from '@mui/material'
+import React, { Dispatch, SetStateAction } from 'react'
+import { Box, Typography, Button, CircularProgress, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from '@mui/material'
 import { convertToRaw } from 'draft-js'
 import { EditorProps } from 'react-draft-wysiwyg'
 import draftToHtml from 'draftjs-to-html'
@@ -17,11 +17,15 @@ type Props = {
   editorState: any
   setEditorState: any
   isLoading: boolean
+  selectedSite: number
+  setSelectedSite: Dispatch<SetStateAction<number>>
+  selectedLanguage: string
+  setSelectedLanguage: Dispatch<SetStateAction<string>>
+  sitesList: any[]
 }
 
 const EditorContainer = (props: Props) => {
-  const { title, editorState, setEditorState, isLoading } = props
-
+  const { title, editorState, setEditorState, isLoading, selectedSite, setSelectedSite, selectedLanguage, setSelectedLanguage, sitesList } = props
   const { handleError, getErrorResponse } = useErrorHandling()
 
   // Get QueryClient from the context
@@ -102,6 +106,30 @@ const EditorContainer = (props: Props) => {
       {isBeingLoadedOrUpdated ? <CircularProgress sx={styles.loaderStyle} /> : undefined}
       <Box>
         <Typography sx={styles.title}>{title}</Typography>
+        <Stack direction='row' gap={4}>
+          <Box sx={{ width: 200 }}>
+            <InputLabel>Site</InputLabel>
+            <Select
+              size='small' fullWidth value={selectedSite.toString()}
+              onChange={(event: SelectChangeEvent) => setSelectedSite(Number(event.target.value))}
+            >
+              <MenuItem  value={0}>Default</MenuItem>
+              {sitesList.map(item =>
+                <MenuItem key={item?.id} value={item?.id}>{item?.name}</MenuItem>
+              )}
+            </Select>
+          </Box>
+          <Box sx={{ width: 200 }}>
+            <InputLabel>Language</InputLabel>
+            <Select
+              size='small' fullWidth value={selectedLanguage}
+              onChange={(event: SelectChangeEvent) => setSelectedLanguage(event.target.value)}
+            >
+              <MenuItem value='en'>English</MenuItem>
+              <MenuItem value='zh_cn'>中国語</MenuItem>
+            </Select>
+          </Box>
+        </Stack>
       </Box>
       <Box>
         <Editor

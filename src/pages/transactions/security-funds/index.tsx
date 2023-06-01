@@ -5,134 +5,119 @@ import Transaction from '@/pages/transactions'
 import { Box, Button } from '@mui/material'
 import Icon from '@/@core/components/icon'
 import EditDrawer from './EditDrawer'
-import Translations from '@/layouts/components/Translations'
-
-const rowData = [
-  {
-    id: 1,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 2,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 3,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 4,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 5,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 6,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 7,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 8,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 9,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  },
-  {
-    id: 10,
-    contentCreator: 'Syaoran Taio',
-    amount: '330, 000 CNY',
-    balance: 'Deposit',
-    type: 'Deposit',
-    dateCreate: '2023-11-18 11:26:13',
-    lastUpdate: '2023-02-08 11:26:06'
-  }
-]
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import { useTranslateString } from '@/utils/TranslateString'
+import { useErrorHandling } from '@/hooks/useErrorHandling'
+import TransactionsService from '@/services/api/Transactions'
+import { useQuery } from '@tanstack/react-query'
+import formatDate from '@/utils/formatDate'
 
 function index() {
+  const [data, setData] = useState([])
+  const [page, setPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [rowCount, setRowCount] = useState(0)
   const [open, setOpen] = useState(false)
-  const columnData = [
-    { field: 'contentCreator', headerName: <Translations text='Content Creator'/>, width: 225, sortable: false },
-    { field: 'amount', headerName: <Translations text='Amount'/>, width: 225, sortable: false },
-    { field: 'balance', headerName: <Translations text='Balance'/>, width: 150, sortable: false },
-    { field: 'type', headerName: <Translations text='Type (Debit | Credit)'/>, width: 170, sortable: false },
-    { field: 'dateCreate', headerName: <Translations text='Date Created'/>, width: 225, sortable: false },
-    { field: 'lastUpdate', headerName: <Translations text='Last Update'/>, width: 225, sortable: false },
+  const TranslateString = useTranslateString()
+  const { handleError } = useErrorHandling()
+
+  const { getSecurityFunds } = TransactionsService()
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ['donations', pageSize, page],
+    queryFn: () => getSecurityFunds({ data: { with: 'site,user', page: page, paginate: pageSize } }),
+    onSuccess: data => {
+      setData(data.data)
+      setRowCount(data.total)
+      setPageSize(data.per_page)
+      setPage(data.current_page)
+    },
+    onError: (e: any) => {
+      handleError(e, `getSecurityFunds() transactions/security-funds/index.tsx`)
+    }
+  })
+
+  const columnData: GridColDef[] = [
+    {
+      field: 'site name',
+      headerName: TranslateString('Site Name'),
+      flex: 0.35,
+      minWidth: 170,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.site?.name
+    },
+    {
+      field: 'amount',
+      headerName: TranslateString('Amount'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.amount
+    },
+    {
+      field: 'balance',
+      headerName: TranslateString('Balance'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.balance
+    },
+    {
+      field: 'type',
+      headerName: TranslateString('Type'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 150,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => params.row?.type
+    },
+    {
+      field: 'created_at',
+      headerName: TranslateString('Date Created'),
+      flex: 0.35,
+      minWidth: 200,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.created_at)
+    },
+    {
+      field: 'updated_at',
+      headerName: TranslateString('Last Update'),
+      flex: 0.35,
+      minWidth: 200,
+      sortable: true,
+      valueGetter: (params: GridRenderCellParams) => formatDate(params.row?.updated_at)
+    },
     {
       field: 'edit',
-      headerName: <Translations text='Edit'/>,
-      width: 130,
+      headerName: TranslateString('Edit'),
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 40,
       sortable: false,
-      renderCell: () => {
-        const handleClick = () => {
-          setOpen(true)
-        }
-
-        return (
-          <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
-            <Button onClick={handleClick}>
-              <Icon fontSize={30} icon='la:pen' color='98A9BC' />
-            </Button>
-          </Box>
-        )
-      }
+      renderCell: () => (
+        <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
+          <Button onClick={() => setOpen(true)}>
+            <Icon fontSize={30} icon='la:pen' color='98A9BC' />
+          </Button>
+        </Box>
+      )
     }
   ]
 
   return (
     <>
-      <Transaction rowData={rowData} columnData={columnData} setOpen={setOpen} />
+      <Transaction
+        title='Security Funds'
+        isLoading={isLoading}
+        isFetching={isFetching}
+        rowData={data}
+        columnData={columnData}
+        rowCount={rowCount}
+        pageSize={pageSize}
+        setPage={setPage}
+        setPageSize={setPageSize}
+      />
       {open ? <EditDrawer open={open} setOpen={setOpen} /> : null}
     </>
   )
@@ -140,7 +125,7 @@ function index() {
 
 index.acl = {
   action: 'read',
-  subject: 'shared-page'
+  subject: 'sa-page'
 }
 
 export default index

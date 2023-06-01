@@ -3,7 +3,7 @@ import React, { useEffect, ChangeEvent } from 'react'
 
 // ** MUI Imports
 import { Box, Card, Grid, Tab } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 import MuiTabList, { TabListProps } from '@mui/lab/TabList'
 import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
@@ -94,12 +94,13 @@ const UserTable = () => {
   const operatorColumns = OperatorColumns()
   const superAgentColumns = SuperAgentColumns()
   const contentCreatorColumns = ContentCreatorColumns()
-  const columnsMap = new Map([
-    ['operators', operatorColumns],
-    ['superagent', superAgentColumns],
-    ['contentcreators', contentCreatorColumns]
-  ])
-  const filteredColumns: any = columnsMap.get(columnType) ?? []
+
+  // const columnsMap = new Map([
+  //   ['operators', operatorColumns],
+  //   ['superagent', superAgentColumns],
+  //   ['contentcreators', contentCreatorColumns]
+  // ])
+  // const filteredColumns: any = columnsMap.get(columnType) ?? []
 
   // ** Service/Hooks
   const { getUsers } = UserTableService()
@@ -197,13 +198,22 @@ const UserTable = () => {
     ]
   })
 
+  const handleSortModel = (newModel: GridSortModel) => {
+    if (newModel.length) {
+      setSort(newModel[0].sort)
+      setSortName(newModel[0].field)
+    } else {
+      setSort('asc')
+      setSortName('username')
+    }
+  }
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <UserTabs />
-
-          <DataGrid
+          {/* <DataGrid
             page={activeTab === 'SUPERVISOR' ? supervisorPage - 1 : activeTab === 'SA' ? saPage - 1 : ccPage - 1}
             disableColumnMenu
             loading={isLoading || isRefetching}
@@ -211,6 +221,7 @@ const UserTable = () => {
             disableSelectionOnClick
             paginationMode='server'
             sortingMode='server'
+            onSortModelChange={handleSortModel}
             autoHeight
             rows={rowData ?? []}
             columns={filteredColumns}
@@ -243,19 +254,19 @@ const UserTable = () => {
               }
             }}
             sx={{ padding: 0 }}
-          />
+          /> */}
           {/* CREATE Drawers */}
-          <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
+          {/* <SupervisorDrawer open={openDrawer === 'SUPERVISOR'} toggle={() => handleDrawerToggle('SUPERVISOR')} />
           <SADrawer
             open={openDrawer === 'SA'}
             toggle={() => handleDrawerToggle('SA')}
             languages={languages}
             currencies={currencies}
           />
-          <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} />
+          <CCDrawer open={openDrawer === 'CC'} toggle={() => handleDrawerToggle('CC')} /> */}
 
           {/* EDIT Drawers */}
-          {drawerRole === 'SUPERVISOR' && (
+          {/* {drawerRole === 'SUPERVISOR' && (
             <EditSupervisorDrawer
               data={drawerData}
               open={drawerRole === 'SUPERVISOR'}
@@ -267,7 +278,7 @@ const UserTable = () => {
           )}
           {drawerRole === 'CC' && (
             <EditCreatorDrawer data={drawerData} open={drawerRole === 'CC'} toggle={() => setDrawerRole(null)} />
-          )}
+          )} */}
         </Card>
       </Grid>
     </Grid>

@@ -224,22 +224,6 @@ const SAStepOne = (
     mutateStepOne(form)
   }
 
-  // const displayErrors = () => {
-  //   const errorElements: any = []
-
-  //   for (const key in responseError) {
-  //     responseError[key].forEach((value: any) => {
-  //       errorElements.push(
-  //         <Typography key={`${key}-${value}`} sx={{ color: 'red' }}>
-  //           {value}
-  //         </Typography>
-  //       )
-  //     })
-  //   }
-
-  //   return errorElements
-  // }
-
   return (
     <>
       {!submitted ? (
@@ -288,7 +272,7 @@ const SAStepOne = (
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Entire Desired Username'
+                      label='Enter Desired Username'
                       variant='outlined'
                       fullWidth
                       error={!!errors.username}
@@ -439,7 +423,7 @@ const SAStepOne = (
                       fullWidth
                       error={!!errors.currency_id}
                       helperText={errors.currency_id?.message}
-                      value={field.value}
+                      value={field.value || ''}
                       onChange={field.onChange}
                       name='currency_id'
                     >
@@ -465,7 +449,7 @@ const SAStepOne = (
                       fullWidth
                       error={!!errors.language_id}
                       helperText={errors.language_id?.message}
-                      value={field.value}
+                      value={field.value || ''}
                       onChange={field.onChange}
                       name='language_id'
                     >
@@ -517,6 +501,7 @@ const SAStepOne = (
                           } else {
                             field.onChange(null)
                           }
+                          console.log(fileName)
                         }}
                         ref={fileInputRef}
                       />

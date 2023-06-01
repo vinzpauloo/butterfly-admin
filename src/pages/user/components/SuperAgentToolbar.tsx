@@ -11,6 +11,7 @@ import Button from '@mui/material/Button'
 import Icon from 'src/@core/components/icon'
 
 import { useTranslateString } from '@/utils/TranslateString'
+import ExportButton from './button/ExportButton'
 
 interface Props {
   usernameValue: string
@@ -35,8 +36,8 @@ const SuperAgentToolbar = (props: Props) => {
   return (
     <Box
       sx={{
-        mx: 2,
-        mb: 2
+        pt: 2,
+        pb: 2
       }}
     >
       <Box
@@ -123,13 +124,40 @@ const SuperAgentToolbar = (props: Props) => {
                 md: 'auto',
                 lg: 150
               },
-              float: 'right'
+              float: 'right',
+              backgroundColor: '#FF9C00',
+              '&:hover': {
+                backgroundColor: '#FF7c02'
+              }
             }}
             onClick={() => props.toggle(props.role)}
             variant='contained'
           >
             {TranslateString('Add') + ' ' + TranslateString('User')}
           </Button>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          mt: 5,
+          borderTop: '1px solid #d3d3d3'
+        }}
+      >
+        <Box
+          sx={{
+            mt: 5,
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
+          <ExportButton
+            role={props.role}
+            emailValue={props.emailValue}
+            mobileValue={props.mobileValue}
+            usernameValue={props.usernameValue}
+            role_id={props.role_id}
+          />
         </Box>
       </Box>
     </Box>

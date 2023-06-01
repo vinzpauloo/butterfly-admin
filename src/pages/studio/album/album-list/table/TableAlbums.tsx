@@ -3,7 +3,7 @@ import React, { useState, ChangeEvent, useCallback } from 'react'
 
 // ** MUI Imports
 import { Box, Typography } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridSortModel } from '@mui/x-data-grid'
 
 // ** Custom Table Components Imports
 import { AlbumColumns } from '@/data/AlbumColumns'
@@ -22,6 +22,7 @@ import { useTranslateString } from '@/utils/TranslateString'
 
 // ** TanStack Query
 import { useQuery } from '@tanstack/react-query'
+import { useUserTableStore } from '@/zustand/userTableStore'
 
 interface AlbumData {
   id: string
@@ -29,8 +30,6 @@ interface AlbumData {
   photo: string[]
   _id: string
 }
-
-type SortType = 'asc' | 'desc' | undefined | null
 
 const TableAlbums = () => {
   // ** DataGrid
@@ -47,12 +46,12 @@ const TableAlbums = () => {
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>()
   const [rowCount, setRowCount] = useState<number>()
-  const [sort] = useState<SortType>('desc')
-  const [sortName] = useState<string>('created_at')
   const [search, setSearch] = useState<string | undefined>(undefined)
   const [titleSearchValue, setTitleSearchValue] = useState<string | undefined>(undefined)
   const debouncedTitle = useDebounce(titleSearchValue, 1000)
   const [albumData, setAlbumData] = useState<AlbumData[] | undefined>()
+
+  const { setSort, setSortName, sort, sortName } = useUserTableStore()
 
   const { isLoading, isRefetching } = useQuery({
     queryKey: ['allAlbums', page, sort, sortName, search, debouncedTitle],
@@ -90,6 +89,16 @@ const TableAlbums = () => {
     }
   }, [])
 
+  const handleSortModel = (newModel: GridSortModel) => {
+    if (newModel.length) {
+      setSort(newModel[0].sort)
+      setSortName(newModel[0].field)
+    } else {
+      setSort('asc')
+      setSortName('created_at')
+    }
+  }
+
   return (
     <Container>
       <Box sx={styles.buttonContainer}>
@@ -105,6 +114,7 @@ const TableAlbums = () => {
         disableSelectionOnClick
         paginationMode='server'
         sortingMode='server'
+        onSortModelChange={handleSortModel}
         autoHeight
         rows={albumData ?? []}
         getRowId={(row: AlbumData) => row?._id}

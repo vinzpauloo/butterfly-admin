@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Box, Card, Grid } from '@mui/material'
+import { Box, Card, Grid, CardContent } from '@mui/material'
 
 function Container({ children }: any) {
   return (
@@ -18,7 +18,9 @@ function Container({ children }: any) {
               }
             ]}
           >
-            {children}
+            <CardContent>
+              {children}
+            </CardContent>
           </Box>
         </Card>
       </Grid>

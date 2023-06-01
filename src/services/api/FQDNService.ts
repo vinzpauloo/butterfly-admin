@@ -4,13 +4,6 @@ import request from '@/lib/request'
 import authConfig from 'src/configs/auth'
 import { getHeaders } from '@/lib/cryptoJs'
 
-interface IGetFQDNParams {
-  site?: number
-  sort?: 'desc' | 'asc' | string
-  sort_by?: string //eg. name
-  paginate?: number
-}
-
 interface IGetSuperAgentFQDNParams {
   site?: number
   sort?: 'desc' | 'asc' | string
@@ -19,42 +12,22 @@ interface IGetSuperAgentFQDNParams {
 }
 
 interface IAddFQDNParams {
+  fqdn_admin?: string,
   siteId? : number,
   data?: {
     site?: number,
-    fqdns?: {name?: string, type?: 'Api' | 'Streaming' | 'Photo'}[]
+    fqdns?: { name?: string, type?: 'api' | 'streaming' | 'photo' }[]
+    fqdn_admin?: string,
   }
 }
 
-interface IDeleteFQDNParams {
-  fqdnID?: number
-}
-
-interface IUpdateFQDNParams {
-  fqdnID?: number
-  data?: {
-    _method?: 'put'
-    site?: number,
-    name?: string,
-    type?: 'Api' | 'Streaming' | 'Photo'
-  }
-}
+type IAddFQDNParamsWithoutInnerFQDNAdmin = Omit<IAddFQDNParams, 'data'> & {
+  data?: Omit<IAddFQDNParams['data'], 'fqdn_admin'>
+};
 
 const FQDNService = () => {
 
   const accessToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-
-  const getFQDNList = (params : IGetFQDNParams) => {
-    return request({
-      headers: {
-        ...getHeaders(),
-        Authorization: `Bearer ${accessToken}`
-      },
-      url: '/fqdns',
-      method: 'GET',
-      params: params
-    })
-  }
 
   const getSuperAgentFQDNList = (params : IGetSuperAgentFQDNParams) => {
     return request({
@@ -62,13 +35,12 @@ const FQDNService = () => {
         ...getHeaders(),
         Authorization: `Bearer ${accessToken}`
       },
-      url: '/server-lists',
+      url: `admin/sites/${params.site}/fqdn`,
       method: 'GET',
-      params: params
     })
   }
 
-  const addFQDN = (params : IAddFQDNParams) => {
+  const addFQDN = (params : IAddFQDNParams | IAddFQDNParamsWithoutInnerFQDNAdmin) => {
     return request({
       headers: {
         ...getHeaders(),
@@ -81,34 +53,7 @@ const FQDNService = () => {
   })
   }
 
-  const updateFQDN = (params: IUpdateFQDNParams) => {
-    return request({
-      headers: {
-        ...getHeaders(),
-        'Content-Type': 'multipart/form-data', // if POST is form-data
-        "Accept": "application/json",
-        Authorization: `Bearer ${accessToken}`
-      },
-      url: `/fqdns/${params.fqdnID}`,
-      method: 'POST',
-      data: params.data, // if body is JSON
-    })
-  }
-
-  const deleteFQDN = (params: IDeleteFQDNParams) => {
-    return request({
-      headers: {
-        ...getHeaders(),
-        'Content-Type': 'multipart/form-data', // if POST is form-data
-        "Accept": "application/json",
-        Authorization: `Bearer ${accessToken}`
-      },
-      url: `/fqdns/${params.fqdnID}`,
-      method: 'DELETE',
-    })
-  }
-
-  return { addFQDN, getFQDNList, getSuperAgentFQDNList, deleteFQDN, updateFQDN }
+  return { addFQDN, getSuperAgentFQDNList }
 }
 
 export default FQDNService

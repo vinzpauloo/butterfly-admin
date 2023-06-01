@@ -6,7 +6,6 @@ import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
-import { CardHeader } from '@mui/material'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -40,7 +39,8 @@ const UserTableToolbar = (props: Props) => {
   return (
     <Box
       sx={{
-        padding: 5
+        pt: 5,
+        pb: 5
       }}
     >
       <Box
@@ -185,9 +185,16 @@ const UserTableToolbar = (props: Props) => {
                 md: 'auto',
                 lg: 150
               },
-              float: 'right'
+              float: 'right',
+              backgroundColor: '#FF9C00',
+              '&:hover': {
+                backgroundColor: '#FF7c02'
+              }
             }}
-            onClick={() => props.toggle(props.role)}
+            onClick={() => {
+              console.log('Button clicked with role: ', props.role)
+              props.toggle(props.role)
+            }}
             variant='contained'
           >
             {TranslateString('Add') + ' ' + TranslateString('User')}
@@ -196,7 +203,7 @@ const UserTableToolbar = (props: Props) => {
       </Box>
 
       {/* Export Button is commented for now, might be used in the future */}
-      {/* <Box
+      <Box
         sx={{
           mt: 5,
           borderTop: '1px solid #d3d3d3'
@@ -217,7 +224,7 @@ const UserTableToolbar = (props: Props) => {
             role_id={props.role_id}
           />
         </Box>
-      </Box> */}
+      </Box>
     </Box>
   )
 }

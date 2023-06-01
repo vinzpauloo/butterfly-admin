@@ -39,7 +39,7 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)<ScrollBarProps & { re
 
 const ChatLog = (props: ChatLogType) => {
   // ** Props
-  const { hidden, userProfile, chat, isLoading, isRefetching } = props
+  const { hidden, userProfile, chat, isLoading, isRefetching, isRefetchingAllChats } = props
 
   // ** Hooks
   const auth = useAuth()
@@ -102,7 +102,7 @@ const ChatLog = (props: ChatLogType) => {
       scrollToBottom()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chat, isRefetching])
+  }, [chat, isRefetching, isRefetchingAllChats])
 
   // ** Renders user chat
   const renderChats = () => {

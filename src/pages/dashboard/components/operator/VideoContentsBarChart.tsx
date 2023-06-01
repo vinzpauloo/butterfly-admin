@@ -296,17 +296,16 @@ const VideoContentsBarChart = (props: VerticalBarProps) => {
             ? `${monthlyTitle}`
             : `${yearlyTitle}`
         }
-        action={
-          <ToggleButtonGroup exclusive value={active} onChange={handleActive} sx={styles.toggle}>
-            <ToggleButton value='daily'>Daily</ToggleButton>
-            <ToggleButton value='weekly'>Weekly</ToggleButton>
-            <ToggleButton value='monthly'>Monthly</ToggleButton>
-            <ToggleButton value='yearly'>Yearly</ToggleButton>
-          </ToggleButtonGroup>
-        }
+        sx={{ padding: 0, margin: 0, mx: 4, my: 2 }}
       />
+      <ToggleButtonGroup exclusive value={active} onChange={handleActive} sx={styles.toggle}>
+        <ToggleButton value='daily'>Daily</ToggleButton>
+        <ToggleButton value='weekly'>Weekly</ToggleButton>
+        <ToggleButton value='monthly'>Monthly</ToggleButton>
+        <ToggleButton value='yearly'>Yearly</ToggleButton>
+      </ToggleButtonGroup>
       <CardContent>
-        <Bar data={data} height={400} options={options} />
+        <Bar data={data} height={258} options={options} />
       </CardContent>
     </Card>
   )
@@ -321,7 +320,7 @@ const styles = {
       md: 'row',
       lg: 'row'
     },
-    marginLeft: 10
+    mx: 4
   }
 }
 
